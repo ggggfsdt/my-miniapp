@@ -253,11 +253,13 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
+        /* ===== HOME HEADER - now matches card style ===== */
         .home-header {
-            background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(0,0,0,0.2));
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
             border-radius: 24px;
             padding: 20px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
@@ -473,7 +475,7 @@
             font-size: 14px;
         }
 
-        /* ===== GRID ===== */
+        /* ===== GRID (Crash Page) ===== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -483,6 +485,28 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             margin: 10px 0 10px 0;
         }
+
+        #curveCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
         .grid-squares {
             position: absolute;
             inset: 0;
@@ -667,7 +691,7 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
-        /* ===== BET / CASH OUT ===== */
+        /* ===== BET / CASH OUT (Crash) ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -729,7 +753,6 @@
             cursor: not-allowed;
         }
 
-        /* ---- Player List ---- */
         .players-list {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
@@ -828,13 +851,12 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        /* ---- Main Button ---- */
         .main-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0px;
+            gap: 2px;
             padding: 16px 16px 14px 16px;
             border: none;
             border-radius: 16px;
@@ -863,7 +885,7 @@
             font-weight: 700;
             line-height: 1.3;
             text-align: center;
-            margin-top: 10px; /* increased to push text lower */
+            margin-top: 14px;
         }
         #mainActionSub {
             font-size: 13px;
@@ -872,7 +894,7 @@
             min-height: 18px;
             line-height: 1.2;
             text-align: center;
-            margin-top: -6px;
+            margin-top: 8px;
         }
 
         .main-action-btn.place-bet {
@@ -908,143 +930,344 @@
             opacity: 0.6;
         }
 
+        /* ============================================================
+           MINES PAGE - PREMIUM (3D, diamond, dark, vibrations)
+           ============================================================ */
+        .mines-header {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mines-header .multiplier {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00d2a0;
+            letter-spacing: -0.5px;
+        }
+        .mines-header .multiplier .x {
+            font-size: 16px;
+            font-weight: 400;
+            opacity: 0.5;
+            margin-left: 2px;
+        }
+
+        /* Grid presets only (no +/- controls for grid/bet) */
+        .grid-presets {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .grid-presets button {
+            padding: 3px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #888;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .grid-presets button:active {
+            transform: scale(0.92);
+        }
+        .grid-presets button.active {
+            background: rgba(108, 92, 231, 0.15);
+            border-color: rgba(108, 92, 231, 0.2);
+            color: #fff;
+        }
+
+        .mines-grid-wrapper {
+            position: relative;
+            margin: 8px 0 12px 0;
+        }
+
+        /* ===== MINES GRID - 3D TILES (stronger shadow, more rounded) ===== */
         .mines-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin: 12px 0;
+            gap: 8px;
+            justify-content: center;
+            margin: 0 auto;
         }
-        .mines-tile {
-            aspect-ratio: 1/1;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        .mines-grid .tile-wrapper {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border-radius: 24px;
+            cursor: pointer;
+            perspective: 800px;
+        }
+        /* Stronger 3D shadow */
+        .mines-grid .tile-wrapper .shadow {
+            position: absolute;
+            inset: 5px 0 0 5px;
+            border-radius: 24px;
+            background: #060608;
+            opacity: 0.6;
+            z-index: 0;
+            transition: all 0.3s;
+        }
+        .mines-grid .tile-wrapper .tile {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            background: #141418;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            position: relative;
+            font-size: 28px;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #fff;
+            opacity: 0;
+            transform: scale(0.7) rotateX(20deg) translateY(10px);
+            pointer-events: none;
+            font-weight: 700;
+            user-select: none;
         }
-        .mines-tile:active {
-            transform: scale(0.90);
+        .mines-grid .tile-wrapper .tile.show {
+            opacity: 1;
+            transform: scale(1) rotateX(0deg) translateY(0);
+            pointer-events: auto;
         }
-        .mines-tile.revealed {
-            transform: scale(0.96);
+        .mines-grid .tile-wrapper:active .tile {
+            transform: scale(0.94);
+        }
+        .mines-grid .tile-wrapper .tile .symbol {
+            font-size: 28px;
+            line-height: 1;
+            opacity: 0;
+            transform: scale(0.3) rotate(-30deg);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 900;
+        }
+        .mines-grid .tile-wrapper .tile.revealed .symbol {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* Revealed states */
+        .mines-grid .tile-wrapper .tile.revealed {
+            transform: scale(0.97);
             border-color: transparent;
         }
-        .mines-tile.revealed.safe {
-            background: rgba(0, 210, 160, 0.12);
+        .mines-grid .tile-wrapper .tile.revealed.safe {
+            background: #0d2018;
+            border-color: rgba(0, 210, 160, 0.12);
+            box-shadow: 0 0 30px rgba(0, 210, 160, 0.06);
+        }
+        .mines-grid .tile-wrapper .tile.revealed.safe .symbol {
+            color: #00d2a0;
+        }
+        .mines-grid .tile-wrapper .tile.revealed.mine {
+            background: #201010;
+            border-color: rgba(255, 80, 80, 0.12);
+            box-shadow: 0 0 30px rgba(255, 80, 80, 0.06);
+        }
+        .mines-grid .tile-wrapper .tile.revealed.mine .symbol {
+            color: #ff6b6b;
+        }
+
+        /* ===== Mines Message ===== */
+        .mines-message {
+            text-align: center;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 10px;
+            color: #888;
+        }
+        .mines-message.success {
+            color: #00d2a0;
+            border-color: rgba(0, 210, 160, 0.1);
+        }
+        .mines-message.danger {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.1);
+        }
+        .mines-message.gold {
+            color: #ffd700;
+            border-color: rgba(255, 215, 0, 0.1);
+        }
+
+        /* ===== Mines Bet Container ===== */
+        .mines-bet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .mines-bet-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 4px;
+            margin: 0;
+        }
+        .mines-bet-input-row.open {
+            max-height: 60px;
+            opacity: 1;
+            padding: 4px;
+            margin: 0;
+        }
+        .mines-bet-input-row input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 0;
+        }
+        .mines-bet-input-row input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .mines-bet-input-row .mines-bet-confirm-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .mines-bet-input-row .mines-bet-confirm-btn:active {
+            transform: scale(0.92);
+        }
+
+        .mines-main-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 16px 16px 14px 16px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: white;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            min-height: 62px;
+        }
+        .mines-main-action-btn:active {
+            transform: scale(0.94);
+        }
+        .mines-main-action-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        .mines-main-action-btn .sub-text {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            min-height: 18px;
+            line-height: 1.2;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .mines-main-action-btn.place-bet {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+        }
+        .mines-main-action-btn.cash-out {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .mines-main-action-btn.waiting {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+        .mines-main-action-btn.confirm-bet {
+            background: linear-gradient(135deg, #f9ca24, #f0932b);
+            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+
+        .mines-history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .mines-history .h-item {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #888;
+        }
+        .mines-history .h-item.win {
+            color: #00d2a0;
             border-color: rgba(0, 210, 160, 0.15);
         }
-        .mines-tile.revealed.mine {
-            background: rgba(255, 107, 107, 0.12);
+        .mines-history .h-item.loss {
+            color: #ff6b6b;
             border-color: rgba(255, 107, 107, 0.15);
-        }
-        .mines-multiplier-box {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 16px;
-            padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         @media (max-width: 420px) {
-            .grid-container {
-                height: 220px;
-            }
-            .gif-overlay {
-                width: 75%;
-                height: 75%;
-                top: 45%;
-            }
-            .history-current {
-                font-size: 15px;
-                min-width: 40px;
-            }
-            .history-item {
-                font-size: 9px;
-                padding: 1px 4px;
-            }
-            .history-bar {
-                bottom: 8px;
-                padding: 3px 8px;
-                gap: 3px;
-            }
-            .countdown-number {
-                font-size: 72px;
-            }
-            #mainActionText {
-                font-size: 16px;
-                margin-top: 8px;
-            }
-            #mainActionSub {
-                font-size: 12px;
-                margin-top: -4px;
-            }
-            .main-action-btn {
-                padding: 14px 14px 12px 14px;
-                min-height: 54px;
-            }
-            #notification {
-                margin: 6px 12px 0 12px;
-                padding: 8px 14px;
-            }
-            #notification .notif-text {
-                font-size: 13px;
-            }
-            #notification .notif-amount {
-                font-size: 14px;
-            }
-            .home-header {
-                padding: 16px 14px;
-                flex-wrap: wrap;
-            }
-            .home-avatar {
-                width: 44px;
-                height: 44px;
-            }
-            .home-user .username {
-                font-size: 17px;
-            }
-            .home-balance-wrap .amount {
+            .mines-grid .tile-wrapper .tile .symbol {
                 font-size: 22px;
             }
-            .quick-card {
-                padding: 16px 10px;
-            }
-            .quick-card .icon {
-                font-size: 26px;
-            }
-            .quick-card .label {
-                font-size: 13px;
-            }
-            .profile-avatar {
-                width: 64px;
-                height: 64px;
-            }
-            .profile-name {
-                font-size: 18px;
-            }
-            .profile-stat .value {
-                font-size: 18px;
-            }
-            .profile-stats {
+            .mines-grid {
                 gap: 6px;
             }
-            .player-item .info .name {
-                font-size: 12px;
+            .mines-header .multiplier {
+                font-size: 20px;
             }
-            .player-item .info .bet-amount {
-                font-size: 10px;
+            .grid-presets button {
+                font-size: 9px;
+                padding: 2px 7px;
             }
-            .player-item .avatar {
-                width: 24px;
-                height: 24px;
+            .mines-grid .tile-wrapper {
+                border-radius: 18px;
             }
-            .players-list {
-                max-height: 80px;
+            .mines-grid .tile-wrapper .tile {
+                border-radius: 18px;
+            }
+            .mines-grid .tile-wrapper .shadow {
+                border-radius: 18px;
+                inset: 4px 0 0 4px;
             }
         }
     </style>
@@ -1102,6 +1325,8 @@
             </div>
 
             <div class="grid-container" id="gridContainer">
+                <canvas id="curveCanvas"></canvas>
+                <canvas id="particleCanvas"></canvas>
                 <div class="grid-squares" id="gridSquares"></div>
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
@@ -1128,36 +1353,53 @@
                     <span id="mainActionSub"></span>
                 </button>
 
-                <!-- PLAYER LIST (only real players) -->
                 <div class="players-list" id="playersList">
                     <div class="empty">No bets placed yet</div>
                 </div>
             </div>
         </div>
 
-        <!-- MINES PAGE -->
+        <!-- ===== MINES PAGE ===== -->
         <div id="page-mines" class="page">
-            <div class="flex-between mb-8">
-                <span class="badge badge-gold"><i class="fas fa-gem" style="margin-right:6px;"></i>Mines</span>
+            <!-- Header -->
+            <div class="mines-header">
+                <span><i class="fas fa-gem" style="color:#ffd700; margin-right:6px;"></i>Mines</span>
+                <span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span>
                 <span class="badge" id="minesBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
             </div>
-            <div class="mines-multiplier-box flex-between">
-                <span style="color:#666; font-size:14px; font-weight:600;">Multiplier</span>
-                <span id="minesMultiplier" style="font-size:28px; font-weight:900; color:#00d2a0;">1.00x</span>
+
+            <!-- Grid presets only (no +/- controls) -->
+            <div class="grid-presets" id="gridPresets">
+                <button data-size="3" data-mines="1">3×3</button>
+                <button data-size="4" data-mines="2">4×4</button>
+                <button data-size="5" data-mines="3" class="active">5×5</button>
+                <button data-size="6" data-mines="5">6×6</button>
+                <button data-size="7" data-mines="7">7×7</button>
+                <button data-size="8" data-mines="10">8×8</button>
             </div>
-            <div class="mines-grid" id="minesGrid"></div>
-            <div class="flex gap-8" style="margin: 8px 0;">
-                <div class="flex" style="background:rgba(255,255,255,0.03); border-radius:16px; padding:4px; border:1px solid rgba(255,255,255,0.04);">
-                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusMines"><i class="fas fa-minus"></i></button>
-                    <input type="number" id="betInputMines" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
-                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusMines"><i class="fas fa-plus"></i></button>
+
+            <!-- Grid -->
+            <div class="mines-grid-wrapper">
+                <div class="mines-grid" id="minesGrid"></div>
+            </div>
+
+            <!-- Message -->
+            <div class="mines-message" id="minesMessage">Press "Start" to play</div>
+
+            <!-- Unified Bet/Cash Out Button -->
+            <div class="mines-bet-container">
+                <div class="mines-bet-input-row" id="minesBetInputRow">
+                    <input type="number" id="minesBetInput" value="10" min="1" step="1" placeholder="Bet amount">
+                    <button class="mines-bet-confirm-btn" onclick="minesGame.confirmBet()">Confirm</button>
                 </div>
-                <button class="btn btn-primary" id="minesStartBtn">Start</button>
-                <button class="btn btn-success" id="minesCashoutBtn" disabled>Cash Out</button>
+                <button class="mines-main-action-btn place-bet" id="minesMainActionBtn" onclick="minesGame.mainAction()">
+                    <span id="minesMainActionText">Place Bet</span>
+                    <span class="sub-text" id="minesMainActionSub"></span>
+                </button>
             </div>
-            <div id="minesMessage" class="card" style="padding: 14px; text-align:center; min-height:50px; display:flex; align-items:center; justify-content:center; font-weight:500;">
-                Press "Start" to play
-            </div>
+
+            <!-- History -->
+            <div class="mines-history" id="minesHistory"></div>
         </div>
 
         <!-- PROFILE PAGE -->
@@ -1244,7 +1486,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - REAL PLAYERS ONLY (no bots)
+        // CRASH GAME (unchanged)
         // ============================================================
 
         const state = {
@@ -1286,7 +1528,6 @@
         };
         const navItems = document.querySelectorAll('.nav-item');
 
-        // ----- Player List (only real players) -----
         let players = [];
 
         function renderPlayers() {
@@ -1295,7 +1536,6 @@
                 playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>';
                 return;
             }
-
             let html = '';
             for (const p of activePlayers) {
                 const isYou = p.isYou || false;
@@ -1303,22 +1543,13 @@
                 const betAmount = p.bet || 0;
                 let statusClass = 'waiting';
                 let statusText = 'Betting';
-
-                if (p.hasCashedOut) {
-                    statusClass = 'cashed';
-                    statusText = 'Cashed Out';
-                } else if (p.crashed) {
-                    statusClass = 'crashed';
-                    statusText = 'Crashed';
-                } else if (crashGame.isPlaying) {
-                    statusClass = 'waiting';
-                    statusText = 'Flying';
-                }
-
+                if (p.hasCashedOut) { statusClass = 'cashed';
+                    statusText = 'Cashed Out'; } else if (p.crashed) { statusClass = 'crashed';
+                    statusText = 'Crashed'; } else if (crashGame.isPlaying) { statusClass = 'waiting';
+                    statusText = 'Flying'; }
                 const avatarContent = isYou ?
                     `<img src="${state.avatarUrl}" alt="${name}">` :
                     `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
-
                 html += `
                     <div class="player-item">
                         <div class="avatar">${avatarContent}</div>
@@ -1333,7 +1564,6 @@
             playersListEl.innerHTML = html;
         }
 
-        // ----- NAVIGATION -----
         function navigateTo(page) {
             Object.keys(pages).forEach(key => {
                 pages[key].classList.toggle('active', key === page);
@@ -1343,7 +1573,12 @@
             });
             if (page === 'rocket') {
                 crashGame.startGameCycle();
+                crashGame.startCurveAnimation();
+                crashGame.startParticles();
                 renderPlayers();
+            } else {
+                crashGame.stopCurveAnimation();
+                crashGame.stopParticles();
             }
             if (page === 'profile') {
                 updateProfile();
@@ -1354,7 +1589,6 @@
             item.addEventListener('click', () => navigateTo(item.dataset.page));
         });
 
-        // ----- Telegram User -----
         function getTelegramUser() {
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
@@ -1411,12 +1645,8 @@
             }
         }
 
-        // ============================================================
-        // VIBRATION HELPERS (only inside crash tab)
-        // ============================================================
+        // ---- Vibration ----
         function triggerVibration(duration = 30, type = 'light') {
-            const rocketPage = document.getElementById('page-rocket');
-            if (!rocketPage || !rocketPage.classList.contains('active')) return;
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -1444,9 +1674,6 @@
             } catch (e) {}
         }
 
-        // ============================================================
-        // NOTIFICATION
-        // ============================================================
         function showNotification(amount) {
             const notif = document.getElementById('notification');
             notifAmount.textContent = `+${amount} ⭐`;
@@ -1456,15 +1683,187 @@
             clearTimeout(notif._timeout);
             notif._timeout = setTimeout(() => {
                 notif.style.transform = 'translateY(-120%)';
-                setTimeout(() => {
-                    notif.style.display = 'none';
-                }, 400);
+                setTimeout(() => { notif.style.display = 'none'; }, 400);
             }, 1000);
         }
 
-        // ============================================================
-        // CRASH GAME
-        // ============================================================
+        // ---- Curve ----
+        const curve = {
+            canvas: null,
+            ctx: null,
+            animId: null,
+            init() {
+                this.canvas = document.getElementById('curveCanvas');
+                if (!this.canvas) return;
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            },
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width * 2;
+                this.canvas.height = rect.height * 2;
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+                this.ctx.scale(2, 2);
+            },
+            draw(time) {
+                const ctx = this.ctx;
+                const w = this.canvas.width / 2;
+                const h = this.canvas.height / 2;
+                ctx.clearRect(0, 0, w, h);
+                const numPoints = 80;
+                const amplitude = 14 + 6 * Math.sin(time * 0.3);
+                const frequency = 1.0 + 0.3 * Math.sin(time * 0.2);
+                const phase = time * 0.4;
+                const exponent = 1.8;
+                ctx.beginPath();
+                for (let i = 0; i <= numPoints; i++) {
+                    const t = i / numPoints;
+                    const x = t * w;
+                    const baseY = h * (1 - Math.pow(t, exponent));
+                    const wiggle = amplitude * Math.sin(frequency * t * Math.PI * 2 + phase);
+                    const y = Math.max(0, Math.min(h, baseY + wiggle));
+                    if (i === 0) ctx.moveTo(x, y);
+                    else {
+                        const prevT = (i - 1) / numPoints;
+                        const prevX = prevT * w;
+                        const prevBaseY = h * (1 - Math.pow(prevT, exponent));
+                        const prevWiggle = amplitude * Math.sin(frequency * prevT * Math.PI * 2 + phase);
+                        const prevY = Math.max(0, Math.min(h, prevBaseY + prevWiggle));
+                        const cpx = (prevX + x) / 2;
+                        const cpy = (prevY + y) / 2 - 4;
+                        ctx.quadraticCurveTo(cpx, cpy, x, y);
+                    }
+                }
+                ctx.shadowColor = '#00ff88';
+                ctx.shadowBlur = 25;
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                ctx.shadowColor = '#6c5ce7';
+                ctx.shadowBlur = 45;
+                ctx.strokeStyle = 'rgba(108, 92, 231, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = '#ccffdd';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                for (let i = 0; i <= numPoints; i += 4) {
+                    const t = i / numPoints;
+                    const x = t * w;
+                    const baseY = h * (1 - Math.pow(t, exponent));
+                    const wiggle = amplitude * Math.sin(frequency * t * Math.PI * 2 + phase);
+                    const y = Math.max(0, Math.min(h, baseY + wiggle));
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#00ff88';
+                    ctx.shadowColor = '#00ff88';
+                    ctx.shadowBlur = 20;
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+            },
+            animate(timestamp) {
+                if (!this.canvas) return;
+                const time = timestamp / 1000;
+                this.draw(time);
+                particleSystem.update();
+                particleSystem.draw();
+                this.animId = requestAnimationFrame((ts) => this.animate(ts));
+            },
+            start() { if (this.animId) return;
+                this.animate(performance.now()); },
+            stop() {
+                if (this.animId) { cancelAnimationFrame(this.animId);
+                    this.animId = null; }
+                if (this.ctx) { const w = this.canvas.width / 2,
+                        h = this.canvas.height / 2;
+                    this.ctx.clearRect(0, 0, w, h); }
+            }
+        };
+
+        // ---- Particles ----
+        const particleSystem = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            count: 80,
+            init() {
+                this.canvas = document.getElementById('particleCanvas');
+                if (!this.canvas) return;
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.createParticles();
+            },
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width * 2;
+                this.canvas.height = rect.height * 2;
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+                this.ctx.scale(2, 2);
+            },
+            createParticles() {
+                const w = this.canvas.width / 2,
+                    h = this.canvas.height / 2;
+                this.particles = [];
+                for (let i = 0; i < this.count; i++) {
+                    this.particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.2,
+                        vy: (Math.random() - 0.5) * 0.2, size: 1.5 + Math.random() * 3, opacity: 0.3 + Math
+                            .random() * 0.6 });
+                }
+            },
+            update() {
+                const w = this.canvas.width / 2,
+                    h = this.canvas.height / 2;
+                const isPlaying = crashGame.isPlaying;
+                const isCountingDown = crashGame.isCountingDown;
+                const multiplier = crashGame.multiplier;
+                let speedFactor = 0.2;
+                if (isCountingDown) speedFactor = 0.5;
+                else if (isPlaying) speedFactor = 0.5 + multiplier * 0.8;
+                for (const p of this.particles) {
+                    p.vx += (Math.random() - 0.5) * 0.02;
+                    p.vy += (Math.random() - 0.5) * 0.02;
+                    if (isPlaying) { p.vy += 0.3 * speedFactor * 0.05; }
+                    const maxSpeed = isPlaying ? 15 : 0.8;
+                    const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                    if (sp > maxSpeed) { p.vx = (p.vx / sp) * maxSpeed;
+                        p.vy = (p.vy / sp) * maxSpeed; }
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = w;
+                    if (p.x > w) p.x = 0;
+                    if (p.y < 0) p.y = h;
+                    if (p.y > h) p.y = 0;
+                }
+            },
+            draw() {
+                const ctx = this.ctx,
+                    w = this.canvas.width / 2,
+                    h = this.canvas.height / 2;
+                ctx.clearRect(0, 0, w, h);
+                for (const p of this.particles) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                    ctx.fill();
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.2)';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+            },
+            start() {},
+            stop() { if (this.ctx) { const w = this.canvas.width / 2,
+                        h = this.canvas.height / 2;
+                    this.ctx.clearRect(0, 0, w, h); } }
+        };
+
+        // ---- Crash Game ----
         const crashGame = {
             multiplier: 1.00,
             crashPoint: 1.00,
@@ -1481,61 +1880,50 @@
             vibrationInterval: null,
             roundId: 0,
 
-            // ---- Game Cycle ----
             startGameCycle() {
-                if (!this.isPlaying && !this.isCountingDown && !this.gameOver) {
-                    this.startCountdown();
-                }
-                if (this.isPlaying) {
-                    this.startContinuousVibration();
-                }
+                if (!this.isPlaying && !this.isCountingDown && !this.gameOver) { this.startCountdown(); }
+                if (this.isPlaying) { this.startContinuousVibration(); }
             },
-
             startContinuousVibration() {
                 if (this.vibrationInterval) return;
-                this.vibrationInterval = setInterval(() => {
-                    if (this.isPlaying) {
-                        triggerContinuousVibration();
-                    }
-                }, 150);
+                this.vibrationInterval = setInterval(() => { if (this.isPlaying) { triggerContinuousVibration(); } }, 150);
             },
-
             stopContinuousVibration() {
-                if (this.vibrationInterval) {
-                    clearInterval(this.vibrationInterval);
-                    this.vibrationInterval = null;
-                }
+                if (this.vibrationInterval) { clearInterval(this.vibrationInterval);
+                    this.vibrationInterval = null; }
             },
+            startCurveAnimation() { curve.start(); },
+            stopCurveAnimation() { curve.stop(); },
+            startParticles() { particleSystem.start(); },
+            stopParticles() { particleSystem.stop(); },
 
-            // ---- INIT ----
             init() {
                 this.createGrid();
                 this.updateUI();
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
-                // Initialize empty player list (no bots)
+                curve.init();
+                particleSystem.init();
                 players = [];
                 renderPlayers();
             },
 
             createGrid() {
                 const container = document.getElementById('gridSquares');
-                const rows = 6;
-                const cols = 8;
+                const rows = 6,
+                    cols = 8;
                 container.innerHTML = '';
                 for (let i = 0; i < rows * cols; i++) {
                     const square = document.createElement('div');
                     square.className = 'grid-square';
-                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) {
-                        square.classList.add('corner');
-                    }
+                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) { square.classList
+                            .add('corner'); }
                     container.appendChild(square);
                 }
             },
 
             setupMainButton() {},
-
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
@@ -1545,26 +1933,18 @@
                 if (m >= 4.0) color = '#a29bfe';
                 currentEl.innerHTML = `${m.toFixed(2)}<span class="x">x</span>`;
                 currentEl.style.color = color;
-
                 document.getElementById('rocketBalance').innerHTML =
                     `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
-
-                if (this.isPlaying) {
-                    this.updateMainButton();
-                }
-                // Update player list statuses (only real players – none, since only you)
+                if (this.isPlaying) { this.updateMainButton(); }
                 renderPlayers();
             },
-
             updateMainButton() {
                 const btn = document.getElementById('mainActionBtn');
                 const mainText = document.getElementById('mainActionText');
                 const subText = document.getElementById('mainActionSub');
                 const confirmBtn = document.getElementById('betConfirmBtn');
                 const inputRow = document.getElementById('betInputRow');
-
                 subText.textContent = '';
-
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
                         mainText.textContent = 'Cash Out';
@@ -1618,31 +1998,19 @@
                     confirmBtn.disabled = true;
                 }
             },
-
-            // ---- Main Action ----
             mainAction() {
                 if (this.isPlaying) {
-                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut) {
-                        this.initiateCashOut();
-                    }
+                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut) { this.initiateCashOut(); }
                     return;
                 }
-
                 if (this.isCountingDown) {
                     const row = document.getElementById('betInputRow');
                     const isOpen = row.classList.contains('open');
-                    if (isOpen) {
-                        this.confirmBet();
-                    } else {
-                        if (this.bet === 0) {
-                            row.classList.add('open');
+                    if (isOpen) { this.confirmBet(); } else { if (this.bet === 0) { row.classList.add('open');
                             document.getElementById('betInputRocket').focus();
-                            this.updateMainButton();
-                        }
-                    }
+                            this.updateMainButton(); } }
                     return;
                 }
-
                 if (this.gameOver) {
                     this.gameOver = false;
                     this.hasCashedOut = false;
@@ -1652,7 +2020,6 @@
                     this.startCountdown();
                     return;
                 }
-
                 if (this.bet === 0) {
                     const row = document.getElementById('betInputRow');
                     row.classList.add('open');
@@ -1660,49 +2027,27 @@
                     this.updateMainButton();
                 }
             },
-
             confirmBet() {
                 const input = document.getElementById('betInputRocket');
                 let bet = parseInt(input.value) || 0;
-                if (bet < 1) {
-                    triggerVibration(60, 'heavy');
-                    return;
-                }
-                if (bet > state.balance) {
-                    triggerVibration(60, 'heavy');
-                    return;
-                }
+                if (bet < 1) { triggerVibration(60, 'heavy'); return; }
+                if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
                 this.bet = bet;
                 document.getElementById('betInputRow').classList.remove('open');
-                // Add/update user in players list
                 const existing = players.find(p => p.isYou);
-                if (existing) {
-                    existing.bet = bet;
+                if (existing) { existing.bet = bet;
                     existing.active = true;
                     existing.hasCashedOut = false;
-                    existing.crashed = false;
-                } else {
-                    players.push({
-                        name: state.displayName,
-                        color: '#ffd700',
-                        bet: bet,
-                        hasCashedOut: false,
-                        crashed: false,
-                        active: true,
-                        isYou: true,
-                    });
-                }
+                    existing.crashed = false; } else { players.push({ name: state.displayName, color: '#ffd700',
+                        bet: bet, hasCashedOut: false, crashed: false, active: true, isYou: true }); }
                 renderPlayers();
                 this.updateMainButton();
             },
-
-            // ---- Cash Out with delay ----
             initiateCashOut() {
                 if (this.isCashingOut) return;
                 this.isCashingOut = true;
                 const btn = document.getElementById('mainActionBtn');
                 btn.disabled = true;
-
                 setTimeout(() => {
                     if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
                         triggerVibration(30, 'light');
@@ -1711,10 +2056,8 @@
                     this.isCashingOut = false;
                 }, 150);
             },
-
             executeCashOut() {
                 if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
-
                 this.hasCashedOut = true;
                 const win = Math.floor(this.bet * this.multiplier);
                 state.balance += win;
@@ -1723,75 +2066,40 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-
                 const user = players.find(p => p.isYou);
-                if (user) {
-                    user.hasCashedOut = true;
-                    user.active = false;
-                }
+                if (user) { user.hasCashedOut = true;
+                    user.active = false; }
                 renderPlayers();
-
                 showNotification(win);
-
                 this.updateUI();
                 this.updateMainButton();
                 updateHomeUI();
             },
-
-            // ---- Countdown ----
             startCountdown() {
                 if (this.isCountingDown) return;
                 if (this.isPlaying) return;
-
                 this.isCountingDown = true;
                 this.gameOver = false;
                 this.hasCashedOut = false;
                 this.roundId++;
-
-                // Remove any previous players except the user (if they had a bet)
                 players = players.filter(p => p.isYou);
-                // If user had a bet, keep them; otherwise clear
-                if (this.bet > 0) {
-                    const user = players.find(p => p.isYou);
-                    if (user) {
-                        user.active = true;
-                        user.hasCashedOut = false;
-                        user.crashed = false;
-                    } else {
-                        // Shouldn't happen, but add user
-                        players.push({
-                            name: state.displayName,
-                            color: '#ffd700',
-                            bet: this.bet,
-                            hasCashedOut: false,
-                            crashed: false,
-                            active: true,
-                            isYou: true,
-                        });
-                    }
-                } else {
-                    players = [];
-                }
+                if (players.length > 0) { const user = players[0];
+                    user.active = true;
+                    user.hasCashedOut = false;
+                    user.crashed = false; }
                 renderPlayers();
-
                 const overlay = document.getElementById('countdownOverlay');
                 const numberEl = document.getElementById('countdownNumber');
                 overlay.classList.add('active');
-
                 let count = 3;
-
                 const showNumber = (num) => {
                     numberEl.textContent = num;
                     numberEl.style.animation = 'none';
                     void numberEl.offsetHeight;
                     numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
-                    if (num === 2 || num === 1) {
-                        triggerVibration(35, 'light');
-                    }
+                    if (num === 2 || num === 1) { triggerVibration(35, 'light'); }
                 };
-
                 showNumber(3);
-
                 this.countdownId = setInterval(() => {
                     count--;
                     if (count <= 0) {
@@ -1805,122 +2113,82 @@
                     showNumber(count);
                 }, 1000);
             },
-
-            // ---- Round ----
             startRound() {
-                if (this.bet > 0 && this.bet <= state.balance) {
-                    state.balance -= this.bet;
-                } else {
-                    this.bet = 0;
-                    // If no bet, remove user from players
-                    const user = players.find(p => p.isYou);
-                    if (user) user.active = false;
-                    renderPlayers();
-                }
-
+                if (this.bet > 0 && this.bet <= state.balance) { state.balance -= this.bet; } else { this.bet = 0;
+                    const user = players.find(p => p.isYou); if (user) user.active = false;
+                    renderPlayers(); }
                 this.hasCashedOut = false;
                 this.multiplier = 1.00;
                 this.crashPoint = this.generateCrashPoint();
                 this.isPlaying = true;
                 this.gameOver = false;
                 this.lastTime = 0;
-
                 document.getElementById('explosionOverlay').classList.remove('active');
-
                 const dogGif = document.getElementById('flyingDogGif');
                 dogGif.style.display = 'block';
                 dogGif.classList.add('active');
-
                 this.updateUI();
                 this.updateMainButton();
                 this.startContinuousVibration();
-
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
-
-            // ---- Game Loop ----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
                 this.lastTime = timestamp;
-
                 const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
-
                 const effectiveMult = Math.min(this.multiplier, 2.3);
                 const tilt = -(effectiveMult - 1) * 8;
                 const dogOverlay = document.getElementById('dogOverlay');
                 dogOverlay.style.transition = 'none';
                 dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
                 void dogOverlay.offsetHeight;
-
                 this.updateUI();
-
                 if (this.multiplier >= this.crashPoint) {
                     this.multiplier = parseFloat(this.crashPoint.toFixed(2));
                     this.isPlaying = false;
                     this.gameOver = true;
-
                     this.stopContinuousVibration();
                     triggerVibration(80, 'heavy');
-
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
                     dogGif.style.display = 'none';
-
                     const explosionOverlay = document.getElementById('explosionOverlay');
                     explosionOverlay.classList.add('active');
                     const explosionImg = document.getElementById('explosionGif');
                     explosionImg.style.animation = 'none';
                     void explosionImg.offsetHeight;
                     explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
-
-                    setTimeout(() => {
-                        explosionOverlay.classList.remove('active');
-                    }, 1200);
-
-                    // Mark user as crashed if they haven't cashed out
+                    setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
                     const user = players.find(p => p.isYou);
-                    if (user && user.active && !user.hasCashedOut) {
-                        user.crashed = true;
-                        user.active = false;
-                    }
+                    if (user && user.active && !user.hasCashedOut) { user.crashed = true;
+                        user.active = false; }
                     renderPlayers();
-
-                    if (this.bet > 0 && !this.hasCashedOut) {
-                        state.losses++;
-                        state.totalGames++;
-                    }
+                    if (this.bet > 0 && !this.hasCashedOut) { state.losses++;
+                        state.totalGames++; }
                     this.addHistory(this.multiplier);
                     this.updateUI();
                     this.updateMainButton();
                     updateHomeUI();
-
-                    if (this.animationId) {
-                        cancelAnimationFrame(this.animationId);
-                        this.animationId = null;
-                    }
-
+                    if (this.animationId) { cancelAnimationFrame(this.animationId);
+                        this.animationId = null; }
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
                             this.hasCashedOut = false;
                             document.getElementById('betInputRocket').value = 10;
                             this.gameOver = false;
-                            if (document.getElementById('page-rocket').classList.contains('active')) {
-                                this.startCountdown();
-                            }
+                            if (document.getElementById('page-rocket').classList.contains('active')) { this
+                                    .startCountdown(); }
                         }
                     }, 1500);
                     return;
                 }
-
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
-
-            // ---- Helpers ----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -1928,7 +2196,6 @@
                 if (r < 0.80) return 2.50 + Math.random() * 2.0;
                 return 4.50 + Math.random() * 6.55;
             },
-
             renderHistory() {
                 const container = document.getElementById('historyPast');
                 container.innerHTML = '';
@@ -1936,176 +2203,228 @@
                 for (const mult of items) {
                     const el = document.createElement('span');
                     el.className = 'history-item';
-                    if (mult >= 4.0) {
-                        el.classList.add('purple');
-                    } else if (mult >= 2.5) {
-                        el.classList.add('blue');
-                    } else if (mult >= 1.4) {
-                        el.classList.add('green');
-                    } else {
-                        el.classList.add('crashed');
-                    }
+                    if (mult >= 4.0) { el.classList.add('purple'); } else if (mult >= 2.5) { el.classList.add('blue'); }
+                    else if (mult >= 1.4) { el.classList.add('green'); } else { el.classList.add('crashed'); }
                     el.textContent = `${mult.toFixed(2)}x`;
                     container.appendChild(el);
                 }
             },
-
-            addHistory(mult) {
-                this.history.unshift(mult);
-                if (this.history.length > 12) this.history.pop();
-                this.renderHistory();
-            }
+            addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop();
+                this.renderHistory(); }
         };
 
         // ============================================================
-        // MINES GAME (unchanged)
+        // MINES GAME - PREMIUM (no +/- controls, fixed cash out reset)
         // ============================================================
+
         const minesGame = {
             gridSize: 5,
             minesCount: 3,
+            bet: 10,
             board: [],
             revealed: [],
             multiplier: 1.00,
             gameActive: false,
             gameOver: false,
-            bet: 10,
+            hasCashedOut: false,
             safeCount: 0,
             revealedSafe: 0,
+            history: [],
+            isCashingOut: false,
 
             init() {
-                this.setupControls();
-                this.renderGrid();
                 this.updateUI();
+                this.renderHistory();
+                this.updateMainButton();
+                this.generateGrid();
+                // Set initial values in presets
+                this.updatePresets();
             },
 
-            setupControls() {
-                const startBtn = document.getElementById('minesStartBtn');
-                const cashBtn = document.getElementById('minesCashoutBtn');
-                const betInput = document.getElementById('betInputMines');
-                const betMinus = document.getElementById('betMinusMines');
-                const betPlus = document.getElementById('betPlusMines');
-
-                startBtn.addEventListener('click', () => this.start());
-                cashBtn.addEventListener('click', () => this.cashOut());
-
-                betMinus.addEventListener('click', () => {
-                    let v = parseInt(betInput.value) || 10;
-                    v = Math.max(1, v - 5);
-                    betInput.value = v;
-                });
-                betPlus.addEventListener('click', () => {
-                    let v = parseInt(betInput.value) || 10;
-                    v = Math.min(1000, v + 5);
-                    betInput.value = v;
-                });
-                betInput.addEventListener('change', () => {
-                    let v = parseInt(betInput.value) || 10;
-                    if (v < 1) v = 1;
-                    if (v > 1000) v = 1000;
-                    betInput.value = v;
+            // ----- Settings (only presets, no +/-) -----
+            updatePresets() {
+                const btns = document.querySelectorAll('.grid-presets button');
+                btns.forEach(btn => {
+                    const size = parseInt(btn.dataset.size);
+                    const mines = parseInt(btn.dataset.mines);
+                    btn.classList.toggle('active', size === this.gridSize && mines === this.minesCount);
                 });
             },
 
-            renderGrid() {
+            // ----- Grid Generation -----
+            generateGrid() {
                 const grid = document.getElementById('minesGrid');
+                const total = this.gridSize * this.gridSize;
+                grid.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
                 grid.innerHTML = '';
-                const total = this.gridSize * this.gridSize;
-                for (let i = 0; i < total; i++) {
-                    const tile = document.createElement('div');
-                    tile.className = 'mines-tile';
-                    tile.dataset.index = i;
-                    tile.innerHTML = `<span class="emoji">❓</span>`;
-                    tile.addEventListener('click', () => this.clickTile(i));
-                    grid.appendChild(tile);
-                }
-                this.updateGrid();
-            },
 
-            updateGrid() {
-                const tiles = document.querySelectorAll('.mines-tile');
-                for (let i = 0; i < tiles.length; i++) {
-                    const tile = tiles[i];
-                    const emoji = tile.querySelector('.emoji');
-                    const isRevealed = this.revealed[i] || false;
-                    if (isRevealed) {
-                        tile.classList.add('revealed');
-                        if (this.board[i] === 1) {
-                            tile.classList.add('mine');
-                            emoji.textContent = '💣';
-                        } else {
-                            tile.classList.add('safe');
-                            emoji.textContent = '💎';
-                        }
-                    } else {
-                        tile.classList.remove('revealed', 'mine', 'safe');
-                        emoji.textContent = '❓';
-                    }
-                }
-            },
-
-            generateBoard() {
-                const total = this.gridSize * this.gridSize;
                 this.board = new Array(total).fill(0);
                 this.revealed = new Array(total).fill(false);
                 let placed = 0;
                 while (placed < this.minesCount) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) {
-                        this.board[idx] = 1;
-                        placed++;
-                    }
+                    if (this.board[idx] === 0) { this.board[idx] = 1;
+                        placed++; }
                 }
                 this.safeCount = total - this.minesCount;
                 this.revealedSafe = 0;
+                this.multiplier = 1.00;
+                this.gameActive = false;
+                this.gameOver = false;
+                this.hasCashedOut = false;
+
+                for (let i = 0; i < total; i++) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'tile-wrapper';
+                    wrapper.dataset.index = i;
+
+                    const shadow = document.createElement('div');
+                    shadow.className = 'shadow';
+                    wrapper.appendChild(shadow);
+
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.innerHTML = `<span class="symbol"></span>`;
+                    const delay = (i % this.gridSize) * 20 + Math.floor(i / this.gridSize) * 20;
+                    tile.style.transitionDelay = `${delay}ms`;
+                    tile.addEventListener('click', () => this.clickTile(i));
+                    wrapper.appendChild(tile);
+
+                    grid.appendChild(wrapper);
+                }
+
+                // Trigger pop-in animation
+                requestAnimationFrame(() => {
+                    const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
+                    wrappers.forEach((w, idx) => {
+                        const tile = w.querySelector('.tile');
+                        const delay = (idx % this.gridSize) * 25 + Math.floor(idx / this.gridSize) * 25;
+                        setTimeout(() => {
+                            tile.classList.add('show');
+                        }, delay + 50);
+                    });
+                });
+
+                this.updateUI();
+                this.updateMainButton();
             },
 
+            // ----- UI Updates -----
             updateUI() {
                 document.getElementById('minesBalance').innerHTML =
                     `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
                 document.getElementById('minesMultiplier').textContent = `${this.multiplier.toFixed(2)}x`;
+
                 const msg = document.getElementById('minesMessage');
                 if (this.gameActive && !this.gameOver) {
-                    msg.textContent = `Find gems! Multiplier ${this.multiplier.toFixed(2)}x`;
-                    msg.style.color = '#00d2a0';
+                    msg.textContent = `Find the gems! Multiplier ${this.multiplier.toFixed(2)}x`;
+                    msg.className = 'mines-message success';
                 } else if (this.gameOver && this.revealedSafe === this.safeCount) {
-                    msg.textContent = 'JACKPOT! All gems found!';
-                    msg.style.color = '#ffd700';
+                    msg.textContent = 'Jackpot! All gems found!';
+                    msg.className = 'mines-message gold';
                 } else if (this.gameOver) {
                     msg.textContent = 'Boom! You hit a mine.';
-                    msg.style.color = '#ff6b6b';
+                    msg.className = 'mines-message danger';
                 } else {
                     msg.textContent = 'Press "Start" to play';
-                    msg.style.color = '#555';
+                    msg.className = 'mines-message';
                 }
-                const startBtn = document.getElementById('minesStartBtn');
-                const cashBtn = document.getElementById('minesCashoutBtn');
-                startBtn.disabled = this.gameActive && !this.gameOver;
-                cashBtn.disabled = !this.gameActive || this.gameOver;
+                this.updateMainButton();
+                this.renderHistory();
             },
 
-            start() {
-                const betInput = document.getElementById('betInputMines');
-                let bet = parseInt(betInput.value) || 10;
-                if (bet < 1) bet = 1;
-                if (bet > state.balance) {
-                    document.getElementById('minesMessage').textContent = 'Not enough balance!';
-                    document.getElementById('minesMessage').style.color = '#ff6b6b';
+            updateMainButton() {
+                const btn = document.getElementById('minesMainActionBtn');
+                const mainText = document.getElementById('minesMainActionText');
+                const subText = document.getElementById('minesMainActionSub');
+                const inputRow = document.getElementById('minesBetInputRow');
+
+                subText.textContent = '';
+
+                // If game is active and not over, show Cash Out
+                if (this.gameActive && !this.gameOver) {
+                    if (this.hasCashedOut) {
+                        mainText.textContent = 'Cashed Out';
+                        btn.className = 'mines-main-action-btn cashed-out';
+                        btn.disabled = true;
+                    } else {
+                        mainText.textContent = 'Cash Out';
+                        subText.textContent = (this.bet * this.multiplier).toFixed(1);
+                        btn.className = 'mines-main-action-btn cash-out';
+                        btn.disabled = false;
+                    }
+                    inputRow.classList.remove('open');
+                } else if (this.gameOver) {
+                    // Game over – show "Start New Round"
+                    mainText.textContent = 'Start New Round';
+                    btn.className = 'mines-main-action-btn place-bet';
+                    btn.disabled = false;
+                    inputRow.classList.remove('open');
+                } else {
+                    // Idle – show "Place Bet" or "Confirm Bet"
+                    const isOpen = inputRow.classList.contains('open');
+                    if (isOpen) {
+                        mainText.textContent = 'Confirm Bet';
+                        btn.className = 'mines-main-action-btn confirm-bet';
+                        btn.disabled = false;
+                    } else {
+                        mainText.textContent = 'Place Bet';
+                        btn.className = 'mines-main-action-btn place-bet';
+                        btn.disabled = false;
+                    }
+                }
+            },
+
+            renderHistory() {
+                const container = document.getElementById('minesHistory');
+                if (this.history.length === 0) {
+                    container.innerHTML = '';
                     return;
                 }
-                this.bet = bet;
-                state.balance -= bet;
-                this.multiplier = 1.00;
-                this.gameActive = true;
-                this.gameOver = false;
-                this.generateBoard();
-                this.renderGrid();
-                this.updateUI();
-                updateHomeUI();
+                let html = '';
+                for (const h of this.history) {
+                    const cls = h.result === 'win' ? 'win' : 'loss';
+                    const label = h.result === 'win' ? `◆ ${h.mult}x` : `✕ ${h.mult}x`;
+                    html += `<span class="h-item ${cls}">${label}</span>`;
+                }
+                container.innerHTML = html;
             },
 
+            addHistory(result, mult) {
+                this.history.unshift({ result, mult });
+                if (this.history.length > 12) this.history.pop();
+                this.renderHistory();
+            },
+
+            // ----- Grid update -----
+            updateGrid() {
+                const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
+                for (let i = 0; i < wrappers.length; i++) {
+                    const tile = wrappers[i].querySelector('.tile');
+                    const symbol = tile.querySelector('.symbol');
+                    const isRevealed = this.revealed[i] || false;
+                    if (isRevealed) {
+                        tile.classList.add('revealed');
+                        if (this.board[i] === 1) {
+                            tile.classList.add('mine');
+                            symbol.textContent = '✕';
+                        } else {
+                            tile.classList.add('safe');
+                            symbol.textContent = '◆'; // diamond
+                        }
+                    } else {
+                        tile.classList.remove('revealed', 'mine', 'safe');
+                        symbol.textContent = '';
+                    }
+                }
+            },
+
+            // ----- Click handler with vibration -----
             clickTile(index) {
-                if (!this.gameActive || this.gameOver || this.revealed[index]) return;
+                if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
+
                 this.revealed[index] = true;
+
                 if (this.board[index] === 1) {
                     this.gameOver = true;
                     this.gameActive = false;
@@ -2117,10 +2436,16 @@
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
+                    this.addHistory('loss', this.multiplier);
+                    triggerVibration(80, 'heavy');
                     return;
                 }
+
+                triggerVibration(15, 'light');
+
                 this.revealedSafe++;
                 this.multiplier = parseFloat((this.multiplier * 1.20).toFixed(2));
+
                 if (this.revealedSafe === this.safeCount) {
                     this.gameOver = true;
                     this.gameActive = false;
@@ -2134,16 +2459,114 @@
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
+                    this.addHistory('win', this.multiplier);
+                    showNotification(win);
+                    triggerVibration(50, 'medium');
                     return;
                 }
+
                 this.updateGrid();
                 this.updateUI();
             },
 
-            cashOut() {
-                if (!this.gameActive || this.gameOver) return;
-                this.gameActive = false;
-                this.gameOver = true;
+            // ----- Main Action (fix cash out reset) -----
+            mainAction() {
+                // If game is active and not over, handle Cash Out
+                if (this.gameActive && !this.gameOver) {
+                    if (!this.hasCashedOut && !this.isCashingOut) {
+                        this.initiateCashOut();
+                    }
+                    return;
+                }
+
+                // If game over, start a new round
+                if (this.gameOver) {
+                    this.generateGrid(); // resets everything, including gameActive, gameOver, etc.
+                    return;
+                }
+
+                // Idle – toggle bet input or confirm
+                const row = document.getElementById('minesBetInputRow');
+                const isOpen = row.classList.contains('open');
+                if (isOpen) {
+                    this.confirmBet();
+                } else {
+                    row.classList.add('open');
+                    document.getElementById('minesBetInput').focus();
+                    this.updateMainButton();
+                }
+            },
+
+            confirmBet() {
+                const input = document.getElementById('minesBetInput');
+                let bet = parseInt(input.value) || 0;
+                if (bet < 1) {
+                    triggerVibration(60, 'heavy');
+                    return;
+                }
+                if (bet > state.balance) {
+                    triggerVibration(60, 'heavy');
+                    return;
+                }
+                this.bet = bet;
+                document.getElementById('minesBetInputRow').classList.remove('open');
+                this.startGame();
+            },
+
+            startGame() {
+                if (this.bet > state.balance) {
+                    document.getElementById('minesMessage').textContent = 'Not enough balance!';
+                    document.getElementById('minesMessage').className = 'mines-message danger';
+                    return;
+                }
+                state.balance -= this.bet;
+                this.multiplier = 1.00;
+                this.gameActive = true;
+                this.gameOver = false;
+                this.hasCashedOut = false;
+                this.revealedSafe = 0;
+                const total = this.gridSize * this.gridSize;
+                this.board = new Array(total).fill(0);
+                let placed = 0;
+                while (placed < this.minesCount) {
+                    const idx = Math.floor(Math.random() * total);
+                    if (this.board[idx] === 0) { this.board[idx] = 1;
+                        placed++; }
+                }
+                this.safeCount = total - this.minesCount;
+                this.revealed = new Array(total).fill(false);
+
+                const tiles = document.querySelectorAll('.mines-grid .tile');
+                tiles.forEach(tile => {
+                    tile.classList.remove('revealed', 'mine', 'safe');
+                    tile.querySelector('.symbol').textContent = '';
+                    tile.classList.add('show');
+                });
+
+                this.updateUI();
+                this.updateMainButton();
+                updateHomeUI();
+                triggerVibration(30, 'light');
+            },
+
+            initiateCashOut() {
+                if (this.isCashingOut) return;
+                this.isCashingOut = true;
+                const btn = document.getElementById('minesMainActionBtn');
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
+                        triggerVibration(30, 'light');
+                        this.executeCashOut();
+                    }
+                    this.isCashingOut = false;
+                }, 150);
+            },
+
+            executeCashOut() {
+                if (!this.gameActive || this.gameOver || this.hasCashedOut) return;
+                this.hasCashedOut = true;
                 const win = Math.floor(this.bet * this.multiplier);
                 state.balance += win;
                 state.wins++;
@@ -2151,8 +2574,12 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
+                this.addHistory('win', this.multiplier);
+                showNotification(win);
                 this.updateUI();
+                this.updateMainButton();
                 updateHomeUI();
+                triggerVibration(30, 'light');
             }
         };
 
@@ -2161,17 +2588,16 @@
         // ============================================================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                if (crashGame.isPlaying) {
-                    crashGame.stopContinuousVibration();
-                }
+                if (crashGame.isPlaying) { crashGame.stopContinuousVibration(); }
+                curve.stop();
+                particleSystem.stop();
             } else {
-                if (crashGame.isPlaying) {
-                    crashGame.startContinuousVibration();
-                }
+                if (crashGame.isPlaying) { crashGame.startContinuousVibration(); }
                 if (document.getElementById('page-rocket').classList.contains('active')) {
-                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) {
-                        crashGame.startGameCycle();
-                    }
+                    curve.start();
+                    particleSystem.start();
+                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) { crashGame
+                            .startGameCycle(); }
                 }
             }
         });
@@ -2186,6 +2612,22 @@
             crashGame.init();
             minesGame.init();
 
+            // Preset buttons
+            document.querySelectorAll('.grid-presets button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = parseInt(this.dataset.size);
+                    const mines = parseInt(this.dataset.mines);
+                    if (minesGame.gameActive) return;
+                    minesGame.gridSize = size;
+                    minesGame.minesCount = mines;
+                    document.querySelectorAll('.grid-presets button').forEach(b => b.classList.remove(
+                    'active'));
+                    this.classList.add('active');
+                    minesGame.generateGrid();
+                    minesGame.updateUI();
+                });
+            });
+
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -2194,12 +2636,14 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded – real players only (no bots).');
+            console.log('Casino loaded – final version with all fixes.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
+                crashGame.startCurveAnimation();
+                crashGame.startParticles();
             }
         });
 
@@ -2208,6 +2652,8 @@
             init();
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
+                crashGame.startCurveAnimation();
+                crashGame.startParticles();
             }
         }
     </script>
