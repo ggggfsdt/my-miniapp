@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, sans-serif;
+            background: #0a0a0c;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        #message {
+            margin-top: 20px;
+            color: #ffd700;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 My Mini App</h1>
+        <p>Your Telegram Mini App is working!</p>
+        <button class="btn" id="myButton">Click Me</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // ===== YOUR GAME SCRIPTS GO HERE =====
+        
+        document.getElementById('myButton').onclick = function() {
+            document.getElementById('message').textContent = '🎉 Button works!';
+        };
+
+        // Initialize Telegram
+        try {
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.ready();
+        } catch (e) {
+            console.log('Not in Telegram');
+        }
+    </script>
+</body>
+</html>
