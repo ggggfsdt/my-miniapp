@@ -6,7 +6,6 @@
     <title>🐕 Flying Dog Casino</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ===== RESET ===== */
         * {
             margin: 0;
             padding: 0;
@@ -39,7 +38,6 @@
             position: relative;
         }
 
-        /* ===== PAGES ===== */
         .page {
             display: none;
             flex: 1;
@@ -62,7 +60,6 @@
             border-radius: 10px;
         }
 
-        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             position: sticky;
             bottom: 0;
@@ -127,7 +124,6 @@
             transform: scale(0.88);
         }
 
-        /* ===== COMMON ===== */
         .card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -165,7 +161,6 @@
             margin-bottom: 8px;
         }
 
-        /* ===== BUTTONS ===== */
         .btn {
             padding: 14px 20px;
             border: none;
@@ -213,7 +208,6 @@
             color: #ffd700;
         }
 
-        /* ===== HOME PAGE ===== */
         .home-greeting {
             font-size: 24px;
             font-weight: 800;
@@ -262,9 +256,6 @@
             margin-top: 2px;
         }
 
-        /* ============================================================
-           ROCKET PAGE - BLACK GRID WITH SQUARES
-           ============================================================ */
         .rocket-multiplier {
             text-align: center;
             padding: 20px 10px;
@@ -296,7 +287,6 @@
             z-index: 1;
         }
 
-        /* ===== BLACK GRID WITH SQUARES ===== */
         .grid-container {
             position: relative;
             height: 200px;
@@ -307,7 +297,6 @@
             margin: 10px 0;
         }
 
-        /* The grid squares */
         .grid-squares {
             position: absolute;
             inset: 0;
@@ -327,7 +316,6 @@
             background: #111115;
         }
 
-        /* ===== FLYING DOG GIF ===== */
         .gif-overlay {
             position: absolute;
             top: 50%;
@@ -368,7 +356,6 @@
             }
         }
 
-        /* ===== CRASH EFFECT ===== */
         .crash-overlay {
             position: absolute;
             inset: 0;
@@ -392,7 +379,6 @@
             100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
 
-        /* ===== BOTS ===== */
         .bots-scroll {
             display: flex;
             flex-wrap: wrap;
@@ -473,9 +459,6 @@
             border-color: rgba(0, 210, 160, 0.15);
         }
 
-        /* ============================================================
-           MINES PAGE
-           ============================================================ */
         .mines-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -518,7 +501,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .rocket-multiplier .value {
                 font-size: 56px;
@@ -592,17 +574,14 @@
                 <div class="status" id="rocketStatus">Press "Launch" to fly!</div>
             </div>
 
-            <!-- ===== BLACK GRID WITH SQUARES + DOG GIF ===== -->
             <div class="grid-container" id="gridContainer">
-                <!-- Grid squares -->
                 <div class="grid-squares" id="gridSquares"></div>
 
-                <!-- GIF overlay (flying dog) -->
+                <!-- ===== YOUR GITHUB-HOSTED GIF ===== -->
                 <div class="gif-overlay">
-                    <img id="flyingDogGif" src="https://s13.gifyu.com/images/bdFts.gif" alt="Flying Dog">
+                    <img id="flyingDogGif" src="https://ggggfsdt.github.io/my-miniapp/YOUR_GIF_FILENAME.gif" alt="Flying Dog">
                 </div>
 
-                <!-- Crash overlay -->
                 <div class="crash-overlay" id="crashOverlay">💥 CRASH!</div>
             </div>
 
@@ -656,7 +635,6 @@
             </div>
         </div>
 
-        <!-- ===== BOTTOM NAV ===== -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
                 <span class="icon">🏠</span>
@@ -678,7 +656,6 @@
         // 🐕 COMPLETE GAME LOGIC - Flying Dog Edition
         // ============================================================
 
-        // ---------- GLOBAL STATE ----------
         const state = {
             balance: 1000,
             totalGames: 0,
@@ -688,14 +665,12 @@
             recentWinners: [],
         };
 
-        // ---------- DOM REFS ----------
         const homeBalance = document.getElementById('homeBalance');
         const totalGamesEl = document.getElementById('totalGames');
         const bestMultiplierEl = document.getElementById('bestMultiplier');
         const winRateEl = document.getElementById('winRate');
         const recentWinnersEl = document.getElementById('recentWinners');
 
-        // ---------- NAVIGATION ----------
         const pages = {
             home: document.getElementById('page-home'),
             rocket: document.getElementById('page-rocket'),
@@ -716,7 +691,6 @@
             item.addEventListener('click', () => navigateTo(item.dataset.page));
         });
 
-        // ---------- UPDATE HOME ----------
         function updateHome() {
             homeBalance.textContent = `⭐ ${state.balance.toLocaleString()}`;
             totalGamesEl.textContent = state.totalGames;
@@ -738,9 +712,6 @@
             }
         }
 
-        // ============================================================
-        // 🐕 FLYING DOG GAME (Rocket Crash with Dog GIF)
-        // ============================================================
         const rocketGame = {
             multiplier: 1.00,
             crashPoint: 1.00,
@@ -921,7 +892,6 @@
                 this.gameOver = false;
                 this.lastTime = 0;
 
-                // Show GIF
                 const dogGif = document.getElementById('flyingDogGif');
                 const crashOverlay = document.getElementById('crashOverlay');
                 crashOverlay.classList.remove('active');
@@ -956,11 +926,9 @@
                     state.losses++;
                     state.totalGames++;
 
-                    // Show crash effect
                     const crashOverlay = document.getElementById('crashOverlay');
                     crashOverlay.classList.add('active');
 
-                    // Hide GIF after crash
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
                     setTimeout(() => { dogGif.style.display = 'none'; }, 500);
@@ -1019,7 +987,6 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-                // Hide GIF on cash out
                 const dogGif = document.getElementById('flyingDogGif');
                 dogGif.classList.remove('active');
                 setTimeout(() => { dogGif.style.display = 'none'; }, 300);
@@ -1042,9 +1009,6 @@
             }
         };
 
-        // ============================================================
-        // 💎 MINES GAME
-        // ============================================================
         const minesGame = {
             gridSize: 5,
             minesCount: 3,
@@ -1240,9 +1204,6 @@
             }
         };
 
-        // ============================================================
-        // INIT
-        // ============================================================
         function init() {
             updateHome();
             rocketGame.init();
@@ -1257,7 +1218,6 @@
             } catch (e) {}
 
             console.log('🐕 Flying Dog Casino loaded!');
-            console.log('🎬 GIF URL: https://s13.gifyu.com/images/bdFts.gif');
         }
 
         document.addEventListener('DOMContentLoaded', init);
