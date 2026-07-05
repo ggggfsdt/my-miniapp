@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🚀 Rocket Casino Pro</title>
+    <title>🐕 Flying Dog Casino</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ===== PREMIUM CASINO THEME - Pure CSS, No Images ===== */
+        /* ===== RESET ===== */
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +15,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #08080a;
             color: #ffffff;
             min-height: 100vh;
@@ -31,23 +31,12 @@
             background: linear-gradient(160deg, #111115, #0a0a0c);
             border-radius: 36px;
             overflow: hidden;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.06);
             min-height: 760px;
             display: flex;
             flex-direction: column;
             position: relative;
-        }
-
-        /* ===== GLOW EFFECTS ===== */
-        .glow-orange {
-            box-shadow: 0 0 40px rgba(255, 107, 53, 0.15), inset 0 0 40px rgba(255, 107, 53, 0.05);
-        }
-        .glow-purple {
-            box-shadow: 0 0 40px rgba(108, 92, 231, 0.2), inset 0 0 40px rgba(108, 92, 231, 0.05);
-        }
-        .glow-green {
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.15), inset 0 0 40px rgba(0, 255, 136, 0.05);
         }
 
         /* ===== PAGES ===== */
@@ -81,7 +70,6 @@
             right: 0;
             background: rgba(20, 20, 25, 0.95);
             backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-around;
@@ -139,7 +127,7 @@
             transform: scale(0.88);
         }
 
-        /* ===== COMMON COMPONENTS ===== */
+        /* ===== COMMON ===== */
         .card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -147,11 +135,6 @@
             padding: 16px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             margin-bottom: 14px;
-            transition: all 0.3s;
-        }
-        .card-glass {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
         }
         .card-title {
             font-size: 12px;
@@ -171,16 +154,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        .flex-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .text-gradient {
-            background: linear-gradient(135deg, #ffd700, #ff6b53);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
         .text-muted {
             color: #555;
             font-size: 13px;
@@ -188,17 +161,8 @@
         .gap-8 {
             gap: 8px;
         }
-        .gap-12 {
-            gap: 12px;
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
         .mb-8 {
             margin-bottom: 8px;
-        }
-        .w-full {
-            width: 100%;
         }
 
         /* ===== BUTTONS ===== */
@@ -217,13 +181,6 @@
             overflow: hidden;
             letter-spacing: 0.3px;
         }
-        .btn::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
-            pointer-events: none;
-        }
         .btn:active {
             transform: scale(0.94);
         }
@@ -240,20 +197,6 @@
             background: linear-gradient(135deg, #00b894, #00d2a0);
             box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
         }
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.35);
-        }
-        .btn-gold {
-            background: linear-gradient(135deg, #f9ca24, #f0932b);
-            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid rgba(255, 255, 255, 0.1);
-            color: #aaa;
-        }
-
         .badge {
             background: rgba(255, 255, 255, 0.06);
             padding: 6px 14px;
@@ -285,7 +228,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .quick-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -320,54 +262,20 @@
             margin-top: 2px;
         }
 
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-        .stat-label {
-            color: #666;
-            font-size: 14px;
-        }
-        .stat-value {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        /* ===== ROCKET PAGE ===== */
+        /* ============================================================
+           ROCKET PAGE - BLACK GRID WITH SQUARES
+           ============================================================ */
         .rocket-multiplier {
             text-align: center;
-            padding: 24px 10px;
-            background: rgba(0, 0, 0, 0.4);
+            padding: 20px 10px;
+            background: rgba(0, 0, 0, 0.6);
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             position: relative;
             overflow: hidden;
         }
-        .rocket-multiplier::before {
-            content: '';
-            position: absolute;
-            inset: -50%;
-            background: radial-gradient(circle at center, rgba(108, 92, 231, 0.05) 0%, transparent 70%);
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-        @keyframes pulseGlow {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-            50% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
         .rocket-multiplier .value {
-            font-size: 80px;
+            font-size: 72px;
             font-weight: 900;
             line-height: 1.1;
             transition: color 0.3s;
@@ -388,30 +296,104 @@
             z-index: 1;
         }
 
-        .graph-container {
+        /* ===== BLACK GRID WITH SQUARES ===== */
+        .grid-container {
             position: relative;
-            height: 140px;
-            background: rgba(0, 0, 0, 0.5);
+            height: 200px;
+            background: #0a0a0c;
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.04);
             margin: 10px 0;
         }
-        .graph-container canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        .graph-overlay {
+
+        /* The grid squares */
+        .grid-squares {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            background: linear-gradient(180deg, transparent 50%, rgba(8, 8, 10, 0.9) 100%);
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 1px;
+            background: #1a1a1e;
+            padding: 1px;
+            z-index: 0;
+        }
+        .grid-square {
+            background: #0a0a0c;
+            transition: background 0.3s;
+        }
+        /* Some squares randomly highlighted for visual interest */
+        .grid-square.highlight {
+            background: #111115;
         }
 
+        /* The video overlay - centered in grid */
+        .video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            width: 70%;
+            height: 70%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-overlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            display: none;
+        }
+        .video-overlay video.active {
+            display: block;
+            animation: dogFly 0.5s ease-out;
+        }
+
+        @keyframes dogFly {
+            0% {
+                transform: scale(0.3) translateY(50px);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) translateY(-10px);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Crash effect overlay */
+        .crash-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 15;
+            background: rgba(255, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 900;
+            color: #ff0000;
+            text-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+            animation: flashCrash 0.5s ease;
+        }
+        .crash-overlay.active {
+            display: flex;
+        }
+        @keyframes flashCrash {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ===== BOTS ===== */
         .bots-scroll {
             display: flex;
             flex-wrap: wrap;
@@ -465,19 +447,9 @@
         .bot-chip.crashed .mult {
             color: #ff6b6b;
         }
-        .bot-chip.waiting .mult {
-            color: #666;
-        }
-
         @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.7);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+            0% { opacity: 0; transform: scale(0.7); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .history-list {
@@ -502,7 +474,9 @@
             border-color: rgba(0, 210, 160, 0.15);
         }
 
-        /* ===== MINES PAGE ===== */
+        /* ============================================================
+           MINES PAGE (unchanged)
+           ============================================================ */
         .mines-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -522,7 +496,6 @@
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
             position: relative;
-            font-weight: 700;
         }
         .mines-tile:active {
             transform: scale(0.90);
@@ -533,33 +506,12 @@
         }
         .mines-tile.revealed.safe {
             background: rgba(0, 210, 160, 0.12);
-            box-shadow: 0 0 30px rgba(0, 210, 160, 0.08);
             border-color: rgba(0, 210, 160, 0.15);
         }
         .mines-tile.revealed.mine {
             background: rgba(255, 107, 107, 0.12);
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.08);
             border-color: rgba(255, 107, 107, 0.15);
         }
-        .mines-tile .emoji {
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .mines-tile.revealed .emoji {
-            transform: scale(1.15);
-        }
-        .mines-tile .glow-ring {
-            position: absolute;
-            inset: -3px;
-            border-radius: 20px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-        .mines-tile.revealed.safe .glow-ring {
-            opacity: 1;
-            box-shadow: 0 0 40px rgba(0, 210, 160, 0.15), inset 0 0 40px rgba(0, 210, 160, 0.05);
-        }
-
         .mines-multiplier-box {
             background: rgba(0, 0, 0, 0.4);
             border-radius: 16px;
@@ -570,59 +522,11 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .rocket-multiplier .value {
-                font-size: 60px;
+                font-size: 56px;
             }
-            .mines-tile {
-                font-size: 26px;
-                border-radius: 14px;
+            .grid-container {
+                height: 160px;
             }
-            .quick-action {
-                padding: 16px 10px;
-            }
-            .quick-action .icon {
-                font-size: 28px;
-            }
-            .home-balance {
-                font-size: 28px;
-            }
-        }
-
-        @media (min-height: 800px) {
-            #app {
-                min-height: 820px;
-            }
-            .page {
-                max-height: 800px;
-            }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .fade-in {
-            animation: fadeInUp 0.5s ease forwards;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: -200% center;
-            }
-            100% {
-                background-position: 200% center;
-            }
-        }
-        .shimmer {
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
-            background-size: 200% auto;
-            animation: shimmer 3s linear infinite;
         }
     </style>
 </head>
@@ -632,18 +536,18 @@
         <!-- ===== PAGE: HOME ===== -->
         <div id="page-home" class="page active">
             <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
-                <div class="home-greeting">🎰 Welcome back</div>
+                <div class="home-greeting">🐕 Welcome back</div>
                 <div class="flex-between" style="margin-top: 4px;">
                     <span class="text-muted" style="font-size: 14px;">Your Balance</span>
                     <span class="home-balance" id="homeBalance">⭐ 1,000</span>
                 </div>
                 <div class="quick-actions">
-                    <div class="quick-action glow-purple" onclick="navigateTo('rocket')">
-                        <span class="icon">🚀</span>
-                        <div class="label">Rocket Crash</div>
-                        <div class="desc">Fly &amp; cash out</div>
+                    <div class="quick-action" onclick="navigateTo('rocket')">
+                        <span class="icon">🐕</span>
+                        <div class="label">Flying Dog</div>
+                        <div class="desc">Watch him fly!</div>
                     </div>
-                    <div class="quick-action glow-green" onclick="navigateTo('mines')">
+                    <div class="quick-action" onclick="navigateTo('mines')">
                         <span class="icon">💎</span>
                         <div class="label">Mines</div>
                         <div class="desc">Find the gems</div>
@@ -653,17 +557,17 @@
 
             <div class="card">
                 <div class="card-title">📊 Statistics</div>
-                <div class="stat-row">
-                    <span class="stat-label">Games Played</span>
-                    <span class="stat-value" id="totalGames">0</span>
+                <div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <span style="color:#666;">Games Played</span>
+                    <span style="font-weight:700;" id="totalGames">0</span>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">Best Multiplier</span>
-                    <span class="stat-value text-gradient" id="bestMultiplier">1.00x</span>
+                <div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <span style="color:#666;">Best Multiplier</span>
+                    <span style="font-weight:700; background: linear-gradient(135deg, #ffd700, #ff6b53); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="bestMultiplier">1.00x</span>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">Win Rate</span>
-                    <span class="stat-value" id="winRate">0%</span>
+                <div class="flex-between" style="padding:4px 0;">
+                    <span style="color:#666;">Win Rate</span>
+                    <span style="font-weight:700;" id="winRate">0%</span>
                 </div>
             </div>
 
@@ -673,21 +577,34 @@
             </div>
         </div>
 
-        <!-- ===== PAGE: ROCKET ===== -->
+        <!-- ===== PAGE: ROCKET (FLYING DOG) ===== -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
-                <span class="badge badge-gold">🚀 ROCKET CRASH</span>
+                <span class="badge badge-gold">🐕 FLYING DOG</span>
                 <span class="badge" id="rocketBalance">⭐ 1,000</span>
             </div>
 
             <div class="rocket-multiplier">
                 <div class="value" id="rocketMultiplier">1.00<span class="x">x</span></div>
-                <div class="status" id="rocketStatus">Press "Launch" to start</div>
+                <div class="status" id="rocketStatus">Press "Launch" to fly!</div>
             </div>
 
-            <div class="graph-container">
-                <canvas id="rocketGraph"></canvas>
-                <div class="graph-overlay"></div>
+            <!-- ===== BLACK GRID WITH SQUARES + VIDEO ===== -->
+            <div class="grid-container" id="gridContainer">
+                <!-- Grid squares -->
+                <div class="grid-squares" id="gridSquares"></div>
+
+                <!-- Video overlay (flying dog) -->
+                <div class="video-overlay">
+                    <video id="flyingDogVideo" muted playsinline>
+                        <source src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2N1eXdxaGNxODBucmRpaTlsZ3VqaWFkcmw1YnRleTQyeTZycmFwayZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/Qt7bHhyE8boPuyZ8au/giphy.mp4" type="video/mp4">
+                        <!-- Fallback: if video doesn't load, show a dog emoji -->
+                        <span style="font-size:80px;">🐕</span>
+                    </video>
+                </div>
+
+                <!-- Crash overlay -->
+                <div class="crash-overlay" id="crashOverlay">💥 CRASH!</div>
             </div>
 
             <div class="card" style="padding: 10px 12px;">
@@ -703,7 +620,7 @@
                     <input type="number" id="betInputRocket" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
                     <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusRocket">+</button>
                 </div>
-                <button class="btn btn-primary" id="rocketStartBtn">🚀 Launch</button>
+                <button class="btn btn-primary" id="rocketStartBtn">🐕 Launch</button>
                 <button class="btn btn-success" id="rocketCashoutBtn" disabled>💰 Cash Out</button>
             </div>
 
@@ -721,14 +638,11 @@
                 <span class="badge badge-gold">💎 MINES</span>
                 <span class="badge" id="minesBalance">⭐ 1,000</span>
             </div>
-
             <div class="mines-multiplier-box flex-between">
                 <span style="color:#666; font-size:14px; font-weight:600;">Multiplier</span>
                 <span id="minesMultiplier" style="font-size:28px; font-weight:900; color:#00d2a0;">1.00x</span>
             </div>
-
             <div class="mines-grid" id="minesGrid"></div>
-
             <div class="flex gap-8" style="margin: 8px 0;">
                 <div class="flex" style="background:rgba(255,255,255,0.03); border-radius:16px; padding:4px; border:1px solid rgba(255,255,255,0.04);">
                     <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusMines">−</button>
@@ -738,21 +652,20 @@
                 <button class="btn btn-primary" id="minesStartBtn">💎 Start</button>
                 <button class="btn btn-success" id="minesCashoutBtn" disabled>💰 Cash Out</button>
             </div>
-
             <div id="minesMessage" class="card" style="padding: 14px; text-align:center; min-height:50px; display:flex; align-items:center; justify-content:center; font-weight:500;">
                 Press "Start" to play
             </div>
         </div>
 
-        <!-- ===== BOTTOM NAVIGATION ===== -->
+        <!-- ===== BOTTOM NAV ===== -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
                 <span class="icon">🏠</span>
                 <span class="label">Home</span>
             </button>
             <button class="nav-item" data-page="rocket">
-                <span class="icon">🚀</span>
-                <span class="label">Rocket</span>
+                <span class="icon">🐕</span>
+                <span class="label">Fly Dog</span>
             </button>
             <button class="nav-item" data-page="mines">
                 <span class="icon">💎</span>
@@ -763,7 +676,7 @@
 
     <script>
         // ============================================================
-        // 🎰 COMPLETE CASINO APP - All Logic
+        // 🐕 COMPLETE GAME LOGIC - Flying Dog Edition
         // ============================================================
 
         // ---------- GLOBAL STATE ----------
@@ -798,9 +711,6 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
-            if (page === 'rocket' && rocketGame.isPlaying) {
-                rocketGame.resumeGraph();
-            }
         }
 
         navItems.forEach(item => {
@@ -830,7 +740,7 @@
         }
 
         // ============================================================
-        // 🚀 ROCKET CRASH GAME
+        // 🐕 FLYING DOG GAME (Rocket Crash with Dog Video)
         // ============================================================
         const rocketGame = {
             multiplier: 1.00,
@@ -842,29 +752,29 @@
             bots: [],
             animationId: null,
             lastTime: 0,
-            graphPoints: [],
-            canvas: null,
-            ctx: null,
 
             init() {
-                this.canvas = document.getElementById('rocketGraph');
-                this.ctx = this.canvas.getContext('2d');
-                this.resizeCanvas();
-                window.addEventListener('resize', () => this.resizeCanvas());
                 this.setupControls();
+                this.createGrid();
                 this.updateUI();
                 this.renderBots();
                 this.renderHistory();
             },
 
-            resizeCanvas() {
-                const rect = this.canvas.parentElement.getBoundingClientRect();
-                this.canvas.width = rect.width * 2;
-                this.canvas.height = rect.height * 2;
-                this.canvas.style.width = rect.width + 'px';
-                this.canvas.style.height = rect.height + 'px';
-                this.ctx.scale(2, 2);
-                this.drawGraph();
+            createGrid() {
+                const container = document.getElementById('gridSquares');
+                const rows = 6;
+                const cols = 8;
+                container.innerHTML = '';
+                for (let i = 0; i < rows * cols; i++) {
+                    const square = document.createElement('div');
+                    square.className = 'grid-square';
+                    // Random highlight for visual interest
+                    if (Math.random() > 0.7) {
+                        square.classList.add('highlight');
+                    }
+                    container.appendChild(square);
+                }
             },
 
             setupControls() {
@@ -908,8 +818,8 @@
 
                 document.getElementById('rocketBalance').textContent = `⭐ ${state.balance.toLocaleString()}`;
                 document.getElementById('rocketStatus').textContent =
-                    this.isPlaying ? `🚀 Flying at ${this.multiplier.toFixed(2)}x` :
-                    this.gameOver ? '💥 Crashed' : 'Press "Launch" to start';
+                    this.isPlaying ? `🐕 Flying at ${this.multiplier.toFixed(2)}x` :
+                    this.gameOver ? '💥 Crashed!' : 'Press "Launch" to fly!';
 
                 const startBtn = document.getElementById('rocketStartBtn');
                 const cashBtn = document.getElementById('rocketCashoutBtn');
@@ -927,8 +837,7 @@
 
             createBots() {
                 const names = ['CryptoKing', 'MoonRider', 'StarChaser', 'RocketMan', 'LuckyOne',
-                    'DiamondHands', 'WhaleAlert', 'PaperHands', 'LunarWolf', 'NeonFox',
-                    'CyberGhost', 'ShadowHunter', 'FireFalcon', 'IcePhoenix'
+                    'DiamondHands', 'WhaleAlert', 'PaperHands', 'LunarWolf', 'NeonFox'
                 ];
                 const colors = ['#ff6b6b', '#feca57', '#00d2a0', '#6c5ce7', '#fd79a8',
                     '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0', '#ff9f43'
@@ -963,7 +872,7 @@
                 let html = '';
                 for (const bot of active) {
                     const status = bot.cashedOut ? '✅' : bot.crashed ? '💥' : '⏳';
-                    const cls = bot.cashedOut ? 'cashed' : bot.crashed ? 'crashed' : 'waiting';
+                    const cls = bot.cashedOut ? 'cashed' : bot.crashed ? 'crashed' : '';
                     const mult = bot.cashedOut ? `${bot.cashoutMultiplier.toFixed(2)}x` :
                         bot.crashed ? '💥' : '...';
                     html += `
@@ -998,92 +907,6 @@
                 this.renderHistory();
             },
 
-            drawGraph() {
-                const ctx = this.ctx;
-                const w = this.canvas.width / 2;
-                const h = this.canvas.height / 2;
-                ctx.clearRect(0, 0, w, h);
-
-                const points = this.graphPoints;
-                if (points.length < 2) {
-                    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(0, h);
-                    ctx.lineTo(w, h);
-                    ctx.stroke();
-                    return;
-                }
-
-                const maxX = Math.max(...points.map(p => p.x), 1);
-                const maxY = Math.max(...points.map(p => p.y), 1.5);
-                const scaleX = w / maxX;
-                const scaleY = h / (maxY * 1.15);
-
-                const grad = ctx.createLinearGradient(0, 0, 0, h);
-                grad.addColorStop(0, 'rgba(0, 210, 160, 0.2)');
-                grad.addColorStop(0.5, 'rgba(0, 210, 160, 0.08)');
-                grad.addColorStop(1, 'rgba(0, 210, 160, 0.01)');
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.moveTo(0, h);
-
-                for (let i = 0; i < points.length; i++) {
-                    const px = points[i].x * scaleX;
-                    const py = h - (points[i].y * scaleY);
-                    if (i === 0) ctx.lineTo(px, py);
-                    else {
-                        const prev = points[i - 1];
-                        const cpx = (prev.x + points[i].x) / 2 * scaleX;
-                        const cpy = h - ((prev.y + points[i].y) / 2 * scaleY);
-                        ctx.quadraticCurveTo(cpx, cpy, px, py);
-                    }
-                }
-                ctx.lineTo(w, h);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.strokeStyle = '#00d2a0';
-                ctx.lineWidth = 2.5;
-                ctx.shadowColor = 'rgba(0, 210, 160, 0.3)';
-                ctx.shadowBlur = 15;
-                ctx.beginPath();
-                for (let i = 0; i < points.length; i++) {
-                    const px = points[i].x * scaleX;
-                    const py = h - (points[i].y * scaleY);
-                    if (i === 0) ctx.moveTo(px, py);
-                    else {
-                        const prev = points[i - 1];
-                        const cpx = (prev.x + points[i].x) / 2 * scaleX;
-                        const cpy = h - ((prev.y + points[i].y) / 2 * scaleY);
-                        ctx.quadraticCurveTo(cpx, cpy, px, py);
-                    }
-                }
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-
-                if (this.isPlaying || this.gameOver) {
-                    const last = points[points.length - 1];
-                    const px = last.x * scaleX;
-                    const py = h - (last.y * scaleY);
-                    const gradDot = ctx.createRadialGradient(px, py, 0, px, py, 15);
-                    gradDot.addColorStop(0, 'rgba(0, 210, 160, 0.8)');
-                    gradDot.addColorStop(1, 'rgba(0, 210, 160, 0)');
-                    ctx.fillStyle = gradDot;
-                    ctx.beginPath();
-                    ctx.arc(px, py, 15, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.beginPath();
-                    ctx.arc(px, py, 5, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00d2a0';
-                    ctx.shadowColor = 'rgba(0, 210, 160, 0.8)';
-                    ctx.shadowBlur = 20;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-            },
-
             start() {
                 const betInput = document.getElementById('betInputRocket');
                 let bet = parseInt(betInput.value) || 10;
@@ -1098,14 +921,22 @@
                 this.crashPoint = this.generateCrashPoint();
                 this.isPlaying = true;
                 this.gameOver = false;
-                this.graphPoints = [{ x: 0, y: 1 }];
                 this.lastTime = 0;
+
+                // Show video
+                const video = document.getElementById('flyingDogVideo');
+                const crashOverlay = document.getElementById('crashOverlay');
+                crashOverlay.classList.remove('active');
+                video.currentTime = 0;
+                video.style.display = 'block';
+                video.classList.add('active');
+                video.play().catch(() => {});
 
                 this.createBots();
 
                 this.updateUI();
                 this.renderBots();
-                document.getElementById('rocketStatus').textContent = `🚀 Launching... crash at ${this.crashPoint.toFixed(2)}x`;
+                document.getElementById('rocketStatus').textContent = `🐕 Flying... crash at ${this.crashPoint.toFixed(2)}x`;
                 document.getElementById('rocketStartBtn').disabled = true;
                 document.getElementById('rocketCashoutBtn').disabled = false;
 
@@ -1122,21 +953,29 @@
                 const inc = 0.01 + (delta * accel * 0.12);
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
-                this.graphPoints.push({ x: this.graphPoints.length * 0.02, y: this.multiplier });
-                if (this.graphPoints.length > 300) this.graphPoints.shift();
-
                 if (this.multiplier >= this.crashPoint) {
                     this.multiplier = parseFloat(this.crashPoint.toFixed(2));
                     this.isPlaying = false;
                     this.gameOver = true;
                     state.losses++;
                     state.totalGames++;
+
+                    // Show crash effect
+                    const crashOverlay = document.getElementById('crashOverlay');
+                    crashOverlay.classList.add('active');
+
+                    // Hide video after crash
+                    const video = document.getElementById('flyingDogVideo');
+                    video.classList.remove('active');
+                    setTimeout(() => { video.style.display = 'none'; }, 500);
+
                     this.updateUI();
                     this.renderBots();
                     this.addHistory('crashed', this.multiplier);
                     document.getElementById('rocketStatus').textContent = '💥 Crashed!';
                     document.getElementById('rocketStartBtn').disabled = false;
                     document.getElementById('rocketCashoutBtn').disabled = true;
+
                     for (const bot of this.bots) {
                         if (bot.active && !bot.cashedOut) {
                             bot.crashed = true;
@@ -1144,7 +983,6 @@
                         }
                     }
                     this.renderBots();
-                    this.drawGraph();
                     updateHome();
                     if (this.animationId) {
                         cancelAnimationFrame(this.animationId);
@@ -1164,8 +1002,7 @@
 
                 this.updateUI();
                 this.renderBots();
-                this.drawGraph();
-                document.getElementById('rocketStatus').textContent = `🚀 ${this.multiplier.toFixed(2)}x`;
+                document.getElementById('rocketStatus').textContent = `🐕 ${this.multiplier.toFixed(2)}x`;
 
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
@@ -1177,6 +1014,7 @@
                     cancelAnimationFrame(this.animationId);
                     this.animationId = null;
                 }
+
                 const win = Math.floor(this.bet * this.multiplier);
                 state.balance += win;
                 state.wins++;
@@ -1184,12 +1022,19 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                // Hide video on cash out
+                const video = document.getElementById('flyingDogVideo');
+                video.classList.remove('active');
+                setTimeout(() => { video.style.display = 'none'; }, 300);
+
                 this.addHistory('won', this.multiplier);
                 this.updateUI();
                 document.getElementById('rocketStatus').textContent = `💰 Cashed out at ${this.multiplier.toFixed(2)}x!`;
                 document.getElementById('rocketStartBtn').disabled = false;
                 document.getElementById('rocketCashoutBtn').disabled = true;
                 this.gameOver = true;
+
                 for (const bot of this.bots) {
                     if (bot.active && !bot.cashedOut) {
                         bot.crashed = true;
@@ -1197,22 +1042,12 @@
                     }
                 }
                 this.renderBots();
-                this.drawGraph();
                 updateHome();
-            },
-
-            resumeGraph() {
-                if (this.isPlaying) {
-                    this.drawGraph();
-                    if (!this.animationId) {
-                        this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
-                    }
-                }
             }
         };
 
         // ============================================================
-        // 💎 MINES GAME
+        // 💎 MINES GAME (unchanged)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1268,7 +1103,7 @@
                     const tile = document.createElement('div');
                     tile.className = 'mines-tile';
                     tile.dataset.index = i;
-                    tile.innerHTML = `<span class="emoji">❓</span><div class="glow-ring"></div>`;
+                    tile.innerHTML = `<span class="emoji">❓</span>`;
                     tile.addEventListener('click', () => this.clickTile(i));
                     grid.appendChild(tile);
                 }
@@ -1425,13 +1260,7 @@
                 }
             } catch (e) {}
 
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden && document.getElementById('page-rocket').classList.contains('active')) {
-                    if (rocketGame.isPlaying) rocketGame.resumeGraph();
-                }
-            });
-
-            console.log('🎰 Casino Pro loaded!');
+            console.log('🐕 Flying Dog Casino loaded!');
         }
 
         document.addEventListener('DOMContentLoaded', init);
