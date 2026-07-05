@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* All styles remain exactly as in the previous version */
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1120,7 +1120,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - VIBRATION FIXED (no vibration on app open)
+        // CRASH GAME - FINAL VERSION (No vibration on app open)
         // ============================================================
 
         const state = {
@@ -1162,6 +1162,7 @@
 
         // ----- NAVIGATION -----
         function navigateTo(page) {
+            // Stop vibration if leaving rocket
             if (page !== 'rocket' && crashGame.isPlaying) {
                 crashGame.stopVibration();
             }
@@ -1171,7 +1172,7 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
-            // If entering rocket page, start the game cycle (countdown or resume)
+            // If entering rocket, start the game cycle
             if (page === 'rocket') {
                 crashGame.startGameCycle();
             }
@@ -1259,7 +1260,7 @@
         }
 
         function triggerContinuousVibration() {
-            // Only vibrate if rocket page is active and document visible
+            // Only vibrate if the rocket page is visible and document is not hidden
             if (document.hidden) return;
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage || !rocketPage.classList.contains('active')) return;
@@ -1328,11 +1329,11 @@
 
             // ---- Game Cycle ----
             startGameCycle() {
-                // If game is over or idle, start countdown
-                if (!this.isPlaying && !this.isCountingDown) {
+                // If game is idle or over, start countdown
+                if (!this.isPlaying && !this.isCountingDown && !this.gameOver) {
                     this.startCountdown();
                 }
-                // If game is playing, ensure vibration is running
+                // If game is playing, ensure vibration runs
                 if (this.isPlaying) {
                     this.startVibration();
                 }
@@ -1345,7 +1346,7 @@
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
-                // Do NOT start countdown here – it will start when user visits the crash page
+                // Do NOT start countdown here – will be triggered when user visits rocket page
             },
 
             createGrid() {
@@ -1530,7 +1531,7 @@
                     }
                 };
 
-                // Suppress vibration on the very first countdown ever
+                // First-ever countdown: no vibration on 3
                 if (this.firstCountdown) {
                     showNumber(3, false);
                     this.firstCountdown = false;
@@ -1548,7 +1549,7 @@
                         this.startRound();
                         return;
                     }
-                    showNumber(count, true);
+                    showNumber(count, true); // 2 and 1 always vibrate
                 }, 1000);
             },
 
@@ -1576,7 +1577,7 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                // Start vibration (only if the page is active)
+                // Start vibration only if the page is active
                 this.startVibration();
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
@@ -1639,14 +1640,14 @@
                         this.animationId = null;
                     }
 
-                    // After crash, wait and then start countdown again (if still on the page)
+                    // After crash, start countdown again (if still on crash page)
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
                             this.hasCashedOut = false;
                             document.getElementById('betInputRocket').value = 10;
                             this.gameOver = false;
-                            // Only start countdown if the rocket page is still active
+                            // Only if rocket page is still active
                             if (document.getElementById('page-rocket').classList.contains('active')) {
                                 this.startCountdown();
                             }
@@ -1932,7 +1933,7 @@
                 if (crashGame.isPlaying && !crashGame.vibrationInterval) {
                     crashGame.startVibration();
                 }
-                // If the app becomes visible and we're on the rocket page, resume the game cycle
+                // If on rocket page and game is idle, start the cycle
                 if (document.getElementById('page-rocket').classList.contains('active')) {
                     if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) {
                         crashGame.startGameCycle();
@@ -1959,8 +1960,7 @@
                 }
             } catch (e) {}
 
-            console.log(`Casino loaded for user: ${state.displayName}`);
-            console.log('Vibration will only start when you open the Crash page.');
+            console.log('Casino loaded – no vibration on app open.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
