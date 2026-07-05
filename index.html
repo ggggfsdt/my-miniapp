@@ -188,6 +188,11 @@
         .mb-8 {
             margin-bottom: 8px;
         }
+        .text-gradient {
+            background: linear-gradient(135deg, #ffd700, #ff6b53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
         .btn {
             padding: 14px 20px;
@@ -253,7 +258,7 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        /* ===== HOME PAGE - PREMIUM DESIGN ===== */
+        /* ===== HOME PAGE ===== */
         .home-header {
             background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(0,0,0,0.2));
             border-radius: 24px;
@@ -386,6 +391,103 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-top: 2px;
+        }
+
+        /* ===== PROFILE PAGE ===== */
+        .profile-header {
+            text-align: center;
+            padding: 20px 0 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 16px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 12px auto;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 24px rgba(108, 92, 231, 0.2);
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-avatar .fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .profile-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .profile-username {
+            font-size: 14px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .profile-stat {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .profile-stat .value {
+            font-size: 22px;
+            font-weight: 900;
+        }
+        .profile-stat .label {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .profile-stat .value.gold {
+            color: #ffd700;
+        }
+        .profile-stat .value.green {
+            color: #00d2a0;
+        }
+        .profile-stat .value.purple {
+            color: #a29bfe;
+        }
+        .profile-stat .value.pink {
+            color: #fd79a8;
+        }
+
+        .profile-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .profile-detail:last-child {
+            border-bottom: none;
+        }
+        .profile-detail .label {
+            color: #666;
+            font-size: 14px;
+        }
+        .profile-detail .value {
+            font-weight: 600;
+            font-size: 14px;
         }
 
         /* ===== GRID ===== */
@@ -839,6 +941,19 @@
             .quick-card .label {
                 font-size: 13px;
             }
+            .profile-avatar {
+                width: 64px;
+                height: 64px;
+            }
+            .profile-name {
+                font-size: 18px;
+            }
+            .profile-stat .value {
+                font-size: 18px;
+            }
+            .profile-stats {
+                gap: 6px;
+            }
         }
     </style>
 </head>
@@ -854,14 +969,13 @@
 
         <!-- ===== HOME PAGE ===== -->
         <div id="page-home" class="page active">
-            <!-- Premium Header with Bot Avatar -->
             <div class="home-header">
                 <div class="home-avatar">
-                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Bot">
+                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="xDll_Lud">
                 </div>
                 <div class="home-user">
                     <div class="greeting">Welcome back</div>
-                    <div class="username">Crash Bot</div>
+                    <div class="username">xDll_Lud</div>
                 </div>
                 <div class="home-balance-wrap">
                     <div class="label">Balance</div>
@@ -869,7 +983,6 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
             <div class="quick-grid">
                 <div class="quick-card glow-purple" onclick="navigateTo('rocket')">
                     <span class="icon"><i class="fas fa-rocket"></i></span>
@@ -883,7 +996,6 @@
                 </div>
             </div>
 
-            <!-- Statistics -->
             <div class="card">
                 <div class="card-title">Statistics</div>
                 <div class="stats-grid">
@@ -902,7 +1014,6 @@
                 </div>
             </div>
 
-            <!-- Recent Winners -->
             <div class="card">
                 <div class="card-title">Recent Winners</div>
                 <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
@@ -970,6 +1081,66 @@
             </div>
         </div>
 
+        <!-- ===== PROFILE PAGE ===== -->
+        <div id="page-profile" class="page">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">
+                    <img id="profileAvatarImg" src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="xDll_Lud" style="display:block;">
+                    <div class="fallback" id="profileFallback" style="display:none;">XD</div>
+                </div>
+                <div class="profile-name" id="profileName">xDll_Lud</div>
+                <div class="profile-username" id="profileUsername">@xDll_Lud</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Statistics</div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="value gold" id="profileBalance"><i class="fas fa-star" style="font-size:16px; color:#ffd700;"></i> 1,000</div>
+                        <div class="label">Balance</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="value purple" id="profileGames">0</div>
+                        <div class="label">Games</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="value green" id="profileWins">0</div>
+                        <div class="label">Wins</div>
+                    </div>
+                </div>
+                <div class="profile-stats" style="margin-top:8px;">
+                    <div class="profile-stat">
+                        <div class="value pink" id="profileBest">1.00x</div>
+                        <div class="label">Best Multiplier</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="value" id="profileLosses" style="color:#ff6b6b;">0</div>
+                        <div class="label">Losses</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="value" id="profileWinRate" style="color:#54a0ff;">0%</div>
+                        <div class="label">Win Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Account Info</div>
+                <div class="profile-detail">
+                    <span class="label">Username</span>
+                    <span class="value" id="profileDetailUsername">@xDll_Lud</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="label">Display Name</span>
+                    <span class="value" id="profileDetailName">xDll_Lud</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="label">Member Since</span>
+                    <span class="value" id="profileSince">Today</span>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== BOTTOM NAV ===== -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
@@ -984,12 +1155,16 @@
                 <span class="icon"><i class="fas fa-gem"></i></span>
                 <span class="label">Mines</span>
             </button>
+            <button class="nav-item" data-page="profile">
+                <span class="icon"><i class="fas fa-user"></i></span>
+                <span class="label">Profile</span>
+            </button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // CRASH GAME - FULL LOGIC
+        // CRASH GAME - WITH PROFILE TAB
         // ============================================================
 
         const state = {
@@ -999,6 +1174,8 @@
             wins: 0,
             losses: 0,
             recentWinners: [],
+            username: 'xDll_Lud',
+            displayName: 'xDll_Lud',
         };
 
         // ----- DOM REFS -----
@@ -1009,10 +1186,23 @@
         const recentWinnersEl = document.getElementById('recentWinners');
         const notifAmount = document.getElementById('notifAmount');
 
+        // Profile DOM refs
+        const profileBalance = document.getElementById('profileBalance');
+        const profileGames = document.getElementById('profileGames');
+        const profileWins = document.getElementById('profileWins');
+        const profileBest = document.getElementById('profileBest');
+        const profileLosses = document.getElementById('profileLosses');
+        const profileWinRate = document.getElementById('profileWinRate');
+        const profileDetailUsername = document.getElementById('profileDetailUsername');
+        const profileDetailName = document.getElementById('profileDetailName');
+        const profileName = document.getElementById('profileName');
+        const profileUsername = document.getElementById('profileUsername');
+
         const pages = {
             home: document.getElementById('page-home'),
             rocket: document.getElementById('page-rocket'),
             mines: document.getElementById('page-mines'),
+            profile: document.getElementById('page-profile'),
         };
         const navItems = document.querySelectorAll('.nav-item');
 
@@ -1029,6 +1219,9 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
+            if (page === 'profile') {
+                updateProfile();
+            }
         }
 
         navItems.forEach(item => {
@@ -1053,6 +1246,40 @@
                     </div>`
                 ).join('');
                 recentWinnersEl.style.color = '#fff';
+            }
+        }
+
+        function updateProfile() {
+            profileBalance.innerHTML = `<i class="fas fa-star" style="font-size:14px; color:#ffd700;"></i> ${state.balance.toLocaleString()}`;
+            profileGames.textContent = state.totalGames;
+            profileWins.textContent = state.wins;
+            profileBest.textContent = `${state.bestMultiplier.toFixed(2)}x`;
+            profileLosses.textContent = state.losses;
+            const total = state.wins + state.losses;
+            profileWinRate.textContent = total > 0 ? `${Math.round((state.wins / total) * 100)}%` : '0%';
+            profileDetailUsername.textContent = `@${state.username}`;
+            profileDetailName.textContent = state.displayName;
+            profileName.textContent = state.displayName;
+            profileUsername.textContent = `@${state.username}`;
+        }
+
+        // ----- Get Telegram User Info -----
+        function getTelegramUser() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    const user = tg.initDataUnsafe?.user;
+                    if (user) {
+                        state.username = user.username || user.first_name || 'xDll_Lud';
+                        state.displayName = user.first_name || 'xDll_Lud';
+                        if (user.last_name) {
+                            state.displayName += ' ' + user.last_name;
+                        }
+                        // Try to get profile photo (not directly accessible, but we keep the bot avatar)
+                    }
+                }
+            } catch (e) {
+                console.log('Not in Telegram or no user data');
             }
         }
 
@@ -1726,7 +1953,9 @@
         // INIT
         // ============================================================
         function init() {
+            getTelegramUser();
             updateHome();
+            updateProfile();
             crashGame.init();
             minesGame.init();
 
@@ -1738,7 +1967,7 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded! Premium home screen with bot avatar.');
+            console.log('xDll_Lud Casino loaded! Profile tab added.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
