@@ -258,7 +258,7 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        /* ===== HOME PAGE ===== */
+        /* ===== HOME PAGE - NO STATISTICS ===== */
         .home-header {
             background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(0,0,0,0.2));
             border-radius: 24px;
@@ -370,29 +370,6 @@
             box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-        .stat-item {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            padding: 12px 8px;
-            text-align: center;
-        }
-        .stat-item .value {
-            font-size: 18px;
-            font-weight: 800;
-        }
-        .stat-item .label {
-            font-size: 10px;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
         /* ===== PROFILE PAGE ===== */
         .profile-header {
             text-align: center;
@@ -413,17 +390,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        .profile-avatar .fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            font-size: 36px;
-            font-weight: 700;
-            color: #fff;
         }
         .profile-name {
             font-size: 22px;
@@ -925,13 +891,6 @@
             .home-balance-wrap .amount {
                 font-size: 22px;
             }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 6px;
-            }
-            .stat-item .value {
-                font-size: 15px;
-            }
             .quick-card {
                 padding: 16px 10px;
             }
@@ -971,11 +930,11 @@
         <div id="page-home" class="page active">
             <div class="home-header">
                 <div class="home-avatar">
-                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="xDll_Lud">
+                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar">
                 </div>
                 <div class="home-user">
                     <div class="greeting">Welcome back</div>
-                    <div class="username">xDll_Lud</div>
+                    <div class="username" id="homeUsername">xDll_Lud</div>
                 </div>
                 <div class="home-balance-wrap">
                     <div class="label">Balance</div>
@@ -996,24 +955,7 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-title">Statistics</div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="value" id="totalGames">0</div>
-                        <div class="label">Games</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value text-gradient" id="bestMultiplier">1.00x</div>
-                        <div class="label">Best</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value" id="winRate">0%</div>
-                        <div class="label">Win Rate</div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Recent Winners (kept) -->
             <div class="card">
                 <div class="card-title">Recent Winners</div>
                 <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
@@ -1084,9 +1026,8 @@
         <!-- ===== PROFILE PAGE ===== -->
         <div id="page-profile" class="page">
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">
-                    <img id="profileAvatarImg" src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="xDll_Lud" style="display:block;">
-                    <div class="fallback" id="profileFallback" style="display:none;">XD</div>
+                <div class="profile-avatar">
+                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar">
                 </div>
                 <div class="profile-name" id="profileName">xDll_Lud</div>
                 <div class="profile-username" id="profileUsername">@xDll_Lud</div>
@@ -1164,7 +1105,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - WITH PROFILE TAB
+        // CRASH GAME - WITH REAL TELEGRAM USER INFO
         // ============================================================
 
         const state = {
@@ -1180,9 +1121,7 @@
 
         // ----- DOM REFS -----
         const homeBalance = document.getElementById('homeBalance');
-        const totalGamesEl = document.getElementById('totalGames');
-        const bestMultiplierEl = document.getElementById('bestMultiplier');
-        const winRateEl = document.getElementById('winRate');
+        const homeUsername = document.getElementById('homeUsername');
         const recentWinnersEl = document.getElementById('recentWinners');
         const notifAmount = document.getElementById('notifAmount');
 
@@ -1228,13 +1167,32 @@
             item.addEventListener('click', () => navigateTo(item.dataset.page));
         });
 
-        function updateHome() {
-            homeBalance.innerHTML = `<i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> ${state.balance.toLocaleString()}`;
-            totalGamesEl.textContent = state.totalGames;
-            bestMultiplierEl.textContent = `${state.bestMultiplier.toFixed(2)}x`;
-            const total = state.wins + state.losses;
-            winRateEl.textContent = total > 0 ? `${Math.round((state.wins / total) * 100)}%` : '0%';
+        // ----- Get Telegram User Info -----
+        function getTelegramUser() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    const user = tg.initDataUnsafe?.user;
+                    if (user) {
+                        state.username = user.username || user.first_name || 'xDll_Lud';
+                        state.displayName = user.first_name || 'xDll_Lud';
+                        if (user.last_name) {
+                            state.displayName += ' ' + user.last_name;
+                        }
+                        // If username is not set, use displayName without @
+                        if (!user.username) {
+                            state.username = state.displayName;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Not in Telegram or no user data');
+            }
+        }
 
+        function updateHomeUI() {
+            homeUsername.textContent = state.displayName;
+            homeBalance.innerHTML = `<i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> ${state.balance.toLocaleString()}`;
             if (state.recentWinners.length === 0) {
                 recentWinnersEl.textContent = 'No wins yet';
                 recentWinnersEl.style.color = '#555';
@@ -1261,26 +1219,6 @@
             profileDetailName.textContent = state.displayName;
             profileName.textContent = state.displayName;
             profileUsername.textContent = `@${state.username}`;
-        }
-
-        // ----- Get Telegram User Info -----
-        function getTelegramUser() {
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    const tg = window.Telegram.WebApp;
-                    const user = tg.initDataUnsafe?.user;
-                    if (user) {
-                        state.username = user.username || user.first_name || 'xDll_Lud';
-                        state.displayName = user.first_name || 'xDll_Lud';
-                        if (user.last_name) {
-                            state.displayName += ' ' + user.last_name;
-                        }
-                        // Try to get profile photo (not directly accessible, but we keep the bot avatar)
-                    }
-                }
-            } catch (e) {
-                console.log('Not in Telegram or no user data');
-            }
         }
 
         // ============================================================
@@ -1646,7 +1584,7 @@
                     this.addHistory(this.multiplier);
                     this.updateUI();
                     this.updateMainButton();
-                    updateHome();
+                    updateHomeUI();
 
                     if (this.animationId) {
                         cancelAnimationFrame(this.animationId);
@@ -1688,7 +1626,7 @@
 
                 this.updateUI();
                 this.updateMainButton();
-                updateHome();
+                updateHomeUI();
             },
 
             generateCrashPoint() {
@@ -1870,7 +1808,7 @@
                 this.generateBoard();
                 this.renderGrid();
                 this.updateUI();
-                updateHome();
+                updateHomeUI();
             },
 
             clickTile(index) {
@@ -1887,7 +1825,7 @@
                     triggerVibration(60, 'heavy');
                     this.updateGrid();
                     this.updateUI();
-                    updateHome();
+                    updateHomeUI();
                     return;
                 }
                 this.revealedSafe++;
@@ -1905,7 +1843,7 @@
                     triggerVibration(50, 'medium');
                     this.updateGrid();
                     this.updateUI();
-                    updateHome();
+                    updateHomeUI();
                     return;
                 }
                 this.updateGrid();
@@ -1925,7 +1863,7 @@
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
                 triggerVibration(30, 'light');
                 this.updateUI();
-                updateHome();
+                updateHomeUI();
             }
         };
 
@@ -1954,7 +1892,7 @@
         // ============================================================
         function init() {
             getTelegramUser();
-            updateHome();
+            updateHomeUI();
             updateProfile();
             crashGame.init();
             minesGame.init();
@@ -1967,7 +1905,7 @@
                 }
             } catch (e) {}
 
-            console.log('xDll_Lud Casino loaded! Profile tab added.');
+            console.log(`Casino loaded for user: ${state.displayName}`);
         }
 
         document.addEventListener('DOMContentLoaded', init);
