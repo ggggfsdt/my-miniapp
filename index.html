@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* (All styles remain unchanged from the previous version – only the profile avatar onerror fallback is added) */
+        /* All styles remain exactly as in the previous version */
         * {
             margin: 0;
             padding: 0;
@@ -1120,7 +1120,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - WITH PROFILE PIC FALLBACK & CENTERED BUTTON TEXT
+        // CRASH GAME - VIBRATION FIXED (no vibration on app open)
         // ============================================================
 
         const state = {
@@ -1171,8 +1171,9 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
-            if (page === 'rocket' && crashGame.isPlaying) {
-                crashGame.startVibration();
+            // If entering rocket page, start the game cycle (countdown or resume)
+            if (page === 'rocket') {
+                crashGame.startGameCycle();
             }
             if (page === 'profile') {
                 updateProfile();
@@ -1198,7 +1199,6 @@
                         if (!user.username) {
                             state.username = state.displayName;
                         }
-                        // Update profile fallback initials
                         if (profileAvatarFallback) {
                             profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
                         }
@@ -1236,7 +1236,6 @@
             profileDetailName.textContent = state.displayName;
             profileName.textContent = state.displayName;
             profileUsername.textContent = `@${state.username}`;
-            // Update fallback initials
             if (profileAvatarFallback) {
                 profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
             }
@@ -1260,6 +1259,7 @@
         }
 
         function triggerContinuousVibration() {
+            // Only vibrate if rocket page is active and document visible
             if (document.hidden) return;
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage || !rocketPage.classList.contains('active')) return;
@@ -1309,6 +1309,7 @@
             vibrationInterval: null,
             firstCountdown: true,
 
+            // ---- Vibration Control ----
             startVibration() {
                 if (this.vibrationInterval) return;
                 this.vibrationInterval = setInterval(() => {
@@ -1325,13 +1326,26 @@
                 }
             },
 
+            // ---- Game Cycle ----
+            startGameCycle() {
+                // If game is over or idle, start countdown
+                if (!this.isPlaying && !this.isCountingDown) {
+                    this.startCountdown();
+                }
+                // If game is playing, ensure vibration is running
+                if (this.isPlaying) {
+                    this.startVibration();
+                }
+            },
+
+            // ---- INIT ----
             init() {
                 this.createGrid();
                 this.updateUI();
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
-                this.startCountdown();
+                // Do NOT start countdown here – it will start when user visits the crash page
             },
 
             createGrid() {
@@ -1432,6 +1446,7 @@
                 }
             },
 
+            // ---- Main Action ----
             mainAction() {
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
@@ -1489,6 +1504,7 @@
                 this.updateMainButton();
             },
 
+            // ---- Countdown ----
             startCountdown() {
                 if (this.isCountingDown) return;
                 if (this.isPlaying) return;
@@ -1514,6 +1530,7 @@
                     }
                 };
 
+                // Suppress vibration on the very first countdown ever
                 if (this.firstCountdown) {
                     showNumber(3, false);
                     this.firstCountdown = false;
@@ -1535,6 +1552,7 @@
                 }, 1000);
             },
 
+            // ---- Round ----
             startRound() {
                 if (this.bet > 0 && this.bet <= state.balance) {
                     state.balance -= this.bet;
@@ -1558,12 +1576,14 @@
                 this.updateUI();
                 this.updateMainButton();
 
+                // Start vibration (only if the page is active)
                 this.startVibration();
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
+            // ---- Game Loop ----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -1619,13 +1639,17 @@
                         this.animationId = null;
                     }
 
+                    // After crash, wait and then start countdown again (if still on the page)
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
                             this.hasCashedOut = false;
                             document.getElementById('betInputRocket').value = 10;
                             this.gameOver = false;
-                            this.startCountdown();
+                            // Only start countdown if the rocket page is still active
+                            if (document.getElementById('page-rocket').classList.contains('active')) {
+                                this.startCountdown();
+                            }
                         }
                     }, 1500);
                     return;
@@ -1657,6 +1681,7 @@
                 updateHomeUI();
             },
 
+            // ---- Helpers ----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -1694,7 +1719,7 @@
         };
 
         // ============================================================
-        // MINES GAME (unchanged)
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1907,6 +1932,12 @@
                 if (crashGame.isPlaying && !crashGame.vibrationInterval) {
                     crashGame.startVibration();
                 }
+                // If the app becomes visible and we're on the rocket page, resume the game cycle
+                if (document.getElementById('page-rocket').classList.contains('active')) {
+                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) {
+                        crashGame.startGameCycle();
+                    }
+                }
             }
         });
 
@@ -1929,6 +1960,7 @@
             } catch (e) {}
 
             console.log(`Casino loaded for user: ${state.displayName}`);
+            console.log('Vibration will only start when you open the Crash page.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
