@@ -287,47 +287,55 @@
             z-index: 1;
         }
 
+        /* ============================================================
+           GRID - ONE SOLID BACKGROUND, OUTLINED SQUARES
+           ============================================================ */
         .grid-container {
             position: relative;
             height: 200px;
-            background: #0a0a0c;
+            background: #0a0a0c;  /* ONE SOLID COLOR */
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.04);
             margin: 10px 0;
         }
 
+        /* Grid squares - transparent with thin border */
         .grid-squares {
             position: absolute;
             inset: 0;
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(6, 1fr);
-            gap: 1px;
-            background: #1a1a1e;
-            padding: 1px;
+            gap: 0;
+            background: transparent;  /* no fill */
+            padding: 0;
             z-index: 0;
         }
         .grid-square {
-            background: #0a0a0c;
-            transition: background 0.3s;
+            background: transparent;  /* all squares transparent */
+            border: 1px solid rgba(255, 255, 255, 0.04);  /* subtle outline */
+            transition: border 0.3s;
         }
-        .grid-square.highlight {
-            background: #111115;
+        /* Slight accent on corner squares (optional) */
+        .grid-square.corner {
+            border-color: rgba(108, 92, 231, 0.06);
         }
 
+        /* Dog GIF - larger size */
         .gif-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) rotate(0deg);
             z-index: 10;
-            width: 60%;
-            height: 60%;
+            width: 75%;   /* increased from 60% */
+            height: 75%;  /* increased */
             pointer-events: none;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.1s;  /* for smooth rotation update */
         }
         .gif-overlay img {
             width: 100%;
@@ -335,6 +343,7 @@
             object-fit: contain;
             display: none;
             filter: drop-shadow(0 0 30px rgba(108, 92, 231, 0.3));
+            transition: transform 0.1s;
         }
         .gif-overlay img.active {
             display: block;
@@ -347,7 +356,7 @@
                 opacity: 0;
             }
             50% {
-                transform: scale(1.3) translateY(-15px) rotate(3deg);
+                transform: scale(1.3) translateY(-15px) rotate(5deg);
                 opacity: 1;
             }
             100% {
@@ -509,8 +518,8 @@
                 height: 160px;
             }
             .gif-overlay {
-                width: 50%;
-                height: 50%;
+                width: 70%;
+                height: 70%;
             }
         }
     </style>
@@ -574,11 +583,11 @@
                 <div class="status" id="rocketStatus">Press "Launch" to fly!</div>
             </div>
 
+            <!-- ===== UPDATED GRID ===== -->
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
 
-                <!-- ===== iimg.live DIRECT LINK ===== -->
-                <div class="gif-overlay">
+                <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
 
@@ -722,6 +731,8 @@
             bots: [],
             animationId: null,
             lastTime: 0,
+            rotation: 0,           // degrees for dog tilt
+            rotationSpeed: 0.3,    // degrees per second increase
 
             init() {
                 this.setupControls();
@@ -739,8 +750,9 @@
                 for (let i = 0; i < rows * cols; i++) {
                     const square = document.createElement('div');
                     square.className = 'grid-square';
-                    if (Math.random() > 0.7) {
-                        square.classList.add('highlight');
+                    // Mark corners for subtle accent
+                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) {
+                        square.classList.add('corner');
                     }
                     container.appendChild(square);
                 }
@@ -891,7 +903,9 @@
                 this.isPlaying = true;
                 this.gameOver = false;
                 this.lastTime = 0;
+                this.rotation = 0;  // reset rotation
 
+                // Show dog
                 const dogGif = document.getElementById('flyingDogGif');
                 const crashOverlay = document.getElementById('crashOverlay');
                 crashOverlay.classList.remove('active');
@@ -915,10 +929,18 @@
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
                 this.lastTime = timestamp;
 
-                const accel = 1 + (this.multiplier * 0.015);
-                const inc = 0.01 + (delta * accel * 0.12);
+                // ----- MULTIPLIER ACCELERATION (starts slow, speeds up) -----
+                // Use exponential-like growth: speed increases with multiplier^1.5
+                const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
+                const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
+                // ----- DOG ROTATION (smoothly rotate upward) -----
+                this.rotation += delta * 1.2; // degrees per second
+                const dogOverlay = document.getElementById('dogOverlay');
+                dogOverlay.style.transform = `translate(-50%, -50%) rotate(${this.rotation}deg)`;
+
+                // Check crash
                 if (this.multiplier >= this.crashPoint) {
                     this.multiplier = parseFloat(this.crashPoint.toFixed(2));
                     this.isPlaying = false;
@@ -955,6 +977,7 @@
                     return;
                 }
 
+                // Bots cashing out
                 for (const bot of this.bots) {
                     if (bot.active && !bot.cashedOut && !bot.crashed) {
                         if (this.multiplier >= bot.cashoutMultiplier) {
