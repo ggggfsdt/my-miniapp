@@ -7,6 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        /* ... (all styles remain exactly the same as previous version) ... */
         * {
             margin: 0;
             padding: 0;
@@ -287,7 +288,6 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
-        /* Dog GIF overlay - NO STRETCH */
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -329,7 +329,6 @@
             }
         }
 
-        /* ===== EXPLOSION OVERLAY ===== */
         .explosion-overlay {
             position: absolute;
             inset: 0;
@@ -368,7 +367,6 @@
             }
         }
 
-        /* ===== COUNTDOWN OVERLAY ===== */
         .countdown-overlay {
             position: absolute;
             inset: 0;
@@ -412,7 +410,6 @@
             }
         }
 
-        /* ========== HISTORY BAR ========== */
         .history-bar {
             position: absolute;
             bottom: 12px;
@@ -489,7 +486,6 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
-        /* ===== BET / CASH OUT BUTTON - NO EMOJIS ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -565,6 +561,11 @@
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
         }
         .main-action-btn:active {
             transform: scale(0.94);
@@ -611,15 +612,11 @@
             cursor: not-allowed;
             opacity: 0.6;
         }
-
-        /* Small text under cash out - only a number */
-        .cashout-info {
-            text-align: center;
-            font-size: 16px;
-            color: #ffd700;
-            padding: 4px 0;
-            min-height: 28px;
-            font-weight: 700;
+        .main-action-btn .sub-text {
+            font-size: 14px;
+            font-weight: 400;
+            color: #ffffff;
+            opacity: 0.9;
         }
 
         .mines-grid {
@@ -693,8 +690,8 @@
                 font-size: 16px;
                 padding: 14px;
             }
-            .cashout-info {
-                font-size: 14px;
+            .main-action-btn .sub-text {
+                font-size: 12px;
             }
         }
     </style>
@@ -753,30 +750,21 @@
 
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
-
-                <!-- Dog -->
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
-
-                <!-- Explosion -->
                 <div class="explosion-overlay" id="explosionOverlay">
                     <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
                 </div>
-
-                <!-- Countdown -->
                 <div class="countdown-overlay" id="countdownOverlay">
                     <div class="countdown-number" id="countdownNumber">3</div>
                 </div>
-
-                <!-- HISTORY BAR -->
                 <div class="history-bar" id="historyBar">
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
                 </div>
             </div>
 
-            <!-- BET / CASH OUT BUTTON - NO EMOJIS -->
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
@@ -785,7 +773,6 @@
                 <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
                     Place Bet
                 </button>
-                <div class="cashout-info" id="cashoutInfo"></div>
             </div>
         </div>
 
@@ -833,8 +820,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - FINAL VERSION
-        // No emojis, no stretch, cashout info shows only a number
+        // CRASH GAME - FIXED VIBRATION ON PAGE HIDE
         // ============================================================
 
         const state = {
@@ -861,6 +847,10 @@
         const navItems = document.querySelectorAll('.nav-item');
 
         function navigateTo(page) {
+            // If leaving rocket, stop vibrations immediately
+            if (page !== 'rocket') {
+                crashGame.stopVibrations();
+            }
             Object.keys(pages).forEach(key => {
                 pages[key].classList.toggle('active', key === page);
             });
@@ -874,7 +864,8 @@
         });
 
         function updateHome() {
-            homeBalance.innerHTML = `<i class="fas fa-star" style="font-size:28px; color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
+            homeBalance.innerHTML =
+                `<i class="fas fa-star" style="font-size:28px; color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
             totalGamesEl.textContent = state.totalGames;
             bestMultiplierEl.textContent = `${state.bestMultiplier.toFixed(2)}x`;
             const total = state.wins + state.losses;
@@ -895,7 +886,7 @@
         }
 
         // ============================================================
-        // VIBRATION HELPER
+        // VIBRATION HELPERS
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
             try {
@@ -939,6 +930,7 @@
             countdownId: null,
             lastTime: 0,
             vibrationInterval: null,
+            isPageVisible: true,
 
             // ----- INIT -----
             init() {
@@ -948,6 +940,19 @@
                 this.setupMainButton();
                 this.updateMainButton();
                 this.startCountdown();
+
+                // Listen for page visibility changes to pause/resume vibrations
+                document.addEventListener('visibilitychange', () => {
+                    this.isPageVisible = !document.hidden;
+                    if (document.hidden) {
+                        this.stopVibrations();
+                    } else {
+                        // Resume only if playing
+                        if (this.isPlaying) {
+                            this.startVibrations();
+                        }
+                    }
+                });
             },
 
             createGrid() {
@@ -967,6 +972,23 @@
 
             setupMainButton() {},
 
+            // ----- VIBRATION CONTROL -----
+            startVibrations() {
+                if (this.vibrationInterval) clearInterval(this.vibrationInterval);
+                this.vibrationInterval = setInterval(() => {
+                    if (this.isPlaying && this.isPageVisible) {
+                        triggerContinuousVibration();
+                    }
+                }, 150);
+            },
+
+            stopVibrations() {
+                if (this.vibrationInterval) {
+                    clearInterval(this.vibrationInterval);
+                    this.vibrationInterval = null;
+                }
+            },
+
             // ----- UPDATE UI -----
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
@@ -978,24 +1000,8 @@
                 currentEl.innerHTML = `${m.toFixed(2)}<span class="x">x</span>`;
                 currentEl.style.color = color;
 
-                document.getElementById('rocketBalance').innerHTML = `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
-
-                // Cashout info - only a number (potential win)
-                const infoEl = document.getElementById('cashoutInfo');
-                if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
-                    const potential = (this.bet * this.multiplier).toFixed(1);
-                    infoEl.textContent = potential;
-                    infoEl.style.color = '#ffd700';
-                } else if (this.hasCashedOut) {
-                    const won = (this.bet * this.multiplier).toFixed(1);
-                    infoEl.textContent = won;
-                    infoEl.style.color = '#00d2a0';
-                } else if (this.isPlaying && this.bet === 0) {
-                    infoEl.textContent = '';
-                    infoEl.style.color = '#555';
-                } else {
-                    infoEl.textContent = '';
-                }
+                document.getElementById('rocketBalance').innerHTML =
+                    `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
 
                 if (this.isPlaying) {
                     this.updateMainButton();
@@ -1009,11 +1015,12 @@
 
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
-                        btn.textContent = 'Cash Out';
+                        const potentialWin = (this.bet * this.multiplier).toFixed(1);
+                        btn.innerHTML = `Cash Out<span class="sub-text">${potentialWin}</span>`;
                         btn.className = 'main-action-btn cash-out';
                         btn.disabled = false;
                     } else if (this.bet > 0 && this.hasCashedOut) {
-                        btn.textContent = 'Cashed Out';
+                        btn.innerHTML = 'Cashed Out';
                         btn.className = 'main-action-btn cashed-out';
                         btn.disabled = true;
                     } else {
@@ -1182,12 +1189,8 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                if (this.vibrationInterval) clearInterval(this.vibrationInterval);
-                this.vibrationInterval = setInterval(() => {
-                    if (this.isPlaying) {
-                        triggerContinuousVibration();
-                    }
-                }, 150);
+                // Start vibrations
+                this.startVibrations();
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
@@ -1218,10 +1221,8 @@
                     this.isPlaying = false;
                     this.gameOver = true;
 
-                    if (this.vibrationInterval) {
-                        clearInterval(this.vibrationInterval);
-                        this.vibrationInterval = null;
-                    }
+                    // Stop vibrations
+                    this.stopVibrations();
 
                     triggerVibration(80, 'heavy');
 
@@ -1289,6 +1290,7 @@
                 this.updateUI();
                 this.updateMainButton();
                 updateHome();
+                // Keep vibrations going because round continues
             },
 
             // ----- HELPERS -----
@@ -1329,7 +1331,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME (unchanged)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1431,7 +1433,8 @@
             },
 
             updateUI() {
-                document.getElementById('minesBalance').innerHTML = `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
+                document.getElementById('minesBalance').innerHTML =
+                    `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
                 document.getElementById('minesMultiplier').textContent = `${this.multiplier.toFixed(2)}x`;
                 const msg = document.getElementById('minesMessage');
                 if (this.gameActive && !this.gameOver) {
