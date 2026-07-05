@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* All previous styles remain unchanged */
+        /* (All CSS remains exactly as in the previous version) */
         * {
             margin: 0;
             padding: 0;
@@ -40,7 +40,6 @@
             position: relative;
         }
 
-        /* ---- NOTIFICATION ---- */
         #notification {
             position: sticky;
             top: 0;
@@ -77,7 +76,6 @@
             font-weight: 700;
         }
 
-        /* Rest of the CSS exactly as before */
         .page {
             display: none;
             flex: 1;
@@ -898,7 +896,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - With Notification on Cash Out
+        // CRASH GAME - Notification 1s, initial vibration removed
         // ============================================================
 
         const state = {
@@ -998,23 +996,21 @@
         }
 
         // ============================================================
-        // NOTIFICATION
+        // NOTIFICATION - duration set to 1000ms
         // ============================================================
         function showNotification(amount) {
             const notif = document.getElementById('notification');
             notifAmount.textContent = `+${amount} ⭐`;
             notif.style.display = 'flex';
-            // Trigger reflow
             void notif.offsetHeight;
             notif.style.transform = 'translateY(0)';
-            // Auto hide after 0.7s
             clearTimeout(notif._timeout);
             notif._timeout = setTimeout(() => {
                 notif.style.transform = 'translateY(-120%)';
                 setTimeout(() => {
                     notif.style.display = 'none';
                 }, 400);
-            }, 700);
+            }, 1000); // 1 second
         }
 
         // ============================================================
@@ -1033,6 +1029,7 @@
             countdownId: null,
             lastTime: 0,
             vibrationInterval: null,
+            firstCountdown: true, // to suppress initial vibration
 
             init() {
                 this.createGrid();
@@ -1213,15 +1210,24 @@
 
                 let count = 3;
 
-                const showNumber = (num) => {
+                // Modified showNumber with optional vibration flag
+                const showNumber = (num, vibrate = true) => {
                     numberEl.textContent = num;
                     numberEl.style.animation = 'none';
                     void numberEl.offsetHeight;
                     numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
-                    triggerVibration(35, 'light');
+                    if (vibrate) {
+                        triggerVibration(35, 'light');
+                    }
                 };
 
-                showNumber(3);
+                // First number (3) - no vibration if it's the very first countdown
+                if (this.firstCountdown) {
+                    showNumber(3, false);
+                    this.firstCountdown = false;
+                } else {
+                    showNumber(3, true);
+                }
 
                 this.countdownId = setInterval(() => {
                     count--;
@@ -1233,7 +1239,8 @@
                         this.startRound();
                         return;
                     }
-                    showNumber(count);
+                    // All subsequent numbers (2,1) vibrate normally
+                    showNumber(count, true);
                 }, 1000);
             },
 
@@ -1361,7 +1368,7 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-                // ---- SHOW NOTIFICATION ----
+                // Show notification for 1 second
                 showNotification(win);
 
                 this.updateUI();
@@ -1643,7 +1650,7 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded! Notification added on cash out.');
+            console.log('Crash loaded! Notification 1s, initial vibration removed.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
