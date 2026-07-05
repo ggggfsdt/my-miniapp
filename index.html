@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== RESET & BASE ===== */
+        /* All CSS remains exactly the same as before */
         * {
             margin: 0;
             padding: 0;
@@ -40,7 +40,6 @@
             position: relative;
         }
 
-        /* ===== NOTIFICATION ===== */
         #notification {
             position: sticky;
             top: 0;
@@ -77,7 +76,6 @@
             font-weight: 700;
         }
 
-        /* ===== PAGES ===== */
         .page {
             display: none;
             flex: 1;
@@ -100,7 +98,6 @@
             border-radius: 10px;
         }
 
-        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             position: sticky;
             bottom: 0;
@@ -151,7 +148,6 @@
             transform: translateY(-2px) scale(1.1);
         }
 
-        /* ===== COMMON ===== */
         .card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -241,7 +237,6 @@
             color: #ffd700;
         }
 
-        /* ===== ONLINE DOT ===== */
         .online-dot {
             display: inline-block;
             width: 10px;
@@ -258,7 +253,6 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        /* ===== HOME PAGE ===== */
         .home-header {
             background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(0,0,0,0.2));
             border-radius: 24px;
@@ -371,12 +365,10 @@
             box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
         }
 
-        /* Recent Winners - moved lower with more spacing */
         .recent-winners-card {
             margin-top: 16px;
         }
 
-        /* ===== PROFILE PAGE ===== */
         .profile-header {
             text-align: center;
             padding: 20px 0 16px 0;
@@ -462,7 +454,6 @@
             font-size: 14px;
         }
 
-        /* ===== GRID ===== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -580,7 +571,6 @@
             100% { opacity: 0; transform: scale(1.1); }
         }
 
-        /* ===== HISTORY BAR ===== */
         .history-bar {
             position: absolute;
             bottom: 12px;
@@ -657,7 +647,6 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
-        /* ===== BET / CASH OUT ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -794,7 +783,6 @@
             opacity: 0.6;
         }
 
-        /* ===== MINES ===== */
         .mines-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -837,7 +825,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .grid-container {
                 height: 220px;
@@ -925,14 +912,14 @@
 <body>
 
     <div id="app">
-        <!-- ===== NOTIFICATION ===== -->
+        <!-- NOTIFICATION -->
         <div id="notification">
             <i class="fas fa-check-circle notif-icon"></i>
             <span class="notif-text">Successfully claimed your bet</span>
             <span class="notif-amount" id="notifAmount">+0 ⭐</span>
         </div>
 
-        <!-- ===== HOME PAGE ===== -->
+        <!-- HOME PAGE -->
         <div id="page-home" class="page active">
             <div class="home-header">
                 <div class="home-avatar">
@@ -961,14 +948,13 @@
                 </div>
             </div>
 
-            <!-- Recent Winners - moved lower with margin-top -->
             <div class="card recent-winners-card">
                 <div class="card-title">Recent Winners</div>
                 <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
             </div>
         </div>
 
-        <!-- ===== CRASH PAGE ===== -->
+        <!-- CRASH PAGE -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span>
@@ -1004,7 +990,7 @@
             </div>
         </div>
 
-        <!-- ===== MINES PAGE ===== -->
+        <!-- MINES PAGE -->
         <div id="page-mines" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold"><i class="fas fa-gem" style="margin-right:6px;"></i>Mines</span>
@@ -1029,7 +1015,7 @@
             </div>
         </div>
 
-        <!-- ===== PROFILE PAGE ===== -->
+        <!-- PROFILE PAGE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
                 <div class="profile-avatar">
@@ -1088,7 +1074,7 @@
             </div>
         </div>
 
-        <!-- ===== BOTTOM NAV ===== -->
+        <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
                 <span class="icon"><i class="fas fa-house"></i></span>
@@ -1111,7 +1097,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - WITH REAL TELEGRAM USER INFO
+        // CRASH GAME - WITH VIBRATION CONTROL (stop on leave, resume on return)
         // ============================================================
 
         const state = {
@@ -1131,7 +1117,6 @@
         const recentWinnersEl = document.getElementById('recentWinners');
         const notifAmount = document.getElementById('notifAmount');
 
-        // Profile DOM refs
         const profileBalance = document.getElementById('profileBalance');
         const profileGames = document.getElementById('profileGames');
         const profileWins = document.getElementById('profileWins');
@@ -1151,12 +1136,11 @@
         };
         const navItems = document.querySelectorAll('.nav-item');
 
+        // ----- NAVIGATION -----
         function navigateTo(page) {
+            // If leaving rocket, stop vibration immediately
             if (page !== 'rocket' && crashGame.isPlaying) {
-                if (crashGame.vibrationInterval) {
-                    clearInterval(crashGame.vibrationInterval);
-                    crashGame.vibrationInterval = null;
-                }
+                crashGame.stopVibration();
             }
             Object.keys(pages).forEach(key => {
                 pages[key].classList.toggle('active', key === page);
@@ -1164,6 +1148,10 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
+            // If entering rocket and game is playing, start vibration
+            if (page === 'rocket' && crashGame.isPlaying) {
+                crashGame.startVibration();
+            }
             if (page === 'profile') {
                 updateProfile();
             }
@@ -1173,7 +1161,7 @@
             item.addEventListener('click', () => navigateTo(item.dataset.page));
         });
 
-        // ----- Get Telegram User Info -----
+        // ----- Telegram User -----
         function getTelegramUser() {
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
@@ -1190,9 +1178,7 @@
                         }
                     }
                 }
-            } catch (e) {
-                console.log('Not in Telegram or no user data');
-            }
+            } catch (e) {}
         }
 
         function updateHomeUI() {
@@ -1227,7 +1213,7 @@
         }
 
         // ============================================================
-        // VIBRATION
+        // VIBRATION HELPERS
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
             try {
@@ -1244,6 +1230,7 @@
         }
 
         function triggerContinuousVibration() {
+            // Only vibrate if the rocket page is active and document is visible
             if (document.hidden) return;
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage || !rocketPage.classList.contains('active')) return;
@@ -1293,6 +1280,24 @@
             vibrationInterval: null,
             firstCountdown: true,
 
+            // ----- Vibration Control -----
+            startVibration() {
+                if (this.vibrationInterval) return;
+                this.vibrationInterval = setInterval(() => {
+                    if (this.isPlaying) {
+                        triggerContinuousVibration();
+                    }
+                }, 150);
+            },
+
+            stopVibration() {
+                if (this.vibrationInterval) {
+                    clearInterval(this.vibrationInterval);
+                    this.vibrationInterval = null;
+                }
+            },
+
+            // ----- INIT -----
             init() {
                 this.createGrid();
                 this.updateUI();
@@ -1319,6 +1324,7 @@
 
             setupMainButton() {},
 
+            // ----- UI Updates -----
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
@@ -1400,6 +1406,7 @@
                 }
             },
 
+            // ----- Actions -----
             mainAction() {
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
@@ -1457,6 +1464,7 @@
                 this.updateMainButton();
             },
 
+            // ----- Countdown -----
             startCountdown() {
                 if (this.isCountingDown) return;
                 if (this.isPlaying) return;
@@ -1503,6 +1511,7 @@
                 }, 1000);
             },
 
+            // ----- Round -----
             startRound() {
                 if (this.bet > 0 && this.bet <= state.balance) {
                     state.balance -= this.bet;
@@ -1526,17 +1535,14 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                if (this.vibrationInterval) clearInterval(this.vibrationInterval);
-                this.vibrationInterval = setInterval(() => {
-                    if (this.isPlaying) {
-                        triggerContinuousVibration();
-                    }
-                }, 150);
+                // Start vibration (only if rocket page is active)
+                this.startVibration();
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
+            // ----- Game Loop -----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -1560,11 +1566,7 @@
                     this.isPlaying = false;
                     this.gameOver = true;
 
-                    if (this.vibrationInterval) {
-                        clearInterval(this.vibrationInterval);
-                        this.vibrationInterval = null;
-                    }
-
+                    this.stopVibration();
                     triggerVibration(80, 'heavy');
 
                     const dogGif = document.getElementById('flyingDogGif');
@@ -1634,6 +1636,7 @@
                 updateHomeUI();
             },
 
+            // ----- Helpers -----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -1671,7 +1674,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME (unchanged, just uses triggerVibration)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1873,21 +1876,16 @@
         };
 
         // ============================================================
-        // VISIBILITY CHANGE HANDLER
+        // VISIBILITY CHANGE HANDLER (stop vibration when hidden)
         // ============================================================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 if (crashGame.isPlaying && crashGame.vibrationInterval) {
-                    clearInterval(crashGame.vibrationInterval);
-                    crashGame.vibrationInterval = null;
+                    crashGame.stopVibration();
                 }
             } else {
                 if (crashGame.isPlaying && !crashGame.vibrationInterval) {
-                    crashGame.vibrationInterval = setInterval(() => {
-                        if (crashGame.isPlaying) {
-                            triggerContinuousVibration();
-                        }
-                    }, 150);
+                    crashGame.startVibration();
                 }
             }
         });
