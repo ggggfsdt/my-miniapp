@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🚀 Crash</title>
+    <title>Crash</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -244,6 +245,7 @@
             font-size: 36px;
             display: block;
             margin-bottom: 6px;
+            color: #fff;
         }
         .quick-action .label {
             font-size: 15px;
@@ -285,12 +287,12 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
-        /* Dog GIF overlay */
+        /* Dog GIF overlay - NO STRETCH */
         .gif-overlay {
             position: absolute;
             top: 45%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(0deg) scale(1, 1);
+            transform: translate(-50%, -50%) rotate(0deg);
             z-index: 10;
             width: 80%;
             height: 80%;
@@ -327,7 +329,7 @@
             }
         }
 
-        /* ===== EXPLOSION OVERLAY (replaces crash overlay) ===== */
+        /* ===== EXPLOSION OVERLAY ===== */
         .explosion-overlay {
             position: absolute;
             inset: 0;
@@ -363,6 +365,50 @@
             100% {
                 transform: scale(1);
                 opacity: 1;
+            }
+        }
+
+        /* ===== COUNTDOWN OVERLAY ===== */
+        .countdown-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+        }
+        .countdown-overlay.active {
+            display: flex;
+        }
+        .countdown-number {
+            font-size: 100px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 60px rgba(108, 92, 231, 0.5), 0 0 120px rgba(108, 92, 231, 0.2);
+            animation: countdownPulse 1s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        @keyframes countdownPulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.1);
             }
         }
 
@@ -443,6 +489,139 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
+        /* ===== BET / CASH OUT BUTTON - NO EMOJIS ===== */
+        .bet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0 0 0;
+        }
+        .bet-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 4px;
+            margin: 0;
+        }
+        .bet-input-row.open {
+            max-height: 60px;
+            opacity: 1;
+            padding: 4px;
+            margin: 0;
+        }
+        .bet-input-row input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 0;
+        }
+        .bet-input-row input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .bet-input-row .bet-confirm-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .bet-input-row .bet-confirm-btn:active {
+            transform: scale(0.92);
+        }
+        .bet-input-row .bet-confirm-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .main-action-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: white;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .main-action-btn:active {
+            transform: scale(0.94);
+        }
+        .main-action-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        .main-action-btn.place-bet {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+        }
+        .main-action-btn.cash-out {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .main-action-btn.waiting {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+        .main-action-btn.confirm-bet {
+            background: linear-gradient(135deg, #f9ca24, #f0932b);
+            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+        .main-action-btn.disabled-btn {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .main-action-btn.round-in-progress {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .main-action-btn.bet-placed {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .main-action-btn.cashed-out {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Small text under cash out - only a number */
+        .cashout-info {
+            text-align: center;
+            font-size: 16px;
+            color: #ffd700;
+            padding: 4px 0;
+            min-height: 28px;
+            font-weight: 700;
+        }
+
         .mines-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -507,6 +686,16 @@
                 padding: 3px 8px;
                 gap: 3px;
             }
+            .countdown-number {
+                font-size: 72px;
+            }
+            .main-action-btn {
+                font-size: 16px;
+                padding: 14px;
+            }
+            .cashout-info {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -516,26 +705,26 @@
         <!-- HOME PAGE -->
         <div id="page-home" class="page active">
             <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
-                <div class="home-greeting">🐕 Welcome back</div>
+                <div class="home-greeting">Welcome back</div>
                 <div class="flex-between" style="margin-top: 4px;">
                     <span class="text-muted" style="font-size: 14px;">Your Balance</span>
-                    <span class="home-balance" id="homeBalance">⭐ 1,000</span>
+                    <span class="home-balance" id="homeBalance"><i class="fas fa-star" style="font-size:28px; color:#ffd700; margin-right:4px;"></i> 1,000</span>
                 </div>
                 <div class="quick-actions">
                     <div class="quick-action" onclick="navigateTo('rocket')">
-                        <span class="icon">🚀</span>
+                        <span class="icon"><i class="fas fa-rocket"></i></span>
                         <div class="label">Crash</div>
                         <div class="desc">Fly high, cash out!</div>
                     </div>
                     <div class="quick-action" onclick="navigateTo('mines')">
-                        <span class="icon">💎</span>
+                        <span class="icon"><i class="fas fa-gem"></i></span>
                         <div class="label">Mines</div>
                         <div class="desc">Find the gems</div>
                     </div>
                 </div>
             </div>
             <div class="card">
-                <div class="card-title">📊 Statistics</div>
+                <div class="card-title">Statistics</div>
                 <div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
                     <span style="color:#666;">Games Played</span>
                     <span style="font-weight:700;" id="totalGames">0</span>
@@ -550,7 +739,7 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-title">🏆 Recent Winners</div>
+                <div class="card-title">Recent Winners</div>
                 <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
             </div>
         </div>
@@ -558,8 +747,8 @@
         <!-- CRASH PAGE -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
-                <span class="badge badge-gold">🚀 CRASH</span>
-                <span class="badge" id="rocketBalance">⭐ 1,000</span>
+                <span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash</span>
+                <span class="badge" id="rocketBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
             </div>
 
             <div class="grid-container" id="gridContainer">
@@ -570,9 +759,14 @@
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
 
-                <!-- Explosion (replaces crash overlay) -->
+                <!-- Explosion -->
                 <div class="explosion-overlay" id="explosionOverlay">
                     <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
+                </div>
+
+                <!-- Countdown -->
+                <div class="countdown-overlay" id="countdownOverlay">
+                    <div class="countdown-number" id="countdownNumber">3</div>
                 </div>
 
                 <!-- HISTORY BAR -->
@@ -582,26 +776,24 @@
                 </div>
             </div>
 
-            <div class="flex gap-8" style="margin: 10px 0;">
-                <div class="flex" style="background:rgba(255,255,255,0.03); border-radius:16px; padding:4px; border:1px solid rgba(255,255,255,0.04);">
-                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusRocket">−</button>
-                    <input type="number" id="betInputRocket" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
-                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusRocket">+</button>
+            <!-- BET / CASH OUT BUTTON - NO EMOJIS -->
+            <div class="bet-container">
+                <div class="bet-input-row" id="betInputRow">
+                    <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
+                    <button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
                 </div>
-                <button class="btn btn-primary" id="rocketStartBtn">🚀 Launch</button>
-                <button class="btn btn-success" id="rocketCashoutBtn" disabled>💰 Cash Out</button>
-            </div>
-
-            <div id="rocketStatus" style="text-align:center; font-size:14px; color:#555; padding:4px 0;">
-                Press "Launch" to start
+                <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
+                    Place Bet
+                </button>
+                <div class="cashout-info" id="cashoutInfo"></div>
             </div>
         </div>
 
         <!-- MINES PAGE -->
         <div id="page-mines" class="page">
             <div class="flex-between mb-8">
-                <span class="badge badge-gold">💎 MINES</span>
-                <span class="badge" id="minesBalance">⭐ 1,000</span>
+                <span class="badge badge-gold"><i class="fas fa-gem" style="margin-right:6px;"></i>Mines</span>
+                <span class="badge" id="minesBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
             </div>
             <div class="mines-multiplier-box flex-between">
                 <span style="color:#666; font-size:14px; font-weight:600;">Multiplier</span>
@@ -610,12 +802,12 @@
             <div class="mines-grid" id="minesGrid"></div>
             <div class="flex gap-8" style="margin: 8px 0;">
                 <div class="flex" style="background:rgba(255,255,255,0.03); border-radius:16px; padding:4px; border:1px solid rgba(255,255,255,0.04);">
-                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusMines">−</button>
+                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusMines"><i class="fas fa-minus"></i></button>
                     <input type="number" id="betInputMines" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
-                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusMines">+</button>
+                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusMines"><i class="fas fa-plus"></i></button>
                 </div>
-                <button class="btn btn-primary" id="minesStartBtn">💎 Start</button>
-                <button class="btn btn-success" id="minesCashoutBtn" disabled>💰 Cash Out</button>
+                <button class="btn btn-primary" id="minesStartBtn">Start</button>
+                <button class="btn btn-success" id="minesCashoutBtn" disabled>Cash Out</button>
             </div>
             <div id="minesMessage" class="card" style="padding: 14px; text-align:center; min-height:50px; display:flex; align-items:center; justify-content:center; font-weight:500;">
                 Press "Start" to play
@@ -625,15 +817,15 @@
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
-                <span class="icon">🏠</span>
+                <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="label">Home</span>
             </button>
             <button class="nav-item" data-page="rocket">
-                <span class="icon">🚀</span>
+                <span class="icon"><i class="fas fa-rocket"></i></span>
                 <span class="label">Crash</span>
             </button>
             <button class="nav-item" data-page="mines">
-                <span class="icon">💎</span>
+                <span class="icon"><i class="fas fa-gem"></i></span>
                 <span class="label">Mines</span>
             </button>
         </div>
@@ -641,7 +833,8 @@
 
     <script>
         // ============================================================
-        // 🚀 CRASH GAME - Final version with vibration & explosion
+        // CRASH GAME - FINAL VERSION
+        // No emojis, no stretch, cashout info shows only a number
         // ============================================================
 
         const state = {
@@ -681,7 +874,7 @@
         });
 
         function updateHome() {
-            homeBalance.textContent = `⭐ ${state.balance.toLocaleString()}`;
+            homeBalance.innerHTML = `<i class="fas fa-star" style="font-size:28px; color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
             totalGamesEl.textContent = state.totalGames;
             bestMultiplierEl.textContent = `${state.bestMultiplier.toFixed(2)}x`;
             const total = state.wins + state.losses;
@@ -704,52 +897,57 @@
         // ============================================================
         // VIBRATION HELPER
         // ============================================================
-        function triggerVibration(duration = 50, type = 'light') {
-            // Try Telegram haptic feedback first
+        function triggerVibration(duration = 30, type = 'light') {
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
-                    if (type === 'heavy') {
-                        tg.HapticFeedback.impactOccurred('heavy');
-                    } else if (type === 'medium') {
-                        tg.HapticFeedback.impactOccurred('medium');
-                    } else {
-                        tg.HapticFeedback.impactOccurred('light');
-                    }
-                    // Also vibrate the device if possible
-                    if (navigator.vibrate) {
-                        navigator.vibrate(duration);
-                    }
-                    return;
+                    if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
+                    else if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
+                    else tg.HapticFeedback.impactOccurred('light');
                 }
             } catch (e) {}
-
-            // Fallback: device vibration only
             try {
-                if (navigator.vibrate) {
-                    navigator.vibrate(duration);
+                if (navigator.vibrate) navigator.vibrate(duration);
+            } catch (e) {}
+        }
+
+        function triggerContinuousVibration() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                 }
+            } catch (e) {}
+            try {
+                if (navigator.vibrate) navigator.vibrate(15);
             } catch (e) {}
         }
 
         // ============================================================
-        // 🚀 CRASH GAME
+        // CRASH GAME
         // ============================================================
-        const rocketGame = {
+        const crashGame = {
+            // ----- STATE -----
             multiplier: 1.00,
             crashPoint: 1.00,
-            isPlaying: false,
-            gameOver: false,
-            bet: 10,
+            bet: 0,
+            hasCashedOut: false,
             history: [],
+            isPlaying: false,
+            isCountingDown: false,
+            gameOver: false,
             animationId: null,
+            countdownId: null,
             lastTime: 0,
+            vibrationInterval: null,
 
+            // ----- INIT -----
             init() {
-                this.setupControls();
                 this.createGrid();
                 this.updateUI();
                 this.renderHistory();
+                this.setupMainButton();
+                this.updateMainButton();
+                this.startCountdown();
             },
 
             createGrid() {
@@ -767,34 +965,9 @@
                 }
             },
 
-            setupControls() {
-                const startBtn = document.getElementById('rocketStartBtn');
-                const cashoutBtn = document.getElementById('rocketCashoutBtn');
-                const betInput = document.getElementById('betInputRocket');
-                const betMinus = document.getElementById('betMinusRocket');
-                const betPlus = document.getElementById('betPlusRocket');
+            setupMainButton() {},
 
-                startBtn.addEventListener('click', () => this.start());
-                cashoutBtn.addEventListener('click', () => this.cashOut());
-
-                betMinus.addEventListener('click', () => {
-                    let v = parseInt(betInput.value) || 10;
-                    v = Math.max(1, v - 5);
-                    betInput.value = v;
-                });
-                betPlus.addEventListener('click', () => {
-                    let v = parseInt(betInput.value) || 10;
-                    v = Math.min(1000, v + 5);
-                    betInput.value = v;
-                });
-                betInput.addEventListener('change', () => {
-                    let v = parseInt(betInput.value) || 10;
-                    if (v < 1) v = 1;
-                    if (v > 1000) v = 1000;
-                    betInput.value = v;
-                });
-            },
-
+            // ----- UPDATE UI -----
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
@@ -805,17 +978,320 @@
                 currentEl.innerHTML = `${m.toFixed(2)}<span class="x">x</span>`;
                 currentEl.style.color = color;
 
-                document.getElementById('rocketBalance').textContent = `⭐ ${state.balance.toLocaleString()}`;
-                document.getElementById('rocketStatus').textContent =
-                    this.isPlaying ? `🚀 Flying at ${this.multiplier.toFixed(2)}x` :
-                    this.gameOver ? '💥 Crashed!' : 'Press "Launch" to start';
+                document.getElementById('rocketBalance').innerHTML = `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
 
-                const startBtn = document.getElementById('rocketStartBtn');
-                const cashBtn = document.getElementById('rocketCashoutBtn');
-                startBtn.disabled = this.isPlaying || this.gameOver;
-                cashBtn.disabled = !this.isPlaying;
+                // Cashout info - only a number (potential win)
+                const infoEl = document.getElementById('cashoutInfo');
+                if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
+                    const potential = (this.bet * this.multiplier).toFixed(1);
+                    infoEl.textContent = potential;
+                    infoEl.style.color = '#ffd700';
+                } else if (this.hasCashedOut) {
+                    const won = (this.bet * this.multiplier).toFixed(1);
+                    infoEl.textContent = won;
+                    infoEl.style.color = '#00d2a0';
+                } else if (this.isPlaying && this.bet === 0) {
+                    infoEl.textContent = '';
+                    infoEl.style.color = '#555';
+                } else {
+                    infoEl.textContent = '';
+                }
+
+                if (this.isPlaying) {
+                    this.updateMainButton();
+                }
             },
 
+            updateMainButton() {
+                const btn = document.getElementById('mainActionBtn');
+                const confirmBtn = document.getElementById('betConfirmBtn');
+                const inputRow = document.getElementById('betInputRow');
+
+                if (this.isPlaying) {
+                    if (this.bet > 0 && !this.hasCashedOut) {
+                        btn.textContent = 'Cash Out';
+                        btn.className = 'main-action-btn cash-out';
+                        btn.disabled = false;
+                    } else if (this.bet > 0 && this.hasCashedOut) {
+                        btn.textContent = 'Cashed Out';
+                        btn.className = 'main-action-btn cashed-out';
+                        btn.disabled = true;
+                    } else {
+                        btn.textContent = 'Round in progress';
+                        btn.className = 'main-action-btn round-in-progress';
+                        btn.disabled = true;
+                    }
+                    inputRow.classList.remove('open');
+                    confirmBtn.disabled = true;
+                } else if (this.isCountingDown) {
+                    const isOpen = inputRow.classList.contains('open');
+                    if (this.bet > 0) {
+                        btn.textContent = 'Waiting for round';
+                        btn.className = 'main-action-btn bet-placed';
+                        btn.disabled = true;
+                        inputRow.classList.remove('open');
+                        confirmBtn.disabled = true;
+                    } else if (isOpen) {
+                        btn.textContent = 'Confirm Bet';
+                        btn.className = 'main-action-btn confirm-bet';
+                        btn.disabled = false;
+                        confirmBtn.disabled = false;
+                    } else {
+                        btn.textContent = 'Place Bet';
+                        btn.className = 'main-action-btn place-bet';
+                        btn.disabled = false;
+                        confirmBtn.disabled = true;
+                    }
+                } else if (this.gameOver) {
+                    this.bet = 0;
+                    this.hasCashedOut = false;
+                    btn.textContent = 'Place Bet';
+                    btn.className = 'main-action-btn place-bet';
+                    btn.disabled = false;
+                    confirmBtn.disabled = true;
+                    inputRow.classList.remove('open');
+                    document.getElementById('betInputRocket').value = 10;
+                } else {
+                    btn.textContent = 'Place Bet';
+                    btn.className = 'main-action-btn place-bet';
+                    btn.disabled = false;
+                    confirmBtn.disabled = true;
+                }
+            },
+
+            // ----- MAIN ACTION -----
+            mainAction() {
+                if (this.isPlaying) {
+                    if (this.bet > 0 && !this.hasCashedOut) {
+                        this.cashOut();
+                    }
+                    return;
+                }
+
+                if (this.isCountingDown) {
+                    const row = document.getElementById('betInputRow');
+                    const isOpen = row.classList.contains('open');
+                    if (isOpen) {
+                        this.confirmBet();
+                    } else {
+                        if (this.bet === 0) {
+                            row.classList.add('open');
+                            document.getElementById('betInputRocket').focus();
+                            this.updateMainButton();
+                        }
+                    }
+                    return;
+                }
+
+                if (this.gameOver) {
+                    this.gameOver = false;
+                    this.hasCashedOut = false;
+                    this.bet = 0;
+                    document.getElementById('explosionOverlay').classList.remove('active');
+                    document.getElementById('betInputRocket').value = 10;
+                    this.startCountdown();
+                    return;
+                }
+
+                if (this.bet === 0) {
+                    const row = document.getElementById('betInputRow');
+                    row.classList.add('open');
+                    document.getElementById('betInputRocket').focus();
+                    this.updateMainButton();
+                }
+            },
+
+            // ----- BET -----
+            confirmBet() {
+                const input = document.getElementById('betInputRocket');
+                let bet = parseInt(input.value) || 0;
+                if (bet < 1) {
+                    triggerVibration(60, 'heavy');
+                    return;
+                }
+                if (bet > state.balance) {
+                    triggerVibration(60, 'heavy');
+                    return;
+                }
+                this.bet = bet;
+                document.getElementById('betInputRow').classList.remove('open');
+                this.updateMainButton();
+            },
+
+            // ----- COUNTDOWN -----
+            startCountdown() {
+                if (this.isCountingDown) return;
+                if (this.isPlaying) return;
+
+                this.isCountingDown = true;
+                this.gameOver = false;
+                this.hasCashedOut = false;
+                this.updateMainButton();
+
+                const overlay = document.getElementById('countdownOverlay');
+                const numberEl = document.getElementById('countdownNumber');
+                overlay.classList.add('active');
+
+                let count = 3;
+
+                const showNumber = (num) => {
+                    numberEl.textContent = num;
+                    numberEl.style.animation = 'none';
+                    void numberEl.offsetHeight;
+                    numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
+                    triggerVibration(35, 'light');
+                };
+
+                showNumber(3);
+
+                this.countdownId = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(this.countdownId);
+                        this.countdownId = null;
+                        overlay.classList.remove('active');
+                        this.isCountingDown = false;
+                        this.startRound();
+                        return;
+                    }
+                    showNumber(count);
+                }, 1000);
+            },
+
+            // ----- ROUND -----
+            startRound() {
+                if (this.bet > 0 && this.bet <= state.balance) {
+                    state.balance -= this.bet;
+                } else {
+                    this.bet = 0;
+                }
+
+                this.hasCashedOut = false;
+                this.multiplier = 1.00;
+                this.crashPoint = this.generateCrashPoint();
+                this.isPlaying = true;
+                this.gameOver = false;
+                this.lastTime = 0;
+
+                document.getElementById('explosionOverlay').classList.remove('active');
+
+                const dogGif = document.getElementById('flyingDogGif');
+                dogGif.style.display = 'block';
+                dogGif.classList.add('active');
+
+                this.updateUI();
+                this.updateMainButton();
+
+                if (this.vibrationInterval) clearInterval(this.vibrationInterval);
+                this.vibrationInterval = setInterval(() => {
+                    if (this.isPlaying) {
+                        triggerContinuousVibration();
+                    }
+                }, 150);
+
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+            },
+
+            // ----- GAME LOOP (NO STRETCH) -----
+            gameLoop(timestamp) {
+                if (!this.isPlaying) return;
+                const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
+                this.lastTime = timestamp;
+
+                const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
+                const inc = delta * speedFactor * 1.5;
+                this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
+
+                // Dog rotation only - NO STRETCH
+                const effectiveMult = Math.min(this.multiplier, 2.3);
+                const tilt = -(effectiveMult - 1) * 8;
+                const dogOverlay = document.getElementById('dogOverlay');
+                dogOverlay.style.transition = 'none';
+                dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
+                void dogOverlay.offsetHeight;
+
+                this.updateUI();
+
+                if (this.multiplier >= this.crashPoint) {
+                    this.multiplier = parseFloat(this.crashPoint.toFixed(2));
+                    this.isPlaying = false;
+                    this.gameOver = true;
+
+                    if (this.vibrationInterval) {
+                        clearInterval(this.vibrationInterval);
+                        this.vibrationInterval = null;
+                    }
+
+                    triggerVibration(80, 'heavy');
+
+                    const dogGif = document.getElementById('flyingDogGif');
+                    dogGif.classList.remove('active');
+                    dogGif.style.display = 'none';
+
+                    const explosionOverlay = document.getElementById('explosionOverlay');
+                    explosionOverlay.classList.add('active');
+                    const explosionImg = document.getElementById('explosionGif');
+                    explosionImg.style.animation = 'none';
+                    void explosionImg.offsetHeight;
+                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
+
+                    setTimeout(() => {
+                        explosionOverlay.classList.remove('active');
+                    }, 1200);
+
+                    if (this.bet > 0 && !this.hasCashedOut) {
+                        state.losses++;
+                        state.totalGames++;
+                    }
+                    this.addHistory(this.multiplier);
+                    this.updateUI();
+                    this.updateMainButton();
+                    updateHome();
+
+                    if (this.animationId) {
+                        cancelAnimationFrame(this.animationId);
+                        this.animationId = null;
+                    }
+
+                    setTimeout(() => {
+                        if (!this.isPlaying && this.gameOver) {
+                            this.bet = 0;
+                            this.hasCashedOut = false;
+                            document.getElementById('betInputRocket').value = 10;
+                            this.gameOver = false;
+                            this.startCountdown();
+                        }
+                    }, 1500);
+                    return;
+                }
+
+                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+            },
+
+            // ----- CASH OUT -----
+            cashOut() {
+                if (!this.isPlaying) return;
+                if (this.bet === 0) return;
+                if (this.hasCashedOut) return;
+
+                this.hasCashedOut = true;
+                triggerVibration(30, 'light');
+
+                const win = Math.floor(this.bet * this.multiplier);
+                state.balance += win;
+                state.wins++;
+                state.totalGames++;
+                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
+                state.recentWinners.unshift({ name: 'You', amount: win });
+                if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                this.updateUI();
+                this.updateMainButton();
+                updateHome();
+            },
+
+            // ----- HELPERS -----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -849,150 +1325,11 @@
                 this.history.unshift(mult);
                 if (this.history.length > 12) this.history.pop();
                 this.renderHistory();
-            },
-
-            start() {
-                const betInput = document.getElementById('betInputRocket');
-                let bet = parseInt(betInput.value) || 10;
-                if (bet < 1) bet = 1;
-                if (bet > state.balance) {
-                    document.getElementById('rocketStatus').textContent = '❌ Not enough balance!';
-                    return;
-                }
-                this.bet = bet;
-                state.balance -= bet;
-                this.multiplier = 1.00;
-                this.crashPoint = this.generateCrashPoint();
-                this.isPlaying = true;
-                this.gameOver = false;
-                this.lastTime = 0;
-
-                // Hide explosion if visible
-                document.getElementById('explosionOverlay').classList.remove('active');
-
-                const dogGif = document.getElementById('flyingDogGif');
-                dogGif.style.display = 'block';
-                dogGif.classList.add('active');
-
-                this.updateUI();
-                document.getElementById('rocketStatus').textContent = `🚀 Flying... crash at ${this.crashPoint.toFixed(2)}x`;
-                document.getElementById('rocketStartBtn').disabled = true;
-                document.getElementById('rocketCashoutBtn').disabled = false;
-
-                if (this.animationId) cancelAnimationFrame(this.animationId);
-                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
-            },
-
-            gameLoop(timestamp) {
-                if (!this.isPlaying) return;
-                const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
-                this.lastTime = timestamp;
-
-                const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
-                const inc = delta * speedFactor * 1.5;
-                this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
-
-                // Dog transform: downward tilt + stretch
-                const dogOverlay = document.getElementById('dogOverlay');
-                const tilt = -(this.multiplier - 1) * 8;
-                let scaleX = 1;
-                let scaleY = 1;
-                if (this.multiplier > 5) {
-                    const stretch = Math.min((this.multiplier - 5) * 0.06, 0.5);
-                    scaleX = 1 + stretch;
-                    scaleY = 1 - stretch * 0.4;
-                }
-                dogOverlay.style.transition = 'none';
-                dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg) scale(${scaleX}, ${scaleY})`;
-                void dogOverlay.offsetHeight;
-
-                // Crash check
-                if (this.multiplier >= this.crashPoint) {
-                    this.multiplier = parseFloat(this.crashPoint.toFixed(2));
-                    this.isPlaying = false;
-                    this.gameOver = true;
-                    state.losses++;
-                    state.totalGames++;
-
-                    // ----- VIBRATION (heavy) on crash -----
-                    triggerVibration(80, 'heavy');
-
-                    // Hide dog
-                    const dogGif = document.getElementById('flyingDogGif');
-                    dogGif.classList.remove('active');
-                    dogGif.style.display = 'none';
-
-                    // ----- SHOW EXPLOSION GIF (no text, no red screen) -----
-                    const explosionOverlay = document.getElementById('explosionOverlay');
-                    explosionOverlay.classList.add('active');
-                    // Reset animation by re-adding the class after a tiny delay
-                    const explosionImg = document.getElementById('explosionGif');
-                    explosionImg.style.animation = 'none';
-                    void explosionImg.offsetHeight;
-                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
-
-                    // Auto-hide explosion after 1.2s
-                    setTimeout(() => {
-                        explosionOverlay.classList.remove('active');
-                    }, 1200);
-
-                    this.addHistory(this.multiplier);
-                    this.updateUI();
-                    document.getElementById('rocketStatus').textContent = '💥 Crashed!';
-                    document.getElementById('rocketStartBtn').disabled = false;
-                    document.getElementById('rocketCashoutBtn').disabled = true;
-
-                    updateHome();
-                    if (this.animationId) {
-                        cancelAnimationFrame(this.animationId);
-                        this.animationId = null;
-                    }
-                    return;
-                }
-
-                this.updateUI();
-                document.getElementById('rocketStatus').textContent = `🚀 ${this.multiplier.toFixed(2)}x`;
-
-                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
-            },
-
-            cashOut() {
-                if (!this.isPlaying) return;
-                this.isPlaying = false;
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
-
-                // ----- VIBRATION (light) on cash out -----
-                triggerVibration(30, 'light');
-
-                const win = Math.floor(this.bet * this.multiplier);
-                state.balance += win;
-                state.wins++;
-                state.totalGames++;
-                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You', amount: win });
-                if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                this.addHistory(this.multiplier);
-
-                const dogGif = document.getElementById('flyingDogGif');
-                dogGif.classList.remove('active');
-                setTimeout(() => { dogGif.style.display = 'none'; }, 300);
-
-                this.updateUI();
-                document.getElementById('rocketStatus').textContent = `💰 Cashed out at ${this.multiplier.toFixed(2)}x!`;
-                document.getElementById('rocketStartBtn').disabled = false;
-                document.getElementById('rocketCashoutBtn').disabled = true;
-                this.gameOver = true;
-
-                updateHome();
             }
         };
 
         // ============================================================
-        // 💎 MINES GAME
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1094,17 +1431,17 @@
             },
 
             updateUI() {
-                document.getElementById('minesBalance').textContent = `⭐ ${state.balance.toLocaleString()}`;
+                document.getElementById('minesBalance').innerHTML = `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
                 document.getElementById('minesMultiplier').textContent = `${this.multiplier.toFixed(2)}x`;
                 const msg = document.getElementById('minesMessage');
                 if (this.gameActive && !this.gameOver) {
-                    msg.textContent = `💎 Find gems! Multiplier ${this.multiplier.toFixed(2)}x`;
+                    msg.textContent = `Find gems! Multiplier ${this.multiplier.toFixed(2)}x`;
                     msg.style.color = '#00d2a0';
                 } else if (this.gameOver && this.revealedSafe === this.safeCount) {
-                    msg.textContent = '🎉 JACKPOT! All gems found!';
+                    msg.textContent = 'JACKPOT! All gems found!';
                     msg.style.color = '#ffd700';
                 } else if (this.gameOver) {
-                    msg.textContent = '💥 Boom! You hit a mine.';
+                    msg.textContent = 'Boom! You hit a mine.';
                     msg.style.color = '#ff6b6b';
                 } else {
                     msg.textContent = 'Press "Start" to play';
@@ -1121,7 +1458,7 @@
                 let bet = parseInt(betInput.value) || 10;
                 if (bet < 1) bet = 1;
                 if (bet > state.balance) {
-                    document.getElementById('minesMessage').textContent = '❌ Not enough balance!';
+                    document.getElementById('minesMessage').textContent = 'Not enough balance!';
                     document.getElementById('minesMessage').style.color = '#ff6b6b';
                     return;
                 }
@@ -1147,7 +1484,6 @@
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
-                    // Vibration on mine hit
                     triggerVibration(60, 'heavy');
                     this.updateGrid();
                     this.updateUI();
@@ -1166,7 +1502,6 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    // Vibration on jackpot
                     triggerVibration(50, 'medium');
                     this.updateGrid();
                     this.updateUI();
@@ -1199,7 +1534,7 @@
         // ============================================================
         function init() {
             updateHome();
-            rocketGame.init();
+            crashGame.init();
             minesGame.init();
 
             try {
@@ -1210,7 +1545,7 @@
                 }
             } catch (e) {}
 
-            console.log('🚀 Crash loaded!');
+            console.log('Crash loaded!');
         }
 
         document.addEventListener('DOMContentLoaded', init);
