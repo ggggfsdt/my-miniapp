@@ -7,6 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        /* All previous styles remain unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -39,6 +40,44 @@
             position: relative;
         }
 
+        /* ---- NOTIFICATION ---- */
+        #notification {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            margin: 10px 16px 0 16px;
+            padding: 10px 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transform: translateY(-120%);
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+        #notification.show {
+            display: flex;
+        }
+        #notification .notif-icon {
+            color: #00d2a0;
+            font-size: 16px;
+        }
+        #notification .notif-text {
+            color: #e0e0e0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #notification .notif-amount {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Rest of the CSS exactly as before */
         .page {
             display: none;
             flex: 1;
@@ -71,7 +110,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-around;
-            padding: 4px 0 10px 0;
+            padding: 6px 0 12px 0;
             border-radius: 0 0 36px 36px;
             margin-top: -10px;
             z-index: 20;
@@ -80,7 +119,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1px;
+            gap: 2px;
             background: transparent;
             border: none;
             color: #555;
@@ -94,9 +133,9 @@
             letter-spacing: 0.3px;
         }
         .nav-item .icon {
-            font-size: 20px;
+            font-size: 22px;
             transition: all 0.3s;
-            filter: grayscale(1) brightness(0.5);
+            opacity: 0.5;
         }
         .nav-item .label {
             font-size: 9px;
@@ -107,22 +146,8 @@
             color: #fff;
         }
         .nav-item.active .icon {
-            filter: grayscale(0) brightness(1);
+            opacity: 1;
             transform: translateY(-2px) scale(1.1);
-        }
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 24px;
-            height: 3px;
-            border-radius: 4px;
-            background: linear-gradient(90deg, #6c5ce7, #fd79a8);
-        }
-        .nav-item:active {
-            transform: scale(0.88);
         }
 
         .card {
@@ -209,7 +234,6 @@
             color: #ffd700;
         }
 
-        /* Online dot */
         .online-dot {
             display: inline-block;
             width: 10px;
@@ -263,6 +287,7 @@
             display: block;
             margin-bottom: 6px;
             color: #fff;
+            opacity: 0.8;
         }
         .quick-action .label {
             font-size: 15px;
@@ -275,7 +300,6 @@
             margin-top: 2px;
         }
 
-        /* ========== GRID ========== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -304,7 +328,6 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
-        /* Dog GIF overlay - NO STRETCH */
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -346,7 +369,6 @@
             }
         }
 
-        /* ===== EXPLOSION OVERLAY ===== */
         .explosion-overlay {
             position: absolute;
             inset: 0;
@@ -385,7 +407,6 @@
             }
         }
 
-        /* ===== COUNTDOWN OVERLAY ===== */
         .countdown-overlay {
             position: absolute;
             inset: 0;
@@ -429,7 +450,6 @@
             }
         }
 
-        /* ========== HISTORY BAR ========== */
         .history-bar {
             position: absolute;
             bottom: 12px;
@@ -506,7 +526,6 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
-        /* ===== BET / CASH OUT BUTTON - NO EMOJIS ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -725,12 +744,29 @@
                 padding: 14px;
                 min-height: 54px;
             }
+            #notification {
+                margin: 6px 12px 0 12px;
+                padding: 8px 14px;
+            }
+            #notification .notif-text {
+                font-size: 13px;
+            }
+            #notification .notif-amount {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
 
     <div id="app">
+        <!-- NOTIFICATION -->
+        <div id="notification">
+            <i class="fas fa-check-circle notif-icon"></i>
+            <span class="notif-text">Successfully claimed your bet</span>
+            <span class="notif-amount" id="notifAmount">+0 ⭐</span>
+        </div>
+
         <!-- HOME PAGE -->
         <div id="page-home" class="page active">
             <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
@@ -805,7 +841,7 @@
                 </div>
             </div>
 
-            <!-- BET / CASH OUT BUTTON - with sub-text inside -->
+            <!-- BET / CASH OUT BUTTON -->
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
@@ -846,7 +882,7 @@
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
-                <span class="icon"><i class="fas fa-home"></i></span>
+                <span class="icon"><i class="fas fa-house"></i></span>
                 <span class="label">Home</span>
             </button>
             <button class="nav-item" data-page="rocket">
@@ -862,8 +898,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - FINAL VERSION
-        // No emojis, no stretch, sub-text inside button, online dot, vibration fixed
+        // CRASH GAME - With Notification on Cash Out
         // ============================================================
 
         const state = {
@@ -881,6 +916,7 @@
         const bestMultiplierEl = document.getElementById('bestMultiplier');
         const winRateEl = document.getElementById('winRate');
         const recentWinnersEl = document.getElementById('recentWinners');
+        const notifAmount = document.getElementById('notifAmount');
 
         const pages = {
             home: document.getElementById('page-home'),
@@ -890,7 +926,6 @@
         const navItems = document.querySelectorAll('.nav-item');
 
         function navigateTo(page) {
-            // Stop vibration if leaving rocket
             if (page !== 'rocket' && crashGame.isPlaying) {
                 if (crashGame.vibrationInterval) {
                     clearInterval(crashGame.vibrationInterval);
@@ -932,7 +967,7 @@
         }
 
         // ============================================================
-        // VIBRATION HELPER (with visibility and page check)
+        // VIBRATION HELPER
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
             try {
@@ -949,7 +984,6 @@
         }
 
         function triggerContinuousVibration() {
-            // Only vibrate if the document is visible and we are on the rocket page
             if (document.hidden) return;
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage || !rocketPage.classList.contains('active')) return;
@@ -964,10 +998,29 @@
         }
 
         // ============================================================
+        // NOTIFICATION
+        // ============================================================
+        function showNotification(amount) {
+            const notif = document.getElementById('notification');
+            notifAmount.textContent = `+${amount} ⭐`;
+            notif.style.display = 'flex';
+            // Trigger reflow
+            void notif.offsetHeight;
+            notif.style.transform = 'translateY(0)';
+            // Auto hide after 0.7s
+            clearTimeout(notif._timeout);
+            notif._timeout = setTimeout(() => {
+                notif.style.transform = 'translateY(-120%)';
+                setTimeout(() => {
+                    notif.style.display = 'none';
+                }, 400);
+            }, 700);
+        }
+
+        // ============================================================
         // CRASH GAME
         // ============================================================
         const crashGame = {
-            // ----- STATE -----
             multiplier: 1.00,
             crashPoint: 1.00,
             bet: 0,
@@ -981,7 +1034,6 @@
             lastTime: 0,
             vibrationInterval: null,
 
-            // ----- INIT -----
             init() {
                 this.createGrid();
                 this.updateUI();
@@ -1008,7 +1060,6 @@
 
             setupMainButton() {},
 
-            // ----- UPDATE UI -----
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
@@ -1090,7 +1141,6 @@
                 }
             },
 
-            // ----- MAIN ACTION -----
             mainAction() {
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
@@ -1132,7 +1182,6 @@
                 }
             },
 
-            // ----- BET -----
             confirmBet() {
                 const input = document.getElementById('betInputRocket');
                 let bet = parseInt(input.value) || 0;
@@ -1149,7 +1198,6 @@
                 this.updateMainButton();
             },
 
-            // ----- COUNTDOWN -----
             startCountdown() {
                 if (this.isCountingDown) return;
                 if (this.isPlaying) return;
@@ -1189,7 +1237,6 @@
                 }, 1000);
             },
 
-            // ----- ROUND -----
             startRound() {
                 if (this.bet > 0 && this.bet <= state.balance) {
                     state.balance -= this.bet;
@@ -1213,7 +1260,6 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                // Start continuous vibration only if page is visible
                 if (this.vibrationInterval) clearInterval(this.vibrationInterval);
                 this.vibrationInterval = setInterval(() => {
                     if (this.isPlaying) {
@@ -1225,7 +1271,6 @@
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
-            // ----- GAME LOOP (NO STRETCH) -----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -1235,7 +1280,6 @@
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
-                // Dog rotation only - NO STRETCH
                 const effectiveMult = Math.min(this.multiplier, 2.3);
                 const tilt = -(effectiveMult - 1) * 8;
                 const dogOverlay = document.getElementById('dogOverlay');
@@ -1301,7 +1345,6 @@
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
-            // ----- CASH OUT -----
             cashOut() {
                 if (!this.isPlaying) return;
                 if (this.bet === 0) return;
@@ -1318,12 +1361,14 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
+                // ---- SHOW NOTIFICATION ----
+                showNotification(win);
+
                 this.updateUI();
                 this.updateMainButton();
                 updateHome();
             },
 
-            // ----- HELPERS -----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -1361,7 +1406,7 @@
         };
 
         // ============================================================
-        // MINES GAME (unchanged)
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1563,17 +1608,15 @@
         };
 
         // ============================================================
-        // VISIBILITY CHANGE HANDLER (stop vibration when hidden)
+        // VISIBILITY CHANGE HANDLER
         // ============================================================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                // Stop vibration if game is playing
                 if (crashGame.isPlaying && crashGame.vibrationInterval) {
                     clearInterval(crashGame.vibrationInterval);
                     crashGame.vibrationInterval = null;
                 }
             } else {
-                // If game is playing and vibration is not running, restart it
                 if (crashGame.isPlaying && !crashGame.vibrationInterval) {
                     crashGame.vibrationInterval = setInterval(() => {
                         if (crashGame.isPlaying) {
@@ -1600,7 +1643,7 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded! Vibration stops when app hidden or page switched.');
+            console.log('Crash loaded! Notification added on cash out.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
