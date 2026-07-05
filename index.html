@@ -863,7 +863,7 @@
             font-weight: 700;
             line-height: 1.3;
             text-align: center;
-            margin-top: 6px;
+            margin-top: 10px; /* increased to push text lower */
         }
         #mainActionSub {
             font-size: 13px;
@@ -872,7 +872,7 @@
             min-height: 18px;
             line-height: 1.2;
             text-align: center;
-            margin-top: -4px;
+            margin-top: -6px;
         }
 
         .main-action-btn.place-bet {
@@ -977,11 +977,11 @@
             }
             #mainActionText {
                 font-size: 16px;
-                margin-top: 5px;
+                margin-top: 8px;
             }
             #mainActionSub {
                 font-size: 12px;
-                margin-top: -3px;
+                margin-top: -4px;
             }
             .main-action-btn {
                 padding: 14px 14px 12px 14px;
@@ -1128,7 +1128,7 @@
                     <span id="mainActionSub"></span>
                 </button>
 
-                <!-- PLAYER LIST -->
+                <!-- PLAYER LIST (only real players) -->
                 <div class="players-list" id="playersList">
                     <div class="empty">No bets placed yet</div>
                 </div>
@@ -1244,7 +1244,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - WITH REALISTIC PLAYER LIST (no bots, simulated online)
+        // CRASH GAME - REAL PLAYERS ONLY (no bots)
         // ============================================================
 
         const state = {
@@ -1286,50 +1286,8 @@
         };
         const navItems = document.querySelectorAll('.nav-item');
 
-        // ----- Player List Data (simulated online players) -----
+        // ----- Player List (only real players) -----
         let players = [];
-        let playerBets = {};
-
-        // Realistic username generator
-        const firstNames = ['Crypto', 'Moon', 'Star', 'Rocket', 'Lucky', 'Diamond', 'Whale', 'Paper', 'Lunar', 'Neon',
-            'Cyber', 'Shadow', 'Fire', 'Ice', 'Storm', 'Thunder', 'Phantom', 'Venom', 'Raven', 'Wolf'
-        ];
-        const lastNames = ['King', 'Rider', 'Chaser', 'Man', 'One', 'Hands', 'Alert', 'Hands', 'Wolf', 'Fox',
-            'Ghost', 'Hunter', 'Falcon', 'Phoenix', 'Blade', 'Strike', 'Knight', 'Ninja', 'Hawk', 'Tiger'
-        ];
-
-        function generateUsername() {
-            const first = firstNames[Math.floor(Math.random() * firstNames.length)];
-            const last = lastNames[Math.floor(Math.random() * lastNames.length)];
-            return first + last;
-        }
-
-        function getAvatarColor() {
-            const colors = ['#ff6b6b', '#feca57', '#00d2a0', '#6c5ce7', '#fd79a8',
-                '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0', '#ff9f43'
-            ];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function generateRandomBets(count) {
-            const bets = {};
-            const names = [];
-            for (let i = 0; i < count; i++) {
-                let name = generateUsername();
-                // Avoid duplicates
-                let attempts = 0;
-                while (names.includes(name) && attempts < 10) {
-                    name = generateUsername();
-                    attempts++;
-                }
-                names.push(name);
-                bets[name] = {
-                    amount: 5 + Math.floor(Math.random() * 45),
-                    color: getAvatarColor(),
-                };
-            }
-            return bets;
-        }
 
         function renderPlayers() {
             const activePlayers = players.filter(p => p.active !== false);
@@ -1556,65 +1514,8 @@
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
-                this.generatePlayers();
-                renderPlayers();
-            },
-
-            generatePlayers() {
-                // Generate random players for the round (simulated online players)
-                const count = 2 + Math.floor(Math.random() * 5);
-                const bets = generateRandomBets(count);
+                // Initialize empty player list (no bots)
                 players = [];
-                let i = 0;
-                for (const [name, data] of Object.entries(bets)) {
-                    players.push({
-                        name: name,
-                        color: data.color,
-                        bet: data.amount,
-                        hasCashedOut: false,
-                        crashed: false,
-                        active: false,
-                        isYou: false,
-                    });
-                }
-                // Add user if they have a bet
-                if (this.bet > 0) {
-                    const existing = players.find(p => p.isYou);
-                    if (!existing) {
-                        players.push({
-                            name: state.displayName,
-                            color: '#ffd700',
-                            bet: this.bet,
-                            hasCashedOut: false,
-                            crashed: false,
-                            active: true,
-                            isYou: true,
-                        });
-                    }
-                }
-                renderPlayers();
-            },
-
-            activatePlayersForRound() {
-                // Activate players for this round
-                const activePlayers = players.filter(p => !p.isYou);
-                const count = Math.min(activePlayers.length, 2 + Math.floor(Math.random() * 4));
-                const shuffled = [...activePlayers].sort(() => Math.random() - 0.5);
-                for (let i = 0; i < count && i < shuffled.length; i++) {
-                    shuffled[i].active = true;
-                    shuffled[i].hasCashedOut = false;
-                    shuffled[i].crashed = false;
-                    // Randomize bet a bit
-                    shuffled[i].bet = 5 + Math.floor(Math.random() * 45);
-                }
-                // Ensure user is active if they have a bet
-                const user = players.find(p => p.isYou);
-                if (user && this.bet > 0) {
-                    user.active = true;
-                    user.bet = this.bet;
-                    user.hasCashedOut = false;
-                    user.crashed = false;
-                }
                 renderPlayers();
             },
 
@@ -1651,22 +1552,8 @@
                 if (this.isPlaying) {
                     this.updateMainButton();
                 }
-                // Update player list statuses during flight
-                if (this.isPlaying) {
-                    for (const p of players) {
-                        if (p.active && !p.isYou) {
-                            // Players randomly cash out during flight (like real players)
-                            if (!p.hasCashedOut && !p.crashed) {
-                                const cashOutChance = 0.008 + (this.multiplier / 100);
-                                if (Math.random() < cashOutChance && this.multiplier >= 1.10) {
-                                    p.hasCashedOut = true;
-                                    p.active = false;
-                                }
-                            }
-                        }
-                    }
-                    renderPlayers();
-                }
+                // Update player list statuses (only real players – none, since only you)
+                renderPlayers();
             },
 
             updateMainButton() {
@@ -1861,9 +1748,31 @@
                 this.hasCashedOut = false;
                 this.roundId++;
 
-                // Generate new players for this round
-                this.generatePlayers();
-                this.activatePlayersForRound();
+                // Remove any previous players except the user (if they had a bet)
+                players = players.filter(p => p.isYou);
+                // If user had a bet, keep them; otherwise clear
+                if (this.bet > 0) {
+                    const user = players.find(p => p.isYou);
+                    if (user) {
+                        user.active = true;
+                        user.hasCashedOut = false;
+                        user.crashed = false;
+                    } else {
+                        // Shouldn't happen, but add user
+                        players.push({
+                            name: state.displayName,
+                            color: '#ffd700',
+                            bet: this.bet,
+                            hasCashedOut: false,
+                            crashed: false,
+                            active: true,
+                            isYou: true,
+                        });
+                    }
+                } else {
+                    players = [];
+                }
+                renderPlayers();
 
                 const overlay = document.getElementById('countdownOverlay');
                 const numberEl = document.getElementById('countdownNumber');
@@ -1903,6 +1812,10 @@
                     state.balance -= this.bet;
                 } else {
                     this.bet = 0;
+                    // If no bet, remove user from players
+                    const user = players.find(p => p.isYou);
+                    if (user) user.active = false;
+                    renderPlayers();
                 }
 
                 this.hasCashedOut = false;
@@ -1968,12 +1881,11 @@
                         explosionOverlay.classList.remove('active');
                     }, 1200);
 
-                    // Mark all active players as crashed
-                    for (const p of players) {
-                        if (p.active && !p.hasCashedOut) {
-                            p.crashed = true;
-                            p.active = false;
-                        }
+                    // Mark user as crashed if they haven't cashed out
+                    const user = players.find(p => p.isYou);
+                    if (user && user.active && !user.hasCashedOut) {
+                        user.crashed = true;
+                        user.active = false;
                     }
                     renderPlayers();
 
@@ -2046,7 +1958,7 @@
         };
 
         // ============================================================
-        // MINES GAME (unchanged, no vibrations)
+        // MINES GAME (unchanged)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -2282,7 +2194,7 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded with realistic player list.');
+            console.log('Crash loaded – real players only (no bots).');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
