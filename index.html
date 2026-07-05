@@ -3,80 +3,1439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Mini App</title>
+    <title>🚀 Rocket Casino Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ===== PREMIUM CASINO THEME - Pure CSS, No Images ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
+
         body {
-            font-family: -apple-system, sans-serif;
-            background: #0a0a0c;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #08080a;
+            color: #ffffff;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
-        .container {
-            max-width: 400px;
+
+        #app {
+            max-width: 420px;
             width: 100%;
-            text-align: center;
+            background: linear-gradient(160deg, #111115, #0a0a0c);
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            min-height: 760px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
-        h1 {
-            font-size: 28px;
+
+        /* ===== GLOW EFFECTS ===== */
+        .glow-orange {
+            box-shadow: 0 0 40px rgba(255, 107, 53, 0.15), inset 0 0 40px rgba(255, 107, 53, 0.05);
+        }
+        .glow-purple {
+            box-shadow: 0 0 40px rgba(108, 92, 231, 0.2), inset 0 0 40px rgba(108, 92, 231, 0.05);
+        }
+        .glow-green {
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.15), inset 0 0 40px rgba(0, 255, 136, 0.05);
+        }
+
+        /* ===== PAGES ===== */
+        .page {
+            display: none;
+            flex: 1;
+            padding: 18px 16px 80px 16px;
+            overflow-y: auto;
+            max-height: 740px;
+            scroll-behavior: smooth;
+        }
+        .page.active {
+            display: block;
+        }
+        .page::-webkit-scrollbar {
+            width: 3px;
+        }
+        .page::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .page::-webkit-scrollbar-thumb {
+            background: #2a2a2e;
+            border-radius: 10px;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 25, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 14px 0;
+            border-radius: 0 0 36px 36px;
+            margin-top: auto;
+            z-index: 20;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            background: transparent;
+            border: none;
+            color: #555;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 4px 16px;
+            border-radius: 16px;
+            position: relative;
+            letter-spacing: 0.3px;
+        }
+        .nav-item .icon {
+            font-size: 22px;
+            transition: all 0.3s;
+            filter: grayscale(1) brightness(0.5);
+        }
+        .nav-item .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .nav-item.active {
+            color: #fff;
+        }
+        .nav-item.active .icon {
+            filter: grayscale(0) brightness(1);
+            transform: translateY(-3px) scale(1.1);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #6c5ce7, #fd79a8);
+        }
+        .nav-item:active {
+            transform: scale(0.88);
+        }
+
+        /* ===== COMMON COMPONENTS ===== */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 14px;
+            transition: all 0.3s;
+        }
+        .card-glass {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
             margin-bottom: 10px;
         }
-        p {
-            color: #888;
-            margin-bottom: 20px;
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #ffd700, #ff6b53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-muted {
+            color: #555;
+            font-size: 13px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .gap-12 {
+            gap: 12px;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .w-full {
+            width: 100%;
+        }
+
+        /* ===== BUTTONS ===== */
         .btn {
-            padding: 14px 40px;
+            padding: 14px 20px;
             border: none;
             border-radius: 16px;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: white;
+            text-align: center;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
         }
         .btn:active {
-            transform: scale(0.95);
+            transform: scale(0.94);
         }
-        #message {
-            margin-top: 20px;
+        .btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.35);
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #f9ca24, #f0932b);
+            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            letter-spacing: 0.3px;
+        }
+        .badge-gold {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.15);
             color: #ffd700;
-            font-size: 18px;
+        }
+
+        /* ===== HOME PAGE ===== */
+        .home-greeting {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .home-balance {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #f0932b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .quick-action {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 22px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .quick-action:active {
+            transform: scale(0.94);
+        }
+        .quick-action .icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .quick-action .label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .quick-action .desc {
+            font-size: 12px;
+            color: #555;
+            margin-top: 2px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .stat-value {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* ===== ROCKET PAGE ===== */
+        .rocket-multiplier {
+            text-align: center;
+            padding: 24px 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        .rocket-multiplier::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: radial-gradient(circle at center, rgba(108, 92, 231, 0.05) 0%, transparent 70%);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        .rocket-multiplier .value {
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 1.1;
+            transition: color 0.3s;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -2px;
+        }
+        .rocket-multiplier .value .x {
+            font-size: 36px;
+            font-weight: 400;
+            opacity: 0.5;
+        }
+        .rocket-multiplier .status {
+            font-size: 14px;
+            color: #555;
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .graph-container {
+            position: relative;
+            height: 140px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin: 10px 0;
+        }
+        .graph-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .graph-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(180deg, transparent 50%, rgba(8, 8, 10, 0.9) 100%);
+        }
+
+        .bots-scroll {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 64px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        .bots-scroll::-webkit-scrollbar {
+            width: 2px;
+        }
+        .bots-scroll::-webkit-scrollbar-thumb {
+            background: #2a2a2e;
+            border-radius: 10px;
+        }
+        .bot-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 12px 4px 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 11px;
+            animation: popIn 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .bot-chip .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .bot-chip .name {
+            color: #aaa;
+            font-weight: 600;
+            font-size: 10px;
+        }
+        .bot-chip .mult {
+            font-weight: 700;
+            font-size: 10px;
+        }
+        .bot-chip.cashed .mult {
+            color: #00d2a0;
+        }
+        .bot-chip.crashed .mult {
+            color: #ff6b6b;
+        }
+        .bot-chip.waiting .mult {
+            color: #666;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .history-item.crashed {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.15);
+        }
+        .history-item.won {
+            color: #00d2a0;
+            border-color: rgba(0, 210, 160, 0.15);
+        }
+
+        /* ===== MINES PAGE ===== */
+        .mines-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .mines-tile {
+            aspect-ratio: 1/1;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
+            font-weight: 700;
+        }
+        .mines-tile:active {
+            transform: scale(0.90);
+        }
+        .mines-tile.revealed {
+            transform: scale(0.96);
+            border-color: transparent;
+        }
+        .mines-tile.revealed.safe {
+            background: rgba(0, 210, 160, 0.12);
+            box-shadow: 0 0 30px rgba(0, 210, 160, 0.08);
+            border-color: rgba(0, 210, 160, 0.15);
+        }
+        .mines-tile.revealed.mine {
+            background: rgba(255, 107, 107, 0.12);
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.08);
+            border-color: rgba(255, 107, 107, 0.15);
+        }
+        .mines-tile .emoji {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .mines-tile.revealed .emoji {
+            transform: scale(1.15);
+        }
+        .mines-tile .glow-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 20px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .mines-tile.revealed.safe .glow-ring {
+            opacity: 1;
+            box-shadow: 0 0 40px rgba(0, 210, 160, 0.15), inset 0 0 40px rgba(0, 210, 160, 0.05);
+        }
+
+        .mines-multiplier-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 420px) {
+            .rocket-multiplier .value {
+                font-size: 60px;
+            }
+            .mines-tile {
+                font-size: 26px;
+                border-radius: 14px;
+            }
+            .quick-action {
+                padding: 16px 10px;
+            }
+            .quick-action .icon {
+                font-size: 28px;
+            }
+            .home-balance {
+                font-size: 28px;
+            }
+        }
+
+        @media (min-height: 800px) {
+            #app {
+                min-height: 820px;
+            }
+            .page {
+                max-height: 800px;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 My Mini App</h1>
-        <p>Your Telegram Mini App is working!</p>
-        <button class="btn" id="myButton">Click Me</button>
-        <div id="message"></div>
+
+    <div id="app">
+        <!-- ===== PAGE: HOME ===== -->
+        <div id="page-home" class="page active">
+            <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
+                <div class="home-greeting">🎰 Welcome back</div>
+                <div class="flex-between" style="margin-top: 4px;">
+                    <span class="text-muted" style="font-size: 14px;">Your Balance</span>
+                    <span class="home-balance" id="homeBalance">⭐ 1,000</span>
+                </div>
+                <div class="quick-actions">
+                    <div class="quick-action glow-purple" onclick="navigateTo('rocket')">
+                        <span class="icon">🚀</span>
+                        <div class="label">Rocket Crash</div>
+                        <div class="desc">Fly &amp; cash out</div>
+                    </div>
+                    <div class="quick-action glow-green" onclick="navigateTo('mines')">
+                        <span class="icon">💎</span>
+                        <div class="label">Mines</div>
+                        <div class="desc">Find the gems</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 Statistics</div>
+                <div class="stat-row">
+                    <span class="stat-label">Games Played</span>
+                    <span class="stat-value" id="totalGames">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Best Multiplier</span>
+                    <span class="stat-value text-gradient" id="bestMultiplier">1.00x</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Win Rate</span>
+                    <span class="stat-value" id="winRate">0%</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🏆 Recent Winners</div>
+                <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: ROCKET ===== -->
+        <div id="page-rocket" class="page">
+            <div class="flex-between mb-8">
+                <span class="badge badge-gold">🚀 ROCKET CRASH</span>
+                <span class="badge" id="rocketBalance">⭐ 1,000</span>
+            </div>
+
+            <div class="rocket-multiplier">
+                <div class="value" id="rocketMultiplier">1.00<span class="x">x</span></div>
+                <div class="status" id="rocketStatus">Press "Launch" to start</div>
+            </div>
+
+            <div class="graph-container">
+                <canvas id="rocketGraph"></canvas>
+                <div class="graph-overlay"></div>
+            </div>
+
+            <div class="card" style="padding: 10px 12px;">
+                <div class="card-title" style="margin-bottom: 4px;">🤖 Live Bots</div>
+                <div class="bots-scroll" id="rocketBots">
+                    <span class="text-muted" style="font-size: 12px;">Waiting for launch...</span>
+                </div>
+            </div>
+
+            <div class="flex gap-8" style="margin: 10px 0;">
+                <div class="flex" style="background:rgba(255,255,255,0.03); border-radius:16px; padding:4px; border:1px solid rgba(255,255,255,0.04);">
+                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusRocket">−</button>
+                    <input type="number" id="betInputRocket" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
+                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusRocket">+</button>
+                </div>
+                <button class="btn btn-primary" id="rocketStartBtn">🚀 Launch</button>
+                <button class="btn btn-success" id="rocketCashoutBtn" disabled>💰 Cash Out</button>
+            </div>
+
+            <div class="card" style="padding: 12px;">
+                <div class="card-title" style="margin-bottom: 4px;">📈 History</div>
+                <div class="history-list" id="rocketHistory">
+                    <span class="text-muted" style="font-size: 12px;">No rounds yet</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PAGE: MINES ===== -->
+        <div id="page-mines" class="page">
+            <div class="flex-between mb-8">
+                <span class="badge badge-gold">💎 MINES</span>
+                <span class="badge" id="minesBalance">⭐ 1,000</span>
+            </div>
+
+            <div class="mines-multiplier-box flex-between">
+                <span style="color:#666; font-size:14px; font-weight:600;">Multiplier</span>
+                <span id="minesMultiplier" style="font-size:28px; font-weight:900; color:#00d2a0;">1.00x</span>
+            </div>
+
+            <div class="mines-grid" id="minesGrid"></div>
+
+            <div class="flex gap-8" style="margin: 8px 0;">
+                <div class="flex" style="background:rgba(255,255,255,0.03); border-radius:16px; padding:4px; border:1px solid rgba(255,255,255,0.04);">
+                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betMinusMines">−</button>
+                    <input type="number" id="betInputMines" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
+                    <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusMines">+</button>
+                </div>
+                <button class="btn btn-primary" id="minesStartBtn">💎 Start</button>
+                <button class="btn btn-success" id="minesCashoutBtn" disabled>💰 Cash Out</button>
+            </div>
+
+            <div id="minesMessage" class="card" style="padding: 14px; text-align:center; min-height:50px; display:flex; align-items:center; justify-content:center; font-weight:500;">
+                Press "Start" to play
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM NAVIGATION ===== -->
+        <div class="bottom-nav">
+            <button class="nav-item active" data-page="home">
+                <span class="icon">🏠</span>
+                <span class="label">Home</span>
+            </button>
+            <button class="nav-item" data-page="rocket">
+                <span class="icon">🚀</span>
+                <span class="label">Rocket</span>
+            </button>
+            <button class="nav-item" data-page="mines">
+                <span class="icon">💎</span>
+                <span class="label">Mines</span>
+            </button>
+        </div>
     </div>
 
     <script>
-        // ===== YOUR GAME SCRIPTS GO HERE =====
-        
-        document.getElementById('myButton').onclick = function() {
-            document.getElementById('message').textContent = '🎉 Button works!';
+        // ============================================================
+        // 🎰 COMPLETE CASINO APP - All Logic
+        // ============================================================
+
+        // ---------- GLOBAL STATE ----------
+        const state = {
+            balance: 1000,
+            totalGames: 0,
+            bestMultiplier: 1.00,
+            wins: 0,
+            losses: 0,
+            recentWinners: [],
         };
 
-        // Initialize Telegram
-        try {
-            const tg = window.Telegram.WebApp;
-            tg.expand();
-            tg.ready();
-        } catch (e) {
-            console.log('Not in Telegram');
+        // ---------- DOM REFS ----------
+        const homeBalance = document.getElementById('homeBalance');
+        const totalGamesEl = document.getElementById('totalGames');
+        const bestMultiplierEl = document.getElementById('bestMultiplier');
+        const winRateEl = document.getElementById('winRate');
+        const recentWinnersEl = document.getElementById('recentWinners');
+
+        // ---------- NAVIGATION ----------
+        const pages = {
+            home: document.getElementById('page-home'),
+            rocket: document.getElementById('page-rocket'),
+            mines: document.getElementById('page-mines'),
+        };
+        const navItems = document.querySelectorAll('.nav-item');
+
+        function navigateTo(page) {
+            Object.keys(pages).forEach(key => {
+                pages[key].classList.toggle('active', key === page);
+            });
+            navItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.page === page);
+            });
+            if (page === 'rocket' && rocketGame.isPlaying) {
+                rocketGame.resumeGraph();
+            }
         }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => navigateTo(item.dataset.page));
+        });
+
+        // ---------- UPDATE HOME ----------
+        function updateHome() {
+            homeBalance.textContent = `⭐ ${state.balance.toLocaleString()}`;
+            totalGamesEl.textContent = state.totalGames;
+            bestMultiplierEl.textContent = `${state.bestMultiplier.toFixed(2)}x`;
+            const total = state.wins + state.losses;
+            winRateEl.textContent = total > 0 ? `${Math.round((state.wins / total) * 100)}%` : '0%';
+
+            if (state.recentWinners.length === 0) {
+                recentWinnersEl.textContent = 'No wins yet';
+                recentWinnersEl.style.color = '#555';
+            } else {
+                recentWinnersEl.innerHTML = state.recentWinners.slice(0, 5).map(w =>
+                    `<div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                        <span style="font-weight:500;">${w.name}</span>
+                        <span style="color:#ffd700; font-weight:700;">+${w.amount} ⭐</span>
+                    </div>`
+                ).join('');
+                recentWinnersEl.style.color = '#fff';
+            }
+        }
+
+        // ============================================================
+        // 🚀 ROCKET CRASH GAME
+        // ============================================================
+        const rocketGame = {
+            multiplier: 1.00,
+            crashPoint: 1.00,
+            isPlaying: false,
+            gameOver: false,
+            bet: 10,
+            history: [],
+            bots: [],
+            animationId: null,
+            lastTime: 0,
+            graphPoints: [],
+            canvas: null,
+            ctx: null,
+
+            init() {
+                this.canvas = document.getElementById('rocketGraph');
+                this.ctx = this.canvas.getContext('2d');
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.setupControls();
+                this.updateUI();
+                this.renderBots();
+                this.renderHistory();
+            },
+
+            resizeCanvas() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width * 2;
+                this.canvas.height = rect.height * 2;
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+                this.ctx.scale(2, 2);
+                this.drawGraph();
+            },
+
+            setupControls() {
+                const startBtn = document.getElementById('rocketStartBtn');
+                const cashoutBtn = document.getElementById('rocketCashoutBtn');
+                const betInput = document.getElementById('betInputRocket');
+                const betMinus = document.getElementById('betMinusRocket');
+                const betPlus = document.getElementById('betPlusRocket');
+
+                startBtn.addEventListener('click', () => this.start());
+                cashoutBtn.addEventListener('click', () => this.cashOut());
+
+                betMinus.addEventListener('click', () => {
+                    let v = parseInt(betInput.value) || 10;
+                    v = Math.max(1, v - 5);
+                    betInput.value = v;
+                });
+                betPlus.addEventListener('click', () => {
+                    let v = parseInt(betInput.value) || 10;
+                    v = Math.min(1000, v + 5);
+                    betInput.value = v;
+                });
+                betInput.addEventListener('change', () => {
+                    let v = parseInt(betInput.value) || 10;
+                    if (v < 1) v = 1;
+                    if (v > 1000) v = 1000;
+                    betInput.value = v;
+                });
+            },
+
+            updateUI() {
+                const multEl = document.getElementById('rocketMultiplier');
+                multEl.innerHTML = `${this.multiplier.toFixed(2)}<span class="x">x</span>`;
+                const m = this.multiplier;
+                let color = '#ffffff';
+                if (m >= 5) color = '#ff6b6b';
+                else if (m >= 3) color = '#ff9f43';
+                else if (m >= 2) color = '#ffd700';
+                else if (m >= 1.5) color = '#00d2a0';
+                multEl.style.color = color;
+
+                document.getElementById('rocketBalance').textContent = `⭐ ${state.balance.toLocaleString()}`;
+                document.getElementById('rocketStatus').textContent =
+                    this.isPlaying ? `🚀 Flying at ${this.multiplier.toFixed(2)}x` :
+                    this.gameOver ? '💥 Crashed' : 'Press "Launch" to start';
+
+                const startBtn = document.getElementById('rocketStartBtn');
+                const cashBtn = document.getElementById('rocketCashoutBtn');
+                startBtn.disabled = this.isPlaying || this.gameOver;
+                cashBtn.disabled = !this.isPlaying;
+            },
+
+            generateCrashPoint() {
+                const r = Math.random();
+                if (r < 0.30) return 1.00 + Math.random() * 0.5;
+                if (r < 0.60) return 1.50 + Math.random() * 1.0;
+                if (r < 0.80) return 2.50 + Math.random() * 2.0;
+                return 4.50 + Math.random() * 5.5;
+            },
+
+            createBots() {
+                const names = ['CryptoKing', 'MoonRider', 'StarChaser', 'RocketMan', 'LuckyOne',
+                    'DiamondHands', 'WhaleAlert', 'PaperHands', 'LunarWolf', 'NeonFox',
+                    'CyberGhost', 'ShadowHunter', 'FireFalcon', 'IcePhoenix'
+                ];
+                const colors = ['#ff6b6b', '#feca57', '#00d2a0', '#6c5ce7', '#fd79a8',
+                    '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0', '#ff9f43'
+                ];
+                const count = 5 + Math.floor(Math.random() * 6);
+                this.bots = [];
+                const shuffled = [...names].sort(() => Math.random() - 0.5);
+                for (let i = 0; i < count && i < shuffled.length; i++) {
+                    this.bots.push({
+                        name: shuffled[i],
+                        color: colors[i % colors.length],
+                        cashoutMultiplier: 1.10 + Math.random() * 6.90,
+                        cashedOut: false,
+                        crashed: false,
+                        active: true,
+                        bet: 5 + Math.floor(Math.random() * 45),
+                    });
+                }
+            },
+
+            renderBots() {
+                const container = document.getElementById('rocketBots');
+                if (!this.isPlaying && !this.gameOver) {
+                    container.innerHTML = '<span class="text-muted" style="font-size:12px;">Waiting for launch...</span>';
+                    return;
+                }
+                const active = this.bots.filter(b => b.active);
+                if (active.length === 0) {
+                    container.innerHTML = '<span class="text-muted" style="font-size:12px;">All bots finished</span>';
+                    return;
+                }
+                let html = '';
+                for (const bot of active) {
+                    const status = bot.cashedOut ? '✅' : bot.crashed ? '💥' : '⏳';
+                    const cls = bot.cashedOut ? 'cashed' : bot.crashed ? 'crashed' : 'waiting';
+                    const mult = bot.cashedOut ? `${bot.cashoutMultiplier.toFixed(2)}x` :
+                        bot.crashed ? '💥' : '...';
+                    html += `
+                        <div class="bot-chip ${cls}">
+                            <span class="dot" style="background:${bot.color};">${status}</span>
+                            <span class="name">${bot.name}</span>
+                            <span class="mult">${mult}</span>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            },
+
+            renderHistory() {
+                const container = document.getElementById('rocketHistory');
+                if (this.history.length === 0) {
+                    container.innerHTML = '<span class="text-muted" style="font-size:12px;">No rounds yet</span>';
+                    return;
+                }
+                let html = '';
+                for (const h of this.history) {
+                    const cls = h.result === 'crashed' ? 'crashed' : 'won';
+                    const label = h.result === 'crashed' ? `💥 ${h.mult.toFixed(2)}x` : `✅ ${h.mult.toFixed(2)}x`;
+                    html += `<span class="history-item ${cls}">${label}</span>`;
+                }
+                container.innerHTML = html;
+            },
+
+            addHistory(result, mult) {
+                this.history.unshift({ result, mult });
+                if (this.history.length > 12) this.history.pop();
+                this.renderHistory();
+            },
+
+            drawGraph() {
+                const ctx = this.ctx;
+                const w = this.canvas.width / 2;
+                const h = this.canvas.height / 2;
+                ctx.clearRect(0, 0, w, h);
+
+                const points = this.graphPoints;
+                if (points.length < 2) {
+                    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(0, h);
+                    ctx.lineTo(w, h);
+                    ctx.stroke();
+                    return;
+                }
+
+                const maxX = Math.max(...points.map(p => p.x), 1);
+                const maxY = Math.max(...points.map(p => p.y), 1.5);
+                const scaleX = w / maxX;
+                const scaleY = h / (maxY * 1.15);
+
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, 'rgba(0, 210, 160, 0.2)');
+                grad.addColorStop(0.5, 'rgba(0, 210, 160, 0.08)');
+                grad.addColorStop(1, 'rgba(0, 210, 160, 0.01)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.moveTo(0, h);
+
+                for (let i = 0; i < points.length; i++) {
+                    const px = points[i].x * scaleX;
+                    const py = h - (points[i].y * scaleY);
+                    if (i === 0) ctx.lineTo(px, py);
+                    else {
+                        const prev = points[i - 1];
+                        const cpx = (prev.x + points[i].x) / 2 * scaleX;
+                        const cpy = h - ((prev.y + points[i].y) / 2 * scaleY);
+                        ctx.quadraticCurveTo(cpx, cpy, px, py);
+                    }
+                }
+                ctx.lineTo(w, h);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = '#00d2a0';
+                ctx.lineWidth = 2.5;
+                ctx.shadowColor = 'rgba(0, 210, 160, 0.3)';
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                for (let i = 0; i < points.length; i++) {
+                    const px = points[i].x * scaleX;
+                    const py = h - (points[i].y * scaleY);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else {
+                        const prev = points[i - 1];
+                        const cpx = (prev.x + points[i].x) / 2 * scaleX;
+                        const cpy = h - ((prev.y + points[i].y) / 2 * scaleY);
+                        ctx.quadraticCurveTo(cpx, cpy, px, py);
+                    }
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                if (this.isPlaying || this.gameOver) {
+                    const last = points[points.length - 1];
+                    const px = last.x * scaleX;
+                    const py = h - (last.y * scaleY);
+                    const gradDot = ctx.createRadialGradient(px, py, 0, px, py, 15);
+                    gradDot.addColorStop(0, 'rgba(0, 210, 160, 0.8)');
+                    gradDot.addColorStop(1, 'rgba(0, 210, 160, 0)');
+                    ctx.fillStyle = gradDot;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 15, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(px, py, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#00d2a0';
+                    ctx.shadowColor = 'rgba(0, 210, 160, 0.8)';
+                    ctx.shadowBlur = 20;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            },
+
+            start() {
+                const betInput = document.getElementById('betInputRocket');
+                let bet = parseInt(betInput.value) || 10;
+                if (bet < 1) bet = 1;
+                if (bet > state.balance) {
+                    document.getElementById('rocketStatus').textContent = '❌ Not enough balance!';
+                    return;
+                }
+                this.bet = bet;
+                state.balance -= bet;
+                this.multiplier = 1.00;
+                this.crashPoint = this.generateCrashPoint();
+                this.isPlaying = true;
+                this.gameOver = false;
+                this.graphPoints = [{ x: 0, y: 1 }];
+                this.lastTime = 0;
+
+                this.createBots();
+
+                this.updateUI();
+                this.renderBots();
+                document.getElementById('rocketStatus').textContent = `🚀 Launching... crash at ${this.crashPoint.toFixed(2)}x`;
+                document.getElementById('rocketStartBtn').disabled = true;
+                document.getElementById('rocketCashoutBtn').disabled = false;
+
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+            },
+
+            gameLoop(timestamp) {
+                if (!this.isPlaying) return;
+                const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
+                this.lastTime = timestamp;
+
+                const accel = 1 + (this.multiplier * 0.015);
+                const inc = 0.01 + (delta * accel * 0.12);
+                this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
+
+                this.graphPoints.push({ x: this.graphPoints.length * 0.02, y: this.multiplier });
+                if (this.graphPoints.length > 300) this.graphPoints.shift();
+
+                if (this.multiplier >= this.crashPoint) {
+                    this.multiplier = parseFloat(this.crashPoint.toFixed(2));
+                    this.isPlaying = false;
+                    this.gameOver = true;
+                    state.losses++;
+                    state.totalGames++;
+                    this.updateUI();
+                    this.renderBots();
+                    this.addHistory('crashed', this.multiplier);
+                    document.getElementById('rocketStatus').textContent = '💥 Crashed!';
+                    document.getElementById('rocketStartBtn').disabled = false;
+                    document.getElementById('rocketCashoutBtn').disabled = true;
+                    for (const bot of this.bots) {
+                        if (bot.active && !bot.cashedOut) {
+                            bot.crashed = true;
+                            bot.active = false;
+                        }
+                    }
+                    this.renderBots();
+                    this.drawGraph();
+                    updateHome();
+                    if (this.animationId) {
+                        cancelAnimationFrame(this.animationId);
+                        this.animationId = null;
+                    }
+                    return;
+                }
+
+                for (const bot of this.bots) {
+                    if (bot.active && !bot.cashedOut && !bot.crashed) {
+                        if (this.multiplier >= bot.cashoutMultiplier) {
+                            bot.cashedOut = true;
+                            bot.active = false;
+                        }
+                    }
+                }
+
+                this.updateUI();
+                this.renderBots();
+                this.drawGraph();
+                document.getElementById('rocketStatus').textContent = `🚀 ${this.multiplier.toFixed(2)}x`;
+
+                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+            },
+
+            cashOut() {
+                if (!this.isPlaying) return;
+                this.isPlaying = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                const win = Math.floor(this.bet * this.multiplier);
+                state.balance += win;
+                state.wins++;
+                state.totalGames++;
+                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
+                state.recentWinners.unshift({ name: 'You', amount: win });
+                if (state.recentWinners.length > 10) state.recentWinners.pop();
+                this.addHistory('won', this.multiplier);
+                this.updateUI();
+                document.getElementById('rocketStatus').textContent = `💰 Cashed out at ${this.multiplier.toFixed(2)}x!`;
+                document.getElementById('rocketStartBtn').disabled = false;
+                document.getElementById('rocketCashoutBtn').disabled = true;
+                this.gameOver = true;
+                for (const bot of this.bots) {
+                    if (bot.active && !bot.cashedOut) {
+                        bot.crashed = true;
+                        bot.active = false;
+                    }
+                }
+                this.renderBots();
+                this.drawGraph();
+                updateHome();
+            },
+
+            resumeGraph() {
+                if (this.isPlaying) {
+                    this.drawGraph();
+                    if (!this.animationId) {
+                        this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+                    }
+                }
+            }
+        };
+
+        // ============================================================
+        // 💎 MINES GAME
+        // ============================================================
+        const minesGame = {
+            gridSize: 5,
+            minesCount: 3,
+            board: [],
+            revealed: [],
+            multiplier: 1.00,
+            gameActive: false,
+            gameOver: false,
+            bet: 10,
+            safeCount: 0,
+            revealedSafe: 0,
+
+            init() {
+                this.setupControls();
+                this.renderGrid();
+                this.updateUI();
+            },
+
+            setupControls() {
+                const startBtn = document.getElementById('minesStartBtn');
+                const cashBtn = document.getElementById('minesCashoutBtn');
+                const betInput = document.getElementById('betInputMines');
+                const betMinus = document.getElementById('betMinusMines');
+                const betPlus = document.getElementById('betPlusMines');
+
+                startBtn.addEventListener('click', () => this.start());
+                cashBtn.addEventListener('click', () => this.cashOut());
+
+                betMinus.addEventListener('click', () => {
+                    let v = parseInt(betInput.value) || 10;
+                    v = Math.max(1, v - 5);
+                    betInput.value = v;
+                });
+                betPlus.addEventListener('click', () => {
+                    let v = parseInt(betInput.value) || 10;
+                    v = Math.min(1000, v + 5);
+                    betInput.value = v;
+                });
+                betInput.addEventListener('change', () => {
+                    let v = parseInt(betInput.value) || 10;
+                    if (v < 1) v = 1;
+                    if (v > 1000) v = 1000;
+                    betInput.value = v;
+                });
+            },
+
+            renderGrid() {
+                const grid = document.getElementById('minesGrid');
+                grid.innerHTML = '';
+                const total = this.gridSize * this.gridSize;
+                for (let i = 0; i < total; i++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'mines-tile';
+                    tile.dataset.index = i;
+                    tile.innerHTML = `<span class="emoji">❓</span><div class="glow-ring"></div>`;
+                    tile.addEventListener('click', () => this.clickTile(i));
+                    grid.appendChild(tile);
+                }
+                this.updateGrid();
+            },
+
+            updateGrid() {
+                const tiles = document.querySelectorAll('.mines-tile');
+                for (let i = 0; i < tiles.length; i++) {
+                    const tile = tiles[i];
+                    const emoji = tile.querySelector('.emoji');
+                    const isRevealed = this.revealed[i] || false;
+                    if (isRevealed) {
+                        tile.classList.add('revealed');
+                        if (this.board[i] === 1) {
+                            tile.classList.add('mine');
+                            emoji.textContent = '💣';
+                        } else {
+                            tile.classList.add('safe');
+                            emoji.textContent = '💎';
+                        }
+                    } else {
+                        tile.classList.remove('revealed', 'mine', 'safe');
+                        emoji.textContent = '❓';
+                    }
+                }
+            },
+
+            generateBoard() {
+                const total = this.gridSize * this.gridSize;
+                this.board = new Array(total).fill(0);
+                this.revealed = new Array(total).fill(false);
+                let placed = 0;
+                while (placed < this.minesCount) {
+                    const idx = Math.floor(Math.random() * total);
+                    if (this.board[idx] === 0) {
+                        this.board[idx] = 1;
+                        placed++;
+                    }
+                }
+                this.safeCount = total - this.minesCount;
+                this.revealedSafe = 0;
+            },
+
+            updateUI() {
+                document.getElementById('minesBalance').textContent = `⭐ ${state.balance.toLocaleString()}`;
+                document.getElementById('minesMultiplier').textContent = `${this.multiplier.toFixed(2)}x`;
+                const msg = document.getElementById('minesMessage');
+                if (this.gameActive && !this.gameOver) {
+                    msg.textContent = `💎 Find gems! Multiplier ${this.multiplier.toFixed(2)}x`;
+                    msg.style.color = '#00d2a0';
+                } else if (this.gameOver && this.revealedSafe === this.safeCount) {
+                    msg.textContent = '🎉 JACKPOT! All gems found!';
+                    msg.style.color = '#ffd700';
+                } else if (this.gameOver) {
+                    msg.textContent = '💥 Boom! You hit a mine.';
+                    msg.style.color = '#ff6b6b';
+                } else {
+                    msg.textContent = 'Press "Start" to play';
+                    msg.style.color = '#555';
+                }
+                const startBtn = document.getElementById('minesStartBtn');
+                const cashBtn = document.getElementById('minesCashoutBtn');
+                startBtn.disabled = this.gameActive && !this.gameOver;
+                cashBtn.disabled = !this.gameActive || this.gameOver;
+            },
+
+            start() {
+                const betInput = document.getElementById('betInputMines');
+                let bet = parseInt(betInput.value) || 10;
+                if (bet < 1) bet = 1;
+                if (bet > state.balance) {
+                    document.getElementById('minesMessage').textContent = '❌ Not enough balance!';
+                    document.getElementById('minesMessage').style.color = '#ff6b6b';
+                    return;
+                }
+                this.bet = bet;
+                state.balance -= bet;
+                this.multiplier = 1.00;
+                this.gameActive = true;
+                this.gameOver = false;
+                this.generateBoard();
+                this.renderGrid();
+                this.updateUI();
+                updateHome();
+            },
+
+            clickTile(index) {
+                if (!this.gameActive || this.gameOver || this.revealed[index]) return;
+                this.revealed[index] = true;
+                if (this.board[index] === 1) {
+                    this.gameOver = true;
+                    this.gameActive = false;
+                    state.losses++;
+                    state.totalGames++;
+                    for (let i = 0; i < this.board.length; i++) {
+                        if (this.board[i] === 1) this.revealed[i] = true;
+                    }
+                    this.updateGrid();
+                    this.updateUI();
+                    updateHome();
+                    return;
+                }
+                this.revealedSafe++;
+                this.multiplier = parseFloat((this.multiplier * 1.20).toFixed(2));
+                if (this.revealedSafe === this.safeCount) {
+                    this.gameOver = true;
+                    this.gameActive = false;
+                    const win = Math.floor(this.bet * this.multiplier);
+                    state.balance += win;
+                    state.wins++;
+                    state.totalGames++;
+                    if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
+                    state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
+                    if (state.recentWinners.length > 10) state.recentWinners.pop();
+                    this.updateGrid();
+                    this.updateUI();
+                    updateHome();
+                    return;
+                }
+                this.updateGrid();
+                this.updateUI();
+            },
+
+            cashOut() {
+                if (!this.gameActive || this.gameOver) return;
+                this.gameActive = false;
+                this.gameOver = true;
+                const win = Math.floor(this.bet * this.multiplier);
+                state.balance += win;
+                state.wins++;
+                state.totalGames++;
+                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
+                state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
+                if (state.recentWinners.length > 10) state.recentWinners.pop();
+                this.updateUI();
+                updateHome();
+            }
+        };
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        function init() {
+            updateHome();
+            rocketGame.init();
+            minesGame.init();
+
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    tg.expand();
+                    tg.ready();
+                }
+            } catch (e) {}
+
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && document.getElementById('page-rocket').classList.contains('active')) {
+                    if (rocketGame.isPlaying) rocketGame.resumeGraph();
+                }
+            });
+
+            console.log('🎰 Casino Pro loaded!');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        if (document.readyState === 'complete') init();
     </script>
 </body>
 </html>
