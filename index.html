@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ... (all styles remain exactly the same as previous version) ... */
         * {
             margin: 0;
             padding: 0;
@@ -210,6 +209,23 @@
             color: #ffd700;
         }
 
+        /* Online dot */
+        .online-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            margin-left: 8px;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0% { opacity: 0.4; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.4; transform: scale(0.8); }
+        }
+
         .home-greeting {
             font-size: 24px;
             font-weight: 800;
@@ -288,6 +304,7 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
+        /* Dog GIF overlay - NO STRETCH */
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -329,6 +346,7 @@
             }
         }
 
+        /* ===== EXPLOSION OVERLAY ===== */
         .explosion-overlay {
             position: absolute;
             inset: 0;
@@ -367,6 +385,7 @@
             }
         }
 
+        /* ===== COUNTDOWN OVERLAY ===== */
         .countdown-overlay {
             position: absolute;
             inset: 0;
@@ -410,6 +429,7 @@
             }
         }
 
+        /* ========== HISTORY BAR ========== */
         .history-bar {
             position: absolute;
             bottom: 12px;
@@ -486,6 +506,7 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
+        /* ===== BET / CASH OUT BUTTON - NO EMOJIS ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -548,6 +569,11 @@
         }
 
         .main-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
             padding: 16px;
             border: none;
             border-radius: 16px;
@@ -561,11 +587,7 @@
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.4;
+            min-height: 62px;
         }
         .main-action-btn:active {
             transform: scale(0.94);
@@ -575,6 +597,19 @@
             pointer-events: none;
             transform: none;
         }
+        #mainActionText {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        #mainActionSub {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            min-height: 18px;
+            line-height: 1.2;
+        }
+
         .main-action-btn.place-bet {
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
@@ -611,12 +646,6 @@
             background: linear-gradient(135deg, #636e72, #2d3436);
             cursor: not-allowed;
             opacity: 0.6;
-        }
-        .main-action-btn .sub-text {
-            font-size: 14px;
-            font-weight: 400;
-            color: #ffffff;
-            opacity: 0.9;
         }
 
         .mines-grid {
@@ -686,12 +715,15 @@
             .countdown-number {
                 font-size: 72px;
             }
-            .main-action-btn {
+            #mainActionText {
                 font-size: 16px;
-                padding: 14px;
             }
-            .main-action-btn .sub-text {
+            #mainActionSub {
                 font-size: 12px;
+            }
+            .main-action-btn {
+                padding: 14px;
+                min-height: 54px;
             }
         }
     </style>
@@ -744,34 +776,44 @@
         <!-- CRASH PAGE -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
-                <span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash</span>
+                <span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span>
                 <span class="badge" id="rocketBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
             </div>
 
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
+
+                <!-- Dog -->
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
+
+                <!-- Explosion -->
                 <div class="explosion-overlay" id="explosionOverlay">
                     <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
                 </div>
+
+                <!-- Countdown -->
                 <div class="countdown-overlay" id="countdownOverlay">
                     <div class="countdown-number" id="countdownNumber">3</div>
                 </div>
+
+                <!-- HISTORY BAR -->
                 <div class="history-bar" id="historyBar">
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
                 </div>
             </div>
 
+            <!-- BET / CASH OUT BUTTON - with sub-text inside -->
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
                     <button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
                 </div>
                 <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
-                    Place Bet
+                    <span id="mainActionText">Place Bet</span>
+                    <span id="mainActionSub"></span>
                 </button>
             </div>
         </div>
@@ -820,7 +862,8 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - FIXED VIBRATION ON PAGE HIDE
+        // CRASH GAME - FINAL VERSION
+        // No emojis, no stretch, sub-text inside button, online dot, vibration fixed
         // ============================================================
 
         const state = {
@@ -847,9 +890,12 @@
         const navItems = document.querySelectorAll('.nav-item');
 
         function navigateTo(page) {
-            // If leaving rocket, stop vibrations immediately
-            if (page !== 'rocket') {
-                crashGame.stopVibrations();
+            // Stop vibration if leaving rocket
+            if (page !== 'rocket' && crashGame.isPlaying) {
+                if (crashGame.vibrationInterval) {
+                    clearInterval(crashGame.vibrationInterval);
+                    crashGame.vibrationInterval = null;
+                }
             }
             Object.keys(pages).forEach(key => {
                 pages[key].classList.toggle('active', key === page);
@@ -886,7 +932,7 @@
         }
 
         // ============================================================
-        // VIBRATION HELPERS
+        // VIBRATION HELPER (with visibility and page check)
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
             try {
@@ -903,6 +949,10 @@
         }
 
         function triggerContinuousVibration() {
+            // Only vibrate if the document is visible and we are on the rocket page
+            if (document.hidden) return;
+            const rocketPage = document.getElementById('page-rocket');
+            if (!rocketPage || !rocketPage.classList.contains('active')) return;
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -930,7 +980,6 @@
             countdownId: null,
             lastTime: 0,
             vibrationInterval: null,
-            isPageVisible: true,
 
             // ----- INIT -----
             init() {
@@ -940,19 +989,6 @@
                 this.setupMainButton();
                 this.updateMainButton();
                 this.startCountdown();
-
-                // Listen for page visibility changes to pause/resume vibrations
-                document.addEventListener('visibilitychange', () => {
-                    this.isPageVisible = !document.hidden;
-                    if (document.hidden) {
-                        this.stopVibrations();
-                    } else {
-                        // Resume only if playing
-                        if (this.isPlaying) {
-                            this.startVibrations();
-                        }
-                    }
-                });
             },
 
             createGrid() {
@@ -971,23 +1007,6 @@
             },
 
             setupMainButton() {},
-
-            // ----- VIBRATION CONTROL -----
-            startVibrations() {
-                if (this.vibrationInterval) clearInterval(this.vibrationInterval);
-                this.vibrationInterval = setInterval(() => {
-                    if (this.isPlaying && this.isPageVisible) {
-                        triggerContinuousVibration();
-                    }
-                }, 150);
-            },
-
-            stopVibrations() {
-                if (this.vibrationInterval) {
-                    clearInterval(this.vibrationInterval);
-                    this.vibrationInterval = null;
-                }
-            },
 
             // ----- UPDATE UI -----
             updateUI() {
@@ -1010,21 +1029,26 @@
 
             updateMainButton() {
                 const btn = document.getElementById('mainActionBtn');
+                const mainText = document.getElementById('mainActionText');
+                const subText = document.getElementById('mainActionSub');
                 const confirmBtn = document.getElementById('betConfirmBtn');
                 const inputRow = document.getElementById('betInputRow');
 
+                subText.textContent = '';
+
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
-                        const potentialWin = (this.bet * this.multiplier).toFixed(1);
-                        btn.innerHTML = `Cash Out<span class="sub-text">${potentialWin}</span>`;
+                        mainText.textContent = 'Cash Out';
+                        subText.textContent = (this.bet * this.multiplier).toFixed(1);
                         btn.className = 'main-action-btn cash-out';
                         btn.disabled = false;
                     } else if (this.bet > 0 && this.hasCashedOut) {
-                        btn.innerHTML = 'Cashed Out';
+                        mainText.textContent = 'Cashed Out';
+                        subText.textContent = (this.bet * this.multiplier).toFixed(1);
                         btn.className = 'main-action-btn cashed-out';
                         btn.disabled = true;
                     } else {
-                        btn.textContent = 'Round in progress';
+                        mainText.textContent = 'Round in progress';
                         btn.className = 'main-action-btn round-in-progress';
                         btn.disabled = true;
                     }
@@ -1033,18 +1057,18 @@
                 } else if (this.isCountingDown) {
                     const isOpen = inputRow.classList.contains('open');
                     if (this.bet > 0) {
-                        btn.textContent = 'Waiting for round';
+                        mainText.textContent = 'Waiting for round';
                         btn.className = 'main-action-btn bet-placed';
                         btn.disabled = true;
                         inputRow.classList.remove('open');
                         confirmBtn.disabled = true;
                     } else if (isOpen) {
-                        btn.textContent = 'Confirm Bet';
+                        mainText.textContent = 'Confirm Bet';
                         btn.className = 'main-action-btn confirm-bet';
                         btn.disabled = false;
                         confirmBtn.disabled = false;
                     } else {
-                        btn.textContent = 'Place Bet';
+                        mainText.textContent = 'Place Bet';
                         btn.className = 'main-action-btn place-bet';
                         btn.disabled = false;
                         confirmBtn.disabled = true;
@@ -1052,14 +1076,14 @@
                 } else if (this.gameOver) {
                     this.bet = 0;
                     this.hasCashedOut = false;
-                    btn.textContent = 'Place Bet';
+                    mainText.textContent = 'Place Bet';
                     btn.className = 'main-action-btn place-bet';
                     btn.disabled = false;
                     confirmBtn.disabled = true;
                     inputRow.classList.remove('open');
                     document.getElementById('betInputRocket').value = 10;
                 } else {
-                    btn.textContent = 'Place Bet';
+                    mainText.textContent = 'Place Bet';
                     btn.className = 'main-action-btn place-bet';
                     btn.disabled = false;
                     confirmBtn.disabled = true;
@@ -1189,8 +1213,13 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                // Start vibrations
-                this.startVibrations();
+                // Start continuous vibration only if page is visible
+                if (this.vibrationInterval) clearInterval(this.vibrationInterval);
+                this.vibrationInterval = setInterval(() => {
+                    if (this.isPlaying) {
+                        triggerContinuousVibration();
+                    }
+                }, 150);
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
@@ -1221,8 +1250,10 @@
                     this.isPlaying = false;
                     this.gameOver = true;
 
-                    // Stop vibrations
-                    this.stopVibrations();
+                    if (this.vibrationInterval) {
+                        clearInterval(this.vibrationInterval);
+                        this.vibrationInterval = null;
+                    }
 
                     triggerVibration(80, 'heavy');
 
@@ -1290,7 +1321,6 @@
                 this.updateUI();
                 this.updateMainButton();
                 updateHome();
-                // Keep vibrations going because round continues
             },
 
             // ----- HELPERS -----
@@ -1533,6 +1563,28 @@
         };
 
         // ============================================================
+        // VISIBILITY CHANGE HANDLER (stop vibration when hidden)
+        // ============================================================
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Stop vibration if game is playing
+                if (crashGame.isPlaying && crashGame.vibrationInterval) {
+                    clearInterval(crashGame.vibrationInterval);
+                    crashGame.vibrationInterval = null;
+                }
+            } else {
+                // If game is playing and vibration is not running, restart it
+                if (crashGame.isPlaying && !crashGame.vibrationInterval) {
+                    crashGame.vibrationInterval = setInterval(() => {
+                        if (crashGame.isPlaying) {
+                            triggerContinuousVibration();
+                        }
+                    }, 150);
+                }
+            }
+        });
+
+        // ============================================================
         // INIT
         // ============================================================
         function init() {
@@ -1548,7 +1600,7 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded!');
+            console.log('Crash loaded! Vibration stops when app hidden or page switched.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
