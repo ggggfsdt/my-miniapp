@@ -473,6 +473,7 @@
             font-size: 14px;
         }
 
+        /* ===== GRID ===== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -666,6 +667,7 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
+        /* ===== BET / CASH OUT ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -727,13 +729,113 @@
             cursor: not-allowed;
         }
 
+        /* ---- Player List ---- */
+        .players-list {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 8px 4px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
+        .players-list::-webkit-scrollbar {
+            width: 2px;
+        }
+        .players-list::-webkit-scrollbar-thumb {
+            background: #2a2a2e;
+            border-radius: 10px;
+        }
+        .players-list .empty {
+            color: #555;
+            font-size: 13px;
+            text-align: center;
+            padding: 6px 0;
+        }
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-bottom: 2px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .player-item .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .player-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .player-item .avatar .initials {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .player-item .info {
+            flex: 1;
+        }
+        .player-item .info .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        .player-item .info .name .you {
+            color: #ffd700;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .player-item .info .bet-amount {
+            font-size: 11px;
+            color: #888;
+        }
+        .player-item .status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .player-item .status.betting {
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        .player-item .status.cashed {
+            color: #00d2a0;
+            border: 1px solid rgba(0, 210, 160, 0.2);
+        }
+        .player-item .status.crashed {
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        .player-item .status.waiting {
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ---- Main Button ---- */
         .main-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            padding: 16px;
+            gap: 0px;
+            padding: 16px 16px 14px 16px;
             border: none;
             border-radius: 16px;
             font-weight: 700;
@@ -759,9 +861,9 @@
         #mainActionText {
             font-size: 18px;
             font-weight: 700;
-            line-height: 1.2;
+            line-height: 1.3;
             text-align: center;
-            margin-top: 2px; /* slight downward adjustment */
+            margin-top: 6px;
         }
         #mainActionSub {
             font-size: 13px;
@@ -770,7 +872,7 @@
             min-height: 18px;
             line-height: 1.2;
             text-align: center;
-            margin-top: -2px;
+            margin-top: -4px;
         }
 
         .main-action-btn.place-bet {
@@ -875,12 +977,14 @@
             }
             #mainActionText {
                 font-size: 16px;
+                margin-top: 5px;
             }
             #mainActionSub {
                 font-size: 12px;
+                margin-top: -3px;
             }
             .main-action-btn {
-                padding: 14px;
+                padding: 14px 14px 12px 14px;
                 min-height: 54px;
             }
             #notification {
@@ -928,6 +1032,19 @@
             }
             .profile-stats {
                 gap: 6px;
+            }
+            .player-item .info .name {
+                font-size: 12px;
+            }
+            .player-item .info .bet-amount {
+                font-size: 10px;
+            }
+            .player-item .avatar {
+                width: 24px;
+                height: 24px;
+            }
+            .players-list {
+                max-height: 80px;
             }
         }
     </style>
@@ -1010,6 +1127,11 @@
                     <span id="mainActionText">Place Bet</span>
                     <span id="mainActionSub"></span>
                 </button>
+
+                <!-- PLAYER LIST -->
+                <div class="players-list" id="playersList">
+                    <div class="empty">No bets placed yet</div>
+                </div>
             </div>
         </div>
 
@@ -1122,7 +1244,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - FINAL (No vibrations except cash out)
+        // CRASH GAME - WITH REALISTIC PLAYER LIST (no bots, simulated online)
         // ============================================================
 
         const state = {
@@ -1134,6 +1256,7 @@
             recentWinners: [],
             username: 'xDll_Lud',
             displayName: 'xDll_Lud',
+            avatarUrl: 'https://images.iimg.live/images/excellent-photo-9680.webp',
         };
 
         // ----- DOM REFS -----
@@ -1141,6 +1264,7 @@
         const homeUsername = document.getElementById('homeUsername');
         const recentWinnersEl = document.getElementById('recentWinners');
         const notifAmount = document.getElementById('notifAmount');
+        const playersListEl = document.getElementById('playersList');
 
         const profileBalance = document.getElementById('profileBalance');
         const profileGames = document.getElementById('profileGames');
@@ -1162,6 +1286,95 @@
         };
         const navItems = document.querySelectorAll('.nav-item');
 
+        // ----- Player List Data (simulated online players) -----
+        let players = [];
+        let playerBets = {};
+
+        // Realistic username generator
+        const firstNames = ['Crypto', 'Moon', 'Star', 'Rocket', 'Lucky', 'Diamond', 'Whale', 'Paper', 'Lunar', 'Neon',
+            'Cyber', 'Shadow', 'Fire', 'Ice', 'Storm', 'Thunder', 'Phantom', 'Venom', 'Raven', 'Wolf'
+        ];
+        const lastNames = ['King', 'Rider', 'Chaser', 'Man', 'One', 'Hands', 'Alert', 'Hands', 'Wolf', 'Fox',
+            'Ghost', 'Hunter', 'Falcon', 'Phoenix', 'Blade', 'Strike', 'Knight', 'Ninja', 'Hawk', 'Tiger'
+        ];
+
+        function generateUsername() {
+            const first = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const last = lastNames[Math.floor(Math.random() * lastNames.length)];
+            return first + last;
+        }
+
+        function getAvatarColor() {
+            const colors = ['#ff6b6b', '#feca57', '#00d2a0', '#6c5ce7', '#fd79a8',
+                '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0', '#ff9f43'
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function generateRandomBets(count) {
+            const bets = {};
+            const names = [];
+            for (let i = 0; i < count; i++) {
+                let name = generateUsername();
+                // Avoid duplicates
+                let attempts = 0;
+                while (names.includes(name) && attempts < 10) {
+                    name = generateUsername();
+                    attempts++;
+                }
+                names.push(name);
+                bets[name] = {
+                    amount: 5 + Math.floor(Math.random() * 45),
+                    color: getAvatarColor(),
+                };
+            }
+            return bets;
+        }
+
+        function renderPlayers() {
+            const activePlayers = players.filter(p => p.active !== false);
+            if (activePlayers.length === 0) {
+                playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>';
+                return;
+            }
+
+            let html = '';
+            for (const p of activePlayers) {
+                const isYou = p.isYou || false;
+                const name = isYou ? state.displayName : p.name;
+                const betAmount = p.bet || 0;
+                let statusClass = 'waiting';
+                let statusText = 'Betting';
+
+                if (p.hasCashedOut) {
+                    statusClass = 'cashed';
+                    statusText = 'Cashed Out';
+                } else if (p.crashed) {
+                    statusClass = 'crashed';
+                    statusText = 'Crashed';
+                } else if (crashGame.isPlaying) {
+                    statusClass = 'waiting';
+                    statusText = 'Flying';
+                }
+
+                const avatarContent = isYou ?
+                    `<img src="${state.avatarUrl}" alt="${name}">` :
+                    `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
+
+                html += `
+                    <div class="player-item">
+                        <div class="avatar">${avatarContent}</div>
+                        <div class="info">
+                            <div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div>
+                            <div class="bet-amount">${betAmount} ⭐</div>
+                        </div>
+                        <div class="status ${statusClass}">${statusText}</div>
+                    </div>
+                `;
+            }
+            playersListEl.innerHTML = html;
+        }
+
         // ----- NAVIGATION -----
         function navigateTo(page) {
             Object.keys(pages).forEach(key => {
@@ -1170,9 +1383,9 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
-            // If entering rocket, start the game cycle
             if (page === 'rocket') {
                 crashGame.startGameCycle();
+                renderPlayers();
             }
             if (page === 'profile') {
                 updateProfile();
@@ -1241,10 +1454,9 @@
         }
 
         // ============================================================
-        // VIBRATION HELPERS (only used for cash out)
+        // VIBRATION HELPERS (only inside crash tab)
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
-            // Only vibrate if the rocket page is active
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage || !rocketPage.classList.contains('active')) return;
             try {
@@ -1257,6 +1469,20 @@
             } catch (e) {}
             try {
                 if (navigator.vibrate) navigator.vibrate(duration);
+            } catch (e) {}
+        }
+
+        function triggerContinuousVibration() {
+            const rocketPage = document.getElementById('page-rocket');
+            if (!rocketPage || !rocketPage.classList.contains('active')) return;
+            if (document.hidden) return;
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                }
+            } catch (e) {}
+            try {
+                if (navigator.vibrate) navigator.vibrate(15);
             } catch (e) {}
         }
 
@@ -1293,12 +1519,33 @@
             animationId: null,
             countdownId: null,
             lastTime: 0,
-            isCashingOut: false, // prevent double click
+            isCashingOut: false,
+            vibrationInterval: null,
+            roundId: 0,
 
             // ---- Game Cycle ----
             startGameCycle() {
                 if (!this.isPlaying && !this.isCountingDown && !this.gameOver) {
                     this.startCountdown();
+                }
+                if (this.isPlaying) {
+                    this.startContinuousVibration();
+                }
+            },
+
+            startContinuousVibration() {
+                if (this.vibrationInterval) return;
+                this.vibrationInterval = setInterval(() => {
+                    if (this.isPlaying) {
+                        triggerContinuousVibration();
+                    }
+                }, 150);
+            },
+
+            stopContinuousVibration() {
+                if (this.vibrationInterval) {
+                    clearInterval(this.vibrationInterval);
+                    this.vibrationInterval = null;
                 }
             },
 
@@ -1309,6 +1556,66 @@
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
+                this.generatePlayers();
+                renderPlayers();
+            },
+
+            generatePlayers() {
+                // Generate random players for the round (simulated online players)
+                const count = 2 + Math.floor(Math.random() * 5);
+                const bets = generateRandomBets(count);
+                players = [];
+                let i = 0;
+                for (const [name, data] of Object.entries(bets)) {
+                    players.push({
+                        name: name,
+                        color: data.color,
+                        bet: data.amount,
+                        hasCashedOut: false,
+                        crashed: false,
+                        active: false,
+                        isYou: false,
+                    });
+                }
+                // Add user if they have a bet
+                if (this.bet > 0) {
+                    const existing = players.find(p => p.isYou);
+                    if (!existing) {
+                        players.push({
+                            name: state.displayName,
+                            color: '#ffd700',
+                            bet: this.bet,
+                            hasCashedOut: false,
+                            crashed: false,
+                            active: true,
+                            isYou: true,
+                        });
+                    }
+                }
+                renderPlayers();
+            },
+
+            activatePlayersForRound() {
+                // Activate players for this round
+                const activePlayers = players.filter(p => !p.isYou);
+                const count = Math.min(activePlayers.length, 2 + Math.floor(Math.random() * 4));
+                const shuffled = [...activePlayers].sort(() => Math.random() - 0.5);
+                for (let i = 0; i < count && i < shuffled.length; i++) {
+                    shuffled[i].active = true;
+                    shuffled[i].hasCashedOut = false;
+                    shuffled[i].crashed = false;
+                    // Randomize bet a bit
+                    shuffled[i].bet = 5 + Math.floor(Math.random() * 45);
+                }
+                // Ensure user is active if they have a bet
+                const user = players.find(p => p.isYou);
+                if (user && this.bet > 0) {
+                    user.active = true;
+                    user.bet = this.bet;
+                    user.hasCashedOut = false;
+                    user.crashed = false;
+                }
+                renderPlayers();
             },
 
             createGrid() {
@@ -1343,6 +1650,22 @@
 
                 if (this.isPlaying) {
                     this.updateMainButton();
+                }
+                // Update player list statuses during flight
+                if (this.isPlaying) {
+                    for (const p of players) {
+                        if (p.active && !p.isYou) {
+                            // Players randomly cash out during flight (like real players)
+                            if (!p.hasCashedOut && !p.crashed) {
+                                const cashOutChance = 0.008 + (this.multiplier / 100);
+                                if (Math.random() < cashOutChance && this.multiplier >= 1.10) {
+                                    p.hasCashedOut = true;
+                                    p.active = false;
+                                }
+                            }
+                        }
+                    }
+                    renderPlayers();
                 }
             },
 
@@ -1455,14 +1778,34 @@
                 const input = document.getElementById('betInputRocket');
                 let bet = parseInt(input.value) || 0;
                 if (bet < 1) {
-                    // No vibration for errors
+                    triggerVibration(60, 'heavy');
                     return;
                 }
                 if (bet > state.balance) {
+                    triggerVibration(60, 'heavy');
                     return;
                 }
                 this.bet = bet;
                 document.getElementById('betInputRow').classList.remove('open');
+                // Add/update user in players list
+                const existing = players.find(p => p.isYou);
+                if (existing) {
+                    existing.bet = bet;
+                    existing.active = true;
+                    existing.hasCashedOut = false;
+                    existing.crashed = false;
+                } else {
+                    players.push({
+                        name: state.displayName,
+                        color: '#ffd700',
+                        bet: bet,
+                        hasCashedOut: false,
+                        crashed: false,
+                        active: true,
+                        isYou: true,
+                    });
+                }
+                renderPlayers();
                 this.updateMainButton();
             },
 
@@ -1473,11 +1816,8 @@
                 const btn = document.getElementById('mainActionBtn');
                 btn.disabled = true;
 
-                // Delay of 150ms
                 setTimeout(() => {
-                    // Check again that we are still playing and haven't cashed out already
                     if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
-                        // Vibrate only if still on crash page
                         triggerVibration(30, 'light');
                         this.executeCashOut();
                     }
@@ -1497,6 +1837,13 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
+                const user = players.find(p => p.isYou);
+                if (user) {
+                    user.hasCashedOut = true;
+                    user.active = false;
+                }
+                renderPlayers();
+
                 showNotification(win);
 
                 this.updateUI();
@@ -1512,7 +1859,11 @@
                 this.isCountingDown = true;
                 this.gameOver = false;
                 this.hasCashedOut = false;
-                this.updateMainButton();
+                this.roundId++;
+
+                // Generate new players for this round
+                this.generatePlayers();
+                this.activatePlayersForRound();
 
                 const overlay = document.getElementById('countdownOverlay');
                 const numberEl = document.getElementById('countdownNumber');
@@ -1525,7 +1876,9 @@
                     numberEl.style.animation = 'none';
                     void numberEl.offsetHeight;
                     numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
-                    // No vibration
+                    if (num === 2 || num === 1) {
+                        triggerVibration(35, 'light');
+                    }
                 };
 
                 showNumber(3);
@@ -1567,12 +1920,13 @@
 
                 this.updateUI();
                 this.updateMainButton();
+                this.startContinuousVibration();
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
-            // ---- Game Loop (no vibration) ----
+            // ---- Game Loop ----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -1596,7 +1950,8 @@
                     this.isPlaying = false;
                     this.gameOver = true;
 
-                    // No vibration on crash
+                    this.stopContinuousVibration();
+                    triggerVibration(80, 'heavy');
 
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
@@ -1613,6 +1968,15 @@
                         explosionOverlay.classList.remove('active');
                     }, 1200);
 
+                    // Mark all active players as crashed
+                    for (const p of players) {
+                        if (p.active && !p.hasCashedOut) {
+                            p.crashed = true;
+                            p.active = false;
+                        }
+                    }
+                    renderPlayers();
+
                     if (this.bet > 0 && !this.hasCashedOut) {
                         state.losses++;
                         state.totalGames++;
@@ -1627,7 +1991,6 @@
                         this.animationId = null;
                     }
 
-                    // After crash, start countdown again (if still on crash page)
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -1683,7 +2046,7 @@
         };
 
         // ============================================================
-        // MINES GAME (vibrations removed from mines as well)
+        // MINES GAME (unchanged, no vibrations)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1839,7 +2202,6 @@
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
-                    // No vibration
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -1857,7 +2219,6 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    // No vibration
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -1878,17 +2239,29 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-                // No vibration in mines cash out
                 this.updateUI();
                 updateHomeUI();
             }
         };
 
         // ============================================================
-        // VISIBILITY CHANGE – no vibration handling needed
+        // VISIBILITY CHANGE
         // ============================================================
         document.addEventListener('visibilitychange', function() {
-            // Nothing to do for vibrations now
+            if (document.hidden) {
+                if (crashGame.isPlaying) {
+                    crashGame.stopContinuousVibration();
+                }
+            } else {
+                if (crashGame.isPlaying) {
+                    crashGame.startContinuousVibration();
+                }
+                if (document.getElementById('page-rocket').classList.contains('active')) {
+                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) {
+                        crashGame.startGameCycle();
+                    }
+                }
+            }
         });
 
         // ============================================================
@@ -1909,12 +2282,9 @@
                 }
             } catch (e) {}
 
-            console.log('Casino loaded – vibrations only on cash out.');
-            // Start the game cycle immediately (countdown will start when crash page is opened)
+            console.log('Crash loaded with realistic player list.');
         }
 
-        // Start the cycle when crash page becomes active for the first time
-        // We check if rocket page is active on load
         document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
