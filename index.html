@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* (All CSS remains exactly as in the previous version) */
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -40,6 +40,7 @@
             position: relative;
         }
 
+        /* ===== NOTIFICATION ===== */
         #notification {
             position: sticky;
             top: 0;
@@ -76,6 +77,7 @@
             font-weight: 700;
         }
 
+        /* ===== PAGES ===== */
         .page {
             display: none;
             flex: 1;
@@ -98,6 +100,7 @@
             border-radius: 10px;
         }
 
+        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             position: sticky;
             bottom: 0;
@@ -148,6 +151,7 @@
             transform: translateY(-2px) scale(1.1);
         }
 
+        /* ===== COMMON ===== */
         .card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -232,6 +236,7 @@
             color: #ffd700;
         }
 
+        /* ===== ONLINE DOT ===== */
         .online-dot {
             display: inline-block;
             width: 10px;
@@ -248,56 +253,142 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        .home-greeting {
-            font-size: 24px;
+        /* ===== HOME PAGE - PREMIUM DESIGN ===== */
+        .home-header {
+            background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(0,0,0,0.2));
+            border-radius: 24px;
+            padding: 20px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .home-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.2);
+        }
+        .home-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .home-user {
+            flex: 1;
+        }
+        .home-user .greeting {
+            font-size: 14px;
+            color: #888;
+            font-weight: 500;
+        }
+        .home-user .username {
+            font-size: 20px;
             font-weight: 800;
             background: linear-gradient(135deg, #fff, #aaa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .home-balance {
-            font-size: 36px;
+        .home-balance-wrap {
+            text-align: right;
+        }
+        .home-balance-wrap .label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .home-balance-wrap .amount {
+            font-size: 28px;
             font-weight: 900;
             background: linear-gradient(135deg, #ffd700, #f0932b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .quick-actions {
+
+        .quick-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-top: 12px;
+            margin-top: 4px;
         }
-        .quick-action {
+        .quick-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 20px;
-            padding: 22px 12px;
+            padding: 20px 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .quick-action:active {
+        .quick-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(108,92,231,0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .quick-card:active {
             transform: scale(0.94);
         }
-        .quick-action .icon {
-            font-size: 36px;
-            display: block;
-            margin-bottom: 6px;
-            color: #fff;
-            opacity: 0.8;
+        .quick-card:active::before {
+            opacity: 1;
         }
-        .quick-action .label {
+        .quick-card .icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            opacity: 0.9;
+        }
+        .quick-card .label {
             font-size: 15px;
             font-weight: 700;
             color: #fff;
         }
-        .quick-action .desc {
+        .quick-card .desc {
             font-size: 12px;
             color: #555;
             margin-top: 2px;
         }
+        .quick-card.glow-purple {
+            box-shadow: 0 0 30px rgba(108, 92, 231, 0.05);
+        }
+        .quick-card.glow-green {
+            box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
+        }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .stat-item .label {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* ===== GRID ===== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -353,18 +444,9 @@
         }
 
         @keyframes dogFly {
-            0% {
-                transform: scale(0.2) translateY(60px) rotate(-10deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.3) translateY(-15px) rotate(5deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1) translateY(0) rotate(0deg);
-                opacity: 1;
-            }
+            0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
         }
 
         .explosion-overlay {
@@ -387,22 +469,10 @@
         }
 
         @keyframes explosionAnim {
-            0% {
-                transform: scale(0.3);
-                opacity: 0;
-            }
-            30% {
-                transform: scale(1.4);
-                opacity: 1;
-            }
-            60% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0% { transform: scale(0.3); opacity: 0; }
+            30% { transform: scale(1.4); opacity: 1; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .countdown-overlay {
@@ -430,24 +500,13 @@
         }
 
         @keyframes countdownPulse {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            30% {
-                opacity: 1;
-                transform: scale(1.3);
-            }
-            70% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(1.1);
-            }
+            0% { opacity: 0; transform: scale(0.3); }
+            30% { opacity: 1; transform: scale(1.3); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.1); }
         }
 
+        /* ===== HISTORY BAR ===== */
         .history-bar {
             position: absolute;
             bottom: 12px;
@@ -524,6 +583,7 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
+        /* ===== BET / CASH OUT ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
@@ -644,11 +704,6 @@
             background: linear-gradient(135deg, #f9ca24, #f0932b);
             box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
         }
-        .main-action-btn.disabled-btn {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
         .main-action-btn.round-in-progress {
             background: linear-gradient(135deg, #636e72, #2d3436);
             cursor: not-allowed;
@@ -665,6 +720,7 @@
             opacity: 0.6;
         }
 
+        /* ===== MINES ===== */
         .mines-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -707,6 +763,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .grid-container {
                 height: 220px;
@@ -752,62 +809,107 @@
             #notification .notif-amount {
                 font-size: 14px;
             }
+            .home-header {
+                padding: 16px 14px;
+                flex-wrap: wrap;
+            }
+            .home-avatar {
+                width: 44px;
+                height: 44px;
+            }
+            .home-user .username {
+                font-size: 17px;
+            }
+            .home-balance-wrap .amount {
+                font-size: 22px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 6px;
+            }
+            .stat-item .value {
+                font-size: 15px;
+            }
+            .quick-card {
+                padding: 16px 10px;
+            }
+            .quick-card .icon {
+                font-size: 26px;
+            }
+            .quick-card .label {
+                font-size: 13px;
+            }
         }
     </style>
 </head>
 <body>
 
     <div id="app">
-        <!-- NOTIFICATION -->
+        <!-- ===== NOTIFICATION ===== -->
         <div id="notification">
             <i class="fas fa-check-circle notif-icon"></i>
             <span class="notif-text">Successfully claimed your bet</span>
             <span class="notif-amount" id="notifAmount">+0 ⭐</span>
         </div>
 
-        <!-- HOME PAGE -->
+        <!-- ===== HOME PAGE ===== -->
         <div id="page-home" class="page active">
-            <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
-                <div class="home-greeting">Welcome back</div>
-                <div class="flex-between" style="margin-top: 4px;">
-                    <span class="text-muted" style="font-size: 14px;">Your Balance</span>
-                    <span class="home-balance" id="homeBalance"><i class="fas fa-star" style="font-size:28px; color:#ffd700; margin-right:4px;"></i> 1,000</span>
+            <!-- Premium Header with Bot Avatar -->
+            <div class="home-header">
+                <div class="home-avatar">
+                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Bot">
                 </div>
-                <div class="quick-actions">
-                    <div class="quick-action" onclick="navigateTo('rocket')">
-                        <span class="icon"><i class="fas fa-rocket"></i></span>
-                        <div class="label">Crash</div>
-                        <div class="desc">Fly high, cash out!</div>
-                    </div>
-                    <div class="quick-action" onclick="navigateTo('mines')">
-                        <span class="icon"><i class="fas fa-gem"></i></span>
-                        <div class="label">Mines</div>
-                        <div class="desc">Find the gems</div>
-                    </div>
+                <div class="home-user">
+                    <div class="greeting">Welcome back</div>
+                    <div class="username">Crash Bot</div>
+                </div>
+                <div class="home-balance-wrap">
+                    <div class="label">Balance</div>
+                    <div class="amount" id="homeBalance"><i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> 1,000</div>
                 </div>
             </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-grid">
+                <div class="quick-card glow-purple" onclick="navigateTo('rocket')">
+                    <span class="icon"><i class="fas fa-rocket"></i></span>
+                    <div class="label">Crash</div>
+                    <div class="desc">Fly high, cash out!</div>
+                </div>
+                <div class="quick-card glow-green" onclick="navigateTo('mines')">
+                    <span class="icon"><i class="fas fa-gem"></i></span>
+                    <div class="label">Mines</div>
+                    <div class="desc">Find the gems</div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
             <div class="card">
                 <div class="card-title">Statistics</div>
-                <div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <span style="color:#666;">Games Played</span>
-                    <span style="font-weight:700;" id="totalGames">0</span>
-                </div>
-                <div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <span style="color:#666;">Best Multiplier</span>
-                    <span style="font-weight:700; background: linear-gradient(135deg, #ffd700, #ff6b53); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="bestMultiplier">1.00x</span>
-                </div>
-                <div class="flex-between" style="padding:4px 0;">
-                    <span style="color:#666;">Win Rate</span>
-                    <span style="font-weight:700;" id="winRate">0%</span>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="value" id="totalGames">0</div>
+                        <div class="label">Games</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value text-gradient" id="bestMultiplier">1.00x</div>
+                        <div class="label">Best</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value" id="winRate">0%</div>
+                        <div class="label">Win Rate</div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Recent Winners -->
             <div class="card">
                 <div class="card-title">Recent Winners</div>
                 <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
             </div>
         </div>
 
-        <!-- CRASH PAGE -->
+        <!-- ===== CRASH PAGE ===== -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span>
@@ -816,30 +918,21 @@
 
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
-
-                <!-- Dog -->
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
-
-                <!-- Explosion -->
                 <div class="explosion-overlay" id="explosionOverlay">
                     <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
                 </div>
-
-                <!-- Countdown -->
                 <div class="countdown-overlay" id="countdownOverlay">
                     <div class="countdown-number" id="countdownNumber">3</div>
                 </div>
-
-                <!-- HISTORY BAR -->
                 <div class="history-bar" id="historyBar">
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
                 </div>
             </div>
 
-            <!-- BET / CASH OUT BUTTON -->
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
@@ -852,7 +945,7 @@
             </div>
         </div>
 
-        <!-- MINES PAGE -->
+        <!-- ===== MINES PAGE ===== -->
         <div id="page-mines" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold"><i class="fas fa-gem" style="margin-right:6px;"></i>Mines</span>
@@ -877,7 +970,7 @@
             </div>
         </div>
 
-        <!-- BOTTOM NAV -->
+        <!-- ===== BOTTOM NAV ===== -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
                 <span class="icon"><i class="fas fa-house"></i></span>
@@ -896,7 +989,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - Notification 1s, initial vibration removed
+        // CRASH GAME - FULL LOGIC
         // ============================================================
 
         const state = {
@@ -943,8 +1036,7 @@
         });
 
         function updateHome() {
-            homeBalance.innerHTML =
-                `<i class="fas fa-star" style="font-size:28px; color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
+            homeBalance.innerHTML = `<i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> ${state.balance.toLocaleString()}`;
             totalGamesEl.textContent = state.totalGames;
             bestMultiplierEl.textContent = `${state.bestMultiplier.toFixed(2)}x`;
             const total = state.wins + state.losses;
@@ -965,7 +1057,7 @@
         }
 
         // ============================================================
-        // VIBRATION HELPER
+        // VIBRATION
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
             try {
@@ -996,7 +1088,7 @@
         }
 
         // ============================================================
-        // NOTIFICATION - duration set to 1000ms
+        // NOTIFICATION
         // ============================================================
         function showNotification(amount) {
             const notif = document.getElementById('notification');
@@ -1010,7 +1102,7 @@
                 setTimeout(() => {
                     notif.style.display = 'none';
                 }, 400);
-            }, 1000); // 1 second
+            }, 1000);
         }
 
         // ============================================================
@@ -1029,7 +1121,7 @@
             countdownId: null,
             lastTime: 0,
             vibrationInterval: null,
-            firstCountdown: true, // to suppress initial vibration
+            firstCountdown: true,
 
             init() {
                 this.createGrid();
@@ -1210,7 +1302,6 @@
 
                 let count = 3;
 
-                // Modified showNumber with optional vibration flag
                 const showNumber = (num, vibrate = true) => {
                     numberEl.textContent = num;
                     numberEl.style.animation = 'none';
@@ -1221,7 +1312,6 @@
                     }
                 };
 
-                // First number (3) - no vibration if it's the very first countdown
                 if (this.firstCountdown) {
                     showNumber(3, false);
                     this.firstCountdown = false;
@@ -1239,7 +1329,6 @@
                         this.startRound();
                         return;
                     }
-                    // All subsequent numbers (2,1) vibrate normally
                     showNumber(count, true);
                 }, 1000);
             },
@@ -1368,7 +1457,6 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-                // Show notification for 1 second
                 showNotification(win);
 
                 this.updateUI();
@@ -1650,7 +1738,7 @@
                 }
             } catch (e) {}
 
-            console.log('Crash loaded! Notification 1s, initial vibration removed.');
+            console.log('Crash loaded! Premium home screen with bot avatar.');
         }
 
         document.addEventListener('DOMContentLoaded', init);
