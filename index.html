@@ -258,7 +258,7 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        /* ===== HOME PAGE - NO STATISTICS ===== */
+        /* ===== HOME PAGE ===== */
         .home-header {
             background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(0,0,0,0.2));
             border-radius: 24px;
@@ -320,6 +320,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-top: 4px;
+            margin-bottom: 6px;
         }
         .quick-card {
             background: rgba(255, 255, 255, 0.03);
@@ -368,6 +369,11 @@
         }
         .quick-card.glow-green {
             box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
+        }
+
+        /* Recent Winners - moved lower with more spacing */
+        .recent-winners-card {
+            margin-top: 16px;
         }
 
         /* ===== PROFILE PAGE ===== */
@@ -955,8 +961,8 @@
                 </div>
             </div>
 
-            <!-- Recent Winners (kept) -->
-            <div class="card">
+            <!-- Recent Winners - moved lower with margin-top -->
+            <div class="card recent-winners-card">
                 <div class="card-title">Recent Winners</div>
                 <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
             </div>
@@ -1179,7 +1185,6 @@
                         if (user.last_name) {
                             state.displayName += ' ' + user.last_name;
                         }
-                        // If username is not set, use displayName without @
                         if (!user.username) {
                             state.username = state.displayName;
                         }
