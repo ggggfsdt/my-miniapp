@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* All CSS remains exactly the same as before */
+        /* (All styles remain unchanged from the previous version – only the profile avatar onerror fallback is added) */
         * {
             margin: 0;
             padding: 0;
@@ -383,11 +383,30 @@
             margin: 0 auto 12px auto;
             border: 2px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 24px rgba(108, 92, 231, 0.2);
+            position: relative;
         }
         .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
+        }
+        .profile-avatar .fallback {
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            font-size: 36px;
+            font-weight: 700;
+            position: absolute;
+            inset: 0;
+        }
+        .profile-avatar img:not([src]) + .fallback,
+        .profile-avatar img.error + .fallback {
+            display: flex;
         }
         .profile-name {
             font-size: 22px;
@@ -741,6 +760,7 @@
             font-size: 18px;
             font-weight: 700;
             line-height: 1.2;
+            text-align: center;
         }
         #mainActionSub {
             font-size: 13px;
@@ -748,6 +768,7 @@
             color: rgba(255, 255, 255, 0.8);
             min-height: 18px;
             line-height: 1.2;
+            text-align: center;
         }
 
         .main-action-btn.place-bet {
@@ -1018,8 +1039,10 @@
         <!-- PROFILE PAGE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
-                <div class="profile-avatar">
-                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar">
+                <div class="profile-avatar" id="profileAvatar">
+                    <img id="profileAvatarImg" src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback" id="profileAvatarFallback">XD</div>
                 </div>
                 <div class="profile-name" id="profileName">xDll_Lud</div>
                 <div class="profile-username" id="profileUsername">@xDll_Lud</div>
@@ -1097,7 +1120,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - WITH VIBRATION CONTROL (stop on leave, resume on return)
+        // CRASH GAME - WITH PROFILE PIC FALLBACK & CENTERED BUTTON TEXT
         // ============================================================
 
         const state = {
@@ -1127,6 +1150,7 @@
         const profileDetailName = document.getElementById('profileDetailName');
         const profileName = document.getElementById('profileName');
         const profileUsername = document.getElementById('profileUsername');
+        const profileAvatarFallback = document.getElementById('profileAvatarFallback');
 
         const pages = {
             home: document.getElementById('page-home'),
@@ -1138,7 +1162,6 @@
 
         // ----- NAVIGATION -----
         function navigateTo(page) {
-            // If leaving rocket, stop vibration immediately
             if (page !== 'rocket' && crashGame.isPlaying) {
                 crashGame.stopVibration();
             }
@@ -1148,7 +1171,6 @@
             navItems.forEach(item => {
                 item.classList.toggle('active', item.dataset.page === page);
             });
-            // If entering rocket and game is playing, start vibration
             if (page === 'rocket' && crashGame.isPlaying) {
                 crashGame.startVibration();
             }
@@ -1175,6 +1197,10 @@
                         }
                         if (!user.username) {
                             state.username = state.displayName;
+                        }
+                        // Update profile fallback initials
+                        if (profileAvatarFallback) {
+                            profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
                         }
                     }
                 }
@@ -1210,6 +1236,10 @@
             profileDetailName.textContent = state.displayName;
             profileName.textContent = state.displayName;
             profileUsername.textContent = `@${state.username}`;
+            // Update fallback initials
+            if (profileAvatarFallback) {
+                profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
+            }
         }
 
         // ============================================================
@@ -1230,7 +1260,6 @@
         }
 
         function triggerContinuousVibration() {
-            // Only vibrate if the rocket page is active and document is visible
             if (document.hidden) return;
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage || !rocketPage.classList.contains('active')) return;
@@ -1280,7 +1309,6 @@
             vibrationInterval: null,
             firstCountdown: true,
 
-            // ----- Vibration Control -----
             startVibration() {
                 if (this.vibrationInterval) return;
                 this.vibrationInterval = setInterval(() => {
@@ -1297,7 +1325,6 @@
                 }
             },
 
-            // ----- INIT -----
             init() {
                 this.createGrid();
                 this.updateUI();
@@ -1324,7 +1351,6 @@
 
             setupMainButton() {},
 
-            // ----- UI Updates -----
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
@@ -1406,7 +1432,6 @@
                 }
             },
 
-            // ----- Actions -----
             mainAction() {
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
@@ -1464,7 +1489,6 @@
                 this.updateMainButton();
             },
 
-            // ----- Countdown -----
             startCountdown() {
                 if (this.isCountingDown) return;
                 if (this.isPlaying) return;
@@ -1511,7 +1535,6 @@
                 }, 1000);
             },
 
-            // ----- Round -----
             startRound() {
                 if (this.bet > 0 && this.bet <= state.balance) {
                     state.balance -= this.bet;
@@ -1535,14 +1558,12 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                // Start vibration (only if rocket page is active)
                 this.startVibration();
 
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
-            // ----- Game Loop -----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -1636,7 +1657,6 @@
                 updateHomeUI();
             },
 
-            // ----- Helpers -----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -1674,7 +1694,7 @@
         };
 
         // ============================================================
-        // MINES GAME (unchanged, just uses triggerVibration)
+        // MINES GAME (unchanged)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1876,7 +1896,7 @@
         };
 
         // ============================================================
-        // VISIBILITY CHANGE HANDLER (stop vibration when hidden)
+        // VISIBILITY CHANGE HANDLER
         // ============================================================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
