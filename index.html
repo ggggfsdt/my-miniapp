@@ -761,6 +761,7 @@
             font-weight: 700;
             line-height: 1.2;
             text-align: center;
+            margin-top: 2px; /* slight downward adjustment */
         }
         #mainActionSub {
             font-size: 13px;
@@ -769,6 +770,7 @@
             min-height: 18px;
             line-height: 1.2;
             text-align: center;
+            margin-top: -2px;
         }
 
         .main-action-btn.place-bet {
@@ -1120,7 +1122,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME - FINAL VERSION (No vibration on app open)
+        // CRASH GAME - FINAL (No vibrations except cash out)
         // ============================================================
 
         const state = {
@@ -1162,10 +1164,6 @@
 
         // ----- NAVIGATION -----
         function navigateTo(page) {
-            // Stop vibration if leaving rocket
-            if (page !== 'rocket' && crashGame.isPlaying) {
-                crashGame.stopVibration();
-            }
             Object.keys(pages).forEach(key => {
                 pages[key].classList.toggle('active', key === page);
             });
@@ -1243,9 +1241,12 @@
         }
 
         // ============================================================
-        // VIBRATION HELPERS
+        // VIBRATION HELPERS (only used for cash out)
         // ============================================================
         function triggerVibration(duration = 30, type = 'light') {
+            // Only vibrate if the rocket page is active
+            const rocketPage = document.getElementById('page-rocket');
+            if (!rocketPage || !rocketPage.classList.contains('active')) return;
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -1256,21 +1257,6 @@
             } catch (e) {}
             try {
                 if (navigator.vibrate) navigator.vibrate(duration);
-            } catch (e) {}
-        }
-
-        function triggerContinuousVibration() {
-            // Only vibrate if the rocket page is visible and document is not hidden
-            if (document.hidden) return;
-            const rocketPage = document.getElementById('page-rocket');
-            if (!rocketPage || !rocketPage.classList.contains('active')) return;
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                }
-            } catch (e) {}
-            try {
-                if (navigator.vibrate) navigator.vibrate(15);
             } catch (e) {}
         }
 
@@ -1307,35 +1293,12 @@
             animationId: null,
             countdownId: null,
             lastTime: 0,
-            vibrationInterval: null,
-            firstCountdown: true,
-
-            // ---- Vibration Control ----
-            startVibration() {
-                if (this.vibrationInterval) return;
-                this.vibrationInterval = setInterval(() => {
-                    if (this.isPlaying) {
-                        triggerContinuousVibration();
-                    }
-                }, 150);
-            },
-
-            stopVibration() {
-                if (this.vibrationInterval) {
-                    clearInterval(this.vibrationInterval);
-                    this.vibrationInterval = null;
-                }
-            },
+            isCashingOut: false, // prevent double click
 
             // ---- Game Cycle ----
             startGameCycle() {
-                // If game is idle or over, start countdown
                 if (!this.isPlaying && !this.isCountingDown && !this.gameOver) {
                     this.startCountdown();
-                }
-                // If game is playing, ensure vibration runs
-                if (this.isPlaying) {
-                    this.startVibration();
                 }
             },
 
@@ -1346,7 +1309,6 @@
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
-                // Do NOT start countdown here – will be triggered when user visits rocket page
             },
 
             createGrid() {
@@ -1450,8 +1412,8 @@
             // ---- Main Action ----
             mainAction() {
                 if (this.isPlaying) {
-                    if (this.bet > 0 && !this.hasCashedOut) {
-                        this.cashOut();
+                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut) {
+                        this.initiateCashOut();
                     }
                     return;
                 }
@@ -1493,16 +1455,53 @@
                 const input = document.getElementById('betInputRocket');
                 let bet = parseInt(input.value) || 0;
                 if (bet < 1) {
-                    triggerVibration(60, 'heavy');
+                    // No vibration for errors
                     return;
                 }
                 if (bet > state.balance) {
-                    triggerVibration(60, 'heavy');
                     return;
                 }
                 this.bet = bet;
                 document.getElementById('betInputRow').classList.remove('open');
                 this.updateMainButton();
+            },
+
+            // ---- Cash Out with delay ----
+            initiateCashOut() {
+                if (this.isCashingOut) return;
+                this.isCashingOut = true;
+                const btn = document.getElementById('mainActionBtn');
+                btn.disabled = true;
+
+                // Delay of 150ms
+                setTimeout(() => {
+                    // Check again that we are still playing and haven't cashed out already
+                    if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
+                        // Vibrate only if still on crash page
+                        triggerVibration(30, 'light');
+                        this.executeCashOut();
+                    }
+                    this.isCashingOut = false;
+                }, 150);
+            },
+
+            executeCashOut() {
+                if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
+
+                this.hasCashedOut = true;
+                const win = Math.floor(this.bet * this.multiplier);
+                state.balance += win;
+                state.wins++;
+                state.totalGames++;
+                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
+                state.recentWinners.unshift({ name: 'You', amount: win });
+                if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                showNotification(win);
+
+                this.updateUI();
+                this.updateMainButton();
+                updateHomeUI();
             },
 
             // ---- Countdown ----
@@ -1521,23 +1520,15 @@
 
                 let count = 3;
 
-                const showNumber = (num, vibrate = true) => {
+                const showNumber = (num) => {
                     numberEl.textContent = num;
                     numberEl.style.animation = 'none';
                     void numberEl.offsetHeight;
                     numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
-                    if (vibrate) {
-                        triggerVibration(35, 'light');
-                    }
+                    // No vibration
                 };
 
-                // First-ever countdown: no vibration on 3
-                if (this.firstCountdown) {
-                    showNumber(3, false);
-                    this.firstCountdown = false;
-                } else {
-                    showNumber(3, true);
-                }
+                showNumber(3);
 
                 this.countdownId = setInterval(() => {
                     count--;
@@ -1549,7 +1540,7 @@
                         this.startRound();
                         return;
                     }
-                    showNumber(count, true); // 2 and 1 always vibrate
+                    showNumber(count);
                 }, 1000);
             },
 
@@ -1577,14 +1568,11 @@
                 this.updateUI();
                 this.updateMainButton();
 
-                // Start vibration only if the page is active
-                this.startVibration();
-
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
 
-            // ---- Game Loop ----
+            // ---- Game Loop (no vibration) ----
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -1608,8 +1596,7 @@
                     this.isPlaying = false;
                     this.gameOver = true;
 
-                    this.stopVibration();
-                    triggerVibration(80, 'heavy');
+                    // No vibration on crash
 
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
@@ -1647,7 +1634,6 @@
                             this.hasCashedOut = false;
                             document.getElementById('betInputRocket').value = 10;
                             this.gameOver = false;
-                            // Only if rocket page is still active
                             if (document.getElementById('page-rocket').classList.contains('active')) {
                                 this.startCountdown();
                             }
@@ -1657,29 +1643,6 @@
                 }
 
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
-            },
-
-            cashOut() {
-                if (!this.isPlaying) return;
-                if (this.bet === 0) return;
-                if (this.hasCashedOut) return;
-
-                this.hasCashedOut = true;
-                triggerVibration(30, 'light');
-
-                const win = Math.floor(this.bet * this.multiplier);
-                state.balance += win;
-                state.wins++;
-                state.totalGames++;
-                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You', amount: win });
-                if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                showNotification(win);
-
-                this.updateUI();
-                this.updateMainButton();
-                updateHomeUI();
             },
 
             // ---- Helpers ----
@@ -1720,7 +1683,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME (vibrations removed from mines as well)
         // ============================================================
         const minesGame = {
             gridSize: 5,
@@ -1876,7 +1839,7 @@
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
-                    triggerVibration(60, 'heavy');
+                    // No vibration
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -1894,7 +1857,7 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    triggerVibration(50, 'medium');
+                    // No vibration
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -1915,31 +1878,17 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-                triggerVibration(30, 'light');
+                // No vibration in mines cash out
                 this.updateUI();
                 updateHomeUI();
             }
         };
 
         // ============================================================
-        // VISIBILITY CHANGE HANDLER
+        // VISIBILITY CHANGE – no vibration handling needed
         // ============================================================
         document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                if (crashGame.isPlaying && crashGame.vibrationInterval) {
-                    crashGame.stopVibration();
-                }
-            } else {
-                if (crashGame.isPlaying && !crashGame.vibrationInterval) {
-                    crashGame.startVibration();
-                }
-                // If on rocket page and game is idle, start the cycle
-                if (document.getElementById('page-rocket').classList.contains('active')) {
-                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) {
-                        crashGame.startGameCycle();
-                    }
-                }
-            }
+            // Nothing to do for vibrations now
         });
 
         // ============================================================
@@ -1960,11 +1909,25 @@
                 }
             } catch (e) {}
 
-            console.log('Casino loaded – no vibration on app open.');
+            console.log('Casino loaded – vibrations only on cash out.');
+            // Start the game cycle immediately (countdown will start when crash page is opened)
         }
 
+        // Start the cycle when crash page becomes active for the first time
+        // We check if rocket page is active on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.startGameCycle();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', init);
-        if (document.readyState === 'complete') init();
+        if (document.readyState === 'complete') {
+            init();
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.startGameCycle();
+            }
+        }
     </script>
 </body>
 </html>
