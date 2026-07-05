@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐕 Flying Dog Casino</title>
+    <title>🐕 Crash</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -41,7 +41,7 @@
         .page {
             display: none;
             flex: 1;
-            padding: 18px 16px 80px 16px;
+            padding: 18px 16px 70px 16px;
             overflow-y: auto;
             max-height: 740px;
             scroll-behavior: smooth;
@@ -60,6 +60,7 @@
             border-radius: 10px;
         }
 
+        /* ===== BOTTOM NAV - MOVED HIGHER ===== */
         .bottom-nav {
             position: sticky;
             bottom: 0;
@@ -70,9 +71,9 @@
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-around;
-            padding: 6px 0 14px 0;
+            padding: 4px 0 10px 0;
             border-radius: 0 0 36px 36px;
-            margin-top: auto;
+            margin-top: -10px;
             z-index: 20;
         }
         .nav-item {
@@ -93,7 +94,7 @@
             letter-spacing: 0.3px;
         }
         .nav-item .icon {
-            font-size: 22px;
+            font-size: 20px;
             transition: all 0.3s;
             filter: grayscale(1) brightness(0.5);
         }
@@ -107,7 +108,7 @@
         }
         .nav-item.active .icon {
             filter: grayscale(0) brightness(1);
-            transform: translateY(-3px) scale(1.1);
+            transform: translateY(-2px) scale(1.1);
         }
         .nav-item.active::before {
             content: '';
@@ -256,46 +257,17 @@
             margin-top: 2px;
         }
 
-        .rocket-multiplier {
-            text-align: center;
-            padding: 20px 10px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            position: relative;
-            overflow: hidden;
-        }
-        .rocket-multiplier .value {
-            font-size: 72px;
-            font-weight: 900;
-            line-height: 1.1;
-            transition: color 0.3s;
-            position: relative;
-            z-index: 1;
-            letter-spacing: -2px;
-        }
-        .rocket-multiplier .value .x {
-            font-size: 36px;
-            font-weight: 400;
-            opacity: 0.5;
-        }
-        .rocket-multiplier .status {
-            font-size: 14px;
-            color: #555;
-            margin-top: 4px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ===== GRID - ONE SOLID BACKGROUND, OUTLINED SQUARES ===== */
+        /* ============================================================
+           GRID - BIGGER
+           ============================================================ */
         .grid-container {
             position: relative;
-            height: 200px;
+            height: 280px;
             background: #0a0a0c;
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.04);
-            margin: 10px 0;
+            margin: 10px 0 10px 0;
         }
         .grid-squares {
             position: absolute;
@@ -316,27 +288,27 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
-        /* Dog GIF - larger, with rotation */
+        /* Dog GIF - BIGGER */
         .gif-overlay {
             position: absolute;
-            top: 50%;
+            top: 45%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(0deg);
             z-index: 10;
-            width: 75%;
-            height: 75%;
+            width: 80%;
+            height: 80%;
             pointer-events: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.05s; /* smooth rotation */
+            transition: transform 0.05s;
         }
         .gif-overlay img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             display: none;
-            filter: drop-shadow(0 0 30px rgba(108, 92, 231, 0.3));
+            filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
         }
         .gif-overlay img.active {
             display: block;
@@ -381,84 +353,87 @@
             100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
 
-        .bots-scroll {
+        /* ============================================================
+           HISTORY BAR - INSIDE GRID (below dog)
+           ============================================================ */
+        .history-bar {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12;
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            max-height: 64px;
-            overflow-y: auto;
-            padding: 4px 0;
-        }
-        .bots-scroll::-webkit-scrollbar {
-            width: 2px;
-        }
-        .bots-scroll::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 10px;
-        }
-        .bot-chip {
-            display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 4px 12px 4px 6px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 11px;
-            animation: popIn 0.3s ease;
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            max-width: 90%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            scrollbar-width: none;
         }
-        .bot-chip .dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 800;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-        .bot-chip .name {
-            color: #aaa;
-            font-weight: 600;
-            font-size: 10px;
-        }
-        .bot-chip .mult {
-            font-weight: 700;
-            font-size: 10px;
-        }
-        .bot-chip.cashed .mult {
-            color: #00d2a0;
-        }
-        .bot-chip.crashed .mult {
-            color: #ff6b6b;
-        }
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.7); }
-            100% { opacity: 1; transform: scale(1); }
+        .history-bar::-webkit-scrollbar {
+            display: none;
         }
 
-        .history-list {
+        /* Current multiplier - big and prominent */
+        .history-current {
+            font-size: 22px;
+            font-weight: 900;
+            padding-right: 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 60px;
+            text-align: center;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+        .history-current .x {
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.5;
+        }
+
+        /* Past history items - colored pills */
+        .history-past {
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px;
+            flex-wrap: nowrap;
         }
         .history-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.06);
+            color: #888;
             border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
         }
-        .history-item.crashed {
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.15);
-        }
-        .history-item.won {
+        /* Color coding */
+        .history-item.green {
+            background: rgba(0, 210, 160, 0.2);
             color: #00d2a0;
             border-color: rgba(0, 210, 160, 0.15);
+        }
+        .history-item.blue {
+            background: rgba(54, 160, 255, 0.2);
+            color: #54a0ff;
+            border-color: rgba(54, 160, 255, 0.15);
+        }
+        .history-item.purple {
+            background: rgba(108, 92, 231, 0.25);
+            color: #a29bfe;
+            border-color: rgba(108, 92, 231, 0.15);
+        }
+        /* Crash result - red */
+        .history-item.crashed {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.15);
         }
 
         .mines-grid {
@@ -504,22 +479,29 @@
         }
 
         @media (max-width: 420px) {
-            .rocket-multiplier .value {
-                font-size: 56px;
-            }
             .grid-container {
-                height: 160px;
+                height: 220px;
             }
             .gif-overlay {
-                width: 70%;
-                height: 70%;
+                width: 75%;
+                height: 75%;
+                top: 45%;
+            }
+            .history-current {
+                font-size: 18px;
+                min-width: 50px;
+            }
+            .history-item {
+                font-size: 10px;
+                padding: 2px 6px;
             }
         }
     </style>
 </head>
 <body>
+
     <div id="app">
-        <!-- HOME PAGE -->
+        <!-- ===== HOME PAGE ===== -->
         <div id="page-home" class="page active">
             <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
                 <div class="home-greeting">🐕 Welcome back</div>
@@ -529,9 +511,9 @@
                 </div>
                 <div class="quick-actions">
                     <div class="quick-action" onclick="navigateTo('rocket')">
-                        <span class="icon">🐕</span>
-                        <div class="label">Flying Dog</div>
-                        <div class="desc">Watch him fly!</div>
+                        <span class="icon">🚀</span>
+                        <div class="label">Crash</div>
+                        <div class="desc">Fly high, cash out!</div>
                     </div>
                     <div class="quick-action" onclick="navigateTo('mines')">
                         <span class="icon">💎</span>
@@ -561,29 +543,26 @@
             </div>
         </div>
 
-        <!-- ROCKET PAGE -->
+        <!-- ===== CRASH PAGE (formerly Fly Dog) ===== -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
-                <span class="badge badge-gold">🐕 FLYING DOG</span>
+                <span class="badge badge-gold">🚀 CRASH</span>
                 <span class="badge" id="rocketBalance">⭐ 1,000</span>
-            </div>
-            <div class="rocket-multiplier">
-                <div class="value" id="rocketMultiplier">1.00<span class="x">x</span></div>
-                <div class="status" id="rocketStatus">Press "Launch" to fly!</div>
             </div>
 
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
+
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
-                <div class="crash-overlay" id="crashOverlay">💥 CRASH!</div>
-            </div>
 
-            <div class="card" style="padding: 10px 12px;">
-                <div class="card-title" style="margin-bottom: 4px;">🤖 Live Bots</div>
-                <div class="bots-scroll" id="rocketBots">
-                    <span class="text-muted" style="font-size: 12px;">Waiting for launch...</span>
+                <div class="crash-overlay" id="crashOverlay">💥 CRASH!</div>
+
+                <!-- ===== HISTORY BAR (inside grid) ===== -->
+                <div class="history-bar" id="historyBar">
+                    <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
+                    <div class="history-past" id="historyPast"></div>
                 </div>
             </div>
 
@@ -593,19 +572,16 @@
                     <input type="number" id="betInputRocket" value="10" min="1" style="width:60px; background:transparent; border:none; color:white; text-align:center; font-weight:700; font-size:16px; outline:none;">
                     <button class="btn" style="flex:0; padding:8px 14px; background:transparent; font-size:20px; color:#666;" id="betPlusRocket">+</button>
                 </div>
-                <button class="btn btn-primary" id="rocketStartBtn">🐕 Launch</button>
+                <button class="btn btn-primary" id="rocketStartBtn">🚀 Launch</button>
                 <button class="btn btn-success" id="rocketCashoutBtn" disabled>💰 Cash Out</button>
             </div>
 
-            <div class="card" style="padding: 12px;">
-                <div class="card-title" style="margin-bottom: 4px;">📈 History</div>
-                <div class="history-list" id="rocketHistory">
-                    <span class="text-muted" style="font-size: 12px;">No rounds yet</span>
-                </div>
+            <div id="rocketStatus" style="text-align:center; font-size:14px; color:#555; padding:4px 0;">
+                Press "Launch" to start
             </div>
         </div>
 
-        <!-- MINES PAGE -->
+        <!-- ===== MINES PAGE ===== -->
         <div id="page-mines" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold">💎 MINES</span>
@@ -630,17 +606,26 @@
             </div>
         </div>
 
-        <!-- BOTTOM NAV -->
+        <!-- ===== BOTTOM NAV ===== -->
         <div class="bottom-nav">
-            <button class="nav-item active" data-page="home"><span class="icon">🏠</span><span class="label">Home</span></button>
-            <button class="nav-item" data-page="rocket"><span class="icon">🐕</span><span class="label">Fly Dog</span></button>
-            <button class="nav-item" data-page="mines"><span class="icon">💎</span><span class="label">Mines</span></button>
+            <button class="nav-item active" data-page="home">
+                <span class="icon">🏠</span>
+                <span class="label">Home</span>
+            </button>
+            <button class="nav-item" data-page="rocket">
+                <span class="icon">🚀</span>
+                <span class="label">Crash</span>
+            </button>
+            <button class="nav-item" data-page="mines">
+                <span class="icon">💎</span>
+                <span class="label">Mines</span>
+            </button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // 🐕 COMPLETE GAME LOGIC - Flying Dog Edition
+        // 🚀 CRASH GAME - No Bots, History in Grid
         // ============================================================
 
         const state = {
@@ -652,6 +637,7 @@
             recentWinners: [],
         };
 
+        // ----- DOM REFS -----
         const homeBalance = document.getElementById('homeBalance');
         const totalGamesEl = document.getElementById('totalGames');
         const bestMultiplierEl = document.getElementById('bestMultiplier');
@@ -699,14 +685,16 @@
             }
         }
 
+        // ============================================================
+        // 🚀 CRASH GAME
+        // ============================================================
         const rocketGame = {
             multiplier: 1.00,
             crashPoint: 1.00,
             isPlaying: false,
             gameOver: false,
             bet: 10,
-            history: [],
-            bots: [],
+            history: [], // stores past multipliers (numbers only)
             animationId: null,
             lastTime: 0,
 
@@ -714,7 +702,6 @@
                 this.setupControls();
                 this.createGrid();
                 this.updateUI();
-                this.renderBots();
                 this.renderHistory();
             },
 
@@ -762,20 +749,20 @@
             },
 
             updateUI() {
-                const multEl = document.getElementById('rocketMultiplier');
-                multEl.innerHTML = `${this.multiplier.toFixed(2)}<span class="x">x</span>`;
+                // Update history bar current multiplier
+                const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
                 let color = '#ffffff';
-                if (m >= 5) color = '#ff6b6b';
-                else if (m >= 3) color = '#ff9f43';
-                else if (m >= 2) color = '#ffd700';
-                else if (m >= 1.5) color = '#00d2a0';
-                multEl.style.color = color;
+                if (m >= 1.4) color = '#00d2a0';   // green
+                if (m >= 2.5) color = '#54a0ff';     // blue
+                if (m >= 4.0) color = '#a29bfe';     // purple
+                currentEl.innerHTML = `${m.toFixed(2)}<span class="x">x</span>`;
+                currentEl.style.color = color;
 
                 document.getElementById('rocketBalance').textContent = `⭐ ${state.balance.toLocaleString()}`;
                 document.getElementById('rocketStatus').textContent =
-                    this.isPlaying ? `🐕 Flying at ${this.multiplier.toFixed(2)}x` :
-                    this.gameOver ? '💥 Crashed!' : 'Press "Launch" to fly!';
+                    this.isPlaying ? `🚀 Flying at ${this.multiplier.toFixed(2)}x` :
+                    this.gameOver ? '💥 Crashed!' : 'Press "Launch" to start';
 
                 const startBtn = document.getElementById('rocketStartBtn');
                 const cashBtn = document.getElementById('rocketCashoutBtn');
@@ -783,85 +770,39 @@
                 cashBtn.disabled = !this.isPlaying;
             },
 
-            // ----- MAX CRASH POINT NOW 11.05 -----
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
                 if (r < 0.60) return 1.50 + Math.random() * 1.0;
                 if (r < 0.80) return 2.50 + Math.random() * 2.0;
-                // 4.50 to 11.05 (max 11.05)
-                return 4.50 + Math.random() * 6.55;
-            },
-
-            createBots() {
-                const names = ['CryptoKing', 'MoonRider', 'StarChaser', 'RocketMan', 'LuckyOne',
-                    'DiamondHands', 'WhaleAlert', 'PaperHands', 'LunarWolf', 'NeonFox'
-                ];
-                const colors = ['#ff6b6b', '#feca57', '#00d2a0', '#6c5ce7', '#fd79a8',
-                    '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0', '#ff9f43'
-                ];
-                const count = 5 + Math.floor(Math.random() * 6);
-                this.bots = [];
-                const shuffled = [...names].sort(() => Math.random() - 0.5);
-                for (let i = 0; i < count && i < shuffled.length; i++) {
-                    this.bots.push({
-                        name: shuffled[i],
-                        color: colors[i % colors.length],
-                        // bots can cash out up to 9.0 (so they might crash if over)
-                        cashoutMultiplier: 1.10 + Math.random() * 7.90,
-                        cashedOut: false,
-                        crashed: false,
-                        active: true,
-                        bet: 5 + Math.floor(Math.random() * 45),
-                    });
-                }
-            },
-
-            renderBots() {
-                const container = document.getElementById('rocketBots');
-                if (!this.isPlaying && !this.gameOver) {
-                    container.innerHTML = '<span class="text-muted" style="font-size:12px;">Waiting for launch...</span>';
-                    return;
-                }
-                const active = this.bots.filter(b => b.active);
-                if (active.length === 0) {
-                    container.innerHTML = '<span class="text-muted" style="font-size:12px;">All bots finished</span>';
-                    return;
-                }
-                let html = '';
-                for (const bot of active) {
-                    const status = bot.cashedOut ? '✅' : bot.crashed ? '💥' : '⏳';
-                    const cls = bot.cashedOut ? 'cashed' : bot.crashed ? 'crashed' : '';
-                    const mult = bot.cashedOut ? `${bot.cashoutMultiplier.toFixed(2)}x` :
-                        bot.crashed ? '💥' : '...';
-                    html += `
-                        <div class="bot-chip ${cls}">
-                            <span class="dot" style="background:${bot.color};">${status}</span>
-                            <span class="name">${bot.name}</span>
-                            <span class="mult">${mult}</span>
-                        </div>
-                    `;
-                }
-                container.innerHTML = html;
+                return 4.50 + Math.random() * 6.55; // max 11.05
             },
 
             renderHistory() {
-                const container = document.getElementById('rocketHistory');
-                if (this.history.length === 0) {
-                    container.innerHTML = '<span class="text-muted" style="font-size:12px;">No rounds yet</span>';
-                    return;
+                const container = document.getElementById('historyPast');
+                container.innerHTML = '';
+                // Show last 8 history items
+                const items = this.history.slice(0, 8);
+                for (const mult of items) {
+                    const el = document.createElement('span');
+                    el.className = 'history-item';
+                    // Color coding
+                    if (mult >= 4.0) {
+                        el.classList.add('purple');
+                    } else if (mult >= 2.5) {
+                        el.classList.add('blue');
+                    } else if (mult >= 1.4) {
+                        el.classList.add('green');
+                    } else {
+                        el.classList.add('crashed');
+                    }
+                    el.textContent = `${mult.toFixed(2)}x`;
+                    container.appendChild(el);
                 }
-                let html = '';
-                for (const h of this.history) {
-                    const cls = h.result === 'crashed' ? 'crashed' : 'won';
-                    const label = h.result === 'crashed' ? `💥 ${h.mult.toFixed(2)}x` : `✅ ${h.mult.toFixed(2)}x`;
-                    html += `<span class="history-item ${cls}">${label}</span>`;
-                }
-                container.innerHTML = html;
             },
 
-            addHistory(result, mult) {
-                this.history.unshift({ result, mult });
+            addHistory(mult) {
+                this.history.unshift(mult);
                 if (this.history.length > 12) this.history.pop();
                 this.renderHistory();
             },
@@ -882,17 +823,15 @@
                 this.gameOver = false;
                 this.lastTime = 0;
 
+                // Show dog
                 const dogGif = document.getElementById('flyingDogGif');
                 const crashOverlay = document.getElementById('crashOverlay');
                 crashOverlay.classList.remove('active');
                 dogGif.style.display = 'block';
                 dogGif.classList.add('active');
 
-                this.createBots();
-
                 this.updateUI();
-                this.renderBots();
-                document.getElementById('rocketStatus').textContent = `🐕 Flying... crash at ${this.crashPoint.toFixed(2)}x`;
+                document.getElementById('rocketStatus').textContent = `🚀 Flying... crash at ${this.crashPoint.toFixed(2)}x`;
                 document.getElementById('rocketStartBtn').disabled = true;
                 document.getElementById('rocketCashoutBtn').disabled = false;
 
@@ -905,13 +844,12 @@
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
                 this.lastTime = timestamp;
 
-                // ----- MULTIPLIER SPEED (starts slow, speeds up) -----
+                // Multiplier speed (starts slow, speeds up)
                 const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
-                // ----- DOG ROTATION: proportional to multiplier (tilt upward) -----
-                // 0° at 1.0x, ~5° per multiplier unit (e.g., 50° at 11x)
+                // Dog rotation (tilt up with multiplier)
                 const tilt = (this.multiplier - 1) * 5;
                 const dogOverlay = document.getElementById('dogOverlay');
                 dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
@@ -931,20 +869,14 @@
                     dogGif.classList.remove('active');
                     setTimeout(() => { dogGif.style.display = 'none'; }, 500);
 
+                    // Add to history (crashed)
+                    this.addHistory(this.multiplier);
+
                     this.updateUI();
-                    this.renderBots();
-                    this.addHistory('crashed', this.multiplier);
                     document.getElementById('rocketStatus').textContent = '💥 Crashed!';
                     document.getElementById('rocketStartBtn').disabled = false;
                     document.getElementById('rocketCashoutBtn').disabled = true;
 
-                    for (const bot of this.bots) {
-                        if (bot.active && !bot.cashedOut) {
-                            bot.crashed = true;
-                            bot.active = false;
-                        }
-                    }
-                    this.renderBots();
                     updateHome();
                     if (this.animationId) {
                         cancelAnimationFrame(this.animationId);
@@ -953,19 +885,8 @@
                     return;
                 }
 
-                // Bots cash out
-                for (const bot of this.bots) {
-                    if (bot.active && !bot.cashedOut && !bot.crashed) {
-                        if (this.multiplier >= bot.cashoutMultiplier) {
-                            bot.cashedOut = true;
-                            bot.active = false;
-                        }
-                    }
-                }
-
                 this.updateUI();
-                this.renderBots();
-                document.getElementById('rocketStatus').textContent = `🐕 ${this.multiplier.toFixed(2)}x`;
+                document.getElementById('rocketStatus').textContent = `🚀 ${this.multiplier.toFixed(2)}x`;
 
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
@@ -986,29 +907,26 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
+                // Add to history (win)
+                this.addHistory(this.multiplier);
+
                 const dogGif = document.getElementById('flyingDogGif');
                 dogGif.classList.remove('active');
                 setTimeout(() => { dogGif.style.display = 'none'; }, 300);
 
-                this.addHistory('won', this.multiplier);
                 this.updateUI();
                 document.getElementById('rocketStatus').textContent = `💰 Cashed out at ${this.multiplier.toFixed(2)}x!`;
                 document.getElementById('rocketStartBtn').disabled = false;
                 document.getElementById('rocketCashoutBtn').disabled = true;
                 this.gameOver = true;
 
-                for (const bot of this.bots) {
-                    if (bot.active && !bot.cashedOut) {
-                        bot.crashed = true;
-                        bot.active = false;
-                    }
-                }
-                this.renderBots();
                 updateHome();
             }
         };
 
-        // ===== MINES GAME (unchanged) =====
+        // ============================================================
+        // 💎 MINES GAME
+        // ============================================================
         const minesGame = {
             gridSize: 5,
             minesCount: 3,
@@ -1204,10 +1122,14 @@
             }
         };
 
+        // ============================================================
+        // INIT
+        // ============================================================
         function init() {
             updateHome();
             rocketGame.init();
             minesGame.init();
+
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -1215,7 +1137,8 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('🐕 Flying Dog Casino loaded!');
+
+            console.log('🚀 Crash loaded!');
         }
 
         document.addEventListener('DOMContentLoaded', init);
