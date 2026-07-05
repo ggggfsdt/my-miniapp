@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐕 Crash</title>
+    <title>🚀 Crash</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -60,7 +60,6 @@
             border-radius: 10px;
         }
 
-        /* ===== BOTTOM NAV - MOVED HIGHER ===== */
         .bottom-nav {
             position: sticky;
             bottom: 0;
@@ -257,9 +256,7 @@
             margin-top: 2px;
         }
 
-        /* ============================================================
-           GRID - BIGGER
-           ============================================================ */
+        /* ========== GRID ========== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -288,12 +285,12 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
-        /* Dog GIF - BIGGER */
+        /* Dog GIF overlay */
         .gif-overlay {
             position: absolute;
             top: 45%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(0deg);
+            transform: translate(-50%, -50%) rotate(0deg) scale(1, 1);
             z-index: 10;
             width: 80%;
             height: 80%;
@@ -301,7 +298,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.05s;
+            transition: none;
         }
         .gif-overlay img {
             width: 100%;
@@ -330,47 +327,61 @@
             }
         }
 
-        .crash-overlay {
+        /* ===== EXPLOSION OVERLAY (replaces crash overlay) ===== */
+        .explosion-overlay {
             position: absolute;
             inset: 0;
             z-index: 15;
-            background: rgba(255, 0, 0, 0.4);
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            font-weight: 900;
-            color: #ff0000;
-            text-shadow: 0 0 60px rgba(255, 0, 0, 0.9), 0 0 120px rgba(255, 0, 0, 0.5);
-            animation: flashCrash 0.6s ease;
+            pointer-events: none;
         }
-        .crash-overlay.active {
+        .explosion-overlay.active {
             display: flex;
         }
-        @keyframes flashCrash {
-            0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
-            50% { opacity: 1; transform: scale(1.3) rotate(3deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        .explosion-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: explosionAnim 0.8s ease-out forwards;
         }
 
-        /* ============================================================
-           HISTORY BAR - INSIDE GRID (below dog)
-           ============================================================ */
+        @keyframes explosionAnim {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            30% {
+                transform: scale(1.4);
+                opacity: 1;
+            }
+            60% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ========== HISTORY BAR ========== */
         .history-bar {
             position: absolute;
-            bottom: 8px;
+            bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 12;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            max-width: 90%;
+            max-width: 92%;
             overflow-x: auto;
             flex-wrap: nowrap;
             scrollbar-width: none;
@@ -379,33 +390,31 @@
             display: none;
         }
 
-        /* Current multiplier - big and prominent */
         .history-current {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 900;
-            padding-right: 10px;
+            padding-right: 8px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-            min-width: 60px;
+            min-width: 50px;
             text-align: center;
             letter-spacing: -0.5px;
             white-space: nowrap;
         }
         .history-current .x {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 400;
             opacity: 0.5;
         }
 
-        /* Past history items - colored pills */
         .history-past {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             flex-wrap: nowrap;
         }
         .history-item {
-            padding: 2px 8px;
+            padding: 1px 6px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             white-space: nowrap;
             background: rgba(255, 255, 255, 0.06);
@@ -413,7 +422,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             transition: all 0.3s;
         }
-        /* Color coding */
         .history-item.green {
             background: rgba(0, 210, 160, 0.2);
             color: #00d2a0;
@@ -429,7 +437,6 @@
             color: #a29bfe;
             border-color: rgba(108, 92, 231, 0.15);
         }
-        /* Crash result - red */
         .history-item.crashed {
             background: rgba(255, 107, 107, 0.2);
             color: #ff6b6b;
@@ -488,12 +495,17 @@
                 top: 45%;
             }
             .history-current {
-                font-size: 18px;
-                min-width: 50px;
+                font-size: 15px;
+                min-width: 40px;
             }
             .history-item {
-                font-size: 10px;
-                padding: 2px 6px;
+                font-size: 9px;
+                padding: 1px 4px;
+            }
+            .history-bar {
+                bottom: 8px;
+                padding: 3px 8px;
+                gap: 3px;
             }
         }
     </style>
@@ -501,7 +513,7 @@
 <body>
 
     <div id="app">
-        <!-- ===== HOME PAGE ===== -->
+        <!-- HOME PAGE -->
         <div id="page-home" class="page active">
             <div class="card" style="background: linear-gradient(160deg, rgba(108,92,231,0.08), rgba(253,121,168,0.04)); border: 1px solid rgba(108,92,231,0.08);">
                 <div class="home-greeting">🐕 Welcome back</div>
@@ -543,7 +555,7 @@
             </div>
         </div>
 
-        <!-- ===== CRASH PAGE (formerly Fly Dog) ===== -->
+        <!-- CRASH PAGE -->
         <div id="page-rocket" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold">🚀 CRASH</span>
@@ -553,13 +565,17 @@
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
 
+                <!-- Dog -->
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
 
-                <div class="crash-overlay" id="crashOverlay">💥 CRASH!</div>
+                <!-- Explosion (replaces crash overlay) -->
+                <div class="explosion-overlay" id="explosionOverlay">
+                    <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
+                </div>
 
-                <!-- ===== HISTORY BAR (inside grid) ===== -->
+                <!-- HISTORY BAR -->
                 <div class="history-bar" id="historyBar">
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
@@ -581,7 +597,7 @@
             </div>
         </div>
 
-        <!-- ===== MINES PAGE ===== -->
+        <!-- MINES PAGE -->
         <div id="page-mines" class="page">
             <div class="flex-between mb-8">
                 <span class="badge badge-gold">💎 MINES</span>
@@ -606,7 +622,7 @@
             </div>
         </div>
 
-        <!-- ===== BOTTOM NAV ===== -->
+        <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home">
                 <span class="icon">🏠</span>
@@ -625,7 +641,7 @@
 
     <script>
         // ============================================================
-        // 🚀 CRASH GAME - No Bots, History in Grid
+        // 🚀 CRASH GAME - Final version with vibration & explosion
         // ============================================================
 
         const state = {
@@ -686,6 +702,37 @@
         }
 
         // ============================================================
+        // VIBRATION HELPER
+        // ============================================================
+        function triggerVibration(duration = 50, type = 'light') {
+            // Try Telegram haptic feedback first
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    if (type === 'heavy') {
+                        tg.HapticFeedback.impactOccurred('heavy');
+                    } else if (type === 'medium') {
+                        tg.HapticFeedback.impactOccurred('medium');
+                    } else {
+                        tg.HapticFeedback.impactOccurred('light');
+                    }
+                    // Also vibrate the device if possible
+                    if (navigator.vibrate) {
+                        navigator.vibrate(duration);
+                    }
+                    return;
+                }
+            } catch (e) {}
+
+            // Fallback: device vibration only
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(duration);
+                }
+            } catch (e) {}
+        }
+
+        // ============================================================
         // 🚀 CRASH GAME
         // ============================================================
         const rocketGame = {
@@ -694,7 +741,7 @@
             isPlaying: false,
             gameOver: false,
             bet: 10,
-            history: [], // stores past multipliers (numbers only)
+            history: [],
             animationId: null,
             lastTime: 0,
 
@@ -749,13 +796,12 @@
             },
 
             updateUI() {
-                // Update history bar current multiplier
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
                 let color = '#ffffff';
-                if (m >= 1.4) color = '#00d2a0';   // green
-                if (m >= 2.5) color = '#54a0ff';     // blue
-                if (m >= 4.0) color = '#a29bfe';     // purple
+                if (m >= 1.4) color = '#00d2a0';
+                if (m >= 2.5) color = '#54a0ff';
+                if (m >= 4.0) color = '#a29bfe';
                 currentEl.innerHTML = `${m.toFixed(2)}<span class="x">x</span>`;
                 currentEl.style.color = color;
 
@@ -775,18 +821,16 @@
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
                 if (r < 0.60) return 1.50 + Math.random() * 1.0;
                 if (r < 0.80) return 2.50 + Math.random() * 2.0;
-                return 4.50 + Math.random() * 6.55; // max 11.05
+                return 4.50 + Math.random() * 6.55;
             },
 
             renderHistory() {
                 const container = document.getElementById('historyPast');
                 container.innerHTML = '';
-                // Show last 8 history items
                 const items = this.history.slice(0, 8);
                 for (const mult of items) {
                     const el = document.createElement('span');
                     el.className = 'history-item';
-                    // Color coding
                     if (mult >= 4.0) {
                         el.classList.add('purple');
                     } else if (mult >= 2.5) {
@@ -823,10 +867,10 @@
                 this.gameOver = false;
                 this.lastTime = 0;
 
-                // Show dog
+                // Hide explosion if visible
+                document.getElementById('explosionOverlay').classList.remove('active');
+
                 const dogGif = document.getElementById('flyingDogGif');
-                const crashOverlay = document.getElementById('crashOverlay');
-                crashOverlay.classList.remove('active');
                 dogGif.style.display = 'block';
                 dogGif.classList.add('active');
 
@@ -844,15 +888,23 @@
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
                 this.lastTime = timestamp;
 
-                // Multiplier speed (starts slow, speeds up)
                 const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
-                // Dog rotation (tilt up with multiplier)
-                const tilt = (this.multiplier - 1) * 5;
+                // Dog transform: downward tilt + stretch
                 const dogOverlay = document.getElementById('dogOverlay');
-                dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
+                const tilt = -(this.multiplier - 1) * 8;
+                let scaleX = 1;
+                let scaleY = 1;
+                if (this.multiplier > 5) {
+                    const stretch = Math.min((this.multiplier - 5) * 0.06, 0.5);
+                    scaleX = 1 + stretch;
+                    scaleY = 1 - stretch * 0.4;
+                }
+                dogOverlay.style.transition = 'none';
+                dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg) scale(${scaleX}, ${scaleY})`;
+                void dogOverlay.offsetHeight;
 
                 // Crash check
                 if (this.multiplier >= this.crashPoint) {
@@ -862,16 +914,29 @@
                     state.losses++;
                     state.totalGames++;
 
-                    const crashOverlay = document.getElementById('crashOverlay');
-                    crashOverlay.classList.add('active');
+                    // ----- VIBRATION (heavy) on crash -----
+                    triggerVibration(80, 'heavy');
 
+                    // Hide dog
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
-                    setTimeout(() => { dogGif.style.display = 'none'; }, 500);
+                    dogGif.style.display = 'none';
 
-                    // Add to history (crashed)
+                    // ----- SHOW EXPLOSION GIF (no text, no red screen) -----
+                    const explosionOverlay = document.getElementById('explosionOverlay');
+                    explosionOverlay.classList.add('active');
+                    // Reset animation by re-adding the class after a tiny delay
+                    const explosionImg = document.getElementById('explosionGif');
+                    explosionImg.style.animation = 'none';
+                    void explosionImg.offsetHeight;
+                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
+
+                    // Auto-hide explosion after 1.2s
+                    setTimeout(() => {
+                        explosionOverlay.classList.remove('active');
+                    }, 1200);
+
                     this.addHistory(this.multiplier);
-
                     this.updateUI();
                     document.getElementById('rocketStatus').textContent = '💥 Crashed!';
                     document.getElementById('rocketStartBtn').disabled = false;
@@ -899,6 +964,9 @@
                     this.animationId = null;
                 }
 
+                // ----- VIBRATION (light) on cash out -----
+                triggerVibration(30, 'light');
+
                 const win = Math.floor(this.bet * this.multiplier);
                 state.balance += win;
                 state.wins++;
@@ -907,7 +975,6 @@
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-                // Add to history (win)
                 this.addHistory(this.multiplier);
 
                 const dogGif = document.getElementById('flyingDogGif');
@@ -1080,6 +1147,8 @@
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
+                    // Vibration on mine hit
+                    triggerVibration(60, 'heavy');
                     this.updateGrid();
                     this.updateUI();
                     updateHome();
@@ -1097,6 +1166,8 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
+                    // Vibration on jackpot
+                    triggerVibration(50, 'medium');
                     this.updateGrid();
                     this.updateUI();
                     updateHome();
@@ -1117,6 +1188,7 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
+                triggerVibration(30, 'light');
                 this.updateUI();
                 updateHome();
             }
