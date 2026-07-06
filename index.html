@@ -859,30 +859,69 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
-        /* ===== UPGRADER & INVENTORY ===== */
-        #wheelContainer {
+        /* ===== EPIC-GIFT STYLE WHEEL ===== */
+        .wheel-wrapper {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             margin: 0 auto;
         }
-        #wheelContainer canvas {
+        .wheel-wrapper canvas {
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
-            box-shadow: 0 0 30px rgba(108, 92, 231, 0.2);
+            box-shadow: 0 0 40px rgba(108, 92, 231, 0.15), 0 0 80px rgba(108, 92, 231, 0.05);
         }
         .wheel-pointer {
             position: absolute;
-            top: -8px;
+            top: -10px;
             left: 50%;
             transform: translateX(-50%);
+            z-index: 5;
             width: 0;
             height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 16px solid #ffd700;
-            z-index: 5;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 20px solid #ffd700;
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.6));
         }
+        .wheel-center-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 30px rgba(108, 92, 231, 0.25);
+            user-select: none;
+            font-size: 10px;
+            padding: 0 4px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .wheel-center-btn:active {
+            transform: translate(-50%, -50%) scale(0.92);
+        }
+        .wheel-center-btn:disabled {
+            opacity: 0.4;
+            transform: translate(-50%, -50%) scale(0.95);
+            cursor: not-allowed;
+        }
+
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -916,6 +955,14 @@
             color: #888;
         }
 
+        .result-text {
+            text-align: center;
+            font-size: 14px;
+            min-height: 22px;
+            color: #aaa;
+            margin-top: 8px;
+        }
+
         @media (max-width: 420px) {
             .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
             .mines-grid { gap: 6px; }
@@ -926,7 +973,10 @@
             .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
             .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
             .badge .balance-icon { width: 26px; height: 26px; margin-top: 5px; }
-            #wheelContainer { width: 160px; height: 160px; }
+            .wheel-wrapper { width: 180px; height: 180px; }
+            .wheel-wrapper canvas { width: 180px; height: 180px; }
+            .wheel-center-btn { width: 44px; height: 44px; font-size: 8px; }
+            .wheel-pointer { border-left-width: 10px; border-right-width: 10px; border-top-width: 16px; top: -8px; }
         }
     </style>
 </head>
@@ -959,10 +1009,7 @@
             <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
-
-                <!-- WIND LINES (3-phase) -->
                 <div class="wind-lines" id="windLines"></div>
-
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
                 </div>
@@ -976,13 +1023,10 @@
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
                 </div>
-
-                <!-- PROGRESS LINE -->
                 <div class="progress-wrap" id="progressWrap">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
             </div>
-
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow"><input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount"><button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button></div>
                 <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()"><span id="mainActionText">Place Bet</span><span id="mainActionSub"></span></button>
@@ -1013,33 +1057,33 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- UPGRADER -->
-        <div id="page-upgrader" class="page">
-            <h2 style="text-align:center; margin-bottom:12px; color:#fff;">Upgrader</h2>
+        <!-- UPGRADE (was Upgrader) -->
+        <div id="page-upgrade" class="page">
+            <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Upgrade</h2>
             <div class="card">
-                <div class="card-title">Select a Gift to Upgrade</div>
+                <div class="card-title">Select a Gift</div>
                 <div id="upgraderInventoryList" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:12px;"></div>
-                <div style="display:flex; gap:12px; align-items:center; justify-content:center;">
-                    <button id="upgraderSpinBtn" class="btn btn-primary" style="flex:0 0 auto; padding:10px 24px;">Spin</button>
-                    <span id="upgraderResult" style="font-size:14px; color:#aaa;"></span>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                    <div class="result-text" id="upgraderResult">Choose a gift and spin!</div>
                 </div>
             </div>
             <div class="card">
                 <div class="card-title">Wheel</div>
-                <div id="wheelContainer">
-                    <canvas id="wheelCanvas" width="200" height="200"></canvas>
+                <div class="wheel-wrapper">
+                    <canvas id="wheelCanvas" width="220" height="220"></canvas>
                     <div class="wheel-pointer"></div>
+                    <button class="wheel-center-btn" id="wheelSpinBtn">SPIN</button>
                 </div>
             </div>
         </div>
 
-        <!-- INVENTORY -->
-        <div id="page-inventory" class="page">
-            <h2 style="text-align:center; margin-bottom:12px; color:#fff;">Inventory</h2>
+        <!-- ITEMS (was Inventory) -->
+        <div id="page-items" class="page">
+            <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Items</h2>
             <div class="card">
                 <div class="card-title">Your Gifts</div>
                 <div id="inventoryGrid" class="inventory-grid"></div>
-                <div id="inventoryEmpty" style="text-align:center; color:#666; padding:20px;">No gifts yet. Play Crash or Mines to earn them!</div>
+                <div id="inventoryEmpty" style="text-align:center; color:#666; padding:20px;">No gifts yet.</div>
             </div>
         </div>
 
@@ -1075,15 +1119,15 @@
             <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
             <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
             <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
-            <button class="nav-item" data-page="upgrader"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgrader</span></button>
-            <button class="nav-item" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inventory</span></button>
+            <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgrade</span></button>
+            <button class="nav-item" data-page="items"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Items</span></button>
             <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // DOG GIFS – 5 dogs including the original
+        // DOG GIFS
         // ============================================================
         const DOG_GIFS = [
             'https://images.iimg.live/images/glorious-portfolio-1947.webp',
@@ -1103,27 +1147,21 @@
         const GIFT_TYPES = {
             bear: { id: 'bear', name: 'Bear', image: 'https://images.iimg.live/images/majestic-moment-5099.webp', level: 1 },
             box: { id: 'box', name: 'Gift Box', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 2 },
-            diamond: { id: 'diamond', name: 'Diamond Gift', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 3 } // temporary same image
+            diamond: { id: 'diamond', name: 'Diamond', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 3 }
         };
 
-        // Gift levels in order for upgrading
         const GIFT_LEVELS = ['bear', 'box', 'diamond'];
 
-        function getGiftById(id) {
-            return GIFT_TYPES[id] || null;
-        }
+        function getGiftById(id) { return GIFT_TYPES[id] || null; }
 
-        // Inventory state: array of gift objects { id, level }
         let inventory = [];
 
-        // Add gift to inventory
         function addGift(giftId) {
             inventory.push({ id: giftId, level: GIFT_TYPES[giftId].level });
             updateInventoryUI();
             updateUpgraderUI();
         }
 
-        // Remove one gift from inventory (for upgrading)
         function removeGift(giftId) {
             const index = inventory.findIndex(g => g.id === giftId);
             if (index !== -1) {
@@ -1135,14 +1173,8 @@
             return false;
         }
 
-        // Get count of a specific gift type
         function getGiftCount(giftId) {
             return inventory.filter(g => g.id === giftId).length;
-        }
-
-        // Check if player has any gift
-        function hasGift(giftId) {
-            return inventory.some(g => g.id === giftId);
         }
 
         // ----- Inventory UI -----
@@ -1155,11 +1187,8 @@
                 return;
             }
             empty.style.display = 'none';
-
-            // Group by type
             const counts = {};
             inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
-
             for (const [id, count] of Object.entries(counts)) {
                 const gift = GIFT_TYPES[id];
                 if (!gift) continue;
@@ -1183,16 +1212,15 @@
             const counts = {};
             inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
 
-            // Show only gifts that have a next level
             const upgradeable = Object.keys(counts).filter(id => {
                 const level = GIFT_TYPES[id].level;
                 return level < GIFT_LEVELS.length && counts[id] > 0;
             });
 
             if (upgradeable.length === 0) {
-                container.innerHTML = '<span style="color:#666; font-size:13px;">No upgradeable gifts in inventory.</span>';
+                container.innerHTML = '<span style="color:#666; font-size:13px;">No upgradeable gifts.</span>';
                 selectedGiftId = null;
-                document.getElementById('upgraderSpinBtn').disabled = true;
+                document.getElementById('wheelSpinBtn').disabled = true;
                 return;
             }
 
@@ -1210,34 +1238,38 @@
                 div.onclick = () => {
                     selectedGiftId = id;
                     updateUpgraderUI();
-                    document.getElementById('upgraderSpinBtn').disabled = false;
+                    document.getElementById('wheelSpinBtn').disabled = false;
+                    document.getElementById('upgraderResult').textContent = 'Ready to spin!';
                 };
                 container.appendChild(div);
             });
 
             if (selectedGiftId && !upgradeable.includes(selectedGiftId)) {
                 selectedGiftId = null;
-                document.getElementById('upgraderSpinBtn').disabled = true;
+                document.getElementById('wheelSpinBtn').disabled = true;
             }
             if (!selectedGiftId && upgradeable.length > 0) {
                 selectedGiftId = upgradeable[0];
                 updateUpgraderUI();
-                document.getElementById('upgraderSpinBtn').disabled = false;
+                document.getElementById('wheelSpinBtn').disabled = false;
             }
         }
 
-        // ----- Upgrader Wheel -----
-        const wheelSegments = [
-            { label: 'Upgrade', color: '#00d2a0', action: 'upgrade' },
-            { label: 'Same', color: '#54a0ff', action: 'same' },
-            { label: 'Downgrade', color: '#ff6b6b', action: 'downgrade' },
-            { label: 'Upgrade', color: '#00d2a0', action: 'upgrade' },
-            { label: 'Same', color: '#54a0ff', action: 'same' },
-            { label: 'Downgrade', color: '#ff6b6b', action: 'downgrade' }
+        // ============================================================
+        // EPIC-GIFT STYLE WHEEL
+        // ============================================================
+        const WHEEL_SEGMENTS = [
+            { label: '⬆', color: '#00d2a0', action: 'upgrade' },
+            { label: '➖', color: '#54a0ff', action: 'same' },
+            { label: '⬇', color: '#ff6b6b', action: 'downgrade' },
+            { label: '⬆', color: '#00d2a0', action: 'upgrade' },
+            { label: '➖', color: '#54a0ff', action: 'same' },
+            { label: '⬇', color: '#ff6b6b', action: 'downgrade' },
+            { label: '⬆', color: '#00d2a0', action: 'upgrade' },
+            { label: '➖', color: '#54a0ff', action: 'same' }
         ];
-        const NUM_SEGMENTS = wheelSegments.length;
+        const NUM_SEGMENTS = WHEEL_SEGMENTS.length;
         const ARC = (2 * Math.PI) / NUM_SEGMENTS;
-
         let wheelRotation = 0;
         let isSpinning = false;
 
@@ -1252,6 +1284,15 @@
 
             ctx.clearRect(0, 0, w, h);
 
+            // Glow
+            const grad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+            grad.addColorStop(0, 'rgba(108,92,231,0.05)');
+            grad.addColorStop(1, 'rgba(108,92,231,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+            ctx.fill();
+
             for (let i = 0; i < NUM_SEGMENTS; i++) {
                 const startAngle = i * ARC + rotation;
                 const endAngle = startAngle + ARC;
@@ -1259,63 +1300,79 @@
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, r, startAngle, endAngle);
                 ctx.closePath();
-                ctx.fillStyle = wheelSegments[i].color;
+
+                // Gradient fill per segment
+                const segGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                const c = WHEEL_SEGMENTS[i].color;
+                segGrad.addColorStop(0, c + '80');
+                segGrad.addColorStop(0.6, c);
+                segGrad.addColorStop(1, c + 'cc');
+                ctx.fillStyle = segGrad;
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
                 // Label
                 const midAngle = startAngle + ARC / 2;
-                const labelR = r * 0.7;
+                const labelR = r * 0.68;
                 const lx = cx + Math.cos(midAngle) * labelR;
                 const ly = cy + Math.sin(midAngle) * labelR;
                 ctx.save();
                 ctx.translate(lx, ly);
                 ctx.rotate(midAngle + (midAngle > Math.PI / 2 ? Math.PI : 0));
                 ctx.fillStyle = '#fff';
-                ctx.font = 'bold 11px sans-serif';
+                ctx.font = 'bold 18px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(wheelSegments[i].label, 0, 0);
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 8;
+                ctx.fillText(WHEEL_SEGMENTS[i].label, 0, 0);
                 ctx.restore();
             }
 
-            // Center dot
+            // Outer ring glow
             ctx.beginPath();
-            ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ffd700';
+            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Inner ring
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 0.15, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(20,20,25,0.6)';
             ctx.fill();
-            ctx.shadowColor = 'rgba(255,215,0,0.5)';
-            ctx.shadowBlur = 12;
-            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
         }
 
         function spinWheel() {
             if (isSpinning || !selectedGiftId) return;
             if (getGiftCount(selectedGiftId) === 0) {
-                document.getElementById('upgraderResult').textContent = 'No gift of this type left!';
+                document.getElementById('upgraderResult').textContent = 'No gift left!';
                 return;
             }
 
             isSpinning = true;
-            const btn = document.getElementById('upgraderSpinBtn');
+            const btn = document.getElementById('wheelSpinBtn');
             btn.disabled = true;
 
-            // Random target rotation (multiple full turns + random segment)
             const spins = 5 + Math.random() * 4;
             const targetSegment = Math.floor(Math.random() * NUM_SEGMENTS);
             const targetAngle = targetSegment * ARC + ARC / 2;
             const finalRotation = wheelRotation + spins * 2 * Math.PI + (2 * Math.PI - targetAngle);
 
             const startRotation = wheelRotation;
-            const duration = 3000 + Math.random() * 1000;
+            const duration = 4000 + Math.random() * 1000;
             const startTime = performance.now();
+            const resultEl = document.getElementById('upgraderResult');
 
             function animateSpin(time) {
                 const elapsed = time - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // Ease out cubic
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const currentRotation = startRotation + (finalRotation - startRotation) * eased;
                 wheelRotation = currentRotation;
@@ -1326,22 +1383,17 @@
                 } else {
                     wheelRotation = finalRotation;
                     drawWheel(finalRotation);
-                    // Determine result
                     const normalized = ((finalRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-                    // Find which segment is at top (pointer at top means angle = -PI/2)
                     const pointerAngle = -Math.PI / 2;
                     let angleDiff = (pointerAngle - normalized + 2 * Math.PI) % (2 * Math.PI);
                     let segIndex = Math.floor(angleDiff / ARC) % NUM_SEGMENTS;
-                    // Safety
                     if (segIndex < 0) segIndex += NUM_SEGMENTS;
-
-                    const result = wheelSegments[segIndex];
+                    const result = WHEEL_SEGMENTS[segIndex];
                     applyUpgradeResult(result.action);
                     isSpinning = false;
                     btn.disabled = false;
                 }
             }
-
             requestAnimationFrame(animateSpin);
         }
 
@@ -1359,29 +1411,26 @@
             if (action === 'upgrade') {
                 if (currentLevel < maxLevel) {
                     newLevel = currentLevel + 1;
-                    msg = `✨ Upgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
+                    msg = `⬆ Upgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
                 } else {
-                    msg = `🌟 ${gift.name} is already max level!`;
+                    msg = `🌟 ${gift.name} is already max!`;
                 }
             } else if (action === 'downgrade') {
                 if (currentLevel > 1) {
                     newLevel = currentLevel - 1;
-                    msg = `⬇️ Downgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
+                    msg = `⬇ Downgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
                 } else {
-                    msg = `🛡️ ${gift.name} can't be downgraded further!`;
+                    msg = `🛡️ ${gift.name} can't go lower!`;
                 }
             } else {
                 msg = `🔄 ${gift.name} stayed the same!`;
             }
 
-            // If level changed, update inventory
             if (newLevel !== currentLevel) {
-                // Remove one of the old gift
                 const removed = removeGift(giftId);
                 if (removed) {
                     const newGiftId = GIFT_LEVELS[newLevel - 1];
                     addGift(newGiftId);
-                    // Update selected gift to new type if possible
                     if (getGiftCount(newGiftId) > 0) {
                         selectedGiftId = newGiftId;
                     } else {
@@ -1390,13 +1439,11 @@
                     updateUpgraderUI();
                 }
             } else {
-                // Just update UI
                 updateInventoryUI();
                 updateUpgraderUI();
             }
 
             resultEl.textContent = msg;
-            // Vibrate feedback
             triggerVibration(30, 'light');
         }
 
@@ -1415,7 +1462,6 @@
             avatarUrl: 'https://images.iimg.live/images/excellent-photo-9680.webp',
         };
 
-        // DOM refs
         const homeBalance = document.getElementById('homeBalance');
         const homeUsername = document.getElementById('homeUsername');
         const recentWinnersEl = document.getElementById('recentWinners');
@@ -1438,8 +1484,8 @@
             home: document.getElementById('page-home'),
             rocket: document.getElementById('page-rocket'),
             mines: document.getElementById('page-mines'),
-            upgrader: document.getElementById('page-upgrader'),
-            inventory: document.getElementById('page-inventory'),
+            upgrade: document.getElementById('page-upgrade'),
+            items: document.getElementById('page-items'),
             profile: document.getElementById('page-profile'),
         };
         const navItems = document.querySelectorAll('.nav-item');
@@ -1473,8 +1519,8 @@
             if (page === 'rocket') { crashGame.startGameCycle();
                 renderPlayers(); }
             if (page === 'profile') { updateProfile(); }
-            if (page === 'inventory') { updateInventoryUI(); }
-            if (page === 'upgrader') { updateUpgraderUI();
+            if (page === 'items') { updateInventoryUI(); }
+            if (page === 'upgrade') { updateUpgraderUI();
                 drawWheel(wheelRotation); }
         }
 
@@ -1541,26 +1587,12 @@
             try { if (navigator.vibrate) navigator.vibrate(duration); } catch (e) {}
         }
 
-        // ---- DOUBLE EXPLOSION VIBRATION: BIG then SMALL ----
         function triggerDoubleExplosionVibration() {
-            try {
-                if (window.Telegram?.WebApp) {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-                }
-            } catch (e) {}
-            try {
-                if (navigator.vibrate) navigator.vibrate(120);
-            } catch (e) {}
-
+            try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy'); } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate(120); } catch (e) {}
             setTimeout(() => {
-                try {
-                    if (window.Telegram?.WebApp) {
-                        window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                    }
-                } catch (e) {}
-                try {
-                    if (navigator.vibrate) navigator.vibrate(60);
-                } catch (e) {}
+                try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } catch (e) {}
+                try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
             }, 150);
         }
 
@@ -1582,31 +1614,6 @@
                 notif.style.transform = 'translateY(-120%)';
                 setTimeout(() => { notif.style.display = 'none'; }, 400);
             }, 1000);
-        }
-
-        // ----- Award gifts based on profit -----
-        function awardGifts(profit) {
-            if (profit >= 18 && profit < 50) {
-                addGift('bear');
-                showNotificationWithGift(profit, 'bear');
-            } else if (profit >= 50) {
-                addGift('box');
-                showNotificationWithGift(profit, 'box');
-            }
-        }
-
-        function showNotificationWithGift(amount, giftId) {
-            const gift = GIFT_TYPES[giftId];
-            const notif = document.getElementById('notification');
-            notifAmount.innerHTML = `+${amount} ⭐ &amp; <img src="${gift.image}" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;" alt="${gift.name}"> ${gift.name}`;
-            notif.style.display = 'flex';
-            void notif.offsetHeight;
-            notif.style.transform = 'translateY(0)';
-            clearTimeout(notif._timeout);
-            notif._timeout = setTimeout(() => {
-                notif.style.transform = 'translateY(-120%)';
-                setTimeout(() => { notif.style.display = 'none'; }, 400);
-            }, 2000);
         }
 
         // ============================================================
@@ -1631,7 +1638,6 @@
             currentDogGif: DOG_GIFS[0],
             windPhase: 0,
 
-            // ---- Wind – 3 phases ----
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
@@ -1653,21 +1659,15 @@
             updateWindEffect() {
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
-
                 let phase = 0;
-                if (mult > 2.83 && mult < 2.9) {
-                    phase = 1;
-                } else if (mult >= 2.9) {
-                    phase = 2;
-                } else {
-                    phase = 0;
-                }
+                if (mult > 2.83 && mult < 2.9) phase = 1;
+                else if (mult >= 2.9) phase = 2;
+                else phase = 0;
                 this.windPhase = phase;
 
                 if (mult > this.windStart && this.isPlaying) {
                     const streaks = windContainer.querySelectorAll('.streak');
                     const distBase = 60 + Math.min(80, (mult - this.windStart) * 35);
-
                     if (phase === 0) {
                         windContainer.style.transform = 'rotate(-20deg)';
                         const intensity = Math.min(1, (mult - this.windStart) / 1.6);
@@ -1704,7 +1704,6 @@
                 }
             },
 
-            // ---- Dog ----
             pickRandomDogAndHide() {
                 this.currentDogGif = getRandomDogGif();
                 const dogImg = document.getElementById('flyingDogGif');
@@ -1721,42 +1720,32 @@
                 dogImg.classList.add('active');
             },
 
-            // ---- Progress line ----
             updateProgressLine() {
                 const wrap = document.getElementById('progressWrap');
                 const fill = document.getElementById('progressFill');
                 const mult = this.multiplier;
-
                 if (mult > 1.0 && this.isPlaying && !this.hasCashedOut) {
                     wrap.classList.add('active');
                     const progress = Math.min(1, (mult - 1.0) / 4.0);
                     fill.style.width = (progress * 100) + '%';
-
                     let color;
-                    if (mult < 2.0) {
-                        color = '#00d2a0';
-                    } else if (mult < 3.0) {
-                        color = '#54a0ff';
-                    } else {
-                        color = '#a29bfe';
-                    }
+                    if (mult < 2.0) color = '#00d2a0';
+                    else if (mult < 3.0) color = '#54a0ff';
+                    else color = '#a29bfe';
                     fill.style.background = color;
                     fill.style.boxShadow = `0 0 16px ${color}50`;
-
                 } else if (this.gameOver && this.multiplier > 0) {
                     wrap.classList.add('active');
                     const progress = Math.min(1, (this.multiplier - 1.0) / 4.0);
                     fill.style.width = (progress * 100) + '%';
                     fill.style.background = '#ff6b6b';
                     fill.style.boxShadow = '0 0 24px rgba(255,107,107,0.5)';
-
                 } else {
                     wrap.classList.remove('active');
                     fill.style.width = '0%';
                 }
             },
 
-            // ---- Core game ----
             startGameCycle() {
                 if (!this.isPlaying && !this.isCountingDown && !this.gameOver) this.startCountdown();
                 if (this.isPlaying) this.startContinuousVibration();
@@ -1783,7 +1772,6 @@
                 const dogImg = document.getElementById('flyingDogGif');
                 dogImg.src = this.currentDogGif;
                 dogImg.style.display = 'none';
-                // Init wheel
                 drawWheel(0);
                 updateInventoryUI();
                 updateUpgraderUI();
@@ -1967,12 +1955,8 @@
                 state.recentWinners.unshift({ name: 'You', amount: profit });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-                // Award gifts based on profit
-                if (profit >= 18) {
-                    awardGifts(profit);
-                } else {
-                    showNotification(profit);
-                }
+                // ❌ NO GIFT DROPS
+                showNotification(profit);
 
                 const user = players.find(p => p.isYou);
                 if (user) { user.hasCashedOut = true;
@@ -1989,9 +1973,7 @@
                 this.gameOver = false;
                 this.hasCashedOut = false;
                 this.roundId++;
-
                 this.pickRandomDogAndHide();
-
                 players = players.filter(p => p.isYou);
                 if (players.length > 0) { const user = players[0];
                     user.active = true;
@@ -2038,14 +2020,11 @@
                 this.gameOver = false;
                 this.lastTime = 0;
                 document.getElementById('explosionOverlay').classList.remove('active');
-
                 this.showDogWithFlyIn();
-
                 document.getElementById('windLines').classList.remove('active');
                 document.getElementById('windLines').style.opacity = 0;
                 document.getElementById('progressWrap').classList.remove('active');
                 document.getElementById('progressFill').style.width = '0%';
-
                 this.updateUI();
                 this.updateMainButton();
                 this.startContinuousVibration();
@@ -2060,25 +2039,19 @@
                 const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
-
                 const effectiveMult = Math.min(this.multiplier, 3.0);
                 const tilt = 12 - (effectiveMult - 1) * 24;
-
                 const dogOverlay = document.getElementById('dogOverlay');
                 dogOverlay.style.transition = 'none';
                 dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
                 void dogOverlay.offsetHeight;
-
                 this.updateUI();
-
                 if (this.multiplier >= this.crashPoint) {
                     this.multiplier = parseFloat(this.crashPoint.toFixed(2));
                     this.isPlaying = false;
                     this.gameOver = true;
                     this.stopContinuousVibration();
-
                     triggerDoubleExplosionVibration();
-
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
                     dogGif.style.display = 'none';
@@ -2147,7 +2120,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME – No gift drops
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -2232,7 +2205,6 @@
                 const total = this.gridSize * this.gridSize;
                 grid.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
                 grid.innerHTML = '';
-
                 this.board = new Array(total).fill(0);
                 this.revealed = new Array(total).fill(false);
                 let placed = 0;
@@ -2244,7 +2216,6 @@
                 }
                 this.safeCount = total - minesToPlace;
                 this.revealedSafe = 0;
-
                 const minMines = this.getMinMines();
                 if (minesToPlace === minMines) {
                     this.startingMultiplier = 1.00;
@@ -2255,20 +2226,16 @@
                     this.startingMultiplier = Math.min(2.50, base + gridBonus);
                 }
                 this.multiplier = this.startingMultiplier;
-
                 this.gameActive = false;
                 this.gameOver = false;
                 this.hasCashedOut = false;
-
                 for (let i = 0; i < total; i++) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'tile-wrapper';
                     wrapper.dataset.index = i;
-
                     const shadow = document.createElement('div');
                     shadow.className = 'shadow';
                     wrapper.appendChild(shadow);
-
                     const tile = document.createElement('div');
                     tile.className = 'tile';
                     tile.innerHTML = `<span class="symbol"></span>`;
@@ -2278,7 +2245,6 @@
                     wrapper.appendChild(tile);
                     grid.appendChild(wrapper);
                 }
-
                 requestAnimationFrame(() => {
                     const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
                     wrappers.forEach((w, idx) => {
@@ -2287,7 +2253,6 @@
                         setTimeout(() => { tile.classList.add('show'); }, delay + 50);
                     });
                 });
-
                 this.updateUI();
                 this.updateMainButton();
             },
@@ -2296,7 +2261,6 @@
                 document.getElementById('minesBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 document.getElementById('minesMultiplier').textContent = `${this.multiplier.toFixed(2)}x`;
-
                 const msg = document.getElementById('minesMessage');
                 if (this.gameActive && !this.gameOver) {
                     msg.textContent = `Find the gems! Multiplier ${this.multiplier.toFixed(2)}x`;
@@ -2320,9 +2284,7 @@
                 const mainText = document.getElementById('minesMainActionText');
                 const subText = document.getElementById('minesMainActionSub');
                 const inputRow = document.getElementById('minesBetInputRow');
-
                 subText.textContent = '';
-
                 if (this.gameActive && !this.gameOver) {
                     const canCashOut = this.revealedSafe > 0;
                     if (this.hasCashedOut) {
@@ -2383,11 +2345,9 @@
                     const tile = wrappers[i].querySelector('.tile');
                     const symbol = tile.querySelector('.symbol');
                     const isRevealed = this.revealed[i] || false;
-
                     if (isRevealed) {
                         tile.classList.add('revealed');
                         symbol.innerHTML = '';
-
                         if (this.board[i] === 1) {
                             tile.classList.add('mine');
                             const img = document.createElement('img');
@@ -2399,7 +2359,6 @@
                             img.style.display = 'block';
                             img.style.borderRadius = '4px';
                             symbol.appendChild(img);
-
                             setTimeout(() => {
                                 if (symbol.contains(img)) {
                                     symbol.removeChild(img);
@@ -2427,16 +2386,13 @@
 
             clickTile(index) {
                 if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
-
                 this.revealed[index] = true;
-
                 if (this.board[index] === 1) {
                     triggerDoubleExplosionVibration();
                     this.gameOver = true;
                     this.gameActive = false;
                     state.losses++;
                     state.totalGames++;
-
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
@@ -2446,9 +2402,7 @@
                     this.addHistory('loss', this.multiplier);
                     return;
                 }
-
                 triggerVibration(15, 'light');
-
                 this.revealedSafe++;
                 const totalTiles = this.gridSize * this.gridSize;
                 const mineRatio = this.minesCount / totalTiles;
@@ -2457,7 +2411,6 @@
                 let newMult = this.multiplier * (1 + inc);
                 if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
                 this.multiplier = parseFloat(newMult.toFixed(3));
-
                 if (this.revealedSafe === this.safeCount) {
                     this.gameOver = true;
                     this.gameActive = false;
@@ -2469,14 +2422,8 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                    // Award gifts based on profit
-                    if (profit >= 18) {
-                        awardGifts(profit);
-                    } else {
-                        showNotification(profit);
-                    }
-
+                    // ❌ NO GIFT DROPS
+                    showNotification(profit);
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -2484,7 +2431,6 @@
                     triggerVibration(50, 'medium');
                     return;
                 }
-
                 this.updateGrid();
                 this.updateUI();
             },
@@ -2528,10 +2474,8 @@
                     return;
                 }
                 state.balance -= this.bet;
-
                 const totalTiles = this.gridSize * this.gridSize;
                 const minesToPlace = Math.min(this.minesCount, totalTiles - 1);
-
                 const minMines = this.getMinMines();
                 if (minesToPlace === minMines) {
                     this.startingMultiplier = 1.00;
@@ -2542,7 +2486,6 @@
                     this.startingMultiplier = Math.min(2.50, base + gridBonus);
                 }
                 this.multiplier = this.startingMultiplier;
-
                 this.gameActive = true;
                 this.gameOver = false;
                 this.hasCashedOut = false;
@@ -2558,14 +2501,12 @@
                 }
                 this.safeCount = total - mines;
                 this.revealed = new Array(total).fill(false);
-
                 const tiles = document.querySelectorAll('.mines-grid .tile');
                 tiles.forEach(tile => {
                     tile.classList.remove('revealed', 'mine', 'safe');
                     tile.querySelector('.symbol').innerHTML = '';
                     tile.classList.add('show');
                 });
-
                 this.updateUI();
                 this.updateMainButton();
                 updateHomeUI();
@@ -2597,13 +2538,8 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                if (profit >= 18) {
-                    awardGifts(profit);
-                } else {
-                    showNotification(profit);
-                }
-
+                // ❌ NO GIFT DROPS
+                showNotification(profit);
                 this.gameActive = false;
                 this.gameOver = true;
                 this.hasCashedOut = false;
@@ -2652,9 +2588,9 @@
         });
 
         // ============================================================
-        // SPIN BUTTON HANDLER
+        // WHEEL SPIN BUTTON
         // ============================================================
-        document.getElementById('upgraderSpinBtn').addEventListener('click', spinWheel);
+        document.getElementById('wheelSpinBtn').addEventListener('click', spinWheel);
 
         // ============================================================
         // VISIBILITY CHANGE
@@ -2681,8 +2617,6 @@
             crashGame.init();
             minesGame.init();
             minesGame.setGridSize(3, 1);
-
-            // Initialize wheel
             drawWheel(0);
             updateInventoryUI();
             updateUpgraderUI();
@@ -2694,7 +2628,7 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('Casino loaded – with Upgrader & Inventory!');
+            console.log('Casino loaded – Epic Gift style wheel, shorter tabs, no gift drops from games.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
