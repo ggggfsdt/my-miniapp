@@ -2060,7 +2060,7 @@
         };
 
         // ============================================================
-        // MINES GAME (final version)
+        // MINES GAME (final version with improved multiplier)
         // ============================================================
 
         const minesGame = {
@@ -2122,7 +2122,6 @@
                 const val = document.getElementById('minesCount');
                 const min = this.getMinMines();
                 const max = this.getMaxMines();
-                // Clamp current value
                 let current = parseInt(val.textContent) || 0;
                 if (current < min) current = min;
                 if (current > max) current = max;
@@ -2159,9 +2158,11 @@
                 this.revealedSafe = 0;
 
                 // Calculate starting multiplier based on mines and grid size
+                // NEW FORMULA: higher mines = higher start multiplier
                 const mineRatio = mines / total;
-                const gridFactor = (this.gridSize - 3) * 0.02;
-                this.startingMultiplier = Math.min(1.0, 0.85 + 0.05 * mines + gridFactor);
+                let base = 0.90 + 0.80 * mineRatio;
+                const gridBonus = (this.gridSize - 3) * 0.03;
+                this.startingMultiplier = Math.min(2.20, base + gridBonus);
                 this.multiplier = this.startingMultiplier;
 
                 this.gameActive = false;
@@ -2415,7 +2416,15 @@
                     return;
                 }
                 state.balance -= this.bet;
+
+                // Recalculate starting multiplier based on current mines & grid
+                const totalTiles = this.gridSize * this.gridSize;
+                const mineRatio = this.minesCount / totalTiles;
+                let base = 0.90 + 0.80 * mineRatio;
+                const gridBonus = (this.gridSize - 3) * 0.03;
+                this.startingMultiplier = Math.min(2.20, base + gridBonus);
                 this.multiplier = this.startingMultiplier;
+
                 this.gameActive = true;
                 this.gameOver = false;
                 this.hasCashedOut = false;
@@ -2426,8 +2435,7 @@
                 const mines = Math.min(this.minesCount, Math.floor(total * 0.35));
                 while (placed < mines) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) { this.board[idx] = 1;
-                        placed++; }
+                    if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
                 }
                 this.safeCount = total - mines;
                 this.revealed = new Array(total).fill(false);
@@ -2492,7 +2500,6 @@
                     return;
                 }
                 this.gridSize = size;
-                // Adjust mines to fit limits
                 const minMines = this.getMinMines();
                 const maxMines = this.getMaxMines();
                 this.minesCount = Math.max(minMines, Math.min(maxMines, mines));
