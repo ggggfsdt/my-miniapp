@@ -284,7 +284,7 @@
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.04);
-            margin: 10px 0 10px 0;
+            margin: 10px 0 6px 0;
         }
         .grid-squares {
             position: absolute;
@@ -300,6 +300,45 @@
         .grid-square { background: transparent; border: 1px solid rgba(255, 255, 255, 0.04); }
         .grid-square.corner { border-color: rgba(108, 92, 231, 0.06); }
 
+        /* ===== WIND STREAKS – FULL COVERAGE, CONSTANT SPEED ===== */
+        .wind-lines {
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .wind-lines.active {
+            opacity: 1;
+        }
+        .wind-lines .streak {
+            position: absolute;
+            height: 2px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            will-change: transform;
+            animation: windStreak linear infinite;
+        }
+        .wind-lines .streak:nth-child(odd) { height: 1.5px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent); }
+        .wind-lines .streak:nth-child(3n) { height: 2.5px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent); }
+        .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent); }
+
+        @keyframes windStreak {
+            0% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+            12% { opacity: 0.7; }
+            85% { opacity: 0.7; }
+            100% {
+                transform: translate(var(--dx), var(--dy));
+                opacity: 0;
+            }
+        }
+
+        /* ===== DOG OVERLAY ===== */
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -313,10 +352,25 @@
             align-items: center;
             justify-content: center;
             transition: none;
+            will-change: transform;
         }
-        .gif-overlay img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3)); }
-        .gif-overlay img.active { display: block; animation: dogFly 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes dogFly { 0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } }
+        .gif-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+            filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
+        }
+        .gif-overlay img.active {
+            display: block;
+            animation: dogFly 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes dogFly {
+            0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+        }
 
         .explosion-overlay {
             position: absolute;
@@ -394,12 +448,35 @@
         .history-item.purple { background: rgba(108, 92, 231, 0.25); color: #a29bfe; border-color: rgba(108, 92, 231, 0.15); }
         .history-item.crashed { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
+        /* ===== PROGRESS LINE (standalone, below grid) ===== */
+        .progress-wrap {
+            padding: 0 4px;
+            margin: 0 0 4px 0;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .progress-wrap.active {
+            opacity: 1;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            background: #00d2a0;
+            transition: none;
+            box-shadow: 0 0 12px rgba(0, 210, 160, 0.15);
+        }
+
         /* ===== BET / CASH OUT (Crash) ===== */
         .bet-container {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin: 10px 0 0 0;
+            margin: 0 0 0 0;
         }
         .bet-input-row {
             display: flex;
@@ -791,11 +868,30 @@
             <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span></div>
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
-                <div class="gif-overlay" id="dogOverlay"><img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog"></div>
-                <div class="explosion-overlay" id="explosionOverlay"><img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion"></div>
-                <div class="countdown-overlay" id="countdownOverlay"><div class="countdown-number" id="countdownNumber">3</div></div>
-                <div class="history-bar" id="historyBar"><div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div><div class="history-past" id="historyPast"></div></div>
+
+                <!-- WIND LINES -->
+                <div class="wind-lines" id="windLines"></div>
+
+                <div class="gif-overlay" id="dogOverlay">
+                    <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
+                </div>
+                <div class="explosion-overlay" id="explosionOverlay">
+                    <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
+                </div>
+                <div class="countdown-overlay" id="countdownOverlay">
+                    <div class="countdown-number" id="countdownNumber">3</div>
+                </div>
+                <div class="history-bar" id="historyBar">
+                    <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
+                    <div class="history-past" id="historyPast"></div>
+                </div>
             </div>
+
+            <!-- PROGRESS LINE (standalone) -->
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow"><input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount"><button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button></div>
                 <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()"><span id="mainActionText">Place Bet</span><span id="mainActionSub"></span></button>
@@ -863,6 +959,21 @@
     </div>
 
     <script>
+        // ============================================================
+        // DOG GIFS – 5 dogs including the original
+        // ============================================================
+        const DOG_GIFS = [
+            'https://images.iimg.live/images/glorious-portfolio-1947.webp', // original
+            'https://images.iimg.live/images/wonderful-work-4770.webp',
+            'https://images.iimg.live/images/wonderful-work-3128.webp',
+            'https://images.iimg.live/images/ultimate-photography-1463.webp',
+            'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
+        ];
+
+        function getRandomDogGif() {
+            return DOG_GIFS[Math.floor(Math.random() * DOG_GIFS.length)];
+        }
+
         // ============================================================
         // STATE
         // ============================================================
@@ -999,20 +1110,14 @@
             try { if (navigator.vibrate) navigator.vibrate(duration); } catch (e) {}
         }
 
-        // ---- Explosion vibration (heavy + long) ----
         function triggerExplosionVibration() {
-            // Heavy haptic + long vibration
             try {
                 if (window.Telegram?.WebApp) {
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
                 }
             } catch (e) {}
-            try {
-                if (navigator.vibrate) {
-                    navigator.vibrate([50, 30, 50, 30, 100]); // explosion pattern
-                }
-            } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]); } catch (e) {}
         }
 
         function triggerContinuousVibration() {
@@ -1036,7 +1141,7 @@
         }
 
         // ============================================================
-        // CRASH GAME
+        // CRASH GAME – constant wind speed, rotation stops at 3x, lower start rotation
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -1053,15 +1158,125 @@
             isCashingOut: false,
             vibrationInterval: null,
             roundId: 0,
+            windStart: 1.8,
+            currentDogGif: DOG_GIFS[0],
 
+            // ---- Wind setup - CONSTANT SPEED (no slow-down) ----
+            initWind() {
+                const container = document.getElementById('windLines');
+                container.innerHTML = '';
+                for (let i = 0; i < 40; i++) {
+                    const streak = document.createElement('div');
+                    streak.className = 'streak';
+                    const x = Math.random() * 120 - 10;
+                    const y = Math.random() * 120 - 10;
+                    const width = 15 + Math.random() * 40;
+                    streak.style.left = x + '%';
+                    streak.style.top = y + '%';
+                    streak.style.width = width + '%';
+                    streak.style.animationDelay = (Math.random() * 3) + 's';
+                    // CONSTANT SPEED – always 2.5s duration, never changes
+                    streak.style.animationDuration = '2.5s';
+                    container.appendChild(streak);
+                }
+            },
+
+            updateWindEffect() {
+                const windContainer = document.getElementById('windLines');
+                const mult = this.multiplier;
+
+                if (mult > this.windStart && this.isPlaying) {
+                    windContainer.classList.add('active');
+                    windContainer.style.opacity = 0.15 + Math.min(0.6, (mult - this.windStart) / 3.0);
+
+                    const effectiveMult = Math.min(mult, 3.0);
+                    const tilt = -(effectiveMult - 1) * 7;
+                    windContainer.style.transform = `rotate(${tilt}deg)`;
+
+                    // Streaks keep constant speed – we just rotate the container
+                    const streaks = windContainer.querySelectorAll('.streak');
+                    streaks.forEach((s) => {
+                        // Distance traveled based on multiplier (further = faster visual)
+                        const dist = 40 + Math.min(70, (mult - this.windStart) * 30);
+                        s.style.setProperty('--dx', '-' + dist + '%');
+                        s.style.setProperty('--dy', dist + '%');
+                    });
+
+                } else {
+                    windContainer.classList.remove('active');
+                    windContainer.style.opacity = 0;
+                }
+            },
+
+            // ---- Pick random dog & HIDE it (stays hidden during countdown) ----
+            pickRandomDogAndHide() {
+                this.currentDogGif = getRandomDogGif();
+                const dogImg = document.getElementById('flyingDogGif');
+                dogImg.src = this.currentDogGif;
+                dogImg.classList.remove('active');
+                dogImg.style.display = 'none';
+            },
+
+            // ---- Show dog with fly-in animation at round start ----
+            showDogWithFlyIn() {
+                const dogImg = document.getElementById('flyingDogGif');
+                dogImg.style.display = 'block';
+                dogImg.classList.remove('active');
+                void dogImg.offsetWidth;
+                dogImg.classList.add('active');
+            },
+
+            // ---- Progress line update ----
+            updateProgressLine() {
+                const wrap = document.getElementById('progressWrap');
+                const fill = document.getElementById('progressFill');
+                const mult = this.multiplier;
+
+                if (mult > 1.0 && this.isPlaying && !this.hasCashedOut) {
+                    wrap.classList.add('active');
+                    const progress = Math.min(1, (mult - 1.0) / 4.0);
+                    fill.style.width = (progress * 100) + '%';
+
+                    // Single color based on multiplier
+                    let hue, color;
+                    if (mult < 1.4) {
+                        hue = 160; // green
+                    } else if (mult < 2.5) {
+                        hue = 220; // blue
+                    } else if (mult < 4.0) {
+                        hue = 270; // purple
+                    } else {
+                        hue = 45; // gold
+                    }
+                    color = `hsl(${hue}, 80%, 55%)`;
+                    fill.style.background = color;
+                    fill.style.boxShadow = `0 0 16px ${color}40`;
+
+                } else if (this.gameOver && this.multiplier > 0) {
+                    // Crash – show red
+                    wrap.classList.add('active');
+                    const progress = Math.min(1, (this.multiplier - 1.0) / 4.0);
+                    fill.style.width = (progress * 100) + '%';
+                    fill.style.background = '#ff6b6b';
+                    fill.style.boxShadow = '0 0 20px rgba(255,107,107,0.4)';
+
+                } else {
+                    wrap.classList.remove('active');
+                    fill.style.width = '0%';
+                }
+            },
+
+            // ---- Core game ----
             startGameCycle() {
                 if (!this.isPlaying && !this.isCountingDown && !this.gameOver) this.startCountdown();
                 if (this.isPlaying) this.startContinuousVibration();
             },
+
             startContinuousVibration() {
                 if (this.vibrationInterval) return;
                 this.vibrationInterval = setInterval(() => { if (this.isPlaying) triggerContinuousVibration(); }, 150);
             },
+
             stopContinuousVibration() {
                 if (this.vibrationInterval) { clearInterval(this.vibrationInterval);
                     this.vibrationInterval = null; }
@@ -1069,11 +1284,15 @@
 
             init() {
                 this.createGrid();
+                this.initWind();
                 this.updateUI();
                 this.renderHistory();
                 this.updateMainButton();
                 players = [];
                 renderPlayers();
+                const dogImg = document.getElementById('flyingDogGif');
+                dogImg.src = this.currentDogGif;
+                dogImg.style.display = 'none';
             },
 
             createGrid() {
@@ -1101,7 +1320,11 @@
                 currentEl.style.color = color;
                 document.getElementById('rocketBalance').innerHTML =
                     `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
-                if (this.isPlaying) this.updateMainButton();
+                if (this.isPlaying || this.gameOver) {
+                    this.updateMainButton();
+                    this.updateWindEffect();
+                    this.updateProgressLine();
+                }
                 renderPlayers();
             },
 
@@ -1158,6 +1381,13 @@
                     confirmBtn.disabled = true;
                     inputRow.classList.remove('open');
                     document.getElementById('betInputRocket').value = 10;
+                    document.getElementById('windLines').classList.remove('active');
+                    document.getElementById('windLines').style.opacity = 0;
+                    document.getElementById('progressWrap').classList.remove('active');
+                    document.getElementById('progressFill').style.width = '0%';
+                    const dogImg = document.getElementById('flyingDogGif');
+                    dogImg.classList.remove('active');
+                    dogImg.style.display = 'none';
                 } else {
                     mainText.textContent = 'Place Bet';
                     btn.className = 'main-action-btn place-bet';
@@ -1257,6 +1487,9 @@
                 this.gameOver = false;
                 this.hasCashedOut = false;
                 this.roundId++;
+
+                this.pickRandomDogAndHide();
+
                 players = players.filter(p => p.isYou);
                 if (players.length > 0) { const user = players[0];
                     user.active = true;
@@ -1303,9 +1536,14 @@
                 this.gameOver = false;
                 this.lastTime = 0;
                 document.getElementById('explosionOverlay').classList.remove('active');
-                const dogGif = document.getElementById('flyingDogGif');
-                dogGif.style.display = 'block';
-                dogGif.classList.add('active');
+
+                this.showDogWithFlyIn();
+
+                document.getElementById('windLines').classList.remove('active');
+                document.getElementById('windLines').style.opacity = 0;
+                document.getElementById('progressWrap').classList.remove('active');
+                document.getElementById('progressFill').style.width = '0%';
+
                 this.updateUI();
                 this.updateMainButton();
                 this.startContinuousVibration();
@@ -1320,13 +1558,19 @@
                 const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
-                const effectiveMult = Math.min(this.multiplier, 2.3);
-                const tilt = -(effectiveMult - 1) * 8;
+
+                // Rotation stops at 3.0x instead of 2.3x, and starts lower (more tilt)
+                const effectiveMult = Math.min(this.multiplier, 3.0);
+                // Start with a lower (more negative) rotation: -6deg at 1x, increasing to -18deg at 3x
+                const tilt = -(effectiveMult - 1) * 9 - 6;
+
                 const dogOverlay = document.getElementById('dogOverlay');
                 dogOverlay.style.transition = 'none';
                 dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
                 void dogOverlay.offsetHeight;
+
                 this.updateUI();
+
                 if (this.multiplier >= this.crashPoint) {
                     this.multiplier = parseFloat(this.crashPoint.toFixed(2));
                     this.isPlaying = false;
@@ -1355,6 +1599,9 @@
                     updateHomeUI();
                     if (this.animationId) { cancelAnimationFrame(this.animationId);
                         this.animationId = null; }
+                    document.getElementById('windLines').classList.remove('active');
+                    document.getElementById('windLines').style.opacity = 0;
+                    // Keep progress line showing crash (red)
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -1399,7 +1646,7 @@
         };
 
         // ============================================================
-        // MINES GAME – with animated GIFs & explosion vibration
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -1418,11 +1665,8 @@
             isCashingOut: false,
             maxMultiplier: 8.34,
 
-            // GIF URLs – replace with your own if needed
             gemGif: 'https://images.iimg.live/images/vibrant-scene-3805.webp',
             mineGif: 'https://images.iimg.live/images/glorious-memory-8181.webp',
-
-            // Mine GIF duration in ms (2s 100ms = 2100ms)
             mineGifDuration: 2100,
 
             init() {
@@ -1500,10 +1744,15 @@
                 this.safeCount = total - minesToPlace;
                 this.revealedSafe = 0;
 
-                const mineRatio = minesToPlace / total;
-                let base = 0.90 + 1.20 * mineRatio;
-                const gridBonus = (this.gridSize - 3) * 0.02;
-                this.startingMultiplier = Math.min(2.50, base + gridBonus);
+                const minMines = this.getMinMines();
+                if (minesToPlace === minMines) {
+                    this.startingMultiplier = 1.00;
+                } else {
+                    const mineRatio = minesToPlace / total;
+                    let base = 0.90 + 1.20 * mineRatio;
+                    const gridBonus = (this.gridSize - 3) * 0.02;
+                    this.startingMultiplier = Math.min(2.50, base + gridBonus);
+                }
                 this.multiplier = this.startingMultiplier;
 
                 this.gameActive = false;
@@ -1574,15 +1823,20 @@
                 subText.textContent = '';
 
                 if (this.gameActive && !this.gameOver) {
+                    const canCashOut = this.revealedSafe > 0;
                     if (this.hasCashedOut) {
                         mainText.textContent = 'Cashed Out';
                         btn.className = 'mines-main-action-btn cashed-out';
                         btn.disabled = true;
-                    } else {
+                    } else if (canCashOut) {
                         mainText.textContent = 'Cash Out';
                         subText.textContent = (this.bet * this.multiplier).toFixed(1);
                         btn.className = 'mines-main-action-btn cash-out';
                         btn.disabled = false;
+                    } else {
+                        mainText.textContent = 'Open a tile first';
+                        btn.className = 'mines-main-action-btn waiting';
+                        btn.disabled = true;
                     }
                     inputRow.classList.remove('open');
                 } else if (this.gameOver) {
@@ -1622,7 +1876,6 @@
                 this.renderHistory();
             },
 
-            // ----- Grid update with animated GIFs -----
             updateGrid() {
                 const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
                 for (let i = 0; i < wrappers.length; i++) {
@@ -1632,12 +1885,9 @@
 
                     if (isRevealed) {
                         tile.classList.add('revealed');
-
-                        // Clear any existing content
                         symbol.innerHTML = '';
 
                         if (this.board[i] === 1) {
-                            // MINE – show animated mine GIF, then disappear after duration (no cross)
                             tile.classList.add('mine');
                             const img = document.createElement('img');
                             img.src = this.mineGif;
@@ -1649,16 +1899,13 @@
                             img.style.borderRadius = '4px';
                             symbol.appendChild(img);
 
-                            // Remove GIF after 2100ms – no cross, just empty
                             setTimeout(() => {
                                 if (symbol.contains(img)) {
                                     symbol.removeChild(img);
-                                    // Leave it empty – no cross
                                     symbol.innerHTML = '';
                                 }
                             }, this.mineGifDuration);
                         } else {
-                            // GEM – show animated diamond GIF (stays visible)
                             tile.classList.add('safe');
                             const img = document.createElement('img');
                             img.src = this.gemGif;
@@ -1677,22 +1924,18 @@
                 }
             },
 
-            // ----- Click handler with explosion vibration -----
             clickTile(index) {
                 if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
 
                 this.revealed[index] = true;
 
                 if (this.board[index] === 1) {
-                    // 💥 EXPLOSION VIBRATION – big & heavy
                     triggerExplosionVibration();
-
                     this.gameOver = true;
                     this.gameActive = false;
                     state.losses++;
                     state.totalGames++;
 
-                    // Reveal all mines
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
@@ -1737,10 +1980,11 @@
                 this.updateUI();
             },
 
-            // ----- Main Action -----
             mainAction() {
                 if (this.gameActive && !this.gameOver) {
-                    if (!this.hasCashedOut && !this.isCashingOut) this.initiateCashOut();
+                    if (!this.hasCashedOut && !this.isCashingOut && this.revealedSafe > 0) {
+                        this.initiateCashOut();
+                    }
                     return;
                 }
                 if (this.gameOver) {
@@ -1778,10 +2022,16 @@
 
                 const totalTiles = this.gridSize * this.gridSize;
                 const minesToPlace = Math.min(this.minesCount, totalTiles - 1);
-                const mineRatio = minesToPlace / totalTiles;
-                let base = 0.90 + 1.20 * mineRatio;
-                const gridBonus = (this.gridSize - 3) * 0.02;
-                this.startingMultiplier = Math.min(2.50, base + gridBonus);
+
+                const minMines = this.getMinMines();
+                if (minesToPlace === minMines) {
+                    this.startingMultiplier = 1.00;
+                } else {
+                    const mineRatio = minesToPlace / totalTiles;
+                    let base = 0.90 + 1.20 * mineRatio;
+                    const gridBonus = (this.gridSize - 3) * 0.02;
+                    this.startingMultiplier = Math.min(2.50, base + gridBonus);
+                }
                 this.multiplier = this.startingMultiplier;
 
                 this.gameActive = true;
@@ -1919,7 +2169,7 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('Casino loaded – final version with explosion vibration & mine GIF duration.');
+            console.log('Casino loaded – constant wind speed, rotation stops at 3x, progress line added.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
