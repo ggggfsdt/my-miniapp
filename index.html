@@ -58,23 +58,10 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
         }
-        #notification.show {
-            display: flex;
-        }
-        #notification .notif-icon {
-            color: #00d2a0;
-            font-size: 16px;
-        }
-        #notification .notif-text {
-            color: #e0e0e0;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        #notification .notif-amount {
-            color: #ffd700;
-            font-size: 16px;
-            font-weight: 700;
-        }
+        #notification.show { display: flex; }
+        #notification .notif-icon { color: #00d2a0; font-size: 16px; }
+        #notification .notif-text { color: #e0e0e0; font-size: 14px; font-weight: 500; }
+        #notification .notif-amount { color: #ffd700; font-size: 16px; font-weight: 700; }
 
         .page {
             display: none;
@@ -84,19 +71,10 @@
             max-height: 740px;
             scroll-behavior: smooth;
         }
-        .page.active {
-            display: block;
-        }
-        .page::-webkit-scrollbar {
-            width: 3px;
-        }
-        .page::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .page::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 10px;
-        }
+        .page.active { display: block; }
+        .page::-webkit-scrollbar { width: 3px; }
+        .page::-webkit-scrollbar-track { background: transparent; }
+        .page::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
 
         .bottom-nav {
             position: sticky;
@@ -130,23 +108,10 @@
             position: relative;
             letter-spacing: 0.3px;
         }
-        .nav-item .icon {
-            font-size: 22px;
-            transition: all 0.3s;
-            opacity: 0.5;
-        }
-        .nav-item .label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-        .nav-item.active {
-            color: #fff;
-        }
-        .nav-item.active .icon {
-            opacity: 1;
-            transform: translateY(-2px) scale(1.1);
-        }
+        .nav-item .icon { font-size: 22px; transition: all 0.3s; opacity: 0.5; }
+        .nav-item .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; }
+        .nav-item.active { color: #fff; }
+        .nav-item.active .icon { opacity: 1; transform: translateY(-2px) scale(1.1); }
 
         .card {
             background: rgba(255, 255, 255, 0.03);
@@ -156,34 +121,12 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             margin-bottom: 14px;
         }
-        .card-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
-        }
-        .flex {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .text-muted {
-            color: #555;
-            font-size: 13px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .mb-8 {
-            margin-bottom: 8px;
-        }
+        .card-title { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .flex { display: flex; align-items: center; gap: 10px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-muted { color: #555; font-size: 13px; }
+        .gap-8 { gap: 8px; }
+        .mb-8 { margin-bottom: 8px; }
 
         .btn {
             padding: 14px 20px;
@@ -200,22 +143,10 @@
             overflow: hidden;
             letter-spacing: 0.3px;
         }
-        .btn:active {
-            transform: scale(0.94);
-        }
-        .btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            transform: none;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-        }
+        .btn:active { transform: scale(0.94); }
+        .btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
+        .btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35); }
+        .btn-success { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35); }
         .badge {
             background: rgba(255, 255, 255, 0.06);
             padding: 6px 14px;
@@ -226,11 +157,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             letter-spacing: 0.3px;
         }
-        .badge-gold {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: rgba(255, 215, 0, 0.15);
-            color: #ffd700;
-        }
+        .badge-gold { background: rgba(255, 215, 0, 0.1); border-color: rgba(255, 215, 0, 0.15); color: #ffd700; }
 
         .online-dot {
             display: inline-block;
@@ -242,13 +169,8 @@
             box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
             animation: pulse-dot 1.5s ease-in-out infinite;
         }
-        @keyframes pulse-dot {
-            0% { opacity: 0.4; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
-            100% { opacity: 0.4; transform: scale(0.8); }
-        }
+        @keyframes pulse-dot { 0% { opacity: 0.4; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.4; transform: scale(0.8); } }
 
-        /* ===== HOME HEADER ===== */
         .home-header {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -260,51 +182,14 @@
             align-items: center;
             gap: 14px;
         }
-        .home-avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.2);
-        }
-        .home-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .home-user {
-            flex: 1;
-        }
-        .home-user .greeting {
-            font-size: 14px;
-            color: #888;
-            font-weight: 500;
-        }
-        .home-user .username {
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .home-balance-wrap {
-            text-align: right;
-        }
-        .home-balance-wrap .label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .home-balance-wrap .amount {
-            font-size: 28px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #ffd700, #f0932b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .home-avatar { width: 52px; height: 52px; border-radius: 16px; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 16px rgba(108, 92, 231, 0.2); }
+        .home-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .home-user { flex: 1; }
+        .home-user .greeting { font-size: 14px; color: #888; font-weight: 500; }
+        .home-user .username { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .home-balance-wrap { text-align: right; }
+        .home-balance-wrap .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .home-balance-wrap .amount { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #ffd700, #f0932b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .quick-grid {
             display: grid;
@@ -324,47 +209,15 @@
             position: relative;
             overflow: hidden;
         }
-        .quick-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(108,92,231,0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .quick-card:active {
-            transform: scale(0.94);
-        }
-        .quick-card:active::before {
-            opacity: 1;
-        }
-        .quick-card .icon {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 8px;
-            color: #fff;
-            opacity: 0.9;
-        }
-        .quick-card .label {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .quick-card .desc {
-            font-size: 12px;
-            color: #555;
-            margin-top: 2px;
-        }
-        .quick-card.glow-purple {
-            box-shadow: 0 0 30px rgba(108, 92, 231, 0.05);
-        }
-        .quick-card.glow-green {
-            box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
-        }
-
-        .recent-winners-card {
-            margin-top: 16px;
-        }
+        .quick-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(108,92,231,0.05), transparent); opacity: 0; transition: opacity 0.3s; }
+        .quick-card:active { transform: scale(0.94); }
+        .quick-card:active::before { opacity: 1; }
+        .quick-card .icon { font-size: 32px; display: block; margin-bottom: 8px; color: #fff; opacity: 0.9; }
+        .quick-card .label { font-size: 15px; font-weight: 700; color: #fff; }
+        .quick-card .desc { font-size: 12px; color: #555; margin-top: 2px; }
+        .quick-card.glow-purple { box-shadow: 0 0 30px rgba(108, 92, 231, 0.05); }
+        .quick-card.glow-green { box-shadow: 0 0 30px rgba(0, 210, 160, 0.05); }
+        .recent-winners-card { margin-top: 16px; }
 
         .profile-header {
             text-align: center;
@@ -382,12 +235,7 @@
             box-shadow: 0 4px 24px rgba(108, 92, 231, 0.2);
             position: relative;
         }
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .profile-avatar .fallback {
             display: none;
             width: 100%;
@@ -401,20 +249,9 @@
             position: absolute;
             inset: 0;
         }
-        .profile-avatar img:not([src]) + .fallback,
-        .profile-avatar img.error + .fallback {
-            display: flex;
-        }
-        .profile-name {
-            font-size: 22px;
-            font-weight: 800;
-            color: #fff;
-        }
-        .profile-username {
-            font-size: 14px;
-            color: #888;
-            margin-top: 2px;
-        }
+        .profile-avatar img:not([src]) + .fallback, .profile-avatar img.error + .fallback { display: flex; }
+        .profile-name { font-size: 22px; font-weight: 800; color: #fff; }
+        .profile-username { font-size: 14px; color: #888; margin-top: 2px; }
         .profile-stats {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -428,49 +265,18 @@
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .profile-stat .value {
-            font-size: 22px;
-            font-weight: 900;
-        }
-        .profile-stat .label {
-            font-size: 10px;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-        .profile-stat .value.gold {
-            color: #ffd700;
-        }
-        .profile-stat .value.green {
-            color: #00d2a0;
-        }
-        .profile-stat .value.purple {
-            color: #a29bfe;
-        }
-        .profile-stat .value.pink {
-            color: #fd79a8;
-        }
+        .profile-stat .value { font-size: 22px; font-weight: 900; }
+        .profile-stat .label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .profile-stat .value.gold { color: #ffd700; }
+        .profile-stat .value.green { color: #00d2a0; }
+        .profile-stat .value.purple { color: #a29bfe; }
+        .profile-stat .value.pink { color: #fd79a8; }
+        .profile-detail { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
+        .profile-detail:last-child { border-bottom: none; }
+        .profile-detail .label { color: #666; font-size: 14px; }
+        .profile-detail .value { font-weight: 600; font-size: 14px; }
 
-        .profile-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .profile-detail:last-child {
-            border-bottom: none;
-        }
-        .profile-detail .label {
-            color: #666;
-            font-size: 14px;
-        }
-        .profile-detail .value {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* ===== GRID (Crash Page) ===== */
+        /* ===== GRID (Crash) ===== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -480,7 +286,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             margin: 10px 0 10px 0;
         }
-
         .grid-squares {
             position: absolute;
             inset: 0;
@@ -492,13 +297,8 @@
             padding: 0;
             z-index: 0;
         }
-        .grid-square {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .grid-square.corner {
-            border-color: rgba(108, 92, 231, 0.06);
-        }
+        .grid-square { background: transparent; border: 1px solid rgba(255, 255, 255, 0.04); }
+        .grid-square.corner { border-color: rgba(108, 92, 231, 0.06); }
 
         .gif-overlay {
             position: absolute;
@@ -514,23 +314,9 @@
             justify-content: center;
             transition: none;
         }
-        .gif-overlay img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: none;
-            filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
-        }
-        .gif-overlay img.active {
-            display: block;
-            animation: dogFly 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes dogFly {
-            0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; }
-            50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; }
-            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
-        }
+        .gif-overlay img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3)); }
+        .gif-overlay img.active { display: block; animation: dogFly 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes dogFly { 0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } }
 
         .explosion-overlay {
             position: absolute;
@@ -541,22 +327,9 @@
             justify-content: center;
             pointer-events: none;
         }
-        .explosion-overlay.active {
-            display: flex;
-        }
-        .explosion-overlay img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            animation: explosionAnim 0.8s ease-out forwards;
-        }
-
-        @keyframes explosionAnim {
-            0% { transform: scale(0.3); opacity: 0; }
-            30% { transform: scale(1.4); opacity: 1; }
-            60% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        .explosion-overlay.active { display: flex; }
+        .explosion-overlay img { width: 100%; height: 100%; object-fit: contain; animation: explosionAnim 0.8s ease-out forwards; }
+        @keyframes explosionAnim { 0% { transform: scale(0.3); opacity: 0; } 30% { transform: scale(1.4); opacity: 1; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
         .countdown-overlay {
             position: absolute;
@@ -569,25 +342,9 @@
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(2px);
         }
-        .countdown-overlay.active {
-            display: flex;
-        }
-        .countdown-number {
-            font-size: 100px;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 0 60px rgba(108, 92, 231, 0.5), 0 0 120px rgba(108, 92, 231, 0.2);
-            animation: countdownPulse 1s ease-out forwards;
-            opacity: 0;
-            transform: scale(0.5);
-        }
-
-        @keyframes countdownPulse {
-            0% { opacity: 0; transform: scale(0.3); }
-            30% { opacity: 1; transform: scale(1.3); }
-            70% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.1); }
-        }
+        .countdown-overlay.active { display: flex; }
+        .countdown-number { font-size: 100px; font-weight: 900; color: #ffffff; text-shadow: 0 0 60px rgba(108, 92, 231, 0.5), 0 0 120px rgba(108, 92, 231, 0.2); animation: countdownPulse 1s ease-out forwards; opacity: 0; transform: scale(0.5); }
+        @keyframes countdownPulse { 0% { opacity: 0; transform: scale(0.3); } 30% { opacity: 1; transform: scale(1.3); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
 
         .history-bar {
             position: absolute;
@@ -608,10 +365,7 @@
             flex-wrap: nowrap;
             scrollbar-width: none;
         }
-        .history-bar::-webkit-scrollbar {
-            display: none;
-        }
-
+        .history-bar::-webkit-scrollbar { display: none; }
         .history-current {
             font-size: 18px;
             font-weight: 900;
@@ -622,17 +376,8 @@
             letter-spacing: -0.5px;
             white-space: nowrap;
         }
-        .history-current .x {
-            font-size: 12px;
-            font-weight: 400;
-            opacity: 0.5;
-        }
-
-        .history-past {
-            display: flex;
-            gap: 3px;
-            flex-wrap: nowrap;
-        }
+        .history-current .x { font-size: 12px; font-weight: 400; opacity: 0.5; }
+        .history-past { display: flex; gap: 3px; flex-wrap: nowrap; }
         .history-item {
             padding: 1px 6px;
             border-radius: 20px;
@@ -644,26 +389,10 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             transition: all 0.3s;
         }
-        .history-item.green {
-            background: rgba(0, 210, 160, 0.2);
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.15);
-        }
-        .history-item.blue {
-            background: rgba(54, 160, 255, 0.2);
-            color: #54a0ff;
-            border-color: rgba(54, 160, 255, 0.15);
-        }
-        .history-item.purple {
-            background: rgba(108, 92, 231, 0.25);
-            color: #a29bfe;
-            border-color: rgba(108, 92, 231, 0.15);
-        }
-        .history-item.crashed {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.15);
-        }
+        .history-item.green { background: rgba(0, 210, 160, 0.2); color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
+        .history-item.blue { background: rgba(54, 160, 255, 0.2); color: #54a0ff; border-color: rgba(54, 160, 255, 0.15); }
+        .history-item.purple { background: rgba(108, 92, 231, 0.25); color: #a29bfe; border-color: rgba(108, 92, 231, 0.15); }
+        .history-item.crashed { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
         /* ===== BET / CASH OUT (Crash) ===== */
         .bet-container {
@@ -687,12 +416,7 @@
             padding: 0 4px;
             margin: 0;
         }
-        .bet-input-row.open {
-            max-height: 60px;
-            opacity: 1;
-            padding: 4px;
-            margin: 0;
-        }
+        .bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
         .bet-input-row input {
             flex: 1;
             background: transparent;
@@ -704,9 +428,7 @@
             outline: none;
             min-width: 0;
         }
-        .bet-input-row input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-        }
+        .bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
         .bet-input-row .bet-confirm-btn {
             padding: 8px 20px;
             border: none;
@@ -719,13 +441,8 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
-        .bet-input-row .bet-confirm-btn:active {
-            transform: scale(0.92);
-        }
-        .bet-input-row .bet-confirm-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .bet-input-row .bet-confirm-btn:active { transform: scale(0.92); }
+        .bet-input-row .bet-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .players-list {
             background: rgba(255, 255, 255, 0.02);
@@ -736,19 +453,9 @@
             overflow-y: auto;
             margin-top: 4px;
         }
-        .players-list::-webkit-scrollbar {
-            width: 2px;
-        }
-        .players-list::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 10px;
-        }
-        .players-list .empty {
-            color: #555;
-            font-size: 13px;
-            text-align: center;
-            padding: 6px 0;
-        }
+        .players-list::-webkit-scrollbar { width: 2px; }
+        .players-list::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
+        .players-list .empty { color: #555; font-size: 13px; text-align: center; padding: 6px 0; }
         .player-item {
             display: flex;
             align-items: center;
@@ -758,81 +465,28 @@
             margin-bottom: 2px;
             background: rgba(255, 255, 255, 0.02);
         }
-        .player-item .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .player-item .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .player-item .avatar .initials {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .player-item .info {
-            flex: 1;
-        }
-        .player-item .info .name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #e0e0e0;
-        }
-        .player-item .info .name .you {
-            color: #ffd700;
-            font-size: 10px;
-            font-weight: 700;
-            margin-left: 4px;
-        }
-        .player-item .info .bet-amount {
-            font-size: 11px;
-            color: #888;
-        }
-        .player-item .status {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 20px;
-            text-align: center;
-            white-space: nowrap;
-        }
-        .player-item .status.betting {
-            color: #ffd700;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-        }
-        .player-item .status.cashed {
-            color: #00d2a0;
-            border: 1px solid rgba(0, 210, 160, 0.2);
-        }
-        .player-item .status.crashed {
-            color: #ff6b6b;
-            border: 1px solid rgba(255, 107, 107, 0.2);
-        }
-        .player-item .status.waiting {
-            color: #888;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
+        .player-item .avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(255, 255, 255, 0.06); }
+        .player-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .player-item .avatar .initials { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 11px; font-weight: 700; }
+        .player-item .info { flex: 1; }
+        .player-item .info .name { font-size: 13px; font-weight: 600; color: #e0e0e0; }
+        .player-item .info .name .you { color: #ffd700; font-size: 10px; font-weight: 700; margin-left: 4px; }
+        .player-item .info .bet-amount { font-size: 11px; color: #888; }
+        .player-item .status { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; text-align: center; white-space: nowrap; }
+        .player-item .status.betting { color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.2); }
+        .player-item .status.cashed { color: #00d2a0; border: 1px solid rgba(0, 210, 160, 0.2); }
+        .player-item .status.crashed { color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.2); }
+        .player-item .status.waiting { color: #888; border: 1px solid rgba(255, 255, 255, 0.06); }
 
-        /* ---- Main Action Button (centered text) ---- */
+        /* ---- Main Action Button (centered, shifted down) ---- */
         .main-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1px;
-            padding: 8px 12px 8px 12px;
+            gap: 0px;
+            padding: 10px 12px 10px 12px;
+            padding-top: 6px;
             border: none;
             border-radius: 14px;
             font-weight: 700;
@@ -845,67 +499,22 @@
             letter-spacing: 0.3px;
             position: relative;
             overflow: hidden;
-            min-height: 40px;
-        }
-        .main-action-btn:active {
-            transform: scale(0.94);
-        }
-        .main-action-btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            transform: none;
-        }
-        #mainActionText {
-            font-size: 14px;
-            font-weight: 700;
+            min-height: 44px;
             line-height: 1.2;
-            text-align: center;
         }
-        #mainActionSub {
-            font-size: 11px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            min-height: 14px;
-            line-height: 1.2;
-            text-align: center;
-        }
+        .main-action-btn:active { transform: scale(0.94); }
+        .main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
+        #mainActionText { font-size: 14px; font-weight: 700; line-height: 1.3; }
+        #mainActionSub { font-size: 11px; font-weight: 400; color: rgba(255, 255, 255, 0.8); line-height: 1.2; min-height: 14px; }
+        .main-action-btn.place-bet { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35); }
+        .main-action-btn.cash-out { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35); }
+        .main-action-btn.waiting { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); cursor: not-allowed; }
+        .main-action-btn.confirm-bet { background: linear-gradient(135deg, #f9ca24, #f0932b); box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3); }
+        .main-action-btn.round-in-progress { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        .main-action-btn.bet-placed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        .main-action-btn.cashed-out { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
 
-        .main-action-btn.place-bet {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
-        }
-        .main-action-btn.cash-out {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-        }
-        .main-action-btn.waiting {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: not-allowed;
-        }
-        .main-action-btn.confirm-bet {
-            background: linear-gradient(135deg, #f9ca24, #f0932b);
-            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
-        }
-        .main-action-btn.round-in-progress {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .main-action-btn.bet-placed {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .main-action-btn.cashed-out {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* ============================================================
-           MINES PAGE - PREMIUM (3D, gem icon, dark, vibrations)
-           ============================================================ */
+        /* ===== MINES PAGE ===== */
         .mines-header {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 20px;
@@ -916,20 +525,9 @@
             align-items: center;
             justify-content: space-between;
         }
-        .mines-header .multiplier {
-            font-size: 24px;
-            font-weight: 900;
-            color: #00d2a0;
-            letter-spacing: -0.5px;
-        }
-        .mines-header .multiplier .x {
-            font-size: 16px;
-            font-weight: 400;
-            opacity: 0.5;
-            margin-left: 2px;
-        }
+        .mines-header .multiplier { font-size: 24px; font-weight: 900; color: #00d2a0; letter-spacing: -0.5px; }
+        .mines-header .multiplier .x { font-size: 16px; font-weight: 400; opacity: 0.5; margin-left: 2px; }
 
-        /* Grid presets */
         .grid-presets {
             display: flex;
             gap: 4px;
@@ -949,22 +547,11 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
-        .grid-presets button.active {
-            background: rgba(108, 92, 231, 0.15);
-            border-color: rgba(108, 92, 231, 0.2);
-            color: #fff;
-        }
-        .grid-presets button.coming-soon {
-            opacity: 0.5;
-            cursor: default;
-        }
+        .grid-presets button.active { background: rgba(108, 92, 231, 0.15); border-color: rgba(108, 92, 231, 0.2); color: #fff; }
+        .grid-presets button.coming-soon { opacity: 0.5; cursor: default; }
 
-        .mines-grid-wrapper {
-            position: relative;
-            margin: 8px 0 12px 0;
-        }
+        .mines-grid-wrapper { position: relative; margin: 8px 0 12px 0; }
 
-        /* ===== MINES GRID - 3D TILES ===== */
         .mines-grid {
             display: grid;
             gap: 8px;
@@ -1007,14 +594,8 @@
             font-weight: 700;
             user-select: none;
         }
-        .mines-grid .tile-wrapper .tile.show {
-            opacity: 1;
-            transform: scale(1) rotateX(0deg) translateY(0);
-            pointer-events: auto;
-        }
-        .mines-grid .tile-wrapper:active .tile {
-            transform: scale(0.94);
-        }
+        .mines-grid .tile-wrapper .tile.show { opacity: 1; transform: scale(1) rotateX(0deg) translateY(0); pointer-events: auto; }
+        .mines-grid .tile-wrapper:active .tile { transform: scale(0.94); }
         .mines-grid .tile-wrapper .tile .symbol {
             font-size: 28px;
             line-height: 1;
@@ -1025,34 +606,13 @@
             align-items: center;
             justify-content: center;
         }
-        .mines-grid .tile-wrapper .tile.revealed .symbol {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
+        .mines-grid .tile-wrapper .tile.revealed .symbol { opacity: 1; transform: scale(1) rotate(0deg); }
+        .mines-grid .tile-wrapper .tile.revealed { transform: scale(0.97); border-color: transparent; }
+        .mines-grid .tile-wrapper .tile.revealed.safe { background: #0d2018; border-color: rgba(0, 210, 160, 0.12); box-shadow: 0 0 30px rgba(0, 210, 160, 0.06); }
+        .mines-grid .tile-wrapper .tile.revealed.safe .symbol { color: #00d2a0; }
+        .mines-grid .tile-wrapper .tile.revealed.mine { background: #201010; border-color: rgba(255, 80, 80, 0.12); box-shadow: 0 0 30px rgba(255, 80, 80, 0.06); }
+        .mines-grid .tile-wrapper .tile.revealed.mine .symbol { color: #ff6b6b; }
 
-        /* Revealed states */
-        .mines-grid .tile-wrapper .tile.revealed {
-            transform: scale(0.97);
-            border-color: transparent;
-        }
-        .mines-grid .tile-wrapper .tile.revealed.safe {
-            background: #0d2018;
-            border-color: rgba(0, 210, 160, 0.12);
-            box-shadow: 0 0 30px rgba(0, 210, 160, 0.06);
-        }
-        .mines-grid .tile-wrapper .tile.revealed.safe .symbol {
-            color: #00d2a0;
-        }
-        .mines-grid .tile-wrapper .tile.revealed.mine {
-            background: #201010;
-            border-color: rgba(255, 80, 80, 0.12);
-            box-shadow: 0 0 30px rgba(255, 80, 80, 0.06);
-        }
-        .mines-grid .tile-wrapper .tile.revealed.mine .symbol {
-            color: #ff6b6b;
-        }
-
-        /* ===== Mines Message ===== */
         .mines-message {
             text-align: center;
             padding: 12px;
@@ -1068,20 +628,10 @@
             margin-bottom: 10px;
             color: #888;
         }
-        .mines-message.success {
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.1);
-        }
-        .mines-message.danger {
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.1);
-        }
-        .mines-message.gold {
-            color: #ffd700;
-            border-color: rgba(255, 215, 0, 0.1);
-        }
+        .mines-message.success { color: #00d2a0; border-color: rgba(0, 210, 160, 0.1); }
+        .mines-message.danger { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.1); }
+        .mines-message.gold { color: #ffd700; border-color: rgba(255, 215, 0, 0.1); }
 
-        /* ===== Mines Bet Container ===== */
         .mines-bet-container {
             display: flex;
             flex-direction: column;
@@ -1103,12 +653,7 @@
             padding: 0 4px;
             margin: 0;
         }
-        .mines-bet-input-row.open {
-            max-height: 60px;
-            opacity: 1;
-            padding: 4px;
-            margin: 0;
-        }
+        .mines-bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
         .mines-bet-input-row input {
             flex: 1;
             background: transparent;
@@ -1120,9 +665,7 @@
             outline: none;
             min-width: 0;
         }
-        .mines-bet-input-row input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-        }
+        .mines-bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
         .mines-bet-input-row .mines-bet-confirm-btn {
             padding: 8px 20px;
             border: none;
@@ -1135,18 +678,16 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
-        .mines-bet-input-row .mines-bet-confirm-btn:active {
-            transform: scale(0.92);
-        }
+        .mines-bet-input-row .mines-bet-confirm-btn:active { transform: scale(0.92); }
 
-        /* ---- Mines Main Action (centered text) ---- */
         .mines-main-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1px;
-            padding: 8px 12px 8px 12px;
+            gap: 0px;
+            padding: 10px 12px 10px 12px;
+            padding-top: 6px;
             border: none;
             border-radius: 14px;
             font-weight: 700;
@@ -1159,43 +700,17 @@
             letter-spacing: 0.3px;
             position: relative;
             overflow: hidden;
-            min-height: 40px;
-        }
-        .mines-main-action-btn:active {
-            transform: scale(0.94);
-        }
-        .mines-main-action-btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            transform: none;
-        }
-        .mines-main-action-btn .sub-text {
-            font-size: 11px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            min-height: 14px;
+            min-height: 44px;
             line-height: 1.2;
-            text-align: center;
         }
-        .mines-main-action-btn.place-bet {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
-        }
-        .mines-main-action-btn.cash-out {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-        }
-        .mines-main-action-btn.waiting {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: not-allowed;
-        }
-        .mines-main-action-btn.confirm-bet {
-            background: linear-gradient(135deg, #f9ca24, #f0932b);
-            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
-        }
+        .mines-main-action-btn:active { transform: scale(0.94); }
+        .mines-main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
+        .mines-main-action-btn .sub-text { font-size: 11px; font-weight: 400; color: rgba(255, 255, 255, 0.8); line-height: 1.2; min-height: 14px; }
+        .mines-main-action-btn.place-bet { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35); }
+        .mines-main-action-btn.cash-out { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35); }
+        .mines-main-action-btn.waiting { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); cursor: not-allowed; }
+        .mines-main-action-btn.confirm-bet { background: linear-gradient(135deg, #f9ca24, #f0932b); box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3); }
 
-        /* ---- Mines control: mine count changer ---- */
         .mines-controls {
             display: flex;
             align-items: center;
@@ -1213,38 +728,10 @@
             border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .mines-controls .control-group .label {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-right: 4px;
-        }
-        .mines-controls .control-group button {
-            width: 24px;
-            height: 24px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mines-controls .control-group button:active {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(0.92);
-        }
-        .mines-controls .control-group .val {
-            font-size: 15px;
-            font-weight: 700;
-            min-width: 22px;
-            text-align: center;
-            color: #fff;
-        }
+        .mines-controls .control-group .label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+        .mines-controls .control-group button { width: 24px; height: 24px; border: none; border-radius: 6px; background: rgba(255, 255, 255, 0.04); color: #fff; font-size: 14px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .mines-controls .control-group button:active { background: rgba(255, 255, 255, 0.1); transform: scale(0.92); }
+        .mines-controls .control-group .val { font-size: 15px; font-weight: 700; min-width: 22px; text-align: center; color: #fff; }
 
         .mines-history {
             display: flex;
@@ -1261,39 +748,17 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: #888;
         }
-        .mines-history .h-item.win {
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.15);
-        }
-        .mines-history .h-item.loss {
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.15);
-        }
+        .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
+        .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
         @media (max-width: 420px) {
-            .mines-grid .tile-wrapper .tile .symbol {
-                font-size: 22px;
-            }
-            .mines-grid {
-                gap: 6px;
-            }
-            .mines-header .multiplier {
-                font-size: 20px;
-            }
-            .grid-presets button {
-                font-size: 9px;
-                padding: 2px 7px;
-            }
-            .mines-grid .tile-wrapper {
-                border-radius: 18px;
-            }
-            .mines-grid .tile-wrapper .tile {
-                border-radius: 18px;
-            }
-            .mines-grid .tile-wrapper .shadow {
-                border-radius: 18px;
-                inset: 4px 0 0 4px;
-            }
+            .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
+            .mines-grid { gap: 6px; }
+            .mines-header .multiplier { font-size: 20px; }
+            .grid-presets button { font-size: 9px; padding: 2px 7px; }
+            .mines-grid .tile-wrapper { border-radius: 18px; }
+            .mines-grid .tile-wrapper .tile { border-radius: 18px; }
+            .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
         }
     </style>
 </head>
@@ -1307,91 +772,40 @@
             <span class="notif-amount" id="notifAmount">+0 ⭐</span>
         </div>
 
-        <!-- HOME PAGE -->
+        <!-- HOME -->
         <div id="page-home" class="page active">
             <div class="home-header">
-                <div class="home-avatar">
-                    <img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar">
-                </div>
-                <div class="home-user">
-                    <div class="greeting">Welcome back</div>
-                    <div class="username" id="homeUsername">xDll_Lud</div>
-                </div>
-                <div class="home-balance-wrap">
-                    <div class="label">Balance</div>
-                    <div class="amount" id="homeBalance"><i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> 1,000</div>
-                </div>
+                <div class="home-avatar"><img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar"></div>
+                <div class="home-user"><div class="greeting">Welcome back</div><div class="username" id="homeUsername">xDll_Lud</div></div>
+                <div class="home-balance-wrap"><div class="label">Balance</div><div class="amount" id="homeBalance"><i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> 1,000</div></div>
             </div>
-
             <div class="quick-grid">
-                <div class="quick-card glow-purple" onclick="navigateTo('rocket')">
-                    <span class="icon"><i class="fas fa-rocket"></i></span>
-                    <div class="label">Crash</div>
-                    <div class="desc">Fly high, cash out!</div>
-                </div>
-                <div class="quick-card glow-green" onclick="navigateTo('mines')">
-                    <span class="icon"><i class="fas fa-gem"></i></span>
-                    <div class="label">Mines</div>
-                    <div class="desc">Find the gems</div>
-                </div>
+                <div class="quick-card glow-purple" onclick="navigateTo('rocket')"><span class="icon"><i class="fas fa-rocket"></i></span><div class="label">Crash</div><div class="desc">Fly high, cash out!</div></div>
+                <div class="quick-card glow-green" onclick="navigateTo('mines')"><span class="icon"><i class="fas fa-gem"></i></span><div class="label">Mines</div><div class="desc">Find the gems</div></div>
             </div>
-
-            <div class="card recent-winners-card">
-                <div class="card-title">Recent Winners</div>
-                <div id="recentWinners" class="text-muted" style="font-size: 14px;">No wins yet</div>
-            </div>
+            <div class="card recent-winners-card"><div class="card-title">Recent Winners</div><div id="recentWinners" class="text-muted" style="font-size:14px;">No wins yet</div></div>
         </div>
 
-        <!-- CRASH PAGE -->
+        <!-- CRASH -->
         <div id="page-rocket" class="page">
-            <div class="flex-between mb-8">
-                <span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span>
-                <span class="badge" id="rocketBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
-            </div>
-
+            <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span></div>
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
-                <div class="gif-overlay" id="dogOverlay">
-                    <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
-                </div>
-                <div class="explosion-overlay" id="explosionOverlay">
-                    <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
-                </div>
-                <div class="countdown-overlay" id="countdownOverlay">
-                    <div class="countdown-number" id="countdownNumber">3</div>
-                </div>
-                <div class="history-bar" id="historyBar">
-                    <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
-                    <div class="history-past" id="historyPast"></div>
-                </div>
+                <div class="gif-overlay" id="dogOverlay"><img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog"></div>
+                <div class="explosion-overlay" id="explosionOverlay"><img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion"></div>
+                <div class="countdown-overlay" id="countdownOverlay"><div class="countdown-number" id="countdownNumber">3</div></div>
+                <div class="history-bar" id="historyBar"><div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div><div class="history-past" id="historyPast"></div></div>
             </div>
-
             <div class="bet-container">
-                <div class="bet-input-row" id="betInputRow">
-                    <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
-                    <button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
-                </div>
-                <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
-                    <span id="mainActionText">Place Bet</span>
-                    <span id="mainActionSub"></span>
-                </button>
-
-                <div class="players-list" id="playersList">
-                    <div class="empty">No bets placed yet</div>
-                </div>
+                <div class="bet-input-row" id="betInputRow"><input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount"><button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button></div>
+                <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()"><span id="mainActionText">Place Bet</span><span id="mainActionSub"></span></button>
+                <div class="players-list" id="playersList"><div class="empty">No bets placed yet</div></div>
             </div>
         </div>
 
-        <!-- ===== MINES PAGE ===== -->
+        <!-- MINES -->
         <div id="page-mines" class="page">
-            <!-- Header with blue gem icon -->
-            <div class="mines-header">
-                <span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span>
-                <span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span>
-                <span class="badge" id="minesBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
-            </div>
-
-            <!-- Grid presets (5x5 active, 6x6/7x7/8x8 "coming soon") -->
+            <div class="mines-header"><span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span><span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span><span class="badge" id="minesBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span></div>
             <div class="grid-presets" id="gridPresets">
                 <button data-size="3" data-mines="1" class="active">3×3</button>
                 <button data-size="4" data-mines="3">4×4</button>
@@ -1400,128 +814,58 @@
                 <button data-size="7" data-mines="10" class="coming-soon">7×7</button>
                 <button data-size="8" data-mines="12" class="coming-soon">8×8</button>
             </div>
-
-            <!-- Grid -->
-            <div class="mines-grid-wrapper">
-                <div class="mines-grid" id="minesGrid"></div>
-            </div>
-
-            <!-- Message -->
+            <div class="mines-grid-wrapper"><div class="mines-grid" id="minesGrid"></div></div>
             <div class="mines-message" id="minesMessage">Press "Start" to play</div>
-
-            <!-- Unified Bet/Cash Out Button -->
             <div class="mines-bet-container">
-                <div class="mines-bet-input-row" id="minesBetInputRow">
-                    <input type="number" id="minesBetInput" value="10" min="1" step="1" placeholder="Bet amount">
-                    <button class="mines-bet-confirm-btn" onclick="minesGame.confirmBet()">Confirm</button>
-                </div>
-                <button class="mines-main-action-btn place-bet" id="minesMainActionBtn" onclick="minesGame.mainAction()">
-                    <span id="minesMainActionText">Place Bet</span>
-                    <span class="sub-text" id="minesMainActionSub"></span>
-                </button>
+                <div class="mines-bet-input-row" id="minesBetInputRow"><input type="number" id="minesBetInput" value="10" min="1" step="1" placeholder="Bet amount"><button class="mines-bet-confirm-btn" onclick="minesGame.confirmBet()">Confirm</button></div>
+                <button class="mines-main-action-btn place-bet" id="minesMainActionBtn" onclick="minesGame.mainAction()"><span id="minesMainActionText">Place Bet</span><span class="sub-text" id="minesMainActionSub"></span></button>
             </div>
-
-            <!-- Mine count changer -->
             <div class="mines-controls">
-                <div class="control-group">
-                    <span class="label">Mines</span>
-                    <button onclick="minesGame.changeMines(-1)"><i class="fas fa-minus"></i></button>
-                    <span class="val" id="minesCount">1</span>
-                    <button onclick="minesGame.changeMines(1)"><i class="fas fa-plus"></i></button>
-                </div>
+                <div class="control-group"><span class="label">Mines</span><button onclick="minesGame.changeMines(-1)"><i class="fas fa-minus"></i></button><span class="val" id="minesCount">1</span><button onclick="minesGame.changeMines(1)"><i class="fas fa-plus"></i></button></div>
             </div>
-
-            <!-- History -->
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- PROFILE PAGE -->
+        <!-- PROFILE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">
-                    <img id="profileAvatarImg" src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="fallback" id="profileAvatarFallback">XD</div>
-                </div>
-                <div class="profile-name" id="profileName">xDll_Lud</div>
-                <div class="profile-username" id="profileUsername">@xDll_Lud</div>
+                <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="fallback" id="profileAvatarFallback">XD</div></div>
+                <div class="profile-name" id="profileName">xDll_Lud</div><div class="profile-username" id="profileUsername">@xDll_Lud</div>
             </div>
-
             <div class="card">
                 <div class="card-title">Statistics</div>
                 <div class="profile-stats">
-                    <div class="profile-stat">
-                        <div class="value gold" id="profileBalance"><i class="fas fa-star" style="font-size:16px; color:#ffd700;"></i> 1,000</div>
-                        <div class="label">Balance</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="value purple" id="profileGames">0</div>
-                        <div class="label">Games</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="value green" id="profileWins">0</div>
-                        <div class="label">Wins</div>
-                    </div>
+                    <div class="profile-stat"><div class="value gold" id="profileBalance"><i class="fas fa-star" style="font-size:16px; color:#ffd700;"></i> 1,000</div><div class="label">Balance</div></div>
+                    <div class="profile-stat"><div class="value purple" id="profileGames">0</div><div class="label">Games</div></div>
+                    <div class="profile-stat"><div class="value green" id="profileWins">0</div><div class="label">Wins</div></div>
                 </div>
                 <div class="profile-stats" style="margin-top:8px;">
-                    <div class="profile-stat">
-                        <div class="value pink" id="profileBest">1.00x</div>
-                        <div class="label">Best Multiplier</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="value" id="profileLosses" style="color:#ff6b6b;">0</div>
-                        <div class="label">Losses</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="value" id="profileWinRate" style="color:#54a0ff;">0%</div>
-                        <div class="label">Win Rate</div>
-                    </div>
+                    <div class="profile-stat"><div class="value pink" id="profileBest">1.00x</div><div class="label">Best Multiplier</div></div>
+                    <div class="profile-stat"><div class="value" id="profileLosses" style="color:#ff6b6b;">0</div><div class="label">Losses</div></div>
+                    <div class="profile-stat"><div class="value" id="profileWinRate" style="color:#54a0ff;">0%</div><div class="label">Win Rate</div></div>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-title">Account Info</div>
-                <div class="profile-detail">
-                    <span class="label">Username</span>
-                    <span class="value" id="profileDetailUsername">@xDll_Lud</span>
-                </div>
-                <div class="profile-detail">
-                    <span class="label">Display Name</span>
-                    <span class="value" id="profileDetailName">xDll_Lud</span>
-                </div>
-                <div class="profile-detail">
-                    <span class="label">Member Since</span>
-                    <span class="value" id="profileSince">Today</span>
-                </div>
+                <div class="profile-detail"><span class="label">Username</span><span class="value" id="profileDetailUsername">@xDll_Lud</span></div>
+                <div class="profile-detail"><span class="label">Display Name</span><span class="value" id="profileDetailName">xDll_Lud</span></div>
+                <div class="profile-detail"><span class="label">Member Since</span><span class="value" id="profileSince">Today</span></div>
             </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
-            <button class="nav-item active" data-page="home">
-                <span class="icon"><i class="fas fa-house"></i></span>
-                <span class="label">Home</span>
-            </button>
-            <button class="nav-item" data-page="rocket">
-                <span class="icon"><i class="fas fa-rocket"></i></span>
-                <span class="label">Crash</span>
-            </button>
-            <button class="nav-item" data-page="mines">
-                <span class="icon"><i class="fas fa-gem"></i></span>
-                <span class="label">Mines</span>
-            </button>
-            <button class="nav-item" data-page="profile">
-                <span class="icon"><i class="fas fa-user"></i></span>
-                <span class="label">Profile</span>
-            </button>
+            <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
+            <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
+            <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
+            <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // CRASH GAME (no particles, no curve)
+        // STATE
         // ============================================================
-
         const state = {
             balance: 1000,
             totalGames: 0,
@@ -1534,7 +878,7 @@
             avatarUrl: 'https://images.iimg.live/images/excellent-photo-9680.webp',
         };
 
-        // ----- DOM REFS -----
+        // DOM refs
         const homeBalance = document.getElementById('homeBalance');
         const homeUsername = document.getElementById('homeUsername');
         const recentWinnersEl = document.getElementById('recentWinners');
@@ -1565,10 +909,7 @@
 
         function renderPlayers() {
             const activePlayers = players.filter(p => p.active !== false);
-            if (activePlayers.length === 0) {
-                playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>';
-                return;
-            }
+            if (activePlayers.length === 0) { playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>'; return; }
             let html = '';
             for (const p of activePlayers) {
                 const isYou = p.isYou || false;
@@ -1580,42 +921,22 @@
                     statusText = 'Cashed Out'; } else if (p.crashed) { statusClass = 'crashed';
                     statusText = 'Crashed'; } else if (crashGame.isPlaying) { statusClass = 'waiting';
                     statusText = 'Flying'; }
-                const avatarContent = isYou ?
-                    `<img src="${state.avatarUrl}" alt="${name}">` :
+                const avatarContent = isYou ? `<img src="${state.avatarUrl}" alt="${name}">` :
                     `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
-                html += `
-                    <div class="player-item">
-                        <div class="avatar">${avatarContent}</div>
-                        <div class="info">
-                            <div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div>
-                            <div class="bet-amount">${betAmount} ⭐</div>
-                        </div>
-                        <div class="status ${statusClass}">${statusText}</div>
-                    </div>
-                `;
+                html += `<div class="player-item"><div class="avatar">${avatarContent}</div><div class="info"><div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div><div class="bet-amount">${betAmount} ⭐</div></div><div class="status ${statusClass}">${statusText}</div></div>`;
             }
             playersListEl.innerHTML = html;
         }
 
         function navigateTo(page) {
-            Object.keys(pages).forEach(key => {
-                pages[key].classList.toggle('active', key === page);
-            });
-            navItems.forEach(item => {
-                item.classList.toggle('active', item.dataset.page === page);
-            });
-            if (page === 'rocket') {
-                crashGame.startGameCycle();
-                renderPlayers();
-            }
-            if (page === 'profile') {
-                updateProfile();
-            }
+            Object.keys(pages).forEach(key => { pages[key].classList.toggle('active', key === page); });
+            navItems.forEach(item => { item.classList.toggle('active', item.dataset.page === page); });
+            if (page === 'rocket') { crashGame.startGameCycle();
+                renderPlayers(); }
+            if (page === 'profile') { updateProfile(); }
         }
 
-        navItems.forEach(item => {
-            item.addEventListener('click', () => navigateTo(item.dataset.page));
-        });
+        navItems.forEach(item => { item.addEventListener('click', () => navigateTo(item.dataset.page)); });
 
         function getTelegramUser() {
             try {
@@ -1625,15 +946,10 @@
                     if (user) {
                         state.username = user.username || user.first_name || 'xDll_Lud';
                         state.displayName = user.first_name || 'xDll_Lud';
-                        if (user.last_name) {
-                            state.displayName += ' ' + user.last_name;
-                        }
-                        if (!user.username) {
-                            state.username = state.displayName;
-                        }
-                        if (profileAvatarFallback) {
-                            profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
-                        }
+                        if (user.last_name) state.displayName += ' ' + user.last_name;
+                        if (!user.username) state.username = state.displayName;
+                        if (profileAvatarFallback) profileAvatarFallback.textContent = state.displayName.charAt(0)
+                            .toUpperCase();
                     }
                 }
             } catch (e) {}
@@ -1641,23 +957,22 @@
 
         function updateHomeUI() {
             homeUsername.textContent = state.displayName;
-            homeBalance.innerHTML = `<i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> ${state.balance.toLocaleString()}`;
+            homeBalance.innerHTML =
+                `<i class="fas fa-star" style="font-size:20px; color:#ffd700; margin-right:2px;"></i> ${state.balance.toLocaleString()}`;
             if (state.recentWinners.length === 0) {
                 recentWinnersEl.textContent = 'No wins yet';
                 recentWinnersEl.style.color = '#555';
             } else {
                 recentWinnersEl.innerHTML = state.recentWinners.slice(0, 5).map(w =>
-                    `<div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
-                        <span style="font-weight:500;">${w.name}</span>
-                        <span style="color:#ffd700; font-weight:700;">+${w.amount} ⭐</span>
-                    </div>`
+                    `<div class="flex-between" style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03);"><span style="font-weight:500;">${w.name}</span><span style="color:#ffd700; font-weight:700;">+${w.amount} ⭐</span></div>`
                 ).join('');
                 recentWinnersEl.style.color = '#fff';
             }
         }
 
         function updateProfile() {
-            profileBalance.innerHTML = `<i class="fas fa-star" style="font-size:14px; color:#ffd700;"></i> ${state.balance.toLocaleString()}`;
+            profileBalance.innerHTML =
+                `<i class="fas fa-star" style="font-size:14px; color:#ffd700;"></i> ${state.balance.toLocaleString()}`;
             profileGames.textContent = state.totalGames;
             profileWins.textContent = state.wins;
             profileBest.textContent = `${state.bestMultiplier.toFixed(2)}x`;
@@ -1668,38 +983,43 @@
             profileDetailName.textContent = state.displayName;
             profileName.textContent = state.displayName;
             profileUsername.textContent = `@${state.username}`;
-            if (profileAvatarFallback) {
-                profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
-            }
+            if (profileAvatarFallback) profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
         }
 
         // ---- Vibration ----
         function triggerVibration(duration = 30, type = 'light') {
             try {
-                if (window.Telegram && window.Telegram.WebApp) {
+                if (window.Telegram?.WebApp) {
                     const tg = window.Telegram.WebApp;
                     if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
                     else if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
                     else tg.HapticFeedback.impactOccurred('light');
                 }
             } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate(duration); } catch (e) {}
+        }
+
+        // ---- Explosion vibration (heavy + long) ----
+        function triggerExplosionVibration() {
+            // Heavy haptic + long vibration
             try {
-                if (navigator.vibrate) navigator.vibrate(duration);
+                if (window.Telegram?.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+                }
+            } catch (e) {}
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 30, 50, 30, 100]); // explosion pattern
+                }
             } catch (e) {}
         }
 
         function triggerContinuousVibration() {
             const rocketPage = document.getElementById('page-rocket');
-            if (!rocketPage || !rocketPage.classList.contains('active')) return;
-            if (document.hidden) return;
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                }
-            } catch (e) {}
-            try {
-                if (navigator.vibrate) navigator.vibrate(15);
-            } catch (e) {}
+            if (!rocketPage?.classList.contains('active') || document.hidden) return;
+            try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('light'); } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate(15); } catch (e) {}
         }
 
         function showNotification(amount) {
@@ -1715,7 +1035,9 @@
             }, 1000);
         }
 
-        // ---- Crash Game ----
+        // ============================================================
+        // CRASH GAME
+        // ============================================================
         const crashGame = {
             multiplier: 1.00,
             crashPoint: 1.00,
@@ -1733,12 +1055,12 @@
             roundId: 0,
 
             startGameCycle() {
-                if (!this.isPlaying && !this.isCountingDown && !this.gameOver) { this.startCountdown(); }
-                if (this.isPlaying) { this.startContinuousVibration(); }
+                if (!this.isPlaying && !this.isCountingDown && !this.gameOver) this.startCountdown();
+                if (this.isPlaying) this.startContinuousVibration();
             },
             startContinuousVibration() {
                 if (this.vibrationInterval) return;
-                this.vibrationInterval = setInterval(() => { if (this.isPlaying) { triggerContinuousVibration(); } }, 150);
+                this.vibrationInterval = setInterval(() => { if (this.isPlaying) triggerContinuousVibration(); }, 150);
             },
             stopContinuousVibration() {
                 if (this.vibrationInterval) { clearInterval(this.vibrationInterval);
@@ -1749,7 +1071,6 @@
                 this.createGrid();
                 this.updateUI();
                 this.renderHistory();
-                this.setupMainButton();
                 this.updateMainButton();
                 players = [];
                 renderPlayers();
@@ -1763,13 +1084,12 @@
                 for (let i = 0; i < rows * cols; i++) {
                     const square = document.createElement('div');
                     square.className = 'grid-square';
-                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) { square.classList
-                            .add('corner'); }
+                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) square.classList.add(
+                        'corner');
                     container.appendChild(square);
                 }
             },
 
-            setupMainButton() {},
             updateUI() {
                 const currentEl = document.getElementById('historyCurrent');
                 const m = this.multiplier;
@@ -1781,9 +1101,10 @@
                 currentEl.style.color = color;
                 document.getElementById('rocketBalance').innerHTML =
                     `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
-                if (this.isPlaying) { this.updateMainButton(); }
+                if (this.isPlaying) this.updateMainButton();
                 renderPlayers();
             },
+
             updateMainButton() {
                 const btn = document.getElementById('mainActionBtn');
                 const mainText = document.getElementById('mainActionText');
@@ -1844,17 +1165,20 @@
                     confirmBtn.disabled = true;
                 }
             },
+
             mainAction() {
                 if (this.isPlaying) {
-                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut) { this.initiateCashOut(); }
+                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut) this.initiateCashOut();
                     return;
                 }
                 if (this.isCountingDown) {
                     const row = document.getElementById('betInputRow');
                     const isOpen = row.classList.contains('open');
-                    if (isOpen) { this.confirmBet(); } else { if (this.bet === 0) { row.classList.add('open');
+                    if (isOpen) { this.confirmBet(); } else {
+                        if (this.bet === 0) { row.classList.add('open');
                             document.getElementById('betInputRocket').focus();
-                            this.updateMainButton(); } }
+                            this.updateMainButton(); }
+                    }
                     return;
                 }
                 if (this.gameOver) {
@@ -1873,6 +1197,7 @@
                     this.updateMainButton();
                 }
             },
+
             confirmBet() {
                 const input = document.getElementById('betInputRocket');
                 let bet = parseInt(input.value) || 0;
@@ -1884,11 +1209,14 @@
                 if (existing) { existing.bet = bet;
                     existing.active = true;
                     existing.hasCashedOut = false;
-                    existing.crashed = false; } else { players.push({ name: state.displayName, color: '#ffd700',
-                        bet: bet, hasCashedOut: false, crashed: false, active: true, isYou: true }); }
+                    existing.crashed = false; } else {
+                    players.push({ name: state.displayName, color: '#ffd700', bet, hasCashedOut: false, crashed: false,
+                        active: true, isYou: true });
+                }
                 renderPlayers();
                 this.updateMainButton();
             },
+
             initiateCashOut() {
                 if (this.isCashingOut) return;
                 this.isCashingOut = true;
@@ -1902,6 +1230,7 @@
                     this.isCashingOut = false;
                 }, 150);
             },
+
             executeCashOut() {
                 if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
                 this.hasCashedOut = true;
@@ -1921,9 +1250,9 @@
                 this.updateMainButton();
                 updateHomeUI();
             },
+
             startCountdown() {
-                if (this.isCountingDown) return;
-                if (this.isPlaying) return;
+                if (this.isCountingDown || this.isPlaying) return;
                 this.isCountingDown = true;
                 this.gameOver = false;
                 this.hasCashedOut = false;
@@ -1943,7 +1272,7 @@
                     numberEl.style.animation = 'none';
                     void numberEl.offsetHeight;
                     numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
-                    if (num === 2 || num === 1) { triggerVibration(35, 'light'); }
+                    if (num === 2 || num === 1) triggerVibration(35, 'light');
                 };
                 showNumber(3);
                 this.countdownId = setInterval(() => {
@@ -1959,10 +1288,14 @@
                     showNumber(count);
                 }, 1000);
             },
+
             startRound() {
-                if (this.bet > 0 && this.bet <= state.balance) { state.balance -= this.bet; } else { this.bet = 0;
-                    const user = players.find(p => p.isYou); if (user) user.active = false;
-                    renderPlayers(); }
+                if (this.bet > 0 && this.bet <= state.balance) { state.balance -= this.bet; } else {
+                    this.bet = 0;
+                    const user = players.find(p => p.isYou);
+                    if (user) user.active = false;
+                    renderPlayers();
+                }
                 this.hasCashedOut = false;
                 this.multiplier = 1.00;
                 this.crashPoint = this.generateCrashPoint();
@@ -1979,6 +1312,7 @@
                 if (this.animationId) cancelAnimationFrame(this.animationId);
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
+
             gameLoop(timestamp) {
                 if (!this.isPlaying) return;
                 const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
@@ -2027,14 +1361,15 @@
                             this.hasCashedOut = false;
                             document.getElementById('betInputRocket').value = 10;
                             this.gameOver = false;
-                            if (document.getElementById('page-rocket').classList.contains('active')) { this
-                                    .startCountdown(); }
+                            if (document.getElementById('page-rocket').classList.contains('active')) this
+                                .startCountdown();
                         }
                     }, 1500);
                     return;
                 }
                 this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
             },
+
             generateCrashPoint() {
                 const r = Math.random();
                 if (r < 0.30) return 1.00 + Math.random() * 0.5;
@@ -2042,6 +1377,7 @@
                 if (r < 0.80) return 2.50 + Math.random() * 2.0;
                 return 4.50 + Math.random() * 6.55;
             },
+
             renderHistory() {
                 const container = document.getElementById('historyPast');
                 container.innerHTML = '';
@@ -2049,20 +1385,22 @@
                 for (const mult of items) {
                     const el = document.createElement('span');
                     el.className = 'history-item';
-                    if (mult >= 4.0) { el.classList.add('purple'); } else if (mult >= 2.5) { el.classList.add('blue'); }
-                    else if (mult >= 1.4) { el.classList.add('green'); } else { el.classList.add('crashed'); }
+                    if (mult >= 4.0) el.classList.add('purple');
+                    else if (mult >= 2.5) el.classList.add('blue');
+                    else if (mult >= 1.4) el.classList.add('green');
+                    else el.classList.add('crashed');
                     el.textContent = `${mult.toFixed(2)}x`;
                     container.appendChild(el);
                 }
             },
+
             addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop();
                 this.renderHistory(); }
         };
 
         // ============================================================
-        // MINES GAME (final version with improved multiplier)
+        // MINES GAME – with animated GIFs & explosion vibration
         // ============================================================
-
         const minesGame = {
             gridSize: 3,
             minesCount: 1,
@@ -2080,6 +1418,13 @@
             isCashingOut: false,
             maxMultiplier: 8.34,
 
+            // GIF URLs – replace with your own if needed
+            gemGif: 'https://images.iimg.live/images/vibrant-scene-3805.webp',
+            mineGif: 'https://images.iimg.live/images/glorious-memory-8181.webp',
+
+            // Mine GIF duration in ms (2s 100ms = 2100ms)
+            mineGifDuration: 2100,
+
             init() {
                 this.updateUI();
                 this.renderHistory();
@@ -2090,7 +1435,6 @@
                 this.updateMineLimits();
             },
 
-            // ----- Settings -----
             changeMines(delta) {
                 if (this.gameActive) return;
                 let mines = this.minesCount + delta;
@@ -2138,7 +1482,6 @@
                 });
             },
 
-            // ----- Grid Generation -----
             generateGrid() {
                 const grid = document.getElementById('minesGrid');
                 const total = this.gridSize * this.gridSize;
@@ -2148,21 +1491,19 @@
                 this.board = new Array(total).fill(0);
                 this.revealed = new Array(total).fill(false);
                 let placed = 0;
-                const mines = Math.min(this.minesCount, Math.floor(total * 0.35));
-                while (placed < mines) {
+                const minesToPlace = Math.min(this.minesCount, total - 1);
+                while (placed < minesToPlace) {
                     const idx = Math.floor(Math.random() * total);
                     if (this.board[idx] === 0) { this.board[idx] = 1;
                         placed++; }
                 }
-                this.safeCount = total - mines;
+                this.safeCount = total - minesToPlace;
                 this.revealedSafe = 0;
 
-                // Calculate starting multiplier based on mines and grid size
-                // NEW FORMULA: higher mines = higher start multiplier
-                const mineRatio = mines / total;
-                let base = 0.90 + 0.80 * mineRatio;
-                const gridBonus = (this.gridSize - 3) * 0.03;
-                this.startingMultiplier = Math.min(2.20, base + gridBonus);
+                const mineRatio = minesToPlace / total;
+                let base = 0.90 + 1.20 * mineRatio;
+                const gridBonus = (this.gridSize - 3) * 0.02;
+                this.startingMultiplier = Math.min(2.50, base + gridBonus);
                 this.multiplier = this.startingMultiplier;
 
                 this.gameActive = false;
@@ -2185,7 +1526,6 @@
                     tile.style.transitionDelay = `${delay}ms`;
                     tile.addEventListener('click', () => this.clickTile(i));
                     wrapper.appendChild(tile);
-
                     grid.appendChild(wrapper);
                 }
 
@@ -2194,9 +1534,7 @@
                     wrappers.forEach((w, idx) => {
                         const tile = w.querySelector('.tile');
                         const delay = (idx % this.gridSize) * 25 + Math.floor(idx / this.gridSize) * 25;
-                        setTimeout(() => {
-                            tile.classList.add('show');
-                        }, delay + 50);
+                        setTimeout(() => { tile.classList.add('show'); }, delay + 50);
                     });
                 });
 
@@ -2204,7 +1542,6 @@
                 this.updateMainButton();
             },
 
-            // ----- UI Updates -----
             updateUI() {
                 document.getElementById('minesBalance').innerHTML =
                     `<i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> ${state.balance.toLocaleString()}`;
@@ -2269,10 +1606,7 @@
 
             renderHistory() {
                 const container = document.getElementById('minesHistory');
-                if (this.history.length === 0) {
-                    container.innerHTML = '';
-                    return;
-                }
+                if (this.history.length === 0) { container.innerHTML = ''; return; }
                 let html = '';
                 for (const h of this.history) {
                     const cls = h.result === 'win' ? 'win' : 'loss';
@@ -2288,21 +1622,53 @@
                 this.renderHistory();
             },
 
-            // ----- Grid update with FontAwesome gem (bigger) -----
+            // ----- Grid update with animated GIFs -----
             updateGrid() {
                 const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
                 for (let i = 0; i < wrappers.length; i++) {
                     const tile = wrappers[i].querySelector('.tile');
                     const symbol = tile.querySelector('.symbol');
                     const isRevealed = this.revealed[i] || false;
+
                     if (isRevealed) {
                         tile.classList.add('revealed');
+
+                        // Clear any existing content
+                        symbol.innerHTML = '';
+
                         if (this.board[i] === 1) {
+                            // MINE – show animated mine GIF, then disappear after duration (no cross)
                             tile.classList.add('mine');
-                            symbol.innerHTML = '✕';
+                            const img = document.createElement('img');
+                            img.src = this.mineGif;
+                            img.alt = 'Mine';
+                            img.style.width = '80%';
+                            img.style.height = '80%';
+                            img.style.objectFit = 'contain';
+                            img.style.display = 'block';
+                            img.style.borderRadius = '4px';
+                            symbol.appendChild(img);
+
+                            // Remove GIF after 2100ms – no cross, just empty
+                            setTimeout(() => {
+                                if (symbol.contains(img)) {
+                                    symbol.removeChild(img);
+                                    // Leave it empty – no cross
+                                    symbol.innerHTML = '';
+                                }
+                            }, this.mineGifDuration);
                         } else {
+                            // GEM – show animated diamond GIF (stays visible)
                             tile.classList.add('safe');
-                            symbol.innerHTML = '<i class="fas fa-gem" style="font-size:32px; color:#00d2a0;"></i>';
+                            const img = document.createElement('img');
+                            img.src = this.gemGif;
+                            img.alt = 'Gem';
+                            img.style.width = '80%';
+                            img.style.height = '80%';
+                            img.style.objectFit = 'contain';
+                            img.style.display = 'block';
+                            img.style.borderRadius = '4px';
+                            symbol.appendChild(img);
                         }
                     } else {
                         tile.classList.remove('revealed', 'mine', 'safe');
@@ -2311,17 +1677,22 @@
                 }
             },
 
-            // ----- Click handler with multiplier formula -----
+            // ----- Click handler with explosion vibration -----
             clickTile(index) {
                 if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
 
                 this.revealed[index] = true;
 
                 if (this.board[index] === 1) {
+                    // 💥 EXPLOSION VIBRATION – big & heavy
+                    triggerExplosionVibration();
+
                     this.gameOver = true;
                     this.gameActive = false;
                     state.losses++;
                     state.totalGames++;
+
+                    // Reveal all mines
                     for (let i = 0; i < this.board.length; i++) {
                         if (this.board[i] === 1) this.revealed[i] = true;
                     }
@@ -2329,18 +1700,16 @@
                     this.updateUI();
                     updateHomeUI();
                     this.addHistory('loss', this.multiplier);
-                    triggerVibration(80, 'heavy');
                     return;
                 }
 
                 triggerVibration(15, 'light');
 
                 this.revealedSafe++;
-                // ---- Multiplier increment ----
                 const totalTiles = this.gridSize * this.gridSize;
                 const mineRatio = this.minesCount / totalTiles;
-                let inc = 0.012 + 0.18 * mineRatio;
-                inc = Math.max(0.01, Math.min(0.30, inc));
+                let inc = 0.008 + 0.25 * mineRatio;
+                inc = Math.max(0.01, Math.min(0.35, inc));
                 let newMult = this.multiplier * (1 + inc);
                 if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
                 this.multiplier = parseFloat(newMult.toFixed(3));
@@ -2371,17 +1740,13 @@
             // ----- Main Action -----
             mainAction() {
                 if (this.gameActive && !this.gameOver) {
-                    if (!this.hasCashedOut && !this.isCashingOut) {
-                        this.initiateCashOut();
-                    }
+                    if (!this.hasCashedOut && !this.isCashingOut) this.initiateCashOut();
                     return;
                 }
-
                 if (this.gameOver) {
                     this.generateGrid();
                     return;
                 }
-
                 const row = document.getElementById('minesBetInputRow');
                 const isOpen = row.classList.contains('open');
                 if (isOpen) {
@@ -2396,14 +1761,8 @@
             confirmBet() {
                 const input = document.getElementById('minesBetInput');
                 let bet = parseInt(input.value) || 0;
-                if (bet < 1) {
-                    triggerVibration(60, 'heavy');
-                    return;
-                }
-                if (bet > state.balance) {
-                    triggerVibration(60, 'heavy');
-                    return;
-                }
+                if (bet < 1) { triggerVibration(60, 'heavy'); return; }
+                if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
                 this.bet = bet;
                 document.getElementById('minesBetInputRow').classList.remove('open');
                 this.startGame();
@@ -2417,12 +1776,12 @@
                 }
                 state.balance -= this.bet;
 
-                // Recalculate starting multiplier based on current mines & grid
                 const totalTiles = this.gridSize * this.gridSize;
-                const mineRatio = this.minesCount / totalTiles;
-                let base = 0.90 + 0.80 * mineRatio;
-                const gridBonus = (this.gridSize - 3) * 0.03;
-                this.startingMultiplier = Math.min(2.20, base + gridBonus);
+                const minesToPlace = Math.min(this.minesCount, totalTiles - 1);
+                const mineRatio = minesToPlace / totalTiles;
+                let base = 0.90 + 1.20 * mineRatio;
+                const gridBonus = (this.gridSize - 3) * 0.02;
+                this.startingMultiplier = Math.min(2.50, base + gridBonus);
                 this.multiplier = this.startingMultiplier;
 
                 this.gameActive = true;
@@ -2432,10 +1791,11 @@
                 const total = this.gridSize * this.gridSize;
                 this.board = new Array(total).fill(0);
                 let placed = 0;
-                const mines = Math.min(this.minesCount, Math.floor(total * 0.35));
+                const mines = Math.min(this.minesCount, total - 1);
                 while (placed < mines) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
+                    if (this.board[idx] === 0) { this.board[idx] = 1;
+                        placed++; }
                 }
                 this.safeCount = total - mines;
                 this.revealed = new Array(total).fill(false);
@@ -2458,7 +1818,6 @@
                 this.isCashingOut = true;
                 const btn = document.getElementById('minesMainActionBtn');
                 btn.disabled = true;
-
                 setTimeout(() => {
                     if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
                         triggerVibration(30, 'light');
@@ -2480,23 +1839,22 @@
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
                 this.addHistory('win', this.multiplier);
                 showNotification(win);
+                this.gameActive = false;
+                this.gameOver = true;
+                this.hasCashedOut = false;
                 this.updateUI();
                 this.updateMainButton();
                 updateHomeUI();
                 triggerVibration(30, 'light');
             },
 
-            // ----- Grid size change (with limits) -----
             setGridSize(size, mines) {
                 if (this.gameActive) return;
-                // Check if coming soon
                 if (size > 5) {
                     const msg = document.getElementById('minesMessage');
                     msg.textContent = 'Coming soon!';
                     msg.className = 'mines-message';
-                    setTimeout(() => {
-                        this.updateUI();
-                    }, 1000);
+                    setTimeout(() => this.updateUI(), 1000);
                     return;
                 }
                 this.gridSize = size;
@@ -2521,9 +1879,7 @@
                     const msg = document.getElementById('minesMessage');
                     msg.textContent = 'Coming soon!';
                     msg.className = 'mines-message';
-                    setTimeout(() => {
-                        minesGame.updateUI();
-                    }, 1000);
+                    setTimeout(() => minesGame.updateUI(), 1000);
                     return;
                 }
                 minesGame.setGridSize(size, mines);
@@ -2535,12 +1891,12 @@
         // ============================================================
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                if (crashGame.isPlaying) { crashGame.stopContinuousVibration(); }
+                if (crashGame.isPlaying) crashGame.stopContinuousVibration();
             } else {
-                if (crashGame.isPlaying) { crashGame.startContinuousVibration(); }
+                if (crashGame.isPlaying) crashGame.startContinuousVibration();
                 if (document.getElementById('page-rocket').classList.contains('active')) {
-                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) { crashGame
-                            .startGameCycle(); }
+                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame
+                        .startGameCycle();
                 }
             }
         });
@@ -2554,33 +1910,26 @@
             updateProfile();
             crashGame.init();
             minesGame.init();
-
-            // Ensure 3x3 is selected by default
             minesGame.setGridSize(3, 1);
 
             try {
-                if (window.Telegram && window.Telegram.WebApp) {
+                if (window.Telegram?.WebApp) {
                     const tg = window.Telegram.WebApp;
                     tg.expand();
                     tg.ready();
                 }
             } catch (e) {}
-
-            console.log('Casino loaded – final version.');
+            console.log('Casino loaded – final version with explosion vibration & mine GIF duration.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.startGameCycle();
-            }
+            if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
         });
 
         document.addEventListener('DOMContentLoaded', init);
         if (document.readyState === 'complete') {
             init();
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.startGameCycle();
-            }
+            if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
         }
     </script>
 </body>
