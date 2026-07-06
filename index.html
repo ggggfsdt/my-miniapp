@@ -156,6 +156,9 @@
             color: #888;
             border: 1px solid rgba(255, 255, 255, 0.04);
             letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .badge-gold { background: rgba(255, 215, 0, 0.1); border-color: rgba(255, 215, 0, 0.15); color: #ffd700; }
 
@@ -190,7 +193,27 @@
         .home-balance-wrap { text-align: right; }
         .home-balance-wrap .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
         .home-balance-wrap .amount { font-size: 28px; font-weight: 900; display: flex; align-items: center; justify-content: flex-end; gap: 6px; background: linear-gradient(135deg, #ffd700, #f0932b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .balance-icon { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4)); margin-top: 4px; }
+
+        .balance-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+            margin-top: 6px;
+        }
+        .badge .balance-icon {
+            width: 30px;
+            height: 30px;
+            margin-top: 6px;
+            margin-right: 2px;
+        }
+
+        .gift-icon {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
 
         .quick-grid {
             display: grid;
@@ -301,7 +324,7 @@
         .grid-square { background: transparent; border: 1px solid rgba(255, 255, 255, 0.04); }
         .grid-square.corner { border-color: rgba(108, 92, 231, 0.06); }
 
-        /* ===== WIND – FIXED DIAGONAL (bottom-left → top-right) ===== */
+        /* ===== WIND – 3 PHASES ===== */
         .wind-lines {
             position: absolute;
             inset: 0;
@@ -309,9 +332,10 @@
             pointer-events: none;
             overflow: hidden;
             opacity: 0;
-            transition: opacity 0.8s ease;
-            transform: rotate(-20deg); /* Fixed rotation – never changes */
+            transition: opacity 0.3s ease;
+            transform: rotate(-20deg);
             transform-origin: center center;
+            will-change: transform, opacity;
         }
         .wind-lines.active {
             opacity: 1;
@@ -328,7 +352,6 @@
         .wind-lines .streak:nth-child(3n) { height: 2.5px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent); }
         .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); }
 
-        /* Wind flows from bottom-left to top-right */
         @keyframes windStreak {
             0% {
                 transform: translate(0, 0);
@@ -836,6 +859,63 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
+        /* ===== UPGRADER & INVENTORY ===== */
+        #wheelContainer {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        #wheelContainer canvas {
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(108, 92, 231, 0.2);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 16px solid #ffd700;
+            z-index: 5;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+        }
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .inventory-item.selected {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+        }
+        .inventory-item .gift-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 6px;
+        }
+        .inventory-item .gift-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ddd;
+        }
+        .inventory-item .gift-count {
+            font-size: 11px;
+            color: #888;
+        }
+
         @media (max-width: 420px) {
             .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
             .mines-grid { gap: 6px; }
@@ -844,7 +924,9 @@
             .mines-grid .tile-wrapper { border-radius: 18px; }
             .mines-grid .tile-wrapper .tile { border-radius: 18px; }
             .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
-            .balance-icon { width: 24px; height: 24px; margin-top: 3px; }
+            .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
+            .badge .balance-icon { width: 26px; height: 26px; margin-top: 5px; }
+            #wheelContainer { width: 160px; height: 160px; }
         }
     </style>
 </head>
@@ -874,11 +956,11 @@
 
         <!-- CRASH -->
         <div id="page-rocket" class="page">
-            <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:22px;height:22px;margin-top:3px;margin-right:4px;" alt="⭐"> 1,000</span></div>
+            <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
 
-                <!-- WIND LINES (fixed diagonal) -->
+                <!-- WIND LINES (3-phase) -->
                 <div class="wind-lines" id="windLines"></div>
 
                 <div class="gif-overlay" id="dogOverlay">
@@ -895,7 +977,7 @@
                     <div class="history-past" id="historyPast"></div>
                 </div>
 
-                <!-- PROGRESS LINE – UNDER the history bar -->
+                <!-- PROGRESS LINE -->
                 <div class="progress-wrap" id="progressWrap">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
@@ -910,7 +992,7 @@
 
         <!-- MINES -->
         <div id="page-mines" class="page">
-            <div class="mines-header"><span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span><span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span><span class="badge" id="minesBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:22px;height:22px;margin-top:3px;margin-right:4px;" alt="⭐"> 1,000</span></div>
+            <div class="mines-header"><span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span><span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span><span class="badge" id="minesBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
             <div class="grid-presets" id="gridPresets">
                 <button data-size="3" data-mines="1" class="active">3×3</button>
                 <button data-size="4" data-mines="3">4×4</button>
@@ -931,6 +1013,36 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
+        <!-- UPGRADER -->
+        <div id="page-upgrader" class="page">
+            <h2 style="text-align:center; margin-bottom:12px; color:#fff;">Upgrader</h2>
+            <div class="card">
+                <div class="card-title">Select a Gift to Upgrade</div>
+                <div id="upgraderInventoryList" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:12px;"></div>
+                <div style="display:flex; gap:12px; align-items:center; justify-content:center;">
+                    <button id="upgraderSpinBtn" class="btn btn-primary" style="flex:0 0 auto; padding:10px 24px;">Spin</button>
+                    <span id="upgraderResult" style="font-size:14px; color:#aaa;"></span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Wheel</div>
+                <div id="wheelContainer">
+                    <canvas id="wheelCanvas" width="200" height="200"></canvas>
+                    <div class="wheel-pointer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTORY -->
+        <div id="page-inventory" class="page">
+            <h2 style="text-align:center; margin-bottom:12px; color:#fff;">Inventory</h2>
+            <div class="card">
+                <div class="card-title">Your Gifts</div>
+                <div id="inventoryGrid" class="inventory-grid"></div>
+                <div id="inventoryEmpty" style="text-align:center; color:#666; padding:20px;">No gifts yet. Play Crash or Mines to earn them!</div>
+            </div>
+        </div>
+
         <!-- PROFILE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
@@ -940,7 +1052,7 @@
             <div class="card">
                 <div class="card-title">Statistics</div>
                 <div class="profile-stats">
-                    <div class="profile-stat"><div class="value gold" id="profileBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:24px;height:24px;margin-top:3px;" alt="⭐"> 1,000</div><div class="label">Balance</div></div>
+                    <div class="profile-stat"><div class="value gold" id="profileBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:34px;height:34px;margin-top:4px;" alt="⭐"> 1,000</div><div class="label">Balance</div></div>
                     <div class="profile-stat"><div class="value purple" id="profileGames">0</div><div class="label">Games</div></div>
                     <div class="profile-stat"><div class="value green" id="profileWins">0</div><div class="label">Wins</div></div>
                 </div>
@@ -963,6 +1075,8 @@
             <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
             <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
             <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
+            <button class="nav-item" data-page="upgrader"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgrader</span></button>
+            <button class="nav-item" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inventory</span></button>
             <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
     </div>
@@ -981,6 +1095,309 @@
 
         function getRandomDogGif() {
             return DOG_GIFS[Math.floor(Math.random() * DOG_GIFS.length)];
+        }
+
+        // ============================================================
+        // GIFT SYSTEM
+        // ============================================================
+        const GIFT_TYPES = {
+            bear: { id: 'bear', name: 'Bear', image: 'https://images.iimg.live/images/majestic-moment-5099.webp', level: 1 },
+            box: { id: 'box', name: 'Gift Box', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 2 },
+            diamond: { id: 'diamond', name: 'Diamond Gift', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 3 } // temporary same image
+        };
+
+        // Gift levels in order for upgrading
+        const GIFT_LEVELS = ['bear', 'box', 'diamond'];
+
+        function getGiftById(id) {
+            return GIFT_TYPES[id] || null;
+        }
+
+        // Inventory state: array of gift objects { id, level }
+        let inventory = [];
+
+        // Add gift to inventory
+        function addGift(giftId) {
+            inventory.push({ id: giftId, level: GIFT_TYPES[giftId].level });
+            updateInventoryUI();
+            updateUpgraderUI();
+        }
+
+        // Remove one gift from inventory (for upgrading)
+        function removeGift(giftId) {
+            const index = inventory.findIndex(g => g.id === giftId);
+            if (index !== -1) {
+                inventory.splice(index, 1);
+                updateInventoryUI();
+                updateUpgraderUI();
+                return true;
+            }
+            return false;
+        }
+
+        // Get count of a specific gift type
+        function getGiftCount(giftId) {
+            return inventory.filter(g => g.id === giftId).length;
+        }
+
+        // Check if player has any gift
+        function hasGift(giftId) {
+            return inventory.some(g => g.id === giftId);
+        }
+
+        // ----- Inventory UI -----
+        function updateInventoryUI() {
+            const grid = document.getElementById('inventoryGrid');
+            const empty = document.getElementById('inventoryEmpty');
+            grid.innerHTML = '';
+            if (inventory.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+
+            // Group by type
+            const counts = {};
+            inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
+
+            for (const [id, count] of Object.entries(counts)) {
+                const gift = GIFT_TYPES[id];
+                if (!gift) continue;
+                const div = document.createElement('div');
+                div.className = 'inventory-item';
+                div.innerHTML = `
+                    <img src="${gift.image}" class="gift-icon" alt="${gift.name}">
+                    <div class="gift-name">${gift.name}</div>
+                    <div class="gift-count">×${count}</div>
+                `;
+                grid.appendChild(div);
+            }
+        }
+
+        // ----- Upgrader UI -----
+        let selectedGiftId = null;
+
+        function updateUpgraderUI() {
+            const container = document.getElementById('upgraderInventoryList');
+            container.innerHTML = '';
+            const counts = {};
+            inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
+
+            // Show only gifts that have a next level
+            const upgradeable = Object.keys(counts).filter(id => {
+                const level = GIFT_TYPES[id].level;
+                return level < GIFT_LEVELS.length && counts[id] > 0;
+            });
+
+            if (upgradeable.length === 0) {
+                container.innerHTML = '<span style="color:#666; font-size:13px;">No upgradeable gifts in inventory.</span>';
+                selectedGiftId = null;
+                document.getElementById('upgraderSpinBtn').disabled = true;
+                return;
+            }
+
+            upgradeable.forEach(id => {
+                const gift = GIFT_TYPES[id];
+                const div = document.createElement('div');
+                div.className = 'inventory-item' + (selectedGiftId === id ? ' selected' : '');
+                div.style.flex = '0 0 auto';
+                div.style.width = '70px';
+                div.innerHTML = `
+                    <img src="${gift.image}" class="gift-icon" style="width:40px;height:40px;">
+                    <div style="font-size:11px; color:#ddd;">${gift.name}</div>
+                    <div style="font-size:10px; color:#888;">×${counts[id]}</div>
+                `;
+                div.onclick = () => {
+                    selectedGiftId = id;
+                    updateUpgraderUI();
+                    document.getElementById('upgraderSpinBtn').disabled = false;
+                };
+                container.appendChild(div);
+            });
+
+            if (selectedGiftId && !upgradeable.includes(selectedGiftId)) {
+                selectedGiftId = null;
+                document.getElementById('upgraderSpinBtn').disabled = true;
+            }
+            if (!selectedGiftId && upgradeable.length > 0) {
+                selectedGiftId = upgradeable[0];
+                updateUpgraderUI();
+                document.getElementById('upgraderSpinBtn').disabled = false;
+            }
+        }
+
+        // ----- Upgrader Wheel -----
+        const wheelSegments = [
+            { label: 'Upgrade', color: '#00d2a0', action: 'upgrade' },
+            { label: 'Same', color: '#54a0ff', action: 'same' },
+            { label: 'Downgrade', color: '#ff6b6b', action: 'downgrade' },
+            { label: 'Upgrade', color: '#00d2a0', action: 'upgrade' },
+            { label: 'Same', color: '#54a0ff', action: 'same' },
+            { label: 'Downgrade', color: '#ff6b6b', action: 'downgrade' }
+        ];
+        const NUM_SEGMENTS = wheelSegments.length;
+        const ARC = (2 * Math.PI) / NUM_SEGMENTS;
+
+        let wheelRotation = 0;
+        let isSpinning = false;
+
+        function drawWheel(rotation) {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            const cx = w / 2,
+                cy = h / 2,
+                r = Math.min(w, h) / 2 - 6;
+
+            ctx.clearRect(0, 0, w, h);
+
+            for (let i = 0; i < NUM_SEGMENTS; i++) {
+                const startAngle = i * ARC + rotation;
+                const endAngle = startAngle + ARC;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, r, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = wheelSegments[i].color;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Label
+                const midAngle = startAngle + ARC / 2;
+                const labelR = r * 0.7;
+                const lx = cx + Math.cos(midAngle) * labelR;
+                const ly = cy + Math.sin(midAngle) * labelR;
+                ctx.save();
+                ctx.translate(lx, ly);
+                ctx.rotate(midAngle + (midAngle > Math.PI / 2 ? Math.PI : 0));
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(wheelSegments[i].label, 0, 0);
+                ctx.restore();
+            }
+
+            // Center dot
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ffd700';
+            ctx.fill();
+            ctx.shadowColor = 'rgba(255,215,0,0.5)';
+            ctx.shadowBlur = 12;
+            ctx.fill();
+        }
+
+        function spinWheel() {
+            if (isSpinning || !selectedGiftId) return;
+            if (getGiftCount(selectedGiftId) === 0) {
+                document.getElementById('upgraderResult').textContent = 'No gift of this type left!';
+                return;
+            }
+
+            isSpinning = true;
+            const btn = document.getElementById('upgraderSpinBtn');
+            btn.disabled = true;
+
+            // Random target rotation (multiple full turns + random segment)
+            const spins = 5 + Math.random() * 4;
+            const targetSegment = Math.floor(Math.random() * NUM_SEGMENTS);
+            const targetAngle = targetSegment * ARC + ARC / 2;
+            const finalRotation = wheelRotation + spins * 2 * Math.PI + (2 * Math.PI - targetAngle);
+
+            const startRotation = wheelRotation;
+            const duration = 3000 + Math.random() * 1000;
+            const startTime = performance.now();
+
+            function animateSpin(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease out cubic
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentRotation = startRotation + (finalRotation - startRotation) * eased;
+                wheelRotation = currentRotation;
+                drawWheel(currentRotation);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    wheelRotation = finalRotation;
+                    drawWheel(finalRotation);
+                    // Determine result
+                    const normalized = ((finalRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                    // Find which segment is at top (pointer at top means angle = -PI/2)
+                    const pointerAngle = -Math.PI / 2;
+                    let angleDiff = (pointerAngle - normalized + 2 * Math.PI) % (2 * Math.PI);
+                    let segIndex = Math.floor(angleDiff / ARC) % NUM_SEGMENTS;
+                    // Safety
+                    if (segIndex < 0) segIndex += NUM_SEGMENTS;
+
+                    const result = wheelSegments[segIndex];
+                    applyUpgradeResult(result.action);
+                    isSpinning = false;
+                    btn.disabled = false;
+                }
+            }
+
+            requestAnimationFrame(animateSpin);
+        }
+
+        function applyUpgradeResult(action) {
+            const giftId = selectedGiftId;
+            if (!giftId) return;
+            const gift = GIFT_TYPES[giftId];
+            const currentLevel = gift.level;
+            const maxLevel = GIFT_LEVELS.length;
+            const resultEl = document.getElementById('upgraderResult');
+
+            let newLevel = currentLevel;
+            let msg = '';
+
+            if (action === 'upgrade') {
+                if (currentLevel < maxLevel) {
+                    newLevel = currentLevel + 1;
+                    msg = `✨ Upgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
+                } else {
+                    msg = `🌟 ${gift.name} is already max level!`;
+                }
+            } else if (action === 'downgrade') {
+                if (currentLevel > 1) {
+                    newLevel = currentLevel - 1;
+                    msg = `⬇️ Downgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
+                } else {
+                    msg = `🛡️ ${gift.name} can't be downgraded further!`;
+                }
+            } else {
+                msg = `🔄 ${gift.name} stayed the same!`;
+            }
+
+            // If level changed, update inventory
+            if (newLevel !== currentLevel) {
+                // Remove one of the old gift
+                const removed = removeGift(giftId);
+                if (removed) {
+                    const newGiftId = GIFT_LEVELS[newLevel - 1];
+                    addGift(newGiftId);
+                    // Update selected gift to new type if possible
+                    if (getGiftCount(newGiftId) > 0) {
+                        selectedGiftId = newGiftId;
+                    } else {
+                        selectedGiftId = null;
+                    }
+                    updateUpgraderUI();
+                }
+            } else {
+                // Just update UI
+                updateInventoryUI();
+                updateUpgraderUI();
+            }
+
+            resultEl.textContent = msg;
+            // Vibrate feedback
+            triggerVibration(30, 'light');
         }
 
         // ============================================================
@@ -1021,6 +1438,8 @@
             home: document.getElementById('page-home'),
             rocket: document.getElementById('page-rocket'),
             mines: document.getElementById('page-mines'),
+            upgrader: document.getElementById('page-upgrader'),
+            inventory: document.getElementById('page-inventory'),
             profile: document.getElementById('page-profile'),
         };
         const navItems = document.querySelectorAll('.nav-item');
@@ -1054,6 +1473,9 @@
             if (page === 'rocket') { crashGame.startGameCycle();
                 renderPlayers(); }
             if (page === 'profile') { updateProfile(); }
+            if (page === 'inventory') { updateInventoryUI(); }
+            if (page === 'upgrader') { updateUpgraderUI();
+                drawWheel(wheelRotation); }
         }
 
         navItems.forEach(item => { item.addEventListener('click', () => navigateTo(item.dataset.page)); });
@@ -1092,7 +1514,7 @@
 
         function updateProfile() {
             profileBalance.innerHTML =
-                `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:24px;height:24px;margin-top:3px;" alt="⭐"> ${state.balance.toLocaleString()}`;
+                `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:34px;height:34px;margin-top:4px;" alt="⭐"> ${state.balance.toLocaleString()}`;
             profileGames.textContent = state.totalGames;
             profileWins.textContent = state.wins;
             profileBest.textContent = `${state.bestMultiplier.toFixed(2)}x`;
@@ -1121,7 +1543,6 @@
 
         // ---- DOUBLE EXPLOSION VIBRATION: BIG then SMALL ----
         function triggerDoubleExplosionVibration() {
-            // First: big/heavy
             try {
                 if (window.Telegram?.WebApp) {
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
@@ -1131,7 +1552,6 @@
                 if (navigator.vibrate) navigator.vibrate(120);
             } catch (e) {}
 
-            // Second: smaller/medium after a short pause
             setTimeout(() => {
                 try {
                     if (window.Telegram?.WebApp) {
@@ -1164,6 +1584,31 @@
             }, 1000);
         }
 
+        // ----- Award gifts based on profit -----
+        function awardGifts(profit) {
+            if (profit >= 18 && profit < 50) {
+                addGift('bear');
+                showNotificationWithGift(profit, 'bear');
+            } else if (profit >= 50) {
+                addGift('box');
+                showNotificationWithGift(profit, 'box');
+            }
+        }
+
+        function showNotificationWithGift(amount, giftId) {
+            const gift = GIFT_TYPES[giftId];
+            const notif = document.getElementById('notification');
+            notifAmount.innerHTML = `+${amount} ⭐ &amp; <img src="${gift.image}" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;" alt="${gift.name}"> ${gift.name}`;
+            notif.style.display = 'flex';
+            void notif.offsetHeight;
+            notif.style.transform = 'translateY(0)';
+            clearTimeout(notif._timeout);
+            notif._timeout = setTimeout(() => {
+                notif.style.transform = 'translateY(-120%)';
+                setTimeout(() => { notif.style.display = 'none'; }, 400);
+            }, 2000);
+        }
+
         // ============================================================
         // CRASH GAME
         // ============================================================
@@ -1184,8 +1629,9 @@
             roundId: 0,
             windStart: 1.2,
             currentDogGif: DOG_GIFS[0],
+            windPhase: 0,
 
-            // ---- Wind – FAST & FIXED DIAGONAL ----
+            // ---- Wind – 3 phases ----
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
@@ -1202,29 +1648,56 @@
                     streak.style.animationDuration = (0.8 + Math.random() * 0.6) + 's';
                     container.appendChild(streak);
                 }
-                // Wind container has a fixed transform: rotate(-20deg) in CSS.
-                // We explicitly lock it in updateWindEffect.
             },
 
             updateWindEffect() {
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
 
+                let phase = 0;
+                if (mult > 2.83 && mult < 2.9) {
+                    phase = 1;
+                } else if (mult >= 2.9) {
+                    phase = 2;
+                } else {
+                    phase = 0;
+                }
+                this.windPhase = phase;
+
                 if (mult > this.windStart && this.isPlaying) {
-                    windContainer.classList.add('active');
-                    windContainer.style.opacity = 0.15 + Math.min(0.7, (mult - this.windStart) / 2.5);
-
-                    // LOCK the rotation – never changes with the dog
-                    windContainer.style.transform = 'rotate(-20deg)';
-
                     const streaks = windContainer.querySelectorAll('.streak');
-                    streaks.forEach((s) => {
-                        const dist = 60 + Math.min(80, (mult - this.windStart) * 35);
-                        // Wind flows from bottom-left to top-right: positive dx, negative dy
-                        s.style.setProperty('--dx', dist + '%');
-                        s.style.setProperty('--dy', '-' + dist + '%');
-                    });
+                    const distBase = 60 + Math.min(80, (mult - this.windStart) * 35);
 
+                    if (phase === 0) {
+                        windContainer.style.transform = 'rotate(-20deg)';
+                        const intensity = Math.min(1, (mult - this.windStart) / 1.6);
+                        windContainer.style.opacity = 0.15 + intensity * 0.7;
+                        windContainer.classList.add('active');
+                        streaks.forEach((s) => {
+                            s.style.setProperty('--dx', distBase + '%');
+                            s.style.setProperty('--dy', '-' + distBase + '%');
+                        });
+                    } else if (phase === 1) {
+                        const fadeProgress = (mult - 2.83) / 0.07;
+                        const baseOpacity = 0.15 + 0.7;
+                        windContainer.style.opacity = baseOpacity * (1 - fadeProgress);
+                        windContainer.style.transform = 'rotate(-20deg)';
+                        windContainer.classList.add('active');
+                        streaks.forEach((s) => {
+                            s.style.setProperty('--dx', distBase + '%');
+                            s.style.setProperty('--dy', '-' + distBase + '%');
+                        });
+                    } else if (phase === 2) {
+                        const effectiveMult = Math.min(mult, 3.0);
+                        const tilt = 12 - (effectiveMult - 1) * 24;
+                        windContainer.style.transform = `rotate(${tilt}deg)`;
+                        windContainer.style.opacity = 0.15 + 0.7;
+                        windContainer.classList.add('active');
+                        streaks.forEach((s) => {
+                            s.style.setProperty('--dx', distBase + '%');
+                            s.style.setProperty('--dy', '-' + distBase + '%');
+                        });
+                    }
                 } else {
                     windContainer.classList.remove('active');
                     windContainer.style.opacity = 0;
@@ -1310,6 +1783,10 @@
                 const dogImg = document.getElementById('flyingDogGif');
                 dogImg.src = this.currentDogGif;
                 dogImg.style.display = 'none';
+                // Init wheel
+                drawWheel(0);
+                updateInventoryUI();
+                updateUpgraderUI();
             },
 
             createGrid() {
@@ -1336,7 +1813,7 @@
                 currentEl.innerHTML = `${m.toFixed(2)}<span class="x">x</span>`;
                 currentEl.style.color = color;
                 document.getElementById('rocketBalance').innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:22px;height:22px;margin-top:3px;margin-right:4px;" alt="⭐"> ${state.balance.toLocaleString()}`;
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 if (this.isPlaying || this.gameOver) {
                     this.updateMainButton();
                     this.updateWindEffect();
@@ -1482,17 +1959,25 @@
                 if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
                 this.hasCashedOut = true;
                 const win = Math.floor(this.bet * this.multiplier);
-                state.balance += win;
+                const profit = win - this.bet;
+                state.balance += profit;
                 state.wins++;
                 state.totalGames++;
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You', amount: win });
+                state.recentWinners.unshift({ name: 'You', amount: profit });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                // Award gifts based on profit
+                if (profit >= 18) {
+                    awardGifts(profit);
+                } else {
+                    showNotification(profit);
+                }
+
                 const user = players.find(p => p.isYou);
                 if (user) { user.hasCashedOut = true;
                     user.active = false; }
                 renderPlayers();
-                showNotification(win);
                 this.updateUI();
                 this.updateMainButton();
                 updateHomeUI();
@@ -1576,8 +2061,6 @@
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
-                // Rotation: starts HIGH (upward) and rotates DOWN as multiplier rises.
-                // At 1.0x: +12° (looking up), at 3.0x: -36° (looking down)
                 const effectiveMult = Math.min(this.multiplier, 3.0);
                 const tilt = 12 - (effectiveMult - 1) * 24;
 
@@ -1594,7 +2077,6 @@
                     this.gameOver = true;
                     this.stopContinuousVibration();
 
-                    // DOUBLE EXPLOSION VIBRATION: BIG then SMALL
                     triggerDoubleExplosionVibration();
 
                     const dogGif = document.getElementById('flyingDogGif');
@@ -1665,7 +2147,7 @@
         };
 
         // ============================================================
-        // MINES GAME – unchanged
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -1812,7 +2294,7 @@
 
             updateUI() {
                 document.getElementById('minesBalance').innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:22px;height:22px;margin-top:3px;margin-right:4px;" alt="⭐"> ${state.balance.toLocaleString()}`;
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 document.getElementById('minesMultiplier').textContent = `${this.multiplier.toFixed(2)}x`;
 
                 const msg = document.getElementById('minesMessage');
@@ -1980,17 +2462,25 @@
                     this.gameOver = true;
                     this.gameActive = false;
                     const win = Math.floor(this.bet * this.multiplier);
-                    state.balance += win;
+                    const profit = win - this.bet;
+                    state.balance += profit;
                     state.wins++;
                     state.totalGames++;
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                    state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
+                    state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                    // Award gifts based on profit
+                    if (profit >= 18) {
+                        awardGifts(profit);
+                    } else {
+                        showNotification(profit);
+                    }
+
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
                     this.addHistory('win', this.multiplier);
-                    showNotification(win);
                     triggerVibration(50, 'medium');
                     return;
                 }
@@ -2100,14 +2590,20 @@
                 if (!this.gameActive || this.gameOver || this.hasCashedOut) return;
                 this.hasCashedOut = true;
                 const win = Math.floor(this.bet * this.multiplier);
-                state.balance += win;
+                const profit = win - this.bet;
+                state.balance += profit;
                 state.wins++;
                 state.totalGames++;
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
+                state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-                this.addHistory('win', this.multiplier);
-                showNotification(win);
+
+                if (profit >= 18) {
+                    awardGifts(profit);
+                } else {
+                    showNotification(profit);
+                }
+
                 this.gameActive = false;
                 this.gameOver = true;
                 this.hasCashedOut = false;
@@ -2156,6 +2652,11 @@
         });
 
         // ============================================================
+        // SPIN BUTTON HANDLER
+        // ============================================================
+        document.getElementById('upgraderSpinBtn').addEventListener('click', spinWheel);
+
+        // ============================================================
         // VISIBILITY CHANGE
         // ============================================================
         document.addEventListener('visibilitychange', function() {
@@ -2181,6 +2682,11 @@
             minesGame.init();
             minesGame.setGridSize(3, 1);
 
+            // Initialize wheel
+            drawWheel(0);
+            updateInventoryUI();
+            updateUpgraderUI();
+
             try {
                 if (window.Telegram?.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -2188,7 +2694,7 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('Casino loaded – dog starts up → rotates down, wind fixed, star bigger, double explosion vibration.');
+            console.log('Casino loaded – with Upgrader & Inventory!');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
