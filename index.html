@@ -184,11 +184,6 @@
         .mb-8 {
             margin-bottom: 8px;
         }
-        .text-gradient {
-            background: linear-gradient(135deg, #ffd700, #ff6b53);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
 
         .btn {
             padding: 14px 20px;
@@ -253,7 +248,7 @@
             100% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        /* ===== HOME HEADER - now matches card style ===== */
+        /* ===== HOME HEADER ===== */
         .home-header {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -484,27 +479,6 @@
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.04);
             margin: 10px 0 10px 0;
-        }
-
-        #curveCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            opacity: 1;
-        }
-
-        #particleCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
         }
 
         .grid-squares {
@@ -851,26 +825,27 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
+        /* ---- Main Action Button (centered text) ---- */
         .main-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            padding: 16px 16px 14px 16px;
+            gap: 1px;
+            padding: 8px 12px 8px 12px;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: white;
             text-align: center;
             width: 100%;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             position: relative;
             overflow: hidden;
-            min-height: 62px;
+            min-height: 40px;
         }
         .main-action-btn:active {
             transform: scale(0.94);
@@ -881,20 +856,18 @@
             transform: none;
         }
         #mainActionText {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
-            line-height: 1.3;
-            text-align: center;
-            margin-top: 14px;
-        }
-        #mainActionSub {
-            font-size: 13px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            min-height: 18px;
             line-height: 1.2;
             text-align: center;
-            margin-top: 8px;
+        }
+        #mainActionSub {
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            min-height: 14px;
+            line-height: 1.2;
+            text-align: center;
         }
 
         .main-action-btn.place-bet {
@@ -931,7 +904,7 @@
         }
 
         /* ============================================================
-           MINES PAGE - PREMIUM (3D, diamond, dark, vibrations)
+           MINES PAGE - PREMIUM (3D, gem icon, dark, vibrations)
            ============================================================ */
         .mines-header {
             background: rgba(255, 255, 255, 0.02);
@@ -956,12 +929,12 @@
             margin-left: 2px;
         }
 
-        /* Grid presets only (no +/- controls for grid/bet) */
+        /* Grid presets */
         .grid-presets {
             display: flex;
             gap: 4px;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
         .grid-presets button {
@@ -976,13 +949,14 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
-        .grid-presets button:active {
-            transform: scale(0.92);
-        }
         .grid-presets button.active {
             background: rgba(108, 92, 231, 0.15);
             border-color: rgba(108, 92, 231, 0.2);
             color: #fff;
+        }
+        .grid-presets button.coming-soon {
+            opacity: 0.5;
+            cursor: default;
         }
 
         .mines-grid-wrapper {
@@ -990,7 +964,7 @@
             margin: 8px 0 12px 0;
         }
 
-        /* ===== MINES GRID - 3D TILES (stronger shadow, more rounded) ===== */
+        /* ===== MINES GRID - 3D TILES ===== */
         .mines-grid {
             display: grid;
             gap: 8px;
@@ -1004,7 +978,6 @@
             cursor: pointer;
             perspective: 800px;
         }
-        /* Stronger 3D shadow */
         .mines-grid .tile-wrapper .shadow {
             position: absolute;
             inset: 5px 0 0 5px;
@@ -1024,7 +997,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 2px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -1049,7 +1021,9 @@
             opacity: 0;
             transform: scale(0.3) rotate(-30deg);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .mines-grid .tile-wrapper .tile.revealed .symbol {
             opacity: 1;
@@ -1165,26 +1139,27 @@
             transform: scale(0.92);
         }
 
+        /* ---- Mines Main Action (centered text) ---- */
         .mines-main-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            padding: 16px 16px 14px 16px;
+            gap: 1px;
+            padding: 8px 12px 8px 12px;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: white;
             text-align: center;
             width: 100%;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             position: relative;
             overflow: hidden;
-            min-height: 62px;
+            min-height: 40px;
         }
         .mines-main-action-btn:active {
             transform: scale(0.94);
@@ -1195,13 +1170,12 @@
             transform: none;
         }
         .mines-main-action-btn .sub-text {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 400;
             color: rgba(255, 255, 255, 0.8);
-            min-height: 18px;
+            min-height: 14px;
             line-height: 1.2;
             text-align: center;
-            margin-top: 8px;
         }
         .mines-main-action-btn.place-bet {
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
@@ -1219,6 +1193,57 @@
         .mines-main-action-btn.confirm-bet {
             background: linear-gradient(135deg, #f9ca24, #f0932b);
             box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+
+        /* ---- Mines control: mine count changer ---- */
+        .mines-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 6px;
+            margin-bottom: 4px;
+        }
+        .mines-controls .control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4px 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .mines-controls .control-group .label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+        .mines-controls .control-group button {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mines-controls .control-group button:active {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(0.92);
+        }
+        .mines-controls .control-group .val {
+            font-size: 15px;
+            font-weight: 700;
+            min-width: 22px;
+            text-align: center;
+            color: #fff;
         }
 
         .mines-history {
@@ -1325,8 +1350,6 @@
             </div>
 
             <div class="grid-container" id="gridContainer">
-                <canvas id="curveCanvas"></canvas>
-                <canvas id="particleCanvas"></canvas>
                 <div class="grid-squares" id="gridSquares"></div>
                 <div class="gif-overlay" id="dogOverlay">
                     <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
@@ -1361,21 +1384,21 @@
 
         <!-- ===== MINES PAGE ===== -->
         <div id="page-mines" class="page">
-            <!-- Header -->
+            <!-- Header with blue gem icon -->
             <div class="mines-header">
-                <span><i class="fas fa-gem" style="color:#ffd700; margin-right:6px;"></i>Mines</span>
+                <span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span>
                 <span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span>
                 <span class="badge" id="minesBalance"><i class="fas fa-star" style="color:#ffd700; margin-right:4px;"></i> 1,000</span>
             </div>
 
-            <!-- Grid presets only (no +/- controls) -->
+            <!-- Grid presets (5x5 active, 6x6/7x7/8x8 "coming soon") -->
             <div class="grid-presets" id="gridPresets">
-                <button data-size="3" data-mines="1">3×3</button>
-                <button data-size="4" data-mines="2">4×4</button>
-                <button data-size="5" data-mines="3" class="active">5×5</button>
-                <button data-size="6" data-mines="5">6×6</button>
-                <button data-size="7" data-mines="7">7×7</button>
-                <button data-size="8" data-mines="10">8×8</button>
+                <button data-size="3" data-mines="1" class="active">3×3</button>
+                <button data-size="4" data-mines="3">4×4</button>
+                <button data-size="5" data-mines="5">5×5</button>
+                <button data-size="6" data-mines="7" class="coming-soon">6×6</button>
+                <button data-size="7" data-mines="10" class="coming-soon">7×7</button>
+                <button data-size="8" data-mines="12" class="coming-soon">8×8</button>
             </div>
 
             <!-- Grid -->
@@ -1396,6 +1419,16 @@
                     <span id="minesMainActionText">Place Bet</span>
                     <span class="sub-text" id="minesMainActionSub"></span>
                 </button>
+            </div>
+
+            <!-- Mine count changer -->
+            <div class="mines-controls">
+                <div class="control-group">
+                    <span class="label">Mines</span>
+                    <button onclick="minesGame.changeMines(-1)"><i class="fas fa-minus"></i></button>
+                    <span class="val" id="minesCount">1</span>
+                    <button onclick="minesGame.changeMines(1)"><i class="fas fa-plus"></i></button>
+                </div>
             </div>
 
             <!-- History -->
@@ -1486,7 +1519,7 @@
 
     <script>
         // ============================================================
-        // CRASH GAME (unchanged)
+        // CRASH GAME (no particles, no curve)
         // ============================================================
 
         const state = {
@@ -1573,12 +1606,7 @@
             });
             if (page === 'rocket') {
                 crashGame.startGameCycle();
-                crashGame.startCurveAnimation();
-                crashGame.startParticles();
                 renderPlayers();
-            } else {
-                crashGame.stopCurveAnimation();
-                crashGame.stopParticles();
             }
             if (page === 'profile') {
                 updateProfile();
@@ -1687,182 +1715,6 @@
             }, 1000);
         }
 
-        // ---- Curve ----
-        const curve = {
-            canvas: null,
-            ctx: null,
-            animId: null,
-            init() {
-                this.canvas = document.getElementById('curveCanvas');
-                if (!this.canvas) return;
-                this.ctx = this.canvas.getContext('2d');
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-            },
-            resize() {
-                const rect = this.canvas.parentElement.getBoundingClientRect();
-                this.canvas.width = rect.width * 2;
-                this.canvas.height = rect.height * 2;
-                this.canvas.style.width = rect.width + 'px';
-                this.canvas.style.height = rect.height + 'px';
-                this.ctx.scale(2, 2);
-            },
-            draw(time) {
-                const ctx = this.ctx;
-                const w = this.canvas.width / 2;
-                const h = this.canvas.height / 2;
-                ctx.clearRect(0, 0, w, h);
-                const numPoints = 80;
-                const amplitude = 14 + 6 * Math.sin(time * 0.3);
-                const frequency = 1.0 + 0.3 * Math.sin(time * 0.2);
-                const phase = time * 0.4;
-                const exponent = 1.8;
-                ctx.beginPath();
-                for (let i = 0; i <= numPoints; i++) {
-                    const t = i / numPoints;
-                    const x = t * w;
-                    const baseY = h * (1 - Math.pow(t, exponent));
-                    const wiggle = amplitude * Math.sin(frequency * t * Math.PI * 2 + phase);
-                    const y = Math.max(0, Math.min(h, baseY + wiggle));
-                    if (i === 0) ctx.moveTo(x, y);
-                    else {
-                        const prevT = (i - 1) / numPoints;
-                        const prevX = prevT * w;
-                        const prevBaseY = h * (1 - Math.pow(prevT, exponent));
-                        const prevWiggle = amplitude * Math.sin(frequency * prevT * Math.PI * 2 + phase);
-                        const prevY = Math.max(0, Math.min(h, prevBaseY + prevWiggle));
-                        const cpx = (prevX + x) / 2;
-                        const cpy = (prevY + y) / 2 - 4;
-                        ctx.quadraticCurveTo(cpx, cpy, x, y);
-                    }
-                }
-                ctx.shadowColor = '#00ff88';
-                ctx.shadowBlur = 25;
-                ctx.strokeStyle = '#00ff88';
-                ctx.lineWidth = 4;
-                ctx.stroke();
-                ctx.shadowColor = '#6c5ce7';
-                ctx.shadowBlur = 45;
-                ctx.strokeStyle = 'rgba(108, 92, 231, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-                ctx.strokeStyle = '#ccffdd';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                for (let i = 0; i <= numPoints; i += 4) {
-                    const t = i / numPoints;
-                    const x = t * w;
-                    const baseY = h * (1 - Math.pow(t, exponent));
-                    const wiggle = amplitude * Math.sin(frequency * t * Math.PI * 2 + phase);
-                    const y = Math.max(0, Math.min(h, baseY + wiggle));
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00ff88';
-                    ctx.shadowColor = '#00ff88';
-                    ctx.shadowBlur = 20;
-                    ctx.fill();
-                }
-                ctx.shadowBlur = 0;
-            },
-            animate(timestamp) {
-                if (!this.canvas) return;
-                const time = timestamp / 1000;
-                this.draw(time);
-                particleSystem.update();
-                particleSystem.draw();
-                this.animId = requestAnimationFrame((ts) => this.animate(ts));
-            },
-            start() { if (this.animId) return;
-                this.animate(performance.now()); },
-            stop() {
-                if (this.animId) { cancelAnimationFrame(this.animId);
-                    this.animId = null; }
-                if (this.ctx) { const w = this.canvas.width / 2,
-                        h = this.canvas.height / 2;
-                    this.ctx.clearRect(0, 0, w, h); }
-            }
-        };
-
-        // ---- Particles ----
-        const particleSystem = {
-            canvas: null,
-            ctx: null,
-            particles: [],
-            count: 80,
-            init() {
-                this.canvas = document.getElementById('particleCanvas');
-                if (!this.canvas) return;
-                this.ctx = this.canvas.getContext('2d');
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-                this.createParticles();
-            },
-            resize() {
-                const rect = this.canvas.parentElement.getBoundingClientRect();
-                this.canvas.width = rect.width * 2;
-                this.canvas.height = rect.height * 2;
-                this.canvas.style.width = rect.width + 'px';
-                this.canvas.style.height = rect.height + 'px';
-                this.ctx.scale(2, 2);
-            },
-            createParticles() {
-                const w = this.canvas.width / 2,
-                    h = this.canvas.height / 2;
-                this.particles = [];
-                for (let i = 0; i < this.count; i++) {
-                    this.particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.2,
-                        vy: (Math.random() - 0.5) * 0.2, size: 1.5 + Math.random() * 3, opacity: 0.3 + Math
-                            .random() * 0.6 });
-                }
-            },
-            update() {
-                const w = this.canvas.width / 2,
-                    h = this.canvas.height / 2;
-                const isPlaying = crashGame.isPlaying;
-                const isCountingDown = crashGame.isCountingDown;
-                const multiplier = crashGame.multiplier;
-                let speedFactor = 0.2;
-                if (isCountingDown) speedFactor = 0.5;
-                else if (isPlaying) speedFactor = 0.5 + multiplier * 0.8;
-                for (const p of this.particles) {
-                    p.vx += (Math.random() - 0.5) * 0.02;
-                    p.vy += (Math.random() - 0.5) * 0.02;
-                    if (isPlaying) { p.vy += 0.3 * speedFactor * 0.05; }
-                    const maxSpeed = isPlaying ? 15 : 0.8;
-                    const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                    if (sp > maxSpeed) { p.vx = (p.vx / sp) * maxSpeed;
-                        p.vy = (p.vy / sp) * maxSpeed; }
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0) p.x = w;
-                    if (p.x > w) p.x = 0;
-                    if (p.y < 0) p.y = h;
-                    if (p.y > h) p.y = 0;
-                }
-            },
-            draw() {
-                const ctx = this.ctx,
-                    w = this.canvas.width / 2,
-                    h = this.canvas.height / 2;
-                ctx.clearRect(0, 0, w, h);
-                for (const p of this.particles) {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
-                    ctx.fill();
-                    ctx.shadowColor = 'rgba(255, 255, 255, 0.2)';
-                    ctx.shadowBlur = 8;
-                    ctx.fill();
-                }
-                ctx.shadowBlur = 0;
-            },
-            start() {},
-            stop() { if (this.ctx) { const w = this.canvas.width / 2,
-                        h = this.canvas.height / 2;
-                    this.ctx.clearRect(0, 0, w, h); } }
-        };
-
         // ---- Crash Game ----
         const crashGame = {
             multiplier: 1.00,
@@ -1892,10 +1744,6 @@
                 if (this.vibrationInterval) { clearInterval(this.vibrationInterval);
                     this.vibrationInterval = null; }
             },
-            startCurveAnimation() { curve.start(); },
-            stopCurveAnimation() { curve.stop(); },
-            startParticles() { particleSystem.start(); },
-            stopParticles() { particleSystem.stop(); },
 
             init() {
                 this.createGrid();
@@ -1903,8 +1751,6 @@
                 this.renderHistory();
                 this.setupMainButton();
                 this.updateMainButton();
-                curve.init();
-                particleSystem.init();
                 players = [];
                 renderPlayers();
             },
@@ -2214,16 +2060,17 @@
         };
 
         // ============================================================
-        // MINES GAME - PREMIUM (no +/- controls, fixed cash out reset)
+        // MINES GAME (final version)
         // ============================================================
 
         const minesGame = {
-            gridSize: 5,
-            minesCount: 3,
+            gridSize: 3,
+            minesCount: 1,
             bet: 10,
             board: [],
             revealed: [],
-            multiplier: 1.00,
+            multiplier: 0.90,
+            startingMultiplier: 0.90,
             gameActive: false,
             gameOver: false,
             hasCashedOut: false,
@@ -2231,19 +2078,60 @@
             revealedSafe: 0,
             history: [],
             isCashingOut: false,
+            maxMultiplier: 8.34,
 
             init() {
                 this.updateUI();
                 this.renderHistory();
                 this.updateMainButton();
                 this.generateGrid();
-                // Set initial values in presets
                 this.updatePresets();
+                document.getElementById('minesCount').textContent = this.minesCount;
+                this.updateMineLimits();
             },
 
-            // ----- Settings (only presets, no +/-) -----
+            // ----- Settings -----
+            changeMines(delta) {
+                if (this.gameActive) return;
+                let mines = this.minesCount + delta;
+                const maxMines = this.getMaxMines();
+                const minMines = this.getMinMines();
+                mines = Math.max(minMines, Math.min(maxMines, mines));
+                this.minesCount = mines;
+                document.getElementById('minesCount').textContent = mines;
+                this.updatePresets();
+                this.generateGrid();
+                this.updateUI();
+            },
+
+            getMinMines() {
+                if (this.gridSize === 3) return 1;
+                if (this.gridSize === 4) return 3;
+                if (this.gridSize === 5) return 5;
+                return 1;
+            },
+
+            getMaxMines() {
+                if (this.gridSize === 3) return 8;
+                if (this.gridSize === 4) return 10;
+                if (this.gridSize === 5) return 12;
+                return 0;
+            },
+
+            updateMineLimits() {
+                const val = document.getElementById('minesCount');
+                const min = this.getMinMines();
+                const max = this.getMaxMines();
+                // Clamp current value
+                let current = parseInt(val.textContent) || 0;
+                if (current < min) current = min;
+                if (current > max) current = max;
+                this.minesCount = current;
+                val.textContent = current;
+            },
+
             updatePresets() {
-                const btns = document.querySelectorAll('.grid-presets button');
+                const btns = document.querySelectorAll('.grid-presets button:not(.coming-soon)');
                 btns.forEach(btn => {
                     const size = parseInt(btn.dataset.size);
                     const mines = parseInt(btn.dataset.mines);
@@ -2261,14 +2149,21 @@
                 this.board = new Array(total).fill(0);
                 this.revealed = new Array(total).fill(false);
                 let placed = 0;
-                while (placed < this.minesCount) {
+                const mines = Math.min(this.minesCount, Math.floor(total * 0.35));
+                while (placed < mines) {
                     const idx = Math.floor(Math.random() * total);
                     if (this.board[idx] === 0) { this.board[idx] = 1;
                         placed++; }
                 }
-                this.safeCount = total - this.minesCount;
+                this.safeCount = total - mines;
                 this.revealedSafe = 0;
-                this.multiplier = 1.00;
+
+                // Calculate starting multiplier based on mines and grid size
+                const mineRatio = mines / total;
+                const gridFactor = (this.gridSize - 3) * 0.02;
+                this.startingMultiplier = Math.min(1.0, 0.85 + 0.05 * mines + gridFactor);
+                this.multiplier = this.startingMultiplier;
+
                 this.gameActive = false;
                 this.gameOver = false;
                 this.hasCashedOut = false;
@@ -2293,7 +2188,6 @@
                     grid.appendChild(wrapper);
                 }
 
-                // Trigger pop-in animation
                 requestAnimationFrame(() => {
                     const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
                     wrappers.forEach((w, idx) => {
@@ -2341,7 +2235,6 @@
 
                 subText.textContent = '';
 
-                // If game is active and not over, show Cash Out
                 if (this.gameActive && !this.gameOver) {
                     if (this.hasCashedOut) {
                         mainText.textContent = 'Cashed Out';
@@ -2355,13 +2248,11 @@
                     }
                     inputRow.classList.remove('open');
                 } else if (this.gameOver) {
-                    // Game over – show "Start New Round"
                     mainText.textContent = 'Start New Round';
                     btn.className = 'mines-main-action-btn place-bet';
                     btn.disabled = false;
                     inputRow.classList.remove('open');
                 } else {
-                    // Idle – show "Place Bet" or "Confirm Bet"
                     const isOpen = inputRow.classList.contains('open');
                     if (isOpen) {
                         mainText.textContent = 'Confirm Bet';
@@ -2396,7 +2287,7 @@
                 this.renderHistory();
             },
 
-            // ----- Grid update -----
+            // ----- Grid update with FontAwesome gem (bigger) -----
             updateGrid() {
                 const wrappers = document.querySelectorAll('.mines-grid .tile-wrapper');
                 for (let i = 0; i < wrappers.length; i++) {
@@ -2407,19 +2298,19 @@
                         tile.classList.add('revealed');
                         if (this.board[i] === 1) {
                             tile.classList.add('mine');
-                            symbol.textContent = '✕';
+                            symbol.innerHTML = '✕';
                         } else {
                             tile.classList.add('safe');
-                            symbol.textContent = '◆'; // diamond
+                            symbol.innerHTML = '<i class="fas fa-gem" style="font-size:32px; color:#00d2a0;"></i>';
                         }
                     } else {
                         tile.classList.remove('revealed', 'mine', 'safe');
-                        symbol.textContent = '';
+                        symbol.innerHTML = '';
                     }
                 }
             },
 
-            // ----- Click handler with vibration -----
+            // ----- Click handler with multiplier formula -----
             clickTile(index) {
                 if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
 
@@ -2444,7 +2335,14 @@
                 triggerVibration(15, 'light');
 
                 this.revealedSafe++;
-                this.multiplier = parseFloat((this.multiplier * 1.20).toFixed(2));
+                // ---- Multiplier increment ----
+                const totalTiles = this.gridSize * this.gridSize;
+                const mineRatio = this.minesCount / totalTiles;
+                let inc = 0.012 + 0.18 * mineRatio;
+                inc = Math.max(0.01, Math.min(0.30, inc));
+                let newMult = this.multiplier * (1 + inc);
+                if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
+                this.multiplier = parseFloat(newMult.toFixed(3));
 
                 if (this.revealedSafe === this.safeCount) {
                     this.gameOver = true;
@@ -2469,9 +2367,8 @@
                 this.updateUI();
             },
 
-            // ----- Main Action (fix cash out reset) -----
+            // ----- Main Action -----
             mainAction() {
-                // If game is active and not over, handle Cash Out
                 if (this.gameActive && !this.gameOver) {
                     if (!this.hasCashedOut && !this.isCashingOut) {
                         this.initiateCashOut();
@@ -2479,13 +2376,11 @@
                     return;
                 }
 
-                // If game over, start a new round
                 if (this.gameOver) {
-                    this.generateGrid(); // resets everything, including gameActive, gameOver, etc.
+                    this.generateGrid();
                     return;
                 }
 
-                // Idle – toggle bet input or confirm
                 const row = document.getElementById('minesBetInputRow');
                 const isOpen = row.classList.contains('open');
                 if (isOpen) {
@@ -2520,7 +2415,7 @@
                     return;
                 }
                 state.balance -= this.bet;
-                this.multiplier = 1.00;
+                this.multiplier = this.startingMultiplier;
                 this.gameActive = true;
                 this.gameOver = false;
                 this.hasCashedOut = false;
@@ -2528,18 +2423,19 @@
                 const total = this.gridSize * this.gridSize;
                 this.board = new Array(total).fill(0);
                 let placed = 0;
-                while (placed < this.minesCount) {
+                const mines = Math.min(this.minesCount, Math.floor(total * 0.35));
+                while (placed < mines) {
                     const idx = Math.floor(Math.random() * total);
                     if (this.board[idx] === 0) { this.board[idx] = 1;
                         placed++; }
                 }
-                this.safeCount = total - this.minesCount;
+                this.safeCount = total - mines;
                 this.revealed = new Array(total).fill(false);
 
                 const tiles = document.querySelectorAll('.mines-grid .tile');
                 tiles.forEach(tile => {
                     tile.classList.remove('revealed', 'mine', 'safe');
-                    tile.querySelector('.symbol').textContent = '';
+                    tile.querySelector('.symbol').innerHTML = '';
                     tile.classList.add('show');
                 });
 
@@ -2580,8 +2476,52 @@
                 this.updateMainButton();
                 updateHomeUI();
                 triggerVibration(30, 'light');
+            },
+
+            // ----- Grid size change (with limits) -----
+            setGridSize(size, mines) {
+                if (this.gameActive) return;
+                // Check if coming soon
+                if (size > 5) {
+                    const msg = document.getElementById('minesMessage');
+                    msg.textContent = 'Coming soon!';
+                    msg.className = 'mines-message';
+                    setTimeout(() => {
+                        this.updateUI();
+                    }, 1000);
+                    return;
+                }
+                this.gridSize = size;
+                // Adjust mines to fit limits
+                const minMines = this.getMinMines();
+                const maxMines = this.getMaxMines();
+                this.minesCount = Math.max(minMines, Math.min(maxMines, mines));
+                document.getElementById('minesCount').textContent = this.minesCount;
+                this.updatePresets();
+                this.generateGrid();
+                this.updateUI();
             }
         };
+
+        // ============================================================
+        // PRESET BUTTON HANDLERS
+        // ============================================================
+        document.querySelectorAll('.grid-presets button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const size = parseInt(this.dataset.size);
+                const mines = parseInt(this.dataset.mines);
+                if (this.classList.contains('coming-soon')) {
+                    const msg = document.getElementById('minesMessage');
+                    msg.textContent = 'Coming soon!';
+                    msg.className = 'mines-message';
+                    setTimeout(() => {
+                        minesGame.updateUI();
+                    }, 1000);
+                    return;
+                }
+                minesGame.setGridSize(size, mines);
+            });
+        });
 
         // ============================================================
         // VISIBILITY CHANGE
@@ -2589,13 +2529,9 @@
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 if (crashGame.isPlaying) { crashGame.stopContinuousVibration(); }
-                curve.stop();
-                particleSystem.stop();
             } else {
                 if (crashGame.isPlaying) { crashGame.startContinuousVibration(); }
                 if (document.getElementById('page-rocket').classList.contains('active')) {
-                    curve.start();
-                    particleSystem.start();
                     if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) { crashGame
                             .startGameCycle(); }
                 }
@@ -2612,21 +2548,8 @@
             crashGame.init();
             minesGame.init();
 
-            // Preset buttons
-            document.querySelectorAll('.grid-presets button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const size = parseInt(this.dataset.size);
-                    const mines = parseInt(this.dataset.mines);
-                    if (minesGame.gameActive) return;
-                    minesGame.gridSize = size;
-                    minesGame.minesCount = mines;
-                    document.querySelectorAll('.grid-presets button').forEach(b => b.classList.remove(
-                    'active'));
-                    this.classList.add('active');
-                    minesGame.generateGrid();
-                    minesGame.updateUI();
-                });
-            });
+            // Ensure 3x3 is selected by default
+            minesGame.setGridSize(3, 1);
 
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
@@ -2636,14 +2559,12 @@
                 }
             } catch (e) {}
 
-            console.log('Casino loaded – final version with all fixes.');
+            console.log('Casino loaded – final version.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
-                crashGame.startCurveAnimation();
-                crashGame.startParticles();
             }
         });
 
@@ -2652,8 +2573,6 @@
             init();
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
-                crashGame.startCurveAnimation();
-                crashGame.startParticles();
             }
         }
     </script>
