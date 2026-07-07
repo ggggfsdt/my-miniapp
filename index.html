@@ -204,7 +204,7 @@
         .badge .balance-icon {
             width: 30px;
             height: 30px;
-            margin-top: 6px;
+            margin-top: 2px;
             margin-right: 2px;
         }
 
@@ -317,7 +317,7 @@
         .grid-square { background: transparent; border: 1px solid rgba(255, 255, 255, 0.04); }
         .grid-square.corner { border-color: rgba(108, 92, 231, 0.06); }
 
-        /* ===== WIND – UPWARD ANGLE ===== */
+        /* ===== WIND – 3 PHASES ===== */
         .wind-lines {
             position: absolute;
             inset: 0;
@@ -345,7 +345,6 @@
         .wind-lines .streak:nth-child(3n) { height: 2.5px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent); }
         .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); }
 
-        /* Wind streaks flow upward with a slight rightward angle */
         @keyframes windStreak {
             0% {
                 transform: translate(0, 0);
@@ -554,18 +553,28 @@
             max-height: 100px;
             overflow-y: auto;
             margin-top: 4px;
+            position: relative;
         }
         .players-list::-webkit-scrollbar { width: 2px; }
         .players-list::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
         .players-list .empty { color: #555; font-size: 13px; text-align: center; padding: 6px 0; }
         .player-item {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            position: relative;
             padding: 4px 8px;
             border-radius: 12px;
             margin-bottom: 2px;
             background: rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+            /* animation properties set inline via JS */
+        }
+        .player-item .player-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            z-index: 2;
         }
         .player-item .avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(255, 255, 255, 0.06); }
         .player-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -574,11 +583,47 @@
         .player-item .info .name { font-size: 13px; font-weight: 600; color: #e0e0e0; }
         .player-item .info .name .you { color: #ffd700; font-size: 10px; font-weight: 700; margin-left: 4px; }
         .player-item .info .bet-amount { font-size: 11px; color: #888; }
-        .player-item .status { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; text-align: center; white-space: nowrap; }
+        .player-item .info .bet-amount .live-mult { color: #54a0ff; font-weight: 600; }
+        .player-item .status { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; text-align: center; white-space: nowrap; z-index: 2; }
         .player-item .status.betting { color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.2); }
         .player-item .status.cashed { color: #00d2a0; border: 1px solid rgba(0, 210, 160, 0.2); }
         .player-item .status.crashed { color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.2); }
         .player-item .status.waiting { color: #888; border: 1px solid rgba(255, 255, 255, 0.06); }
+
+        .player-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            opacity: 0.25;
+            transition: width 0.1s linear, background 0.3s;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .player-progress.green { background: #00d2a0; }
+        .player-progress.blue { background: #54a0ff; }
+        .player-progress.red { background: #ff6b6b; }
+
+        /* ===== ANIMATIONS for player items ===== */
+        @keyframes playerPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(12px) rotateX(6deg); }
+            100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0); }
+        }
+        @keyframes playerSlide {
+            0% { opacity: 0; transform: translateX(-18px) scale(0.92); }
+            100% { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        @keyframes playerBounce {
+            0% { opacity: 0; transform: scale(0.6) translateY(-20px); }
+            60% { opacity: 1; transform: scale(1.08) translateY(4px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+        @keyframes playerFadeZoom {
+            0% { opacity: 0; transform: scale(0.5) rotate(-6deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
 
         /* ---- Main Action Button ---- */
         .main-action-btn {
@@ -863,7 +908,7 @@
             .mines-grid .tile-wrapper .tile { border-radius: 18px; }
             .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
             .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
-            .badge .balance-icon { width: 26px; height: 26px; margin-top: 5px; }
+            .badge .balance-icon { width: 26px; height: 26px; margin-top: 1px; }
         }
     </style>
 </head>
@@ -1039,13 +1084,24 @@
 
         let players = [];
 
+        // ---- Helper for random animation ----
+        function getRandomAnimationClass() {
+            const anims = ['playerPop', 'playerSlide', 'playerBounce', 'playerFadeZoom'];
+            return anims[Math.floor(Math.random() * anims.length)];
+        }
+
+        // ---- RENDER PLAYERS with progress bars and multiplied bet ----
         function renderPlayers() {
-            // Only show players that have an active bet or have cashed out this round
             const activePlayers = players.filter(p => p.active !== false && p.bet > 0);
             if (activePlayers.length === 0) {
                 playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>';
                 return;
             }
+
+            const maxMult = Math.max(5.0, crashGame.multiplier || 1.0);
+            const currentMult = crashGame.multiplier || 1.0;
+            const isPlaying = crashGame.isPlaying;
+
             let html = '';
             for (const p of activePlayers) {
                 const isYou = p.isYou || false;
@@ -1053,21 +1109,68 @@
                 const betAmount = p.bet || 0;
                 let statusClass = 'waiting';
                 let statusText = 'Betting';
-                if (p.hasCashedOut) { statusClass = 'cashed';
-                    statusText = 'Cashed Out'; } else if (p.crashed) { statusClass = 'crashed';
-                    statusText = 'Crashed'; } else if (crashGame.isPlaying) { statusClass = 'waiting';
-                    statusText = 'Flying'; }
+                let progressColor = 'green';
+                let progressWidth = 0;
+
+                // Determine live multiplied amount
+                let liveMultiplied = betAmount;
+
+                if (p.hasCashedOut) {
+                    statusClass = 'cashed';
+                    statusText = 'Cashed Out';
+                    progressColor = 'blue';
+                    progressWidth = Math.min(100, ((p.cashOutMultiplier || 1.0) - 1) / (maxMult - 1) * 100);
+                    liveMultiplied = p.cashOutAmount || betAmount;
+                } else if (p.crashed) {
+                    statusClass = 'crashed';
+                    statusText = 'Crashed';
+                    progressColor = 'red';
+                    progressWidth = Math.min(100, ((crashGame.multiplier || 1.0) - 1) / (maxMult - 1) * 100);
+                    liveMultiplied = betAmount;
+                } else if (isPlaying && !p.hasCashedOut && !p.crashed) {
+                    statusClass = 'betting';
+                    statusText = 'Flying';
+                    progressColor = 'green';
+                    const mult = currentMult;
+                    progressWidth = Math.min(100, (mult - 1) / (maxMult - 1) * 100);
+                    liveMultiplied = Math.floor(betAmount * mult);
+                } else {
+                    statusClass = 'waiting';
+                    statusText = 'Waiting';
+                    progressColor = 'green';
+                    progressWidth = 0;
+                    liveMultiplied = betAmount;
+                }
+
                 const avatarContent = isYou ?
                     `<img src="${state.avatarUrl}" alt="${name}">` :
                     `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
+
+                let amountDisplay = `${betAmount} ⭐`;
+                if (p.hasCashedOut && p.cashOutAmount !== undefined) {
+                    amountDisplay = `${p.cashOutAmount} ⭐ won`;
+                } else if (p.crashed && p.bet > 0) {
+                    amountDisplay = `-${p.bet} ⭐`;
+                } else if (isPlaying && !p.hasCashedOut && !p.crashed) {
+                    amountDisplay = `${betAmount} ⭐ → <span class="live-mult">${liveMultiplied} ⭐</span>`;
+                }
+
+                // Random animation
+                const animClass = getRandomAnimationClass();
+                const animDur = (0.25 + Math.random() * 0.25).toFixed(2);
+                const animDelay = (Math.random() * 0.18).toFixed(2);
+
                 html += `
-                    <div class="player-item">
-                        <div class="avatar">${avatarContent}</div>
-                        <div class="info">
-                            <div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div>
-                            <div class="bet-amount">${betAmount} ⭐</div>
+                    <div class="player-item" style="animation: ${animClass} ${animDur}s cubic-bezier(0.34, 1.56, 0.64, 1) ${animDelay}s forwards; opacity:0;">
+                        <div class="player-progress ${progressColor}" style="width: ${progressWidth}%;"></div>
+                        <div class="player-main">
+                            <div class="avatar">${avatarContent}</div>
+                            <div class="info">
+                                <div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div>
+                                <div class="bet-amount">${amountDisplay}</div>
+                            </div>
+                            <div class="status ${statusClass}">${statusText}</div>
                         </div>
-                        <div class="status ${statusClass}">${statusText}</div>
                     </div>
                 `;
             }
@@ -1198,7 +1301,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – FIXED: wind angle, bet button during countdown
+        // CRASH GAME – wind fixed: first goes backward, second vertical
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -1270,7 +1373,7 @@
                     const distBase = 60 + Math.min(80, (mult - this.windStart) * 35);
 
                     if (phase === 0 || phase === 1) {
-                        // Phase 0/1: original angled flow (top-right to bottom-left)
+                        // Phase 0/1: WIND BLOWS BACKWARD (top-right → bottom-left)
                         windContainer.style.transform = 'rotate(-20deg)';
                         let intensity;
                         if (phase === 0) {
@@ -1283,19 +1386,19 @@
                         }
                         windContainer.classList.add('active');
                         streaks.forEach((s) => {
-                            s.style.setProperty('--dx', distBase + '%');
-                            s.style.setProperty('--dy', '-' + distBase + '%');
+                            // Move left (negative dx) and down (positive dy) = backward
+                            s.style.setProperty('--dx', '-' + distBase + '%');
+                            s.style.setProperty('--dy', distBase + '%');
                         });
                     } else if (phase === 3) {
-                        // Phase 3: upward angle (not purely vertical)
-                        // Rotate slightly so streaks go up and slightly right
-                        windContainer.style.transform = 'rotate(-10deg)';
+                        // Phase 3: WIND BLOWS PERFECTLY VERTICAL (straight up)
+                        windContainer.style.transform = 'rotate(0deg)';
                         windContainer.style.opacity = 0.15 + 0.7;
                         windContainer.classList.add('active');
                         streaks.forEach((s) => {
-                            // Move up (positive dy) and a little right (positive dx)
-                            s.style.setProperty('--dx', '15%');
-                            s.style.setProperty('--dy', distBase + '%');
+                            // No horizontal movement, only upward (negative dy)
+                            s.style.setProperty('--dx', '0%');
+                            s.style.setProperty('--dy', '-' + distBase + '%');
                         });
                     }
                 } else {
@@ -1457,12 +1560,13 @@
                     this.updateWindEffect();
                     this.updateProgressLine();
                     this.updateDogRotationAndZoom();
+                    renderPlayers();
                 } else if (this.gameOver) {
                     this.updateMainButton();
                     this.updateWindEffect();
                     this.updateProgressLine();
+                    renderPlayers();
                 }
-                renderPlayers();
             },
 
             updateMainButton() {
@@ -1473,10 +1577,8 @@
                 const inputRow = document.getElementById('betInputRow');
                 subText.textContent = '';
 
-                // Check if the game is in a crashed state
                 const isCrashed = this.gameOver && !this.isPlaying && !this.isCountingDown;
 
-                // When counting down, we should show "Place Bet" if no bet is placed
                 if (this.isCountingDown) {
                     if (this.bet > 0) {
                         mainText.textContent = 'Waiting for round';
@@ -1522,7 +1624,6 @@
                     return;
                 }
 
-                // After crash – disable button until next countdown
                 if (isCrashed) {
                     mainText.textContent = 'Crashed';
                     btn.className = 'main-action-btn crashed';
@@ -1532,7 +1633,6 @@
                     return;
                 }
 
-                // Fallback (should not be reached)
                 mainText.textContent = 'Place Bet';
                 btn.className = 'main-action-btn place-bet';
                 btn.disabled = false;
@@ -1540,7 +1640,6 @@
             },
 
             mainAction() {
-                // Don't allow any action if crashed
                 if (this.gameOver && !this.isPlaying && !this.isCountingDown) return;
 
                 if (this.isPlaying) {
@@ -1563,7 +1662,6 @@
                     }
                     return;
                 }
-                // Only allow starting a new round if we're in a clean state
                 if (this.gameOver && !this.isPlaying && !this.isCountingDown) {
                     this.gameOver = false;
                     this.hasCashedOut = false;
@@ -1594,9 +1692,20 @@
                     existing.active = true;
                     existing.hasCashedOut = false;
                     existing.crashed = false;
+                    existing.cashOutMultiplier = undefined;
+                    existing.cashOutAmount = undefined;
                 } else {
-                    players.push({ name: state.displayName, color: '#ffd700', bet, hasCashedOut: false, crashed: false,
-                        active: true, isYou: true });
+                    players.push({
+                        name: state.displayName,
+                        color: '#ffd700',
+                        bet: bet,
+                        hasCashedOut: false,
+                        crashed: false,
+                        active: true,
+                        isYou: true,
+                        cashOutMultiplier: undefined,
+                        cashOutAmount: undefined
+                    });
                 }
                 renderPlayers();
                 this.updateMainButton();
@@ -1605,14 +1714,10 @@
             initiateCashOut() {
                 if (this.isCashingOut || this.cashOutPending) return;
                 this.cashOutPending = true;
-
-                // Vibration on cash out press
                 triggerCashOutVibration();
-
                 const btn = document.getElementById('mainActionBtn');
                 btn.disabled = true;
 
-                // 0.3 second delay before cashing out
                 setTimeout(() => {
                     this.cashOutPending = false;
                     if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
@@ -1636,8 +1741,12 @@
                 showNotification(win, win);
 
                 const user = players.find(p => p.isYou);
-                if (user) { user.hasCashedOut = true;
-                    user.active = false; }
+                if (user) {
+                    user.hasCashedOut = true;
+                    user.active = false;
+                    user.cashOutMultiplier = this.multiplier;
+                    user.cashOutAmount = win;
+                }
                 renderPlayers();
                 this.updateUI();
                 this.updateMainButton();
@@ -1651,7 +1760,7 @@
                 this.hasCashedOut = false;
                 this.roundId++;
                 this.pickRandomDogAndHide();
-                // Reset players list for new round (keep only the user entry)
+                // Reset players: keep only the user (if any) but set inactive and bet=0
                 players = players.filter(p => p.isYou);
                 if (players.length > 0) {
                     const user = players[0];
@@ -1659,6 +1768,8 @@
                     user.hasCashedOut = false;
                     user.crashed = false;
                     user.bet = 0;
+                    user.cashOutMultiplier = undefined;
+                    user.cashOutAmount = undefined;
                 }
                 renderPlayers();
                 const overlay = document.getElementById('countdownOverlay');
@@ -1685,21 +1796,20 @@
                     }
                     showNumber(count);
                 }, 1000);
-
-                // ✅ FIX: update the button immediately so "Place Bet" shows
                 this.updateMainButton();
             },
 
             startRound() {
                 if (this.bet > 0 && this.bet <= state.balance) {
                     state.balance -= this.bet;
-                    // Set user as active
                     const user = players.find(p => p.isYou);
                     if (user) {
                         user.active = true;
                         user.bet = this.bet;
                         user.hasCashedOut = false;
                         user.crashed = false;
+                        user.cashOutMultiplier = undefined;
+                        user.cashOutAmount = undefined;
                     }
                 } else {
                     this.bet = 0;
@@ -1778,7 +1888,6 @@
                         this.animationId = null; }
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
-                    // Start countdown after crash
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -1824,7 +1933,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME (unchanged)
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -2321,7 +2430,7 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('Casino loaded – wind angled upward, bet button fixed.');
+            console.log('Casino loaded – wind: first goes backward, second is vertical. Live bets have animations and show multiplied amount.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
