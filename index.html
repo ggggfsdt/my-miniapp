@@ -208,13 +208,6 @@
             margin-right: 2px;
         }
 
-        .gift-icon {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
         .quick-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -324,7 +317,7 @@
         .grid-square { background: transparent; border: 1px solid rgba(255, 255, 255, 0.04); }
         .grid-square.corner { border-color: rgba(108, 92, 231, 0.06); }
 
-        /* ===== WIND – 3 PHASES ===== */
+        /* ===== WIND – UPWARD ANGLE ===== */
         .wind-lines {
             position: absolute;
             inset: 0;
@@ -352,6 +345,7 @@
         .wind-lines .streak:nth-child(3n) { height: 2.5px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent); }
         .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); }
 
+        /* Wind streaks flow upward with a slight rightward angle */
         @keyframes windStreak {
             0% {
                 transform: translate(0, 0);
@@ -365,12 +359,12 @@
             }
         }
 
-        /* ===== DOG OVERLAY ===== */
+        /* ===== DOG OVERLAY with spring physics ===== */
         .gif-overlay {
             position: absolute;
             top: 45%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(0deg);
+            transform: translate(-50%, -50%) rotate(0deg) scale(1);
             z-index: 10;
             width: 80%;
             height: 80%;
@@ -621,6 +615,7 @@
         .main-action-btn.round-in-progress { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
         .main-action-btn.bet-placed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
         .main-action-btn.cashed-out { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        .main-action-btn.crashed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
 
         /* ===== MINES PAGE ===== */
         .mines-header {
@@ -859,163 +854,6 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
-        /* ===== EPIC-GIFT STYLE WHEEL ===== */
-        .wheel-wrapper {
-            position: relative;
-            width: 260px;
-            height: 260px;
-            margin: 0 auto;
-        }
-        .wheel-wrapper canvas {
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            box-shadow: 0 0 60px rgba(108, 92, 231, 0.12), 0 0 120px rgba(108, 92, 231, 0.05);
-        }
-        .wheel-pointer {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-            width: 0;
-            height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top: 24px solid #ffd700;
-            filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.7));
-        }
-        .wheel-center-btn {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 6;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 40px rgba(108, 92, 231, 0.3);
-            user-select: none;
-            text-align: center;
-            line-height: 1.2;
-        }
-        .wheel-center-btn:active {
-            transform: translate(-50%, -50%) scale(0.92);
-        }
-        .wheel-center-btn:disabled {
-            opacity: 0.4;
-            transform: translate(-50%, -50%) scale(0.95);
-            cursor: not-allowed;
-        }
-
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .inventory-item {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 12px 8px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            position: relative;
-        }
-        .inventory-item .gift-icon {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 6px;
-        }
-        .inventory-item .gift-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #ddd;
-            margin-bottom: 4px;
-        }
-        .inventory-item .gift-count {
-            font-size: 11px;
-            color: #888;
-        }
-        .inventory-item .gift-actions {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-top: 8px;
-        }
-        .inventory-item .gift-actions button {
-            padding: 4px 12px;
-            border: none;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .inventory-item .gift-actions .upgrade-btn {
-            background: rgba(108, 92, 231, 0.3);
-            color: #a29bfe;
-            border: 1px solid rgba(108, 92, 231, 0.2);
-        }
-        .inventory-item .gift-actions .upgrade-btn:active { transform: scale(0.92); }
-        .inventory-item .gift-actions .sale-btn {
-            background: rgba(255, 215, 0, 0.2);
-            color: #ffd700;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-        }
-        .inventory-item .gift-actions .sale-btn:active { transform: scale(0.92); }
-
-        .target-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 6px;
-        }
-        .target-item {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            background: rgba(255, 255, 255, 0.03);
-            color: #888;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .target-item.selected {
-            border-color: #ffd700;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
-        }
-        .target-item img {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-        }
-
-        .result-text {
-            text-align: center;
-            font-size: 14px;
-            min-height: 22px;
-            color: #aaa;
-            margin-top: 8px;
-        }
-
         @media (max-width: 420px) {
             .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
             .mines-grid { gap: 6px; }
@@ -1026,11 +864,6 @@
             .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
             .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
             .badge .balance-icon { width: 26px; height: 26px; margin-top: 5px; }
-            .wheel-wrapper { width: 210px; height: 210px; }
-            .wheel-wrapper canvas { width: 210px; height: 210px; }
-            .wheel-center-btn { width: 48px; height: 48px; font-size: 10px; }
-            .wheel-pointer { border-left-width: 12px; border-right-width: 12px; border-top-width: 20px; top: -10px; }
-            .inventory-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -1111,36 +944,6 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- UPGR (Upgrade) -->
-        <div id="page-upgr" class="page">
-            <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Upgrade <i class="fas fa-arrow-up" style="color:#a29bfe;"></i></h2>
-            <div class="card">
-                <div class="card-title">Select a Gift</div>
-                <div id="upgrInventoryList" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:8px;"></div>
-                <div class="card-title" style="margin-top:8px;">Desired Gift</div>
-                <div id="upgrTargetList" class="target-grid"></div>
-                <div class="result-text" id="upgrResult">Select a gift and target, then spin!</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Wheel</div>
-                <div class="wheel-wrapper">
-                    <canvas id="wheelCanvas" width="260" height="260"></canvas>
-                    <div class="wheel-pointer"></div>
-                    <button class="wheel-center-btn" id="wheelSpinBtn">SPIN</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ITEMS -->
-        <div id="page-items" class="page">
-            <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Items</h2>
-            <div class="card">
-                <div class="card-title">Your Gifts</div>
-                <div id="inventoryGrid" class="inventory-grid"></div>
-                <div id="inventoryEmpty" style="text-align:center; color:#666; padding:20px;">No gifts yet. Play Crash or Mines to earn them!</div>
-            </div>
-        </div>
-
         <!-- PROFILE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
@@ -1173,15 +976,13 @@
             <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
             <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
             <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
-            <button class="nav-item" data-page="upgr"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgr</span></button>
-            <button class="nav-item" data-page="items"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Items</span></button>
             <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // DOG GIFS
+        // DOG GIFS – 5 dogs including the original
         // ============================================================
         const DOG_GIFS = [
             'https://images.iimg.live/images/glorious-portfolio-1947.webp',
@@ -1193,391 +994,6 @@
 
         function getRandomDogGif() {
             return DOG_GIFS[Math.floor(Math.random() * DOG_GIFS.length)];
-        }
-
-        // ============================================================
-        // GIFT SYSTEM
-        // ============================================================
-        const GIFT_TYPES = {
-            bear: { id: 'bear', name: 'Bear', image: 'https://images.iimg.live/images/majestic-moment-5099.webp', level: 1, salePrice: 10 },
-            box: { id: 'box', name: 'Gift Box', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 2, salePrice: 30 },
-            diamond: { id: 'diamond', name: 'Diamond', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 3, salePrice: 100 }
-        };
-
-        const GIFT_LEVELS = ['bear', 'box', 'diamond'];
-
-        let inventory = [];
-
-        function addGift(giftId) {
-            inventory.push({ id: giftId, level: GIFT_TYPES[giftId].level });
-            updateInventoryUI();
-            updateUpgrUI();
-        }
-
-        function removeGift(giftId) {
-            const index = inventory.findIndex(g => g.id === giftId);
-            if (index !== -1) {
-                inventory.splice(index, 1);
-                updateInventoryUI();
-                updateUpgrUI();
-                return true;
-            }
-            return false;
-        }
-
-        function getGiftCount(giftId) {
-            return inventory.filter(g => g.id === giftId).length;
-        }
-
-        // ----- Inventory UI with Upgrade & Sale buttons -----
-        function updateInventoryUI() {
-            const grid = document.getElementById('inventoryGrid');
-            const empty = document.getElementById('inventoryEmpty');
-            grid.innerHTML = '';
-            if (inventory.length === 0) {
-                empty.style.display = 'block';
-                return;
-            }
-            empty.style.display = 'none';
-
-            const counts = {};
-            inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
-
-            for (const [id, count] of Object.entries(counts)) {
-                const gift = GIFT_TYPES[id];
-                if (!gift) continue;
-                const div = document.createElement('div');
-                div.className = 'inventory-item';
-                div.innerHTML = `
-                    <img src="${gift.image}" class="gift-icon" alt="${gift.name}">
-                    <div class="gift-name">${gift.name}</div>
-                    <div class="gift-count">×${count}</div>
-                    <div class="gift-actions">
-                        <button class="upgrade-btn" data-gift="${id}">Upgrade</button>
-                        <button class="sale-btn" data-gift="${id}" data-price="${gift.salePrice}">Sale</button>
-                    </div>
-                `;
-                grid.appendChild(div);
-
-                // Upgrade button: navigate to upgr tab with this gift preselected
-                div.querySelector('.upgrade-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const giftId = e.target.dataset.gift;
-                    navigateToUpgrWithGift(giftId);
-                });
-
-                // Sale button: sell one gift for stars
-                div.querySelector('.sale-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const giftId = e.target.dataset.gift;
-                    const price = parseInt(e.target.dataset.price);
-                    if (getGiftCount(giftId) > 0) {
-                        removeGift(giftId);
-                        state.balance += price;
-                        updateHomeUI();
-                        updateProfile();
-                        showNotification(price);
-                    }
-                });
-            }
-        }
-
-        // ============================================================
-        // UPGR WHEEL
-        // ============================================================
-        let selectedSourceId = null;
-        let selectedTargetId = null;
-        let wheelRotation = 0;
-        let isSpinning = false;
-        const WHEEL_SEGMENTS = 8;
-
-        function getUpgradeChance(sourceLevel, targetLevel) {
-            if (targetLevel <= sourceLevel) return 0;
-            const diff = targetLevel - sourceLevel;
-            if (diff === 1) return 70;
-            if (diff === 2) return 50;
-            if (diff === 3) return 30;
-            return 20;
-        }
-
-        function updateUpgrUI() {
-            const container = document.getElementById('upgrInventoryList');
-            container.innerHTML = '';
-            const counts = {};
-            inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
-
-            const hasGifts = Object.keys(counts).some(id => counts[id] > 0);
-            if (!hasGifts) {
-                container.innerHTML = '<span style="color:#666; font-size:13px;">No gifts in inventory.</span>';
-                selectedSourceId = null;
-                selectedTargetId = null;
-                document.getElementById('wheelSpinBtn').disabled = true;
-                document.getElementById('upgrTargetList').innerHTML = '';
-                document.getElementById('upgrResult').textContent = 'Earn gifts from Crash or Mines!';
-                return;
-            }
-
-            // Source gifts
-            const sourceKeys = Object.keys(counts).filter(id => counts[id] > 0);
-            sourceKeys.forEach(id => {
-                const gift = GIFT_TYPES[id];
-                const div = document.createElement('div');
-                div.className = 'inventory-item' + (selectedSourceId === id ? ' selected' : '');
-                div.style.flex = '0 0 auto';
-                div.style.width = '70px';
-                div.innerHTML = `
-                    <img src="${gift.image}" class="gift-icon" style="width:40px;height:40px;">
-                    <div style="font-size:11px; color:#ddd;">${gift.name}</div>
-                    <div style="font-size:10px; color:#888;">×${counts[id]}</div>
-                `;
-                div.onclick = () => {
-                    selectedSourceId = id;
-                    selectedTargetId = null;
-                    updateUpgrUI();
-                    updateWheel();
-                    document.getElementById('wheelSpinBtn').disabled = false;
-                    document.getElementById('upgrResult').textContent = 'Select a target gift.';
-                };
-                container.appendChild(div);
-            });
-
-            // Target gifts
-            const targetContainer = document.getElementById('upgrTargetList');
-            targetContainer.innerHTML = '';
-            if (selectedSourceId) {
-                const sourceLevel = GIFT_TYPES[selectedSourceId].level;
-                const higherGifts = GIFT_LEVELS.filter((id, idx) => idx + 1 > sourceLevel);
-                if (higherGifts.length === 0) {
-                    targetContainer.innerHTML = '<span style="color:#666; font-size:13px;">No higher-level gifts available.</span>';
-                    document.getElementById('wheelSpinBtn').disabled = true;
-                    document.getElementById('upgrResult').textContent = 'This gift is already max level!';
-                } else {
-                    higherGifts.forEach(id => {
-                        const gift = GIFT_TYPES[id];
-                        const div = document.createElement('div');
-                        div.className = 'target-item' + (selectedTargetId === id ? ' selected' : '');
-                        div.innerHTML = `
-                            <img src="${gift.image}" alt="${gift.name}">
-                            ${gift.name}
-                        `;
-                        div.onclick = () => {
-                            selectedTargetId = id;
-                            updateUpgrUI();
-                            updateWheel();
-                            const chance = getUpgradeChance(GIFT_TYPES[selectedSourceId].level, GIFT_TYPES[id]
-                                .level);
-                            document.getElementById('upgrResult').textContent =
-                                `Chance: ${chance}% — ${chance >= 50 ? 'Good luck!' : 'Risky!'}`;
-                            document.getElementById('wheelSpinBtn').disabled = false;
-                        };
-                        targetContainer.appendChild(div);
-                    });
-                }
-            } else {
-                targetContainer.innerHTML = '<span style="color:#666; font-size:13px;">Select a gift first.</span>';
-                document.getElementById('wheelSpinBtn').disabled = true;
-            }
-
-            if (selectedSourceId && !selectedTargetId) {
-                const sourceLevel = GIFT_TYPES[selectedSourceId].level;
-                const higherGifts = GIFT_LEVELS.filter((id, idx) => idx + 1 > sourceLevel);
-                if (higherGifts.length > 0) {
-                    selectedTargetId = higherGifts[0];
-                    updateUpgrUI();
-                    updateWheel();
-                    const chance = getUpgradeChance(GIFT_TYPES[selectedSourceId].level, GIFT_TYPES[selectedTargetId].level);
-                    document.getElementById('upgrResult').textContent =
-                        `Chance: ${chance}% — ${chance >= 50 ? 'Good luck!' : 'Risky!'}`;
-                    document.getElementById('wheelSpinBtn').disabled = false;
-                }
-            }
-        }
-
-        function updateWheel() {
-            if (!selectedSourceId || !selectedTargetId) {
-                drawWheel(wheelRotation, 0);
-                return;
-            }
-            const sourceLevel = GIFT_TYPES[selectedSourceId].level;
-            const targetLevel = GIFT_TYPES[selectedTargetId].level;
-            const chance = getUpgradeChance(sourceLevel, targetLevel);
-            drawWheel(wheelRotation, chance);
-        }
-
-        function drawWheel(rotation, chance) {
-            const canvas = document.getElementById('wheelCanvas');
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width,
-                h = canvas.height;
-            const cx = w / 2,
-                cy = h / 2,
-                r = Math.min(w, h) / 2 - 6;
-
-            ctx.clearRect(0, 0, w, h);
-
-            const numSeg = WHEEL_SEGMENTS;
-            const arc = (2 * Math.PI) / numSeg;
-
-            const greenCount = Math.round((chance / 100) * numSeg);
-            const redCount = numSeg - greenCount;
-
-            for (let i = 0; i < numSeg; i++) {
-                const startAngle = i * arc + rotation;
-                const endAngle = startAngle + arc;
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.arc(cx, cy, r, startAngle, endAngle);
-                ctx.closePath();
-
-                const isGreen = i < greenCount;
-                const color = isGreen ? '#00d2a0' : '#ff6b6b';
-                const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-                grad.addColorStop(0, color + '80');
-                grad.addColorStop(0.6, color);
-                grad.addColorStop(1, color + 'cc');
-                ctx.fillStyle = grad;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // No arrow icons – just clean segments
-            }
-
-            // Outer ring
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // Inner ring
-            ctx.beginPath();
-            ctx.arc(cx, cy, r * 0.15, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(20,20,25,0.6)';
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            // Center chance label
-            ctx.fillStyle = 'rgba(255,255,255,0.15)';
-            ctx.font = '11px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(chance + '%', cx, cy - 14);
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = 'rgba(255,255,255,0.08)';
-            ctx.font = '8px sans-serif';
-            ctx.fillText(chance >= 50 ? 'GOOD' : 'RISKY', cx, cy + 6);
-        }
-
-        function spinWheel() {
-            if (isSpinning || !selectedSourceId || !selectedTargetId) return;
-            if (getGiftCount(selectedSourceId) === 0) {
-                document.getElementById('upgrResult').textContent = 'You don\'t have this gift anymore!';
-                return;
-            }
-
-            const sourceLevel = GIFT_TYPES[selectedSourceId].level;
-            const targetLevel = GIFT_TYPES[selectedTargetId].level;
-            if (targetLevel <= sourceLevel) {
-                document.getElementById('upgrResult').textContent = 'Target must be a higher level!';
-                return;
-            }
-
-            isSpinning = true;
-            const btn = document.getElementById('wheelSpinBtn');
-            btn.disabled = true;
-
-            const chance = getUpgradeChance(sourceLevel, targetLevel);
-            const numSeg = WHEEL_SEGMENTS;
-            const arc = (2 * Math.PI) / numSeg;
-            const greenCount = Math.round((chance / 100) * numSeg);
-
-            const isSuccess = Math.random() * 100 < chance;
-            let targetSegment;
-            if (isSuccess) {
-                targetSegment = Math.floor(Math.random() * greenCount);
-            } else {
-                targetSegment = greenCount + Math.floor(Math.random() * (numSeg - greenCount));
-            }
-
-            const targetAngle = targetSegment * arc + arc / 2;
-            const spins = 5 + Math.random() * 4;
-            const finalRotation = wheelRotation + spins * 2 * Math.PI + (2 * Math.PI - targetAngle);
-
-            const startRotation = wheelRotation;
-            const duration = 4000 + Math.random() * 1000;
-            const startTime = performance.now();
-            const resultEl = document.getElementById('upgrResult');
-
-            function animateSpin(time) {
-                const elapsed = time - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                const currentRotation = startRotation + (finalRotation - startRotation) * eased;
-                wheelRotation = currentRotation;
-                drawWheel(currentRotation, chance);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateSpin);
-                } else {
-                    wheelRotation = finalRotation;
-                    drawWheel(finalRotation, chance);
-                    if (isSuccess) {
-                        const removed = removeGift(selectedSourceId);
-                        if (removed) {
-                            addGift(selectedTargetId);
-                            resultEl.textContent =
-                                `🎉 Success! ${GIFT_TYPES[selectedSourceId].name} → ${GIFT_TYPES[selectedTargetId].name}!`;
-                            triggerVibration(50, 'medium');
-                            selectedSourceId = selectedTargetId;
-                            selectedTargetId = null;
-                            updateUpgrUI();
-                            updateWheel();
-                        }
-                    } else {
-                        const removed = removeGift(selectedSourceId);
-                        if (removed) {
-                            if (sourceLevel > 1) {
-                                const prevId = GIFT_LEVELS[sourceLevel - 2];
-                                addGift(prevId);
-                                resultEl.textContent =
-                                    `💔 Failed! ${GIFT_TYPES[selectedSourceId].name} downgraded to ${GIFT_TYPES[prevId].name}.`;
-                            } else {
-                                resultEl.textContent =
-                                    `💔 Failed! ${GIFT_TYPES[selectedSourceId].name} was lost!`;
-                            }
-                            triggerVibration(60, 'heavy');
-                            selectedSourceId = null;
-                            selectedTargetId = null;
-                            updateUpgrUI();
-                            updateWheel();
-                        }
-                    }
-                    isSpinning = false;
-                    btn.disabled = false;
-                    if (inventory.length > 0) {
-                        updateUpgrUI();
-                    }
-                }
-            }
-            requestAnimationFrame(animateSpin);
-        }
-
-        // Navigate to Upgr tab with a preselected gift
-        function navigateToUpgrWithGift(giftId) {
-            selectedSourceId = giftId;
-            selectedTargetId = null;
-            navigateTo('upgr');
-            // Update UI after page becomes active
-            setTimeout(() => {
-                updateUpgrUI();
-                updateWheel();
-                document.getElementById('wheelSpinBtn').disabled = false;
-                document.getElementById('upgrResult').textContent = 'Select a target gift.';
-            }, 100);
         }
 
         // ============================================================
@@ -1617,8 +1033,6 @@
             home: document.getElementById('page-home'),
             rocket: document.getElementById('page-rocket'),
             mines: document.getElementById('page-mines'),
-            upgr: document.getElementById('page-upgr'),
-            items: document.getElementById('page-items'),
             profile: document.getElementById('page-profile'),
         };
         const navItems = document.querySelectorAll('.nav-item');
@@ -1626,8 +1040,12 @@
         let players = [];
 
         function renderPlayers() {
-            const activePlayers = players.filter(p => p.active !== false);
-            if (activePlayers.length === 0) { playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>'; return; }
+            // Only show players that have an active bet or have cashed out this round
+            const activePlayers = players.filter(p => p.active !== false && p.bet > 0);
+            if (activePlayers.length === 0) {
+                playersListEl.innerHTML = '<div class="empty">No bets placed yet</div>';
+                return;
+            }
             let html = '';
             for (const p of activePlayers) {
                 const isYou = p.isYou || false;
@@ -1639,9 +1057,19 @@
                     statusText = 'Cashed Out'; } else if (p.crashed) { statusClass = 'crashed';
                     statusText = 'Crashed'; } else if (crashGame.isPlaying) { statusClass = 'waiting';
                     statusText = 'Flying'; }
-                const avatarContent = isYou ? `<img src="${state.avatarUrl}" alt="${name}">` :
+                const avatarContent = isYou ?
+                    `<img src="${state.avatarUrl}" alt="${name}">` :
                     `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
-                html += `<div class="player-item"><div class="avatar">${avatarContent}</div><div class="info"><div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div><div class="bet-amount">${betAmount} ⭐</div></div><div class="status ${statusClass}">${statusText}</div></div>`;
+                html += `
+                    <div class="player-item">
+                        <div class="avatar">${avatarContent}</div>
+                        <div class="info">
+                            <div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div>
+                            <div class="bet-amount">${betAmount} ⭐</div>
+                        </div>
+                        <div class="status ${statusClass}">${statusText}</div>
+                    </div>
+                `;
             }
             playersListEl.innerHTML = html;
         }
@@ -1652,9 +1080,6 @@
             if (page === 'rocket') { crashGame.startGameCycle();
                 renderPlayers(); }
             if (page === 'profile') { updateProfile(); }
-            if (page === 'items') { updateInventoryUI(); }
-            if (page === 'upgr') { updateUpgrUI();
-                updateWheel(); }
         }
 
         navItems.forEach(item => { item.addEventListener('click', () => navigateTo(item.dataset.page)); });
@@ -1720,13 +1145,32 @@
             try { if (navigator.vibrate) navigator.vibrate(duration); } catch (e) {}
         }
 
-        function triggerDoubleExplosionVibration() {
-            try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy'); } catch (e) {}
-            try { if (navigator.vibrate) navigator.vibrate(120); } catch (e) {}
-            setTimeout(() => {
-                try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } catch (e) {}
-                try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
-            }, 150);
+        function triggerCashOutVibration() {
+            try {
+                if (window.Telegram?.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }
+            } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate(50); } catch (e) {}
+        }
+
+        function triggerExplosionVibration() {
+            const durations = [60, 80, 100, 130];
+            const types = ['light', 'medium', 'medium', 'heavy'];
+            const delays = [0, 120, 240, 380];
+
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    try {
+                        if (window.Telegram?.WebApp) {
+                            window.Telegram.WebApp.HapticFeedback.impactOccurred(types[i]);
+                        }
+                    } catch (e) {}
+                    try {
+                        if (navigator.vibrate) navigator.vibrate(durations[i]);
+                    } catch (e) {}
+                }, delays[i]);
+            }
         }
 
         function triggerContinuousVibration() {
@@ -1736,9 +1180,13 @@
             try { if (navigator.vibrate) navigator.vibrate(15); } catch (e) {}
         }
 
-        function showNotification(amount) {
+        function showNotification(amount, totalWin) {
             const notif = document.getElementById('notification');
-            notifAmount.textContent = `+${amount} ⭐`;
+            if (totalWin !== undefined) {
+                notifAmount.innerHTML = `${totalWin} ⭐ (won)`;
+            } else {
+                notifAmount.textContent = `+${amount} ⭐`;
+            }
             notif.style.display = 'flex';
             void notif.offsetHeight;
             notif.style.transform = 'translateY(0)';
@@ -1749,37 +1197,8 @@
             }, 1000);
         }
 
-        function showNotificationWithGift(amount, giftId) {
-            const gift = GIFT_TYPES[giftId];
-            const notif = document.getElementById('notification');
-            notifAmount.innerHTML = `+${amount} ⭐ &amp; <img src="${gift.image}" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;" alt="${gift.name}"> ${gift.name}`;
-            notif.style.display = 'flex';
-            void notif.offsetHeight;
-            notif.style.transform = 'translateY(0)';
-            clearTimeout(notif._timeout);
-            notif._timeout = setTimeout(() => {
-                notif.style.transform = 'translateY(-120%)';
-                setTimeout(() => { notif.style.display = 'none'; }, 400);
-            }, 2000);
-        }
-
         // ============================================================
-        // AWARD GIFTS (from games)
-        // ============================================================
-        function awardGifts(profit) {
-            if (profit >= 18 && profit < 50) {
-                addGift('bear');
-                showNotificationWithGift(profit, 'bear');
-            } else if (profit >= 50) {
-                addGift('box');
-                showNotificationWithGift(profit, 'box');
-            } else {
-                showNotification(profit);
-            }
-        }
-
-        // ============================================================
-        // CRASH GAME
+        // CRASH GAME – FIXED: wind angle, bet button during countdown
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -1797,9 +1216,21 @@
             vibrationInterval: null,
             roundId: 0,
             windStart: 1.2,
+            windReappear: 3.3,
             currentDogGif: DOG_GIFS[0],
             windPhase: 0,
+            // Spring physics
+            currentAngle: 0,
+            velocity: 0,
+            targetAngle: 0,
+            // Zoom
+            currentScale: 1,
+            targetScale: 1,
+            scaleVelocity: 0,
+            // Cash out delay
+            cashOutPending: false,
 
+            // ---- Wind ----
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
@@ -1822,42 +1253,49 @@
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
-                if (mult > 2.83 && mult < 2.9) phase = 1;
-                else if (mult >= 2.9) phase = 2;
-                else phase = 0;
+                if (mult > this.windStart && mult < 2.83) {
+                    phase = 0;
+                } else if (mult >= 2.83 && mult < 2.9) {
+                    phase = 1;
+                } else if (mult >= 2.9 && mult < this.windReappear) {
+                    phase = 2;
+                } else if (mult >= this.windReappear) {
+                    phase = 3;
+                }
+
                 this.windPhase = phase;
 
-                if (mult > this.windStart && this.isPlaying) {
+                if (mult > this.windStart && this.isPlaying && phase !== 2) {
                     const streaks = windContainer.querySelectorAll('.streak');
                     const distBase = 60 + Math.min(80, (mult - this.windStart) * 35);
-                    if (phase === 0) {
+
+                    if (phase === 0 || phase === 1) {
+                        // Phase 0/1: original angled flow (top-right to bottom-left)
                         windContainer.style.transform = 'rotate(-20deg)';
-                        const intensity = Math.min(1, (mult - this.windStart) / 1.6);
-                        windContainer.style.opacity = 0.15 + intensity * 0.7;
+                        let intensity;
+                        if (phase === 0) {
+                            intensity = Math.min(1, (mult - this.windStart) / 1.6);
+                            windContainer.style.opacity = 0.15 + intensity * 0.7;
+                        } else {
+                            const fadeProgress = (mult - 2.83) / 0.07;
+                            const baseOpacity = 0.15 + 0.7;
+                            windContainer.style.opacity = baseOpacity * (1 - fadeProgress);
+                        }
                         windContainer.classList.add('active');
                         streaks.forEach((s) => {
                             s.style.setProperty('--dx', distBase + '%');
                             s.style.setProperty('--dy', '-' + distBase + '%');
                         });
-                    } else if (phase === 1) {
-                        const fadeProgress = (mult - 2.83) / 0.07;
-                        const baseOpacity = 0.15 + 0.7;
-                        windContainer.style.opacity = baseOpacity * (1 - fadeProgress);
-                        windContainer.style.transform = 'rotate(-20deg)';
-                        windContainer.classList.add('active');
-                        streaks.forEach((s) => {
-                            s.style.setProperty('--dx', distBase + '%');
-                            s.style.setProperty('--dy', '-' + distBase + '%');
-                        });
-                    } else if (phase === 2) {
-                        const effectiveMult = Math.min(mult, 3.0);
-                        const tilt = 12 - (effectiveMult - 1) * 24;
-                        windContainer.style.transform = `rotate(${tilt}deg)`;
+                    } else if (phase === 3) {
+                        // Phase 3: upward angle (not purely vertical)
+                        // Rotate slightly so streaks go up and slightly right
+                        windContainer.style.transform = 'rotate(-10deg)';
                         windContainer.style.opacity = 0.15 + 0.7;
                         windContainer.classList.add('active');
                         streaks.forEach((s) => {
-                            s.style.setProperty('--dx', distBase + '%');
-                            s.style.setProperty('--dy', '-' + distBase + '%');
+                            // Move up (positive dy) and a little right (positive dx)
+                            s.style.setProperty('--dx', '15%');
+                            s.style.setProperty('--dy', distBase + '%');
                         });
                     }
                 } else {
@@ -1866,12 +1304,21 @@
                 }
             },
 
+            // ---- Dog ----
             pickRandomDogAndHide() {
                 this.currentDogGif = getRandomDogGif();
                 const dogImg = document.getElementById('flyingDogGif');
                 dogImg.src = this.currentDogGif;
                 dogImg.classList.remove('active');
                 dogImg.style.display = 'none';
+                this.currentAngle = 0;
+                this.velocity = 0;
+                this.targetAngle = 0;
+                this.currentScale = 1;
+                this.targetScale = 1;
+                this.scaleVelocity = 0;
+                const dogOverlay = document.getElementById('dogOverlay');
+                dogOverlay.style.transform = `translate(-50%, -50%) rotate(0deg) scale(1)`;
             },
 
             showDogWithFlyIn() {
@@ -1880,8 +1327,51 @@
                 dogImg.classList.remove('active');
                 void dogImg.offsetWidth;
                 dogImg.classList.add('active');
+                this.currentAngle = 0;
+                this.velocity = 0;
+                this.targetAngle = 0;
+                this.currentScale = 1;
+                this.targetScale = 1;
+                this.scaleVelocity = 0;
             },
 
+            updateDogRotationAndZoom() {
+                const effectiveMult = Math.min(this.multiplier, 3.0);
+                this.targetAngle = 12 - (effectiveMult - 1) * 24;
+
+                const stiffness = 8.0;
+                const damping = 4.0;
+                const springForce = (this.targetAngle - this.currentAngle) * stiffness;
+                const dampingForce = -this.velocity * damping;
+                const acceleration = springForce + dampingForce;
+                const dt = 1 / 60;
+                this.velocity += acceleration * dt;
+                this.currentAngle += this.velocity * dt;
+                this.currentAngle = Math.max(-45, Math.min(45, this.currentAngle));
+
+                const mult = this.multiplier;
+                if (mult >= 5.0) {
+                    const zoomProgress = Math.min(1, (mult - 5.0) / 5.0);
+                    this.targetScale = 1.0 - zoomProgress * 0.3;
+                } else {
+                    this.targetScale = 1.0;
+                }
+
+                const scaleStiffness = 6.0;
+                const scaleDamping = 3.5;
+                const scaleForce = (this.targetScale - this.currentScale) * scaleStiffness;
+                const scaleDampForce = -this.scaleVelocity * scaleDamping;
+                const scaleAccel = scaleForce + scaleDampForce;
+                this.scaleVelocity += scaleAccel * dt;
+                this.currentScale += this.scaleVelocity * dt;
+                this.currentScale = Math.max(0.5, Math.min(1.2, this.currentScale));
+
+                const dogOverlay = document.getElementById('dogOverlay');
+                dogOverlay.style.transform =
+                    `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
+            },
+
+            // ---- Progress line ----
             updateProgressLine() {
                 const wrap = document.getElementById('progressWrap');
                 const fill = document.getElementById('progressFill');
@@ -1908,6 +1398,7 @@
                 }
             },
 
+            // ---- Core game ----
             startGameCycle() {
                 if (!this.isPlaying && !this.isCountingDown && !this.gameOver) this.startCountdown();
                 if (this.isPlaying) this.startContinuousVibration();
@@ -1934,9 +1425,6 @@
                 const dogImg = document.getElementById('flyingDogGif');
                 dogImg.src = this.currentDogGif;
                 dogImg.style.display = 'none';
-                drawWheel(0, 0);
-                updateInventoryUI();
-                updateUpgrUI();
             },
 
             createGrid() {
@@ -1964,7 +1452,12 @@
                 currentEl.style.color = color;
                 document.getElementById('rocketBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-                if (this.isPlaying || this.gameOver) {
+                if (this.isPlaying) {
+                    this.updateMainButton();
+                    this.updateWindEffect();
+                    this.updateProgressLine();
+                    this.updateDogRotationAndZoom();
+                } else if (this.gameOver) {
                     this.updateMainButton();
                     this.updateWindEffect();
                     this.updateProgressLine();
@@ -1979,6 +1472,35 @@
                 const confirmBtn = document.getElementById('betConfirmBtn');
                 const inputRow = document.getElementById('betInputRow');
                 subText.textContent = '';
+
+                // Check if the game is in a crashed state
+                const isCrashed = this.gameOver && !this.isPlaying && !this.isCountingDown;
+
+                // When counting down, we should show "Place Bet" if no bet is placed
+                if (this.isCountingDown) {
+                    if (this.bet > 0) {
+                        mainText.textContent = 'Waiting for round';
+                        btn.className = 'main-action-btn bet-placed';
+                        btn.disabled = true;
+                        inputRow.classList.remove('open');
+                        confirmBtn.disabled = true;
+                    } else {
+                        const isOpen = inputRow.classList.contains('open');
+                        if (isOpen) {
+                            mainText.textContent = 'Confirm Bet';
+                            btn.className = 'main-action-btn confirm-bet';
+                            btn.disabled = false;
+                            confirmBtn.disabled = false;
+                        } else {
+                            mainText.textContent = 'Place Bet';
+                            btn.className = 'main-action-btn place-bet';
+                            btn.disabled = false;
+                            confirmBtn.disabled = true;
+                        }
+                    }
+                    return;
+                }
+
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
                         mainText.textContent = 'Cash Out';
@@ -1997,65 +1519,52 @@
                     }
                     inputRow.classList.remove('open');
                     confirmBtn.disabled = true;
-                } else if (this.isCountingDown) {
-                    const isOpen = inputRow.classList.contains('open');
-                    if (this.bet > 0) {
-                        mainText.textContent = 'Waiting for round';
-                        btn.className = 'main-action-btn bet-placed';
-                        btn.disabled = true;
-                        inputRow.classList.remove('open');
-                        confirmBtn.disabled = true;
-                    } else if (isOpen) {
-                        mainText.textContent = 'Confirm Bet';
-                        btn.className = 'main-action-btn confirm-bet';
-                        btn.disabled = false;
-                        confirmBtn.disabled = false;
-                    } else {
-                        mainText.textContent = 'Place Bet';
-                        btn.className = 'main-action-btn place-bet';
-                        btn.disabled = false;
-                        confirmBtn.disabled = true;
-                    }
-                } else if (this.gameOver) {
-                    this.bet = 0;
-                    this.hasCashedOut = false;
-                    mainText.textContent = 'Place Bet';
-                    btn.className = 'main-action-btn place-bet';
-                    btn.disabled = false;
-                    confirmBtn.disabled = true;
-                    inputRow.classList.remove('open');
-                    document.getElementById('betInputRocket').value = 10;
-                    document.getElementById('windLines').classList.remove('active');
-                    document.getElementById('windLines').style.opacity = 0;
-                    document.getElementById('progressWrap').classList.remove('active');
-                    document.getElementById('progressFill').style.width = '0%';
-                    const dogImg = document.getElementById('flyingDogGif');
-                    dogImg.classList.remove('active');
-                    dogImg.style.display = 'none';
-                } else {
-                    mainText.textContent = 'Place Bet';
-                    btn.className = 'main-action-btn place-bet';
-                    btn.disabled = false;
-                    confirmBtn.disabled = true;
+                    return;
                 }
+
+                // After crash – disable button until next countdown
+                if (isCrashed) {
+                    mainText.textContent = 'Crashed';
+                    btn.className = 'main-action-btn crashed';
+                    btn.disabled = true;
+                    inputRow.classList.remove('open');
+                    confirmBtn.disabled = true;
+                    return;
+                }
+
+                // Fallback (should not be reached)
+                mainText.textContent = 'Place Bet';
+                btn.className = 'main-action-btn place-bet';
+                btn.disabled = false;
+                confirmBtn.disabled = true;
             },
 
             mainAction() {
+                // Don't allow any action if crashed
+                if (this.gameOver && !this.isPlaying && !this.isCountingDown) return;
+
                 if (this.isPlaying) {
-                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut) this.initiateCashOut();
+                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut && !this.cashOutPending) {
+                        this.initiateCashOut();
+                    }
                     return;
                 }
                 if (this.isCountingDown) {
                     const row = document.getElementById('betInputRow');
                     const isOpen = row.classList.contains('open');
-                    if (isOpen) { this.confirmBet(); } else {
-                        if (this.bet === 0) { row.classList.add('open');
+                    if (isOpen) {
+                        this.confirmBet();
+                    } else {
+                        if (this.bet === 0) {
+                            row.classList.add('open');
                             document.getElementById('betInputRocket').focus();
-                            this.updateMainButton(); }
+                            this.updateMainButton();
+                        }
                     }
                     return;
                 }
-                if (this.gameOver) {
+                // Only allow starting a new round if we're in a clean state
+                if (this.gameOver && !this.isPlaying && !this.isCountingDown) {
                     this.gameOver = false;
                     this.hasCashedOut = false;
                     this.bet = 0;
@@ -2064,7 +1573,7 @@
                     this.startCountdown();
                     return;
                 }
-                if (this.bet === 0) {
+                if (this.bet === 0 && !this.isPlaying && !this.isCountingDown) {
                     const row = document.getElementById('betInputRow');
                     row.classList.add('open');
                     document.getElementById('betInputRocket').focus();
@@ -2080,10 +1589,12 @@
                 this.bet = bet;
                 document.getElementById('betInputRow').classList.remove('open');
                 const existing = players.find(p => p.isYou);
-                if (existing) { existing.bet = bet;
+                if (existing) {
+                    existing.bet = bet;
                     existing.active = true;
                     existing.hasCashedOut = false;
-                    existing.crashed = false; } else {
+                    existing.crashed = false;
+                } else {
                     players.push({ name: state.displayName, color: '#ffd700', bet, hasCashedOut: false, crashed: false,
                         active: true, isYou: true });
                 }
@@ -2092,33 +1603,37 @@
             },
 
             initiateCashOut() {
-                if (this.isCashingOut) return;
-                this.isCashingOut = true;
+                if (this.isCashingOut || this.cashOutPending) return;
+                this.cashOutPending = true;
+
+                // Vibration on cash out press
+                triggerCashOutVibration();
+
                 const btn = document.getElementById('mainActionBtn');
                 btn.disabled = true;
+
+                // 0.3 second delay before cashing out
                 setTimeout(() => {
+                    this.cashOutPending = false;
                     if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) {
-                        triggerVibration(30, 'light');
                         this.executeCashOut();
                     }
-                    this.isCashingOut = false;
-                }, 150);
+                    btn.disabled = false;
+                }, 300);
             },
 
             executeCashOut() {
                 if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
                 this.hasCashedOut = true;
+
                 const win = Math.floor(this.bet * this.multiplier);
-                const profit = win - this.bet;
-                state.balance += profit;
+                state.balance += win;
                 state.wins++;
                 state.totalGames++;
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You', amount: profit });
+                state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                // 🎁 AWARD GIFTS based on profit
-                awardGifts(profit);
+                showNotification(win, win);
 
                 const user = players.find(p => p.isYou);
                 if (user) { user.hasCashedOut = true;
@@ -2136,11 +1651,15 @@
                 this.hasCashedOut = false;
                 this.roundId++;
                 this.pickRandomDogAndHide();
+                // Reset players list for new round (keep only the user entry)
                 players = players.filter(p => p.isYou);
-                if (players.length > 0) { const user = players[0];
-                    user.active = true;
+                if (players.length > 0) {
+                    const user = players[0];
+                    user.active = false;
                     user.hasCashedOut = false;
-                    user.crashed = false; }
+                    user.crashed = false;
+                    user.bet = 0;
+                }
                 renderPlayers();
                 const overlay = document.getElementById('countdownOverlay');
                 const numberEl = document.getElementById('countdownNumber');
@@ -2166,13 +1685,26 @@
                     }
                     showNumber(count);
                 }, 1000);
+
+                // ✅ FIX: update the button immediately so "Place Bet" shows
+                this.updateMainButton();
             },
 
             startRound() {
-                if (this.bet > 0 && this.bet <= state.balance) { state.balance -= this.bet; } else {
+                if (this.bet > 0 && this.bet <= state.balance) {
+                    state.balance -= this.bet;
+                    // Set user as active
+                    const user = players.find(p => p.isYou);
+                    if (user) {
+                        user.active = true;
+                        user.bet = this.bet;
+                        user.hasCashedOut = false;
+                        user.crashed = false;
+                    }
+                } else {
                     this.bet = 0;
                     const user = players.find(p => p.isYou);
-                    if (user) user.active = false;
+                    if (user) { user.active = false; }
                     renderPlayers();
                 }
                 this.hasCashedOut = false;
@@ -2187,6 +1719,11 @@
                 document.getElementById('windLines').style.opacity = 0;
                 document.getElementById('progressWrap').classList.remove('active');
                 document.getElementById('progressFill').style.width = '0%';
+                this.currentAngle = 0;
+                this.velocity = 0;
+                this.currentScale = 1;
+                this.targetScale = 1;
+                this.scaleVelocity = 0;
                 this.updateUI();
                 this.updateMainButton();
                 this.startContinuousVibration();
@@ -2201,19 +1738,18 @@
                 const speedFactor = 0.12 * Math.pow(this.multiplier, 0.8) + 0.01;
                 const inc = delta * speedFactor * 1.5;
                 this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
-                const effectiveMult = Math.min(this.multiplier, 3.0);
-                const tilt = 12 - (effectiveMult - 1) * 24;
-                const dogOverlay = document.getElementById('dogOverlay');
-                dogOverlay.style.transition = 'none';
-                dogOverlay.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
-                void dogOverlay.offsetHeight;
+
+                this.updateDogRotationAndZoom();
                 this.updateUI();
+
                 if (this.multiplier >= this.crashPoint) {
                     this.multiplier = parseFloat(this.crashPoint.toFixed(2));
                     this.isPlaying = false;
                     this.gameOver = true;
                     this.stopContinuousVibration();
-                    triggerDoubleExplosionVibration();
+
+                    triggerExplosionVibration();
+
                     const dogGif = document.getElementById('flyingDogGif');
                     dogGif.classList.remove('active');
                     dogGif.style.display = 'none';
@@ -2225,11 +1761,15 @@
                     explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
                     setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
                     const user = players.find(p => p.isYou);
-                    if (user && user.active && !user.hasCashedOut) { user.crashed = true;
-                        user.active = false; }
+                    if (user && user.active && !user.hasCashedOut) {
+                        user.crashed = true;
+                        user.active = false;
+                    }
                     renderPlayers();
-                    if (this.bet > 0 && !this.hasCashedOut) { state.losses++;
-                        state.totalGames++; }
+                    if (this.bet > 0 && !this.hasCashedOut) {
+                        state.losses++;
+                        state.totalGames++;
+                    }
                     this.addHistory(this.multiplier);
                     this.updateUI();
                     this.updateMainButton();
@@ -2238,14 +1778,16 @@
                         this.animationId = null; }
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
+                    // Start countdown after crash
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
                             this.hasCashedOut = false;
                             document.getElementById('betInputRocket').value = 10;
                             this.gameOver = false;
-                            if (document.getElementById('page-rocket').classList.contains('active')) this
-                                .startCountdown();
+                            if (document.getElementById('page-rocket').classList.contains('active')) {
+                                this.startCountdown();
+                            }
                         }
                     }, 1500);
                     return;
@@ -2282,7 +1824,7 @@
         };
 
         // ============================================================
-        // MINES GAME (with gift earning)
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -2550,7 +2092,7 @@
                 if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
                 this.revealed[index] = true;
                 if (this.board[index] === 1) {
-                    triggerDoubleExplosionVibration();
+                    triggerExplosionVibration();
                     this.gameOver = true;
                     this.gameActive = false;
                     state.losses++;
@@ -2577,17 +2119,13 @@
                     this.gameOver = true;
                     this.gameActive = false;
                     const win = Math.floor(this.bet * this.multiplier);
-                    const profit = win - this.bet;
-                    state.balance += profit;
+                    state.balance += win;
                     state.wins++;
                     state.totalGames++;
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                    state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
+                    state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                    // 🎁 AWARD GIFTS based on profit
-                    awardGifts(profit);
-
+                    showNotification(win, win);
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -2680,32 +2218,29 @@
             initiateCashOut() {
                 if (this.isCashingOut) return;
                 this.isCashingOut = true;
+                triggerCashOutVibration();
                 const btn = document.getElementById('minesMainActionBtn');
                 btn.disabled = true;
                 setTimeout(() => {
                     if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
-                        triggerVibration(30, 'light');
                         this.executeCashOut();
                     }
                     this.isCashingOut = false;
-                }, 150);
+                    btn.disabled = false;
+                }, 300);
             },
 
             executeCashOut() {
                 if (!this.gameActive || this.gameOver || this.hasCashedOut) return;
                 this.hasCashedOut = true;
                 const win = Math.floor(this.bet * this.multiplier);
-                const profit = win - this.bet;
-                state.balance += profit;
+                state.balance += win;
                 state.wins++;
                 state.totalGames++;
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
+                state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                // 🎁 AWARD GIFTS based on profit
-                awardGifts(profit);
-
+                showNotification(win, win);
                 this.gameActive = false;
                 this.gameOver = true;
                 this.hasCashedOut = false;
@@ -2754,11 +2289,6 @@
         });
 
         // ============================================================
-        // WHEEL SPIN BUTTON
-        // ============================================================
-        document.getElementById('wheelSpinBtn').addEventListener('click', spinWheel);
-
-        // ============================================================
         // VISIBILITY CHANGE
         // ============================================================
         document.addEventListener('visibilitychange', function() {
@@ -2783,9 +2313,6 @@
             crashGame.init();
             minesGame.init();
             minesGame.setGridSize(3, 1);
-            drawWheel(0, 0);
-            updateInventoryUI();
-            updateUpgrUI();
 
             try {
                 if (window.Telegram?.WebApp) {
@@ -2794,7 +2321,7 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('Casino loaded – gift earning fixed, inventory buttons, clean wheel.');
+            console.log('Casino loaded – wind angled upward, bet button fixed.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
