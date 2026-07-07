@@ -862,28 +862,28 @@
         /* ===== EPIC-GIFT STYLE WHEEL ===== */
         .wheel-wrapper {
             position: relative;
-            width: 220px;
-            height: 220px;
+            width: 260px;
+            height: 260px;
             margin: 0 auto;
         }
         .wheel-wrapper canvas {
-            width: 220px;
-            height: 220px;
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
-            box-shadow: 0 0 40px rgba(108, 92, 231, 0.15), 0 0 80px rgba(108, 92, 231, 0.05);
+            box-shadow: 0 0 60px rgba(108, 92, 231, 0.12), 0 0 120px rgba(108, 92, 231, 0.05);
         }
         .wheel-pointer {
             position: absolute;
-            top: -10px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
             width: 0;
             height: 0;
-            border-left: 12px solid transparent;
-            border-right: 12px solid transparent;
-            border-top: 20px solid #ffd700;
-            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.6));
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 24px solid #ffd700;
+            filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.7));
         }
         .wheel-center-btn {
             position: absolute;
@@ -891,14 +891,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 6;
-            width: 52px;
-            height: 52px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             border: 2px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -906,10 +906,8 @@
             transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 0 30px rgba(108, 92, 231, 0.25);
+            box-shadow: 0 0 40px rgba(108, 92, 231, 0.3);
             user-select: none;
-            font-size: 10px;
-            padding: 0 4px;
             text-align: center;
             line-height: 1.2;
         }
@@ -924,7 +922,7 @@
 
         .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
         .inventory-item {
@@ -933,26 +931,81 @@
             padding: 12px 8px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .inventory-item.selected {
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+            position: relative;
         }
         .inventory-item .gift-icon {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             margin-bottom: 6px;
         }
         .inventory-item .gift-name {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: #ddd;
+            margin-bottom: 4px;
         }
         .inventory-item .gift-count {
             font-size: 11px;
             color: #888;
+        }
+        .inventory-item .gift-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .inventory-item .gift-actions button {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .inventory-item .gift-actions .upgrade-btn {
+            background: rgba(108, 92, 231, 0.3);
+            color: #a29bfe;
+            border: 1px solid rgba(108, 92, 231, 0.2);
+        }
+        .inventory-item .gift-actions .upgrade-btn:active { transform: scale(0.92); }
+        .inventory-item .gift-actions .sale-btn {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+        }
+        .inventory-item .gift-actions .sale-btn:active { transform: scale(0.92); }
+
+        .target-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 6px;
+        }
+        .target-item {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #888;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .target-item.selected {
+            border-color: #ffd700;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+        .target-item img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
         }
 
         .result-text {
@@ -973,10 +1026,11 @@
             .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
             .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
             .badge .balance-icon { width: 26px; height: 26px; margin-top: 5px; }
-            .wheel-wrapper { width: 180px; height: 180px; }
-            .wheel-wrapper canvas { width: 180px; height: 180px; }
-            .wheel-center-btn { width: 44px; height: 44px; font-size: 8px; }
-            .wheel-pointer { border-left-width: 10px; border-right-width: 10px; border-top-width: 16px; top: -8px; }
+            .wheel-wrapper { width: 210px; height: 210px; }
+            .wheel-wrapper canvas { width: 210px; height: 210px; }
+            .wheel-center-btn { width: 48px; height: 48px; font-size: 10px; }
+            .wheel-pointer { border-left-width: 12px; border-right-width: 12px; border-top-width: 20px; top: -10px; }
+            .inventory-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -1057,33 +1111,33 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- UPGRADE (was Upgrader) -->
-        <div id="page-upgrade" class="page">
-            <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Upgrade</h2>
+        <!-- UPGR (Upgrade) -->
+        <div id="page-upgr" class="page">
+            <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Upgrade <i class="fas fa-arrow-up" style="color:#a29bfe;"></i></h2>
             <div class="card">
                 <div class="card-title">Select a Gift</div>
-                <div id="upgraderInventoryList" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:12px;"></div>
-                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div class="result-text" id="upgraderResult">Choose a gift and spin!</div>
-                </div>
+                <div id="upgrInventoryList" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:8px;"></div>
+                <div class="card-title" style="margin-top:8px;">Desired Gift</div>
+                <div id="upgrTargetList" class="target-grid"></div>
+                <div class="result-text" id="upgrResult">Select a gift and target, then spin!</div>
             </div>
             <div class="card">
                 <div class="card-title">Wheel</div>
                 <div class="wheel-wrapper">
-                    <canvas id="wheelCanvas" width="220" height="220"></canvas>
+                    <canvas id="wheelCanvas" width="260" height="260"></canvas>
                     <div class="wheel-pointer"></div>
                     <button class="wheel-center-btn" id="wheelSpinBtn">SPIN</button>
                 </div>
             </div>
         </div>
 
-        <!-- ITEMS (was Inventory) -->
+        <!-- ITEMS -->
         <div id="page-items" class="page">
             <h2 style="text-align:center; margin-bottom:12px; color:#fff; font-size:18px;">Items</h2>
             <div class="card">
                 <div class="card-title">Your Gifts</div>
                 <div id="inventoryGrid" class="inventory-grid"></div>
-                <div id="inventoryEmpty" style="text-align:center; color:#666; padding:20px;">No gifts yet.</div>
+                <div id="inventoryEmpty" style="text-align:center; color:#666; padding:20px;">No gifts yet. Play Crash or Mines to earn them!</div>
             </div>
         </div>
 
@@ -1119,7 +1173,7 @@
             <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
             <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
             <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
-            <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgrade</span></button>
+            <button class="nav-item" data-page="upgr"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgr</span></button>
             <button class="nav-item" data-page="items"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Items</span></button>
             <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
@@ -1145,21 +1199,19 @@
         // GIFT SYSTEM
         // ============================================================
         const GIFT_TYPES = {
-            bear: { id: 'bear', name: 'Bear', image: 'https://images.iimg.live/images/majestic-moment-5099.webp', level: 1 },
-            box: { id: 'box', name: 'Gift Box', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 2 },
-            diamond: { id: 'diamond', name: 'Diamond', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 3 }
+            bear: { id: 'bear', name: 'Bear', image: 'https://images.iimg.live/images/majestic-moment-5099.webp', level: 1, salePrice: 10 },
+            box: { id: 'box', name: 'Gift Box', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 2, salePrice: 30 },
+            diamond: { id: 'diamond', name: 'Diamond', image: 'https://images.iimg.live/images/glorious-scene-9808.webp', level: 3, salePrice: 100 }
         };
 
         const GIFT_LEVELS = ['bear', 'box', 'diamond'];
-
-        function getGiftById(id) { return GIFT_TYPES[id] || null; }
 
         let inventory = [];
 
         function addGift(giftId) {
             inventory.push({ id: giftId, level: GIFT_TYPES[giftId].level });
             updateInventoryUI();
-            updateUpgraderUI();
+            updateUpgrUI();
         }
 
         function removeGift(giftId) {
@@ -1167,7 +1219,7 @@
             if (index !== -1) {
                 inventory.splice(index, 1);
                 updateInventoryUI();
-                updateUpgraderUI();
+                updateUpgrUI();
                 return true;
             }
             return false;
@@ -1177,7 +1229,7 @@
             return inventory.filter(g => g.id === giftId).length;
         }
 
-        // ----- Inventory UI -----
+        // ----- Inventory UI with Upgrade & Sale buttons -----
         function updateInventoryUI() {
             const grid = document.getElementById('inventoryGrid');
             const empty = document.getElementById('inventoryEmpty');
@@ -1187,8 +1239,10 @@
                 return;
             }
             empty.style.display = 'none';
+
             const counts = {};
             inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
+
             for (const [id, count] of Object.entries(counts)) {
                 const gift = GIFT_TYPES[id];
                 if (!gift) continue;
@@ -1198,36 +1252,77 @@
                     <img src="${gift.image}" class="gift-icon" alt="${gift.name}">
                     <div class="gift-name">${gift.name}</div>
                     <div class="gift-count">×${count}</div>
+                    <div class="gift-actions">
+                        <button class="upgrade-btn" data-gift="${id}">Upgrade</button>
+                        <button class="sale-btn" data-gift="${id}" data-price="${gift.salePrice}">Sale</button>
+                    </div>
                 `;
                 grid.appendChild(div);
+
+                // Upgrade button: navigate to upgr tab with this gift preselected
+                div.querySelector('.upgrade-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const giftId = e.target.dataset.gift;
+                    navigateToUpgrWithGift(giftId);
+                });
+
+                // Sale button: sell one gift for stars
+                div.querySelector('.sale-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const giftId = e.target.dataset.gift;
+                    const price = parseInt(e.target.dataset.price);
+                    if (getGiftCount(giftId) > 0) {
+                        removeGift(giftId);
+                        state.balance += price;
+                        updateHomeUI();
+                        updateProfile();
+                        showNotification(price);
+                    }
+                });
             }
         }
 
-        // ----- Upgrader UI -----
-        let selectedGiftId = null;
+        // ============================================================
+        // UPGR WHEEL
+        // ============================================================
+        let selectedSourceId = null;
+        let selectedTargetId = null;
+        let wheelRotation = 0;
+        let isSpinning = false;
+        const WHEEL_SEGMENTS = 8;
 
-        function updateUpgraderUI() {
-            const container = document.getElementById('upgraderInventoryList');
+        function getUpgradeChance(sourceLevel, targetLevel) {
+            if (targetLevel <= sourceLevel) return 0;
+            const diff = targetLevel - sourceLevel;
+            if (diff === 1) return 70;
+            if (diff === 2) return 50;
+            if (diff === 3) return 30;
+            return 20;
+        }
+
+        function updateUpgrUI() {
+            const container = document.getElementById('upgrInventoryList');
             container.innerHTML = '';
             const counts = {};
             inventory.forEach(g => { counts[g.id] = (counts[g.id] || 0) + 1; });
 
-            const upgradeable = Object.keys(counts).filter(id => {
-                const level = GIFT_TYPES[id].level;
-                return level < GIFT_LEVELS.length && counts[id] > 0;
-            });
-
-            if (upgradeable.length === 0) {
-                container.innerHTML = '<span style="color:#666; font-size:13px;">No upgradeable gifts.</span>';
-                selectedGiftId = null;
+            const hasGifts = Object.keys(counts).some(id => counts[id] > 0);
+            if (!hasGifts) {
+                container.innerHTML = '<span style="color:#666; font-size:13px;">No gifts in inventory.</span>';
+                selectedSourceId = null;
+                selectedTargetId = null;
                 document.getElementById('wheelSpinBtn').disabled = true;
+                document.getElementById('upgrTargetList').innerHTML = '';
+                document.getElementById('upgrResult').textContent = 'Earn gifts from Crash or Mines!';
                 return;
             }
 
-            upgradeable.forEach(id => {
+            // Source gifts
+            const sourceKeys = Object.keys(counts).filter(id => counts[id] > 0);
+            sourceKeys.forEach(id => {
                 const gift = GIFT_TYPES[id];
                 const div = document.createElement('div');
-                div.className = 'inventory-item' + (selectedGiftId === id ? ' selected' : '');
+                div.className = 'inventory-item' + (selectedSourceId === id ? ' selected' : '');
                 div.style.flex = '0 0 auto';
                 div.style.width = '70px';
                 div.innerHTML = `
@@ -1236,44 +1331,80 @@
                     <div style="font-size:10px; color:#888;">×${counts[id]}</div>
                 `;
                 div.onclick = () => {
-                    selectedGiftId = id;
-                    updateUpgraderUI();
+                    selectedSourceId = id;
+                    selectedTargetId = null;
+                    updateUpgrUI();
+                    updateWheel();
                     document.getElementById('wheelSpinBtn').disabled = false;
-                    document.getElementById('upgraderResult').textContent = 'Ready to spin!';
+                    document.getElementById('upgrResult').textContent = 'Select a target gift.';
                 };
                 container.appendChild(div);
             });
 
-            if (selectedGiftId && !upgradeable.includes(selectedGiftId)) {
-                selectedGiftId = null;
+            // Target gifts
+            const targetContainer = document.getElementById('upgrTargetList');
+            targetContainer.innerHTML = '';
+            if (selectedSourceId) {
+                const sourceLevel = GIFT_TYPES[selectedSourceId].level;
+                const higherGifts = GIFT_LEVELS.filter((id, idx) => idx + 1 > sourceLevel);
+                if (higherGifts.length === 0) {
+                    targetContainer.innerHTML = '<span style="color:#666; font-size:13px;">No higher-level gifts available.</span>';
+                    document.getElementById('wheelSpinBtn').disabled = true;
+                    document.getElementById('upgrResult').textContent = 'This gift is already max level!';
+                } else {
+                    higherGifts.forEach(id => {
+                        const gift = GIFT_TYPES[id];
+                        const div = document.createElement('div');
+                        div.className = 'target-item' + (selectedTargetId === id ? ' selected' : '');
+                        div.innerHTML = `
+                            <img src="${gift.image}" alt="${gift.name}">
+                            ${gift.name}
+                        `;
+                        div.onclick = () => {
+                            selectedTargetId = id;
+                            updateUpgrUI();
+                            updateWheel();
+                            const chance = getUpgradeChance(GIFT_TYPES[selectedSourceId].level, GIFT_TYPES[id]
+                                .level);
+                            document.getElementById('upgrResult').textContent =
+                                `Chance: ${chance}% — ${chance >= 50 ? 'Good luck!' : 'Risky!'}`;
+                            document.getElementById('wheelSpinBtn').disabled = false;
+                        };
+                        targetContainer.appendChild(div);
+                    });
+                }
+            } else {
+                targetContainer.innerHTML = '<span style="color:#666; font-size:13px;">Select a gift first.</span>';
                 document.getElementById('wheelSpinBtn').disabled = true;
             }
-            if (!selectedGiftId && upgradeable.length > 0) {
-                selectedGiftId = upgradeable[0];
-                updateUpgraderUI();
-                document.getElementById('wheelSpinBtn').disabled = false;
+
+            if (selectedSourceId && !selectedTargetId) {
+                const sourceLevel = GIFT_TYPES[selectedSourceId].level;
+                const higherGifts = GIFT_LEVELS.filter((id, idx) => idx + 1 > sourceLevel);
+                if (higherGifts.length > 0) {
+                    selectedTargetId = higherGifts[0];
+                    updateUpgrUI();
+                    updateWheel();
+                    const chance = getUpgradeChance(GIFT_TYPES[selectedSourceId].level, GIFT_TYPES[selectedTargetId].level);
+                    document.getElementById('upgrResult').textContent =
+                        `Chance: ${chance}% — ${chance >= 50 ? 'Good luck!' : 'Risky!'}`;
+                    document.getElementById('wheelSpinBtn').disabled = false;
+                }
             }
         }
 
-        // ============================================================
-        // EPIC-GIFT STYLE WHEEL
-        // ============================================================
-        const WHEEL_SEGMENTS = [
-            { label: '⬆', color: '#00d2a0', action: 'upgrade' },
-            { label: '➖', color: '#54a0ff', action: 'same' },
-            { label: '⬇', color: '#ff6b6b', action: 'downgrade' },
-            { label: '⬆', color: '#00d2a0', action: 'upgrade' },
-            { label: '➖', color: '#54a0ff', action: 'same' },
-            { label: '⬇', color: '#ff6b6b', action: 'downgrade' },
-            { label: '⬆', color: '#00d2a0', action: 'upgrade' },
-            { label: '➖', color: '#54a0ff', action: 'same' }
-        ];
-        const NUM_SEGMENTS = WHEEL_SEGMENTS.length;
-        const ARC = (2 * Math.PI) / NUM_SEGMENTS;
-        let wheelRotation = 0;
-        let isSpinning = false;
+        function updateWheel() {
+            if (!selectedSourceId || !selectedTargetId) {
+                drawWheel(wheelRotation, 0);
+                return;
+            }
+            const sourceLevel = GIFT_TYPES[selectedSourceId].level;
+            const targetLevel = GIFT_TYPES[selectedTargetId].level;
+            const chance = getUpgradeChance(sourceLevel, targetLevel);
+            drawWheel(wheelRotation, chance);
+        }
 
-        function drawWheel(rotation) {
+        function drawWheel(rotation, chance) {
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
             const w = canvas.width,
@@ -1284,55 +1415,36 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            // Glow
-            const grad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
-            grad.addColorStop(0, 'rgba(108,92,231,0.05)');
-            grad.addColorStop(1, 'rgba(108,92,231,0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-            ctx.fill();
+            const numSeg = WHEEL_SEGMENTS;
+            const arc = (2 * Math.PI) / numSeg;
 
-            for (let i = 0; i < NUM_SEGMENTS; i++) {
-                const startAngle = i * ARC + rotation;
-                const endAngle = startAngle + ARC;
+            const greenCount = Math.round((chance / 100) * numSeg);
+            const redCount = numSeg - greenCount;
+
+            for (let i = 0; i < numSeg; i++) {
+                const startAngle = i * arc + rotation;
+                const endAngle = startAngle + arc;
                 ctx.beginPath();
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, r, startAngle, endAngle);
                 ctx.closePath();
 
-                // Gradient fill per segment
-                const segGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-                const c = WHEEL_SEGMENTS[i].color;
-                segGrad.addColorStop(0, c + '80');
-                segGrad.addColorStop(0.6, c);
-                segGrad.addColorStop(1, c + 'cc');
-                ctx.fillStyle = segGrad;
+                const isGreen = i < greenCount;
+                const color = isGreen ? '#00d2a0' : '#ff6b6b';
+                const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                grad.addColorStop(0, color + '80');
+                grad.addColorStop(0.6, color);
+                grad.addColorStop(1, color + 'cc');
+                ctx.fillStyle = grad;
                 ctx.fill();
-
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // Label
-                const midAngle = startAngle + ARC / 2;
-                const labelR = r * 0.68;
-                const lx = cx + Math.cos(midAngle) * labelR;
-                const ly = cy + Math.sin(midAngle) * labelR;
-                ctx.save();
-                ctx.translate(lx, ly);
-                ctx.rotate(midAngle + (midAngle > Math.PI / 2 ? Math.PI : 0));
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 18px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 8;
-                ctx.fillText(WHEEL_SEGMENTS[i].label, 0, 0);
-                ctx.restore();
+                // No arrow icons – just clean segments
             }
 
-            // Outer ring glow
+            // Outer ring
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, 2 * Math.PI);
             ctx.strokeStyle = 'rgba(255,255,255,0.06)';
@@ -1347,12 +1459,30 @@
             ctx.strokeStyle = 'rgba(255,255,255,0.04)';
             ctx.lineWidth = 1;
             ctx.stroke();
+
+            // Center chance label
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(chance + '%', cx, cy - 14);
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            ctx.font = '8px sans-serif';
+            ctx.fillText(chance >= 50 ? 'GOOD' : 'RISKY', cx, cy + 6);
         }
 
         function spinWheel() {
-            if (isSpinning || !selectedGiftId) return;
-            if (getGiftCount(selectedGiftId) === 0) {
-                document.getElementById('upgraderResult').textContent = 'No gift left!';
+            if (isSpinning || !selectedSourceId || !selectedTargetId) return;
+            if (getGiftCount(selectedSourceId) === 0) {
+                document.getElementById('upgrResult').textContent = 'You don\'t have this gift anymore!';
+                return;
+            }
+
+            const sourceLevel = GIFT_TYPES[selectedSourceId].level;
+            const targetLevel = GIFT_TYPES[selectedTargetId].level;
+            if (targetLevel <= sourceLevel) {
+                document.getElementById('upgrResult').textContent = 'Target must be a higher level!';
                 return;
             }
 
@@ -1360,15 +1490,27 @@
             const btn = document.getElementById('wheelSpinBtn');
             btn.disabled = true;
 
+            const chance = getUpgradeChance(sourceLevel, targetLevel);
+            const numSeg = WHEEL_SEGMENTS;
+            const arc = (2 * Math.PI) / numSeg;
+            const greenCount = Math.round((chance / 100) * numSeg);
+
+            const isSuccess = Math.random() * 100 < chance;
+            let targetSegment;
+            if (isSuccess) {
+                targetSegment = Math.floor(Math.random() * greenCount);
+            } else {
+                targetSegment = greenCount + Math.floor(Math.random() * (numSeg - greenCount));
+            }
+
+            const targetAngle = targetSegment * arc + arc / 2;
             const spins = 5 + Math.random() * 4;
-            const targetSegment = Math.floor(Math.random() * NUM_SEGMENTS);
-            const targetAngle = targetSegment * ARC + ARC / 2;
             const finalRotation = wheelRotation + spins * 2 * Math.PI + (2 * Math.PI - targetAngle);
 
             const startRotation = wheelRotation;
             const duration = 4000 + Math.random() * 1000;
             const startTime = performance.now();
-            const resultEl = document.getElementById('upgraderResult');
+            const resultEl = document.getElementById('upgrResult');
 
             function animateSpin(time) {
                 const elapsed = time - startTime;
@@ -1376,75 +1518,66 @@
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const currentRotation = startRotation + (finalRotation - startRotation) * eased;
                 wheelRotation = currentRotation;
-                drawWheel(currentRotation);
+                drawWheel(currentRotation, chance);
 
                 if (progress < 1) {
                     requestAnimationFrame(animateSpin);
                 } else {
                     wheelRotation = finalRotation;
-                    drawWheel(finalRotation);
-                    const normalized = ((finalRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-                    const pointerAngle = -Math.PI / 2;
-                    let angleDiff = (pointerAngle - normalized + 2 * Math.PI) % (2 * Math.PI);
-                    let segIndex = Math.floor(angleDiff / ARC) % NUM_SEGMENTS;
-                    if (segIndex < 0) segIndex += NUM_SEGMENTS;
-                    const result = WHEEL_SEGMENTS[segIndex];
-                    applyUpgradeResult(result.action);
+                    drawWheel(finalRotation, chance);
+                    if (isSuccess) {
+                        const removed = removeGift(selectedSourceId);
+                        if (removed) {
+                            addGift(selectedTargetId);
+                            resultEl.textContent =
+                                `🎉 Success! ${GIFT_TYPES[selectedSourceId].name} → ${GIFT_TYPES[selectedTargetId].name}!`;
+                            triggerVibration(50, 'medium');
+                            selectedSourceId = selectedTargetId;
+                            selectedTargetId = null;
+                            updateUpgrUI();
+                            updateWheel();
+                        }
+                    } else {
+                        const removed = removeGift(selectedSourceId);
+                        if (removed) {
+                            if (sourceLevel > 1) {
+                                const prevId = GIFT_LEVELS[sourceLevel - 2];
+                                addGift(prevId);
+                                resultEl.textContent =
+                                    `💔 Failed! ${GIFT_TYPES[selectedSourceId].name} downgraded to ${GIFT_TYPES[prevId].name}.`;
+                            } else {
+                                resultEl.textContent =
+                                    `💔 Failed! ${GIFT_TYPES[selectedSourceId].name} was lost!`;
+                            }
+                            triggerVibration(60, 'heavy');
+                            selectedSourceId = null;
+                            selectedTargetId = null;
+                            updateUpgrUI();
+                            updateWheel();
+                        }
+                    }
                     isSpinning = false;
                     btn.disabled = false;
+                    if (inventory.length > 0) {
+                        updateUpgrUI();
+                    }
                 }
             }
             requestAnimationFrame(animateSpin);
         }
 
-        function applyUpgradeResult(action) {
-            const giftId = selectedGiftId;
-            if (!giftId) return;
-            const gift = GIFT_TYPES[giftId];
-            const currentLevel = gift.level;
-            const maxLevel = GIFT_LEVELS.length;
-            const resultEl = document.getElementById('upgraderResult');
-
-            let newLevel = currentLevel;
-            let msg = '';
-
-            if (action === 'upgrade') {
-                if (currentLevel < maxLevel) {
-                    newLevel = currentLevel + 1;
-                    msg = `⬆ Upgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
-                } else {
-                    msg = `🌟 ${gift.name} is already max!`;
-                }
-            } else if (action === 'downgrade') {
-                if (currentLevel > 1) {
-                    newLevel = currentLevel - 1;
-                    msg = `⬇ Downgraded! ${gift.name} → ${GIFT_TYPES[GIFT_LEVELS[newLevel-1]].name}`;
-                } else {
-                    msg = `🛡️ ${gift.name} can't go lower!`;
-                }
-            } else {
-                msg = `🔄 ${gift.name} stayed the same!`;
-            }
-
-            if (newLevel !== currentLevel) {
-                const removed = removeGift(giftId);
-                if (removed) {
-                    const newGiftId = GIFT_LEVELS[newLevel - 1];
-                    addGift(newGiftId);
-                    if (getGiftCount(newGiftId) > 0) {
-                        selectedGiftId = newGiftId;
-                    } else {
-                        selectedGiftId = null;
-                    }
-                    updateUpgraderUI();
-                }
-            } else {
-                updateInventoryUI();
-                updateUpgraderUI();
-            }
-
-            resultEl.textContent = msg;
-            triggerVibration(30, 'light');
+        // Navigate to Upgr tab with a preselected gift
+        function navigateToUpgrWithGift(giftId) {
+            selectedSourceId = giftId;
+            selectedTargetId = null;
+            navigateTo('upgr');
+            // Update UI after page becomes active
+            setTimeout(() => {
+                updateUpgrUI();
+                updateWheel();
+                document.getElementById('wheelSpinBtn').disabled = false;
+                document.getElementById('upgrResult').textContent = 'Select a target gift.';
+            }, 100);
         }
 
         // ============================================================
@@ -1484,7 +1617,7 @@
             home: document.getElementById('page-home'),
             rocket: document.getElementById('page-rocket'),
             mines: document.getElementById('page-mines'),
-            upgrade: document.getElementById('page-upgrade'),
+            upgr: document.getElementById('page-upgr'),
             items: document.getElementById('page-items'),
             profile: document.getElementById('page-profile'),
         };
@@ -1520,8 +1653,8 @@
                 renderPlayers(); }
             if (page === 'profile') { updateProfile(); }
             if (page === 'items') { updateInventoryUI(); }
-            if (page === 'upgrade') { updateUpgraderUI();
-                drawWheel(wheelRotation); }
+            if (page === 'upgr') { updateUpgrUI();
+                updateWheel(); }
         }
 
         navItems.forEach(item => { item.addEventListener('click', () => navigateTo(item.dataset.page)); });
@@ -1614,6 +1747,35 @@
                 notif.style.transform = 'translateY(-120%)';
                 setTimeout(() => { notif.style.display = 'none'; }, 400);
             }, 1000);
+        }
+
+        function showNotificationWithGift(amount, giftId) {
+            const gift = GIFT_TYPES[giftId];
+            const notif = document.getElementById('notification');
+            notifAmount.innerHTML = `+${amount} ⭐ &amp; <img src="${gift.image}" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;" alt="${gift.name}"> ${gift.name}`;
+            notif.style.display = 'flex';
+            void notif.offsetHeight;
+            notif.style.transform = 'translateY(0)';
+            clearTimeout(notif._timeout);
+            notif._timeout = setTimeout(() => {
+                notif.style.transform = 'translateY(-120%)';
+                setTimeout(() => { notif.style.display = 'none'; }, 400);
+            }, 2000);
+        }
+
+        // ============================================================
+        // AWARD GIFTS (from games)
+        // ============================================================
+        function awardGifts(profit) {
+            if (profit >= 18 && profit < 50) {
+                addGift('bear');
+                showNotificationWithGift(profit, 'bear');
+            } else if (profit >= 50) {
+                addGift('box');
+                showNotificationWithGift(profit, 'box');
+            } else {
+                showNotification(profit);
+            }
         }
 
         // ============================================================
@@ -1772,9 +1934,9 @@
                 const dogImg = document.getElementById('flyingDogGif');
                 dogImg.src = this.currentDogGif;
                 dogImg.style.display = 'none';
-                drawWheel(0);
+                drawWheel(0, 0);
                 updateInventoryUI();
-                updateUpgraderUI();
+                updateUpgrUI();
             },
 
             createGrid() {
@@ -1955,8 +2117,8 @@
                 state.recentWinners.unshift({ name: 'You', amount: profit });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-                // ❌ NO GIFT DROPS
-                showNotification(profit);
+                // 🎁 AWARD GIFTS based on profit
+                awardGifts(profit);
 
                 const user = players.find(p => p.isYou);
                 if (user) { user.hasCashedOut = true;
@@ -2120,7 +2282,7 @@
         };
 
         // ============================================================
-        // MINES GAME – No gift drops
+        // MINES GAME (with gift earning)
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -2422,8 +2584,10 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    // ❌ NO GIFT DROPS
-                    showNotification(profit);
+
+                    // 🎁 AWARD GIFTS based on profit
+                    awardGifts(profit);
+
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -2538,8 +2702,10 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: profit });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-                // ❌ NO GIFT DROPS
-                showNotification(profit);
+
+                // 🎁 AWARD GIFTS based on profit
+                awardGifts(profit);
+
                 this.gameActive = false;
                 this.gameOver = true;
                 this.hasCashedOut = false;
@@ -2617,9 +2783,9 @@
             crashGame.init();
             minesGame.init();
             minesGame.setGridSize(3, 1);
-            drawWheel(0);
+            drawWheel(0, 0);
             updateInventoryUI();
-            updateUpgraderUI();
+            updateUpgrUI();
 
             try {
                 if (window.Telegram?.WebApp) {
@@ -2628,7 +2794,7 @@
                     tg.ready();
                 }
             } catch (e) {}
-            console.log('Casino loaded – Epic Gift style wheel, shorter tabs, no gift drops from games.');
+            console.log('Casino loaded – gift earning fixed, inventory buttons, clean wheel.');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
