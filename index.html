@@ -103,9 +103,8 @@
         .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
         @keyframes windStreak { 0% { transform: translate(0,0); opacity: 0; } 10% { opacity: 0.8; } 85% { opacity: 0.8; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 
-        /* ===== ROCKET/CAR OVERLAY ===== */
         .gif-overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(0deg) scale(1); z-index: 10; width: 80%; height: 80%; pointer-events: none; display: flex; align-items: center; justify-content: center; transition: none; will-change: transform; }
-        .gif-overlay img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 0 40px rgba(108,92,231,0.3)); transition: opacity 0.25s ease; }
+        .gif-overlay img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 0 40px rgba(108,92,231,0.3)); transition: opacity 0.15s ease; }
         .gif-overlay img.active { display: block; animation: flyIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
         @keyframes flyIn { 0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } }
         .explosion-overlay { position: absolute; inset: 0; z-index: 15; display: none; align-items: center; justify-content: center; pointer-events: none; }
@@ -132,7 +131,6 @@
         .progress-wrap.active { opacity: 1; }
         .progress-fill { height: 100%; width: 0%; border-radius: 2px; background: #00d2a0; transition: none; box-shadow: 0 0 16px rgba(0,210,160,0.2); }
 
-        /* ===== BET / CASH OUT (Crash) ===== */
         .bet-container { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 0 0; }
         .bet-input-row { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 4px; border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; max-height: 0; overflow: hidden; opacity: 0; padding: 0 4px; margin: 0; }
         .bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
@@ -175,30 +173,7 @@
         .player-cash-gif.show { display: flex; }
         .player-cash-gif img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; }
 
-        /* ---- Main Action Button ---- */
-        .main-action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0px;
-            padding: 14px 12px 12px 12px; /* Increased top padding to push text lower */
-            padding-top: 14px;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            color: white;
-            text-align: center;
-            width: 100%;
-            letter-spacing: 0.3px;
-            position: relative;
-            overflow: hidden;
-            min-height: 44px;
-            line-height: 1.2;
-        }
+        .main-action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0px; padding: 14px 12px 12px 12px; padding-top: 14px; border: none; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); color: white; text-align: center; width: 100%; letter-spacing: 0.3px; position: relative; overflow: hidden; min-height: 44px; line-height: 1.2; }
         .main-action-btn:active { transform: scale(0.94); }
         .main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
         #mainActionText { font-size: 14px; font-weight: 700; line-height: 1.3; }
@@ -956,7 +931,7 @@
     }
 
     // ============================================================
-    // CRASH GAME – smooth car → rocket transition (fast)
+    // CRASH GAME – faster, non‑stop multiplier
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -1073,54 +1048,41 @@
             this.transitioning = false;
         },
 
-        // Smooth transition: car fades out → disappears → rocket fades in (fast)
         transitionToRocket() {
             if (this.transitioning || !this.isCarPhase) return;
             this.transitioning = true;
             const img = document.getElementById('crashGif');
-            
-            // Step 1: Fade out the car (fast)
-            img.style.transition = 'opacity 0.25s ease';
+            img.style.transition = 'opacity 0.15s ease';
             img.style.opacity = 0;
-            
             setTimeout(() => {
-                // Step 2: Remove active class, clear src to prevent flicker
                 img.classList.remove('active');
                 img.src = '';
                 img.style.display = 'none';
-                
-                // Short delay before loading rocket
                 setTimeout(() => {
-                    // Step 3: Load the rocket
                     this.currentRocketGif = getRandomRocketGif();
                     img.style.display = 'block';
                     img.src = this.currentRocketGif;
-                    
                     const onLoad = () => {
                         img.onload = null;
-                        img.style.transition = 'opacity 0.25s ease';
+                        img.style.transition = 'opacity 0.15s ease';
                         img.style.opacity = 1;
                         img.classList.add('active');
                         this.isCarPhase = false;
                         this.transitioning = false;
                     };
                     img.onload = onLoad;
-                    // If image is already cached
-                    if (img.complete && img.naturalWidth > 0) {
-                        onLoad();
-                    }
-                    // Safety fallback
+                    if (img.complete && img.naturalWidth > 0) onLoad();
                     setTimeout(() => {
                         if (this.transitioning) {
-                            img.style.transition = 'opacity 0.25s ease';
+                            img.style.transition = 'opacity 0.15s ease';
                             img.style.opacity = 1;
                             img.classList.add('active');
                             this.isCarPhase = false;
                             this.transitioning = false;
                         }
-                    }, 500);
-                }, 50);
-            }, 250);
+                    }, 300);
+                }, 30);
+            }, 150);
         },
 
         hideImage() {
@@ -1434,6 +1396,7 @@
             updateHomeUI();
         },
 
+        // ---- Slower countdown (1.2s per number) ----
         startCountdown() {
             if (this.isCountingDown || this.isPlaying) return;
             this.isCountingDown = true;
@@ -1467,6 +1430,7 @@
                 if (num === 2 || num === 1) triggerVibration(35, 'light');
             };
             showNumber(3);
+            const intervalTime = 1200;
             this.countdownId = setInterval(() => {
                 count--;
                 if (count <= 0) {
@@ -1478,7 +1442,7 @@
                     return;
                 }
                 showNumber(count);
-            }, 1000);
+            }, intervalTime);
             this.updateMainButton();
         },
 
@@ -1508,7 +1472,6 @@
             this.gameOver = false;
             this.lastTime = 0;
             document.getElementById('explosionOverlay').classList.remove('active');
-            // Show car
             this.setCarImage();
             document.getElementById('windLines').classList.remove('active');
             document.getElementById('windLines').style.opacity = 0;
@@ -1526,12 +1489,14 @@
             this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
         },
 
+        // ---- Faster, non‑stop multiplier growth ----
         gameLoop(timestamp) {
             if (!this.isPlaying) return;
             const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
             this.lastTime = timestamp;
             const mult = this.multiplier;
-            const speedFactor = 0.02 + 0.10 * Math.pow(mult, 1.2);
+            // Use a more aggressive formula: base 0.04, exponent 1.2, multiplier 1.5
+            const speedFactor = 0.04 + 0.09 * Math.pow(mult, 1.2);
             const inc = delta * speedFactor * 1.5;
             this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
@@ -2345,7 +2310,7 @@
                 tg.ready();
             }
         } catch (e) {}
-        console.log('Casino loaded – faster rocket transition, button text centered lower.');
+        console.log('Casino loaded – faster non‑stop multiplier, slower countdown, fast rocket switch.');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
