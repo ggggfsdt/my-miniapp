@@ -214,7 +214,7 @@
             display: inline-block;
             vertical-align: middle;
         }
-        /* ===== STACKED QUICK GRID ===== */
+        /* ===== QUICK GRID – stacked full width ===== */
         .quick-grid {
             display: flex;
             flex-direction: column;
@@ -357,7 +357,7 @@
             100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
         }
 
-        /* ===== ROCKET OVERLAY (replaces dog) ===== */
+        /* ===== DOG OVERLAY ===== */
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -380,8 +380,8 @@
             display: none;
             filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
         }
-        .gif-overlay img.active { display: block; animation: flyIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes flyIn {
+        .gif-overlay img.active { display: block; animation: dogFly 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes dogFly {
             0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; }
             50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; }
             100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
@@ -894,7 +894,7 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
-        /* ===== SURF GAME ===== */
+        /* ===== SURF GAME – black grid ===== */
         .surf-container {
             background: #0a0a0c;
             border-radius: 20px;
@@ -917,25 +917,28 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
+            transform: translate(-50%, -50%) scale(0.85);
             width: 70%;
             height: 70%;
             object-fit: contain;
-            transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: left 0.9s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.5s ease;
             opacity: 0;
             pointer-events: none;
+            z-index: 2;
             filter: drop-shadow(0 0 30px rgba(54, 160, 255, 0.15));
         }
         .surf-display .surf-gif.show {
             opacity: 1;
         }
         .surf-display .surf-gif.left {
-            left: 20%;
-            transform: translate(-50%, -50%) scale(0.9) rotate(-6deg);
+            left: 22%;
+            transform: translate(-50%, -50%) scale(0.85) rotate(-6deg);
         }
         .surf-display .surf-gif.right {
-            left: 80%;
-            transform: translate(-50%, -50%) scale(0.9) rotate(6deg);
+            left: 78%;
+            transform: translate(-50%, -50%) scale(0.85) rotate(6deg);
         }
         .surf-display .surf-countdown {
             position: absolute;
@@ -943,19 +946,52 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 80px;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 0 60px rgba(54, 160, 255, 0.4);
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
             z-index: 10;
             opacity: 0;
-            transition: opacity 0.3s;
             pointer-events: none;
+            transition: opacity 0.3s;
         }
         .surf-display .surf-countdown.show {
             opacity: 1;
+        }
+        .surf-display .surf-countdown .count-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        .surf-display .surf-countdown .count-ring svg {
+            transform: rotate(-90deg);
+            width: 120px;
+            height: 120px;
+        }
+        .surf-display .surf-countdown .count-ring .bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 6;
+        }
+        .surf-display .surf-countdown .count-ring .progress {
+            fill: none;
+            stroke: #54a0ff;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.35s ease;
+            filter: drop-shadow(0 0 12px rgba(54, 160, 255, 0.3));
+        }
+        .surf-display .surf-countdown .count-ring .num {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(54, 160, 255, 0.3);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+        }
+        .surf-display .surf-countdown .count-ring .num.pulse {
+            transform: scale(1.25);
+            opacity: 0.7;
         }
         .surf-display .surf-result {
             position: absolute;
@@ -963,24 +999,33 @@
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            font-weight: 800;
-            color: #fff;
+            flex-direction: column;
+            gap: 4px;
             z-index: 15;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(6px);
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
         .surf-display .surf-result.show {
             display: flex;
+            opacity: 1;
         }
+        .surf-display .surf-result .result-icon { font-size: 48px; }
+        .surf-display .surf-result .result-text { font-size: 28px; font-weight: 800; }
+        .surf-display .surf-result .result-sub { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
         .surf-display .surf-result.win {
-            background: rgba(0, 210, 160, 0.2);
+            background: rgba(0, 210, 160, 0.15);
             color: #00d2a0;
+            border: 1px solid rgba(0, 210, 160, 0.1);
         }
         .surf-display .surf-result.lose {
-            background: rgba(255, 80, 80, 0.2);
+            background: rgba(255, 80, 80, 0.15);
             color: #ff6b6b;
+            border: 1px solid rgba(255, 80, 80, 0.1);
         }
+        .surf-display .surf-result .result-sub img { width: 22px; height: 22px; }
+
         .surf-bet-buttons {
             display: flex;
             gap: 12px;
@@ -1003,6 +1048,7 @@
         .surf-bet-buttons .surf-btn.left { background: linear-gradient(135deg, #54a0ff, #2e86de); box-shadow: 0 4px 20px rgba(54, 160, 255, 0.2); }
         .surf-bet-buttons .surf-btn.right { background: linear-gradient(135deg, #a29bfe, #6c5ce7); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.2); }
         .surf-bet-buttons .surf-btn .sub { font-size: 11px; font-weight: 400; opacity: 0.8; display: block; margin-top: 2px; }
+
         .surf-bet-input-row {
             display: flex;
             gap: 8px;
@@ -1055,6 +1101,9 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: #888;
+            display: flex;
+            align-items: center;
+            gap: 3px;
         }
         .surf-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); background: rgba(0, 210, 160, 0.05); }
         .surf-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); background: rgba(255, 107, 107, 0.05); }
@@ -1082,8 +1131,12 @@
             .badge .balance-icon { width: 26px; height: 26px; margin-top: 1px; }
             .star-icon-sm { width: 16px; height: 16px; }
             .star-icon-xs { width: 14px; height: 14px; }
-            .surf-display .surf-countdown { font-size: 60px; }
-            .surf-display .surf-result { font-size: 24px; }
+            .surf-display .surf-countdown .count-ring { width: 90px; height: 90px; }
+            .surf-display .surf-countdown .count-ring svg { width: 90px; height: 90px; }
+            .surf-display .surf-countdown .count-ring .num { font-size: 38px; }
+            .surf-display .surf-result .result-text { font-size: 22px; }
+            .surf-display .surf-result .result-icon { font-size: 36px; }
+            .surf-display .surf-result .result-sub { font-size: 16px; }
             .surf-bet-buttons .surf-btn { font-size: 14px; padding: 8px; }
         }
     </style>
@@ -1101,7 +1154,7 @@
     <!-- HOME -->
     <div id="page-home" class="page active">
         <div class="home-header">
-            <div class="home-avatar"><img src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar"></div>
+            <div class="home-avatar"><img id="homeAvatarImg" src="" alt="Avatar"></div>
             <div class="home-user"><div class="greeting">Welcome back</div><div class="username" id="homeUsername">xDll_Lud</div></div>
             <div class="home-balance-wrap"><div class="label">Balance</div><div class="amount" id="homeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</div></div>
         </div>
@@ -1125,14 +1178,14 @@
         <div class="card recent-winners-card"><div class="card-title">Recent Winners</div><div id="recentWinners" class="text-muted" style="font-size:14px;">No wins yet</div></div>
     </div>
 
-    <!-- CRASH -->
+    <!-- CRASH (unchanged) -->
     <div id="page-rocket" class="page">
         <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
         <div class="grid-container" id="gridContainer">
             <div class="grid-squares" id="gridSquares"></div>
             <div class="wind-lines" id="windLines"></div>
-            <div class="gif-overlay" id="rocketOverlay">
-                <img id="rocketGif" src="https://images.iimg.live/images/radiant-picture-4066.webp" alt="Rocket">
+            <div class="gif-overlay" id="dogOverlay">
+                <img id="flyingDogGif" src="https://images.iimg.live/images/glorious-portfolio-1947.webp" alt="Flying Dog">
             </div>
             <div class="explosion-overlay" id="explosionOverlay">
                 <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
@@ -1155,7 +1208,7 @@
         </div>
     </div>
 
-    <!-- MINES -->
+    <!-- MINES (unchanged) -->
     <div id="page-mines" class="page">
         <div class="mines-header"><span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span><span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span><span class="badge" id="minesBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
         <div class="grid-presets" id="gridPresets">
@@ -1180,12 +1233,24 @@
 
     <!-- SURF -->
     <div id="page-surf" class="page">
-        <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-water" style="margin-right:6px;"></i>Surf<span class="online-dot"></span></span><span class="badge" id="surfBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
+        <div class="flex-between mb-8"><span class="badge badge-blue"><i class="fas fa-water" style="margin-right:6px;"></i>Surf<span class="online-dot"></span></span><span class="badge" id="surfBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
         <div class="surf-container">
             <div class="surf-display" id="surfDisplay">
                 <img class="surf-gif" id="surfGif" src="" alt="Surf">
-                <div class="surf-countdown" id="surfCountdown">3</div>
-                <div class="surf-result" id="surfResult"></div>
+                <div class="surf-countdown" id="surfCountdown">
+                    <div class="count-ring">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="bg" cx="60" cy="60" r="52"/>
+                            <circle class="progress" id="surfProgress" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="num" id="surfCountNum">3</div>
+                    </div>
+                </div>
+                <div class="surf-result" id="surfResult">
+                    <div class="result-icon" id="resultIcon"><i class="fas fa-check-circle"></i></div>
+                    <div class="result-text" id="resultText">WIN</div>
+                    <div class="result-sub" id="resultSub">+0 <img src="https://images.iimg.live/images/radiant-capture-7834.webp" alt="⭐"></div>
+                </div>
             </div>
             <div class="surf-status" id="surfStatus">Place your bet and pick a side</div>
             <div class="surf-bet-input-row">
@@ -1210,7 +1275,7 @@
     <!-- PROFILE -->
     <div id="page-profile" class="page">
         <div class="profile-header">
-            <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="https://images.iimg.live/images/excellent-photo-9680.webp" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="fallback" id="profileAvatarFallback">XD</div></div>
+            <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="fallback" id="profileAvatarFallback">XD</div></div>
             <div class="profile-name" id="profileName">xDll_Lud</div><div class="profile-username" id="profileUsername">@xDll_Lud</div>
         </div>
         <div class="card">
@@ -1246,6 +1311,18 @@
 
 <script>
     // ============================================================
+    // DOG GIFS (Crash)
+    // ============================================================
+    const DOG_GIFS = [
+        'https://images.iimg.live/images/glorious-portfolio-1947.webp',
+        'https://images.iimg.live/images/wonderful-work-4770.webp',
+        'https://images.iimg.live/images/wonderful-work-3128.webp',
+        'https://images.iimg.live/images/ultimate-photography-1463.webp',
+        'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
+    ];
+    function getRandomDogGif() { return DOG_GIFS[Math.floor(Math.random() * DOG_GIFS.length)]; }
+
+    // ============================================================
     // SURF GIFS
     // ============================================================
     const SURF_GIFS = [
@@ -1266,12 +1343,13 @@
         recentWinners: [],
         username: 'xDll_Lud',
         displayName: 'xDll_Lud',
-        avatarUrl: 'https://images.iimg.live/images/excellent-photo-9680.webp',
+        avatarUrl: '',
     };
 
     // -------- DOM refs ----------
     const homeBalance = document.getElementById('homeBalance');
     const homeUsername = document.getElementById('homeUsername');
+    const homeAvatarImg = document.getElementById('homeAvatarImg');
     const recentWinnersEl = document.getElementById('recentWinners');
     const notifAmount = document.getElementById('notifAmount');
     const playersListEl = document.getElementById('playersList');
@@ -1288,6 +1366,7 @@
     const profileName = document.getElementById('profileName');
     const profileUsername = document.getElementById('profileUsername');
     const profileAvatarFallback = document.getElementById('profileAvatarFallback');
+    const profileAvatarImg = document.getElementById('profileAvatarImg');
 
     const pages = {
         home: document.getElementById('page-home'),
@@ -1349,7 +1428,7 @@
                 progressWidth = 0;
             }
             const avatarContent = isYou ?
-                `<img src="${state.avatarUrl}" alt="${name}">` :
+                `<img src="${state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp'}" alt="${name}">` :
                 `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
             const playerId = 'p_' + i;
             html += `
@@ -1466,30 +1545,30 @@
             const p = active[i];
             const isYou = p.isYou || false;
             const name = isYou ? state.displayName : p.name;
-            const avatar = p.avatar || state.avatarUrl;
+            const avatar = p.avatar || state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp';
             let statusText = 'Waiting';
             let statusClass = 'waiting';
             let resultText = '';
             if (p.result === 'won') {
                 statusText = 'Won!';
                 statusClass = 'won';
-                resultText = ` +${p.winAmount || Math.floor(p.bet * 2)}⭐`;
+                resultText = ` +${p.winAmount || Math.floor(p.bet * 2)}${starImg('star-icon-xs')}`;
             } else if (p.result === 'lost') {
                 statusText = 'Lost';
                 statusClass = 'lost';
-                resultText = ` -${p.bet}⭐`;
+                resultText = ` -${p.bet}${starImg('star-icon-xs')}`;
             } else if (p.side && !p.result) {
                 statusText = `Bet ${p.side}`;
                 statusClass = 'betting';
             }
-            const sideIcon = p.side === 'left' ? '◀' : '▶';
+            const sideIcon = p.side === 'left' ? '<i class="fas fa-arrow-left"></i>' : '<i class="fas fa-arrow-right"></i>';
             html += `
                 <div class="player-item" style="--anim-delay: ${(i * 0.06).toFixed(2)}s;">
                     <div class="player-main">
                         <div class="avatar"><img src="${avatar}" alt="${name}"></div>
                         <div class="info">
                             <div class="name">${name}${isYou ? '<span class="you">(You)</span>' : ''}</div>
-                            <div class="bet-amount">${p.bet}⭐ ${sideIcon} ${resultText}</div>
+                            <div class="bet-amount">${p.bet}${starImg('star-icon-xs')} ${sideIcon} ${resultText}</div>
                         </div>
                         <div class="status ${statusClass}">${statusText}</div>
                     </div>
@@ -1525,11 +1604,40 @@
                     state.displayName = user.first_name || 'xDll_Lud';
                     if (user.last_name) state.displayName += ' ' + user.last_name;
                     if (!user.username) state.username = state.displayName;
-                    if (profileAvatarFallback) profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
-                    if (user.photo_url) state.avatarUrl = user.photo_url;
+                    // Get profile picture
+                    if (user.photo_url) {
+                        state.avatarUrl = user.photo_url;
+                    } else {
+                        // Fallback: try to get from tg
+                        try {
+                            const tgUser = tg.initDataUnsafe?.user;
+                            if (tgUser && tgUser.photo_url) state.avatarUrl = tgUser.photo_url;
+                        } catch(e) {}
+                    }
+                    // Update all avatar elements
+                    updateAvatars();
                 }
             }
         } catch (e) {}
+        // If no avatar, set fallback
+        if (!state.avatarUrl) {
+            state.avatarUrl = 'https://images.iimg.live/images/excellent-photo-9680.webp';
+            updateAvatars();
+        }
+    }
+
+    function updateAvatars() {
+        const url = state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp';
+        if (homeAvatarImg) homeAvatarImg.src = url;
+        if (profileAvatarImg) {
+            profileAvatarImg.src = url;
+            profileAvatarImg.style.display = 'block';
+            if (profileAvatarFallback) profileAvatarFallback.style.display = 'none';
+        }
+        // Also update fallback
+        if (profileAvatarFallback) {
+            profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
+        }
     }
 
     function updateHomeUI() {
@@ -1545,6 +1653,7 @@
             ).join('');
             recentWinnersEl.style.color = '#fff';
         }
+        updateAvatars();
     }
 
     function updateProfile() {
@@ -1561,6 +1670,7 @@
         profileName.textContent = state.displayName;
         profileUsername.textContent = `@${state.username}`;
         if (profileAvatarFallback) profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
+        updateAvatars();
     }
 
     function updateSurfUI() {
@@ -1628,7 +1738,7 @@
     }
 
     // ============================================================
-    // CRASH GAME (with new rocket GIF)
+    // CRASH GAME (unchanged)
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -1647,6 +1757,8 @@
         roundId: 0,
         windStart: 1.2,
         windReappear: 3.3,
+        currentDogGif: DOG_GIFS[0],
+        windPhase: 0,
         currentAngle: 0,
         velocity: 0,
         targetAngle: 0,
@@ -1681,6 +1793,7 @@
             else if (mult >= 2.83 && mult < 2.9) { phase = 1; }
             else if (mult >= 2.9 && mult < this.windReappear) { phase = 2; }
             else if (mult >= this.windReappear) { phase = 3; }
+            this.windPhase = phase;
 
             if (mult > this.windStart && this.isPlaying && phase !== 2) {
                 const streaks = windContainer.querySelectorAll('.streak');
@@ -1716,12 +1829,28 @@
             }
         },
 
-        showRocket() {
-            const rocketImg = document.getElementById('rocketGif');
-            rocketImg.style.display = 'block';
-            rocketImg.classList.remove('active');
-            void rocketImg.offsetWidth;
-            rocketImg.classList.add('active');
+        pickRandomDogAndHide() {
+            this.currentDogGif = getRandomDogGif();
+            const dogImg = document.getElementById('flyingDogGif');
+            dogImg.src = this.currentDogGif;
+            dogImg.classList.remove('active');
+            dogImg.style.display = 'none';
+            this.currentAngle = 0;
+            this.velocity = 0;
+            this.targetAngle = 0;
+            this.currentScale = 1;
+            this.targetScale = 1;
+            this.scaleVelocity = 0;
+            const dogOverlay = document.getElementById('dogOverlay');
+            dogOverlay.style.transform = 'translate(-50%, -50%) rotate(0deg) scale(1)';
+        },
+
+        showDogWithFlyIn() {
+            const dogImg = document.getElementById('flyingDogGif');
+            dogImg.style.display = 'block';
+            dogImg.classList.remove('active');
+            void dogImg.offsetWidth;
+            dogImg.classList.add('active');
             this.currentAngle = 0;
             this.velocity = 0;
             this.targetAngle = 0;
@@ -1730,13 +1859,7 @@
             this.scaleVelocity = 0;
         },
 
-        hideRocket() {
-            const rocketImg = document.getElementById('rocketGif');
-            rocketImg.classList.remove('active');
-            rocketImg.style.display = 'none';
-        },
-
-        updateRocketRotationAndZoom() {
+        updateDogRotationAndZoom() {
             const effectiveMult = Math.min(this.multiplier, 3.0);
             this.targetAngle = 12 - (effectiveMult - 1) * 24;
             const stiffness = 8.0, damping = 4.0;
@@ -1761,8 +1884,8 @@
             this.currentScale += this.scaleVelocity * dt;
             this.currentScale = Math.max(0.5, Math.min(1.2, this.currentScale));
 
-            const overlay = document.getElementById('rocketOverlay');
-            overlay.style.transform =
+            const dogOverlay = document.getElementById('dogOverlay');
+            dogOverlay.style.transform =
                 `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
         },
 
@@ -1814,7 +1937,9 @@
             this.updateMainButton();
             players = [];
             renderPlayers();
-            document.getElementById('rocketGif').style.display = 'none';
+            const dogImg = document.getElementById('flyingDogGif');
+            dogImg.src = this.currentDogGif;
+            dogImg.style.display = 'none';
         },
 
         createGrid() {
@@ -1844,7 +1969,7 @@
                 this.updateMainButton();
                 this.updateWindEffect();
                 this.updateProgressLine();
-                this.updateRocketRotationAndZoom();
+                this.updateDogRotationAndZoom();
                 updateLiveData();
             } else if (this.gameOver) {
                 this.updateMainButton();
@@ -2039,7 +2164,7 @@
             this.gameOver = false;
             this.hasCashedOut = false;
             this.roundId++;
-            this.hideRocket();
+            this.pickRandomDogAndHide();
 
             players = players.filter(p => p.isYou);
             if (players.length > 0) {
@@ -2107,7 +2232,7 @@
             this.gameOver = false;
             this.lastTime = 0;
             document.getElementById('explosionOverlay').classList.remove('active');
-            this.showRocket();
+            this.showDogWithFlyIn();
             document.getElementById('windLines').classList.remove('active');
             document.getElementById('windLines').style.opacity = 0;
             document.getElementById('progressWrap').classList.remove('active');
@@ -2132,7 +2257,7 @@
             const inc = delta * speedFactor * 1.5;
             this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
-            this.updateRocketRotationAndZoom();
+            this.updateDogRotationAndZoom();
             this.updateUI();
 
             if (this.multiplier >= this.crashPoint) {
@@ -2142,7 +2267,9 @@
                 this.stopContinuousVibration();
                 triggerExplosionVibration();
 
-                this.hideRocket();
+                const dogGif = document.getElementById('flyingDogGif');
+                dogGif.classList.remove('active');
+                dogGif.style.display = 'none';
                 const explosionOverlay = document.getElementById('explosionOverlay');
                 explosionOverlay.classList.add('active');
                 const explosionImg = document.getElementById('explosionGif');
@@ -2663,10 +2790,10 @@
         countdown: 3,
         countdownId: null,
         bet: 0,
-        playerSide: null, // 'left' or 'right'
+        playerSide: null,
         resultSide: null,
         history: [],
-        gifLoaded: false,
+        countdownProgress: 0,
 
         confirmBet() {
             const input = document.getElementById('surfBetInput');
@@ -2680,7 +2807,6 @@
             document.getElementById('surfStatus').className = 'surf-status waiting';
             document.getElementById('surfLeftBtn').disabled = false;
             document.getElementById('surfRightBtn').disabled = false;
-            // Add to players
             const existing = surfPlayers.find(p => p.isYou);
             if (existing) {
                 existing.bet = bet;
@@ -2690,7 +2816,7 @@
             } else {
                 surfPlayers.push({
                     name: state.displayName,
-                    avatar: state.avatarUrl,
+                    avatar: state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp',
                     bet: bet,
                     side: null,
                     result: null,
@@ -2699,6 +2825,7 @@
                 });
             }
             renderSurfPlayers();
+            triggerVibration(20);
         },
 
         betSide(side) {
@@ -2712,13 +2839,12 @@
             document.getElementById('surfRightBtn').disabled = true;
             document.getElementById('surfStatus').textContent = `You bet ${side.toUpperCase()}! Waiting for round...`;
             document.getElementById('surfStatus').className = 'surf-status waiting';
+            triggerVibration(20);
 
-            // Update player
             const user = surfPlayers.find(p => p.isYou);
             if (user) { user.side = side; }
             renderSurfPlayers();
 
-            // Start countdown
             this.startCountdown();
         },
 
@@ -2726,20 +2852,29 @@
             if (this.running) return;
             this.running = true;
             this.countdown = 3;
+            this.countdownProgress = 1;
             const countdownEl = document.getElementById('surfCountdown');
             const resultEl = document.getElementById('surfResult');
             const gifEl = document.getElementById('surfGif');
             resultEl.classList.remove('show', 'win', 'lose');
             gifEl.classList.remove('show', 'left', 'right');
             gifEl.src = '';
-            countdownEl.textContent = '3';
             countdownEl.classList.add('show');
+            this.updateCountdownRing(1);
 
-            document.getElementById('surfStatus').textContent = 'Round starting in 3...';
+            document.getElementById('surfStatus').textContent = 'Round starting...';
             document.getElementById('surfStatus').className = 'surf-status waiting';
 
             this.countdownId = setInterval(() => {
                 this.countdown--;
+                this.countdownProgress = this.countdown / 3;
+                this.updateCountdownRing(this.countdownProgress);
+                const numEl = document.getElementById('surfCountNum');
+                numEl.textContent = this.countdown;
+                numEl.classList.add('pulse');
+                setTimeout(() => numEl.classList.remove('pulse'), 200);
+                triggerVibration(20, 'light');
+
                 if (this.countdown <= 0) {
                     clearInterval(this.countdownId);
                     this.countdownId = null;
@@ -2747,80 +2882,83 @@
                     this.playRound();
                     return;
                 }
-                countdownEl.textContent = this.countdown;
-                triggerVibration(20, 'light');
             }, 1000);
         },
 
+        updateCountdownRing(progress) {
+            const circle = document.getElementById('surfProgress');
+            const circumference = 326.7;
+            const offset = circumference * (1 - progress);
+            circle.style.strokeDashoffset = offset;
+        },
+
         playRound() {
-            // Pick random side
             this.resultSide = Math.random() < 0.5 ? 'left' : 'right';
-            // Pick random surf GIF
             const gifUrl = SURF_GIFS[Math.floor(Math.random() * SURF_GIFS.length)];
             const gifEl = document.getElementById('surfGif');
             gifEl.src = gifUrl;
             gifEl.classList.add('show');
-            gifEl.className = 'surf-gif show'; // reset
+            gifEl.className = 'surf-gif show';
 
             document.getElementById('surfStatus').textContent = `Surfing to the ${this.resultSide.toUpperCase()}!`;
             document.getElementById('surfStatus').className = 'surf-status';
+            triggerVibration(30, 'medium');
 
-            // Animate side after short delay
             setTimeout(() => {
                 gifEl.classList.add(this.resultSide);
-                // Determine result
-                const win = this.playerSide === this.resultSide;
-                const winAmount = win ? Math.floor(this.bet * 2) : 0;
+                triggerVibration(40, 'medium');
 
-                // Update state
-                if (win) {
-                    state.balance += winAmount;
-                    state.wins++;
-                    state.totalGames++;
-                    state.recentWinners.unshift({ name: 'You (Surf)', amount: winAmount });
-                    if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    showNotification(winAmount, winAmount);
-                    document.getElementById('surfStatus').textContent = `🎉 WIN! You got ${winAmount}⭐!`;
-                    document.getElementById('surfStatus').className = 'surf-status success';
-                    // Show result overlay
-                    const resultEl = document.getElementById('surfResult');
-                    resultEl.textContent = `+${winAmount}⭐ WIN!`;
-                    resultEl.className = 'surf-result show win';
-                    setTimeout(() => { resultEl.classList.remove('show'); }, 2500);
-                } else {
-                    state.losses++;
-                    state.totalGames++;
-                    document.getElementById('surfStatus').textContent = `💀 LOSE! The surf went ${this.resultSide}.`;
-                    document.getElementById('surfStatus').className = 'surf-status fail';
-                    const resultEl = document.getElementById('surfResult');
-                    resultEl.textContent = `-${this.bet}⭐ LOSE`;
-                    resultEl.className = 'surf-result show lose';
-                    setTimeout(() => { resultEl.classList.remove('show'); }, 2500);
-                }
-
-                // Update player
-                const user = surfPlayers.find(p => p.isYou);
-                if (user) {
-                    user.result = win ? 'won' : 'lost';
-                    user.winAmount = winAmount;
-                }
-                renderSurfPlayers();
-
-                // Add history
-                this.addHistory(this.resultSide, win);
-
-                // Update UI
-                updateHomeUI();
-                updateProfile();
-                document.getElementById('surfBalance').innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-
-                // Reset after delay
                 setTimeout(() => {
-                    this.resetRound();
-                }, 3000);
+                    const win = this.playerSide === this.resultSide;
+                    const winAmount = win ? Math.floor(this.bet * 2) : 0;
 
-            }, 600); // delay before movement
+                    if (win) {
+                        state.balance += winAmount;
+                        state.wins++;
+                        state.totalGames++;
+                        state.recentWinners.unshift({ name: 'You (Surf)', amount: winAmount });
+                        if (state.recentWinners.length > 10) state.recentWinners.pop();
+                        showNotification(winAmount, winAmount);
+                        document.getElementById('surfStatus').textContent = `WIN! You got ${winAmount}⭐!`;
+                        document.getElementById('surfStatus').className = 'surf-status success';
+                        const resultEl = document.getElementById('surfResult');
+                        document.getElementById('resultIcon').innerHTML = '<i class="fas fa-check-circle"></i>';
+                        document.getElementById('resultText').textContent = 'WIN';
+                        document.getElementById('resultSub').innerHTML = `+${winAmount} ${starImg()}`;
+                        resultEl.className = 'surf-result show win';
+                        triggerVibration(80, 'heavy');
+                    } else {
+                        state.losses++;
+                        state.totalGames++;
+                        document.getElementById('surfStatus').textContent = `LOSE! The surf went ${this.resultSide}.`;
+                        document.getElementById('surfStatus').className = 'surf-status fail';
+                        const resultEl = document.getElementById('surfResult');
+                        document.getElementById('resultIcon').innerHTML = '<i class="fas fa-times-circle"></i>';
+                        document.getElementById('resultText').textContent = 'LOSE';
+                        document.getElementById('resultSub').innerHTML = `-${this.bet} ${starImg()}`;
+                        resultEl.className = 'surf-result show lose';
+                        triggerVibration(100, 'heavy');
+                    }
+
+                    const user = surfPlayers.find(p => p.isYou);
+                    if (user) {
+                        user.result = win ? 'won' : 'lost';
+                        user.winAmount = winAmount;
+                    }
+                    renderSurfPlayers();
+                    this.addHistory(this.resultSide, win);
+                    updateHomeUI();
+                    updateProfile();
+                    document.getElementById('surfBalance').innerHTML =
+                        `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+
+                    setTimeout(() => {
+                        const resultEl = document.getElementById('surfResult');
+                        resultEl.classList.remove('show');
+                        this.resetRound();
+                    }, 2800);
+                }, 900);
+            }, 500);
         },
 
         resetRound() {
@@ -2836,13 +2974,12 @@
             document.getElementById('surfStatus').className = 'surf-status';
             const gifEl = document.getElementById('surfGif');
             gifEl.classList.remove('show', 'left', 'right');
-            // Remove player from list if they are done
-            // Keep them for history visibility
+            this.updateCountdownRing(1);
+            document.getElementById('surfCountNum').textContent = '3';
             setTimeout(() => {
-                // Clean up players that are not active and have result
                 surfPlayers = surfPlayers.filter(p => p.isYou || p.result === null);
                 renderSurfPlayers();
-            }, 500);
+            }, 300);
         },
 
         addHistory(side, win) {
@@ -2860,7 +2997,7 @@
             let html = '';
             for (const h of this.history) {
                 const cls = h.win ? 'win' : 'loss';
-                const icon = h.side === 'left' ? '◀' : '▶';
+                const icon = h.side === 'left' ? '<i class="fas fa-arrow-left"></i>' : '<i class="fas fa-arrow-right"></i>';
                 const label = h.win ? '+' : '-';
                 html += `<span class="h-item ${cls}"><span class="side-icon">${icon}</span> ${label}</span>`;
             }
@@ -2913,6 +3050,7 @@
         surfGame.renderHistory();
         document.getElementById('surfLeftBtn').disabled = true;
         document.getElementById('surfRightBtn').disabled = true;
+        surfGame.updateCountdownRing(1);
 
         try {
             if (window.Telegram?.WebApp) {
@@ -2921,7 +3059,7 @@
                 tg.ready();
             }
         } catch (e) {}
-        console.log('Casino loaded – new rocket GIF, Surf game added.');
+        console.log('Casino loaded – Crash, Mines, Surf – with profile pictures.');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
