@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== RESET & BASE ===== */
+        /* ===== RESET & BASE (same as before, omitted for brevity) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -894,7 +894,7 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
-        /* ===== SURF GAME – black grid ===== */
+        /* ===== SURF GAME – black grid with trail effect ===== */
         .surf-container {
             background: #0a0a0c;
             border-radius: 20px;
@@ -939,6 +939,52 @@
         .surf-display .surf-gif.right {
             left: 78%;
             transform: translate(-50%, -50%) scale(0.85) rotate(6deg);
+        }
+        /* TRAIL EFFECT */
+        .surf-display .surf-trail {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .surf-display .surf-trail.active {
+            opacity: 1;
+        }
+        .surf-display .surf-trail .trail-line {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(54, 160, 255, 0.8), transparent);
+            border-radius: 2px;
+            transform: translateY(-50%);
+            animation: trailMove 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+        }
+        .surf-display .surf-trail .trail-line:nth-child(1) { top: 30%; animation-delay: 0s; }
+        .surf-display .surf-trail .trail-line:nth-child(2) { top: 45%; animation-delay: 0.1s; }
+        .surf-display .surf-trail .trail-line:nth-child(3) { top: 60%; animation-delay: 0.2s; }
+        .surf-display .surf-trail .trail-line:nth-child(4) { top: 35%; animation-delay: 0.05s; }
+        .surf-display .surf-trail .trail-line:nth-child(5) { top: 55%; animation-delay: 0.15s; }
+        .surf-display .surf-trail .trail-line:nth-child(6) { top: 70%; animation-delay: 0.25s; }
+        .surf-display .surf-trail .trail-line:nth-child(7) { top: 25%; animation-delay: 0.08s; }
+        .surf-display .surf-trail .trail-line:nth-child(8) { top: 50%; animation-delay: 0.18s; }
+        .surf-display .surf-trail .trail-line:nth-child(9) { top: 40%; animation-delay: 0.12s; }
+        .surf-display .surf-trail .trail-line:nth-child(10) { top: 65%; animation-delay: 0.22s; }
+        @keyframes trailMove {
+            0% { transform: translateY(-50%) translateX(-20px) scaleX(0.6); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-50%) translateX(40px) scaleX(1.4); opacity: 0; }
+        }
+        .surf-display .surf-trail.left .trail-line {
+            animation-name: trailMoveLeft;
+            background: linear-gradient(270deg, rgba(54, 160, 255, 0.8), transparent);
+        }
+        @keyframes trailMoveLeft {
+            0% { transform: translateY(-50%) translateX(20px) scaleX(0.6); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-50%) translateX(-40px) scaleX(1.4); opacity: 0; }
         }
         .surf-display .surf-countdown {
             position: absolute;
@@ -1138,6 +1184,7 @@
             .surf-display .surf-result .result-icon { font-size: 36px; }
             .surf-display .surf-result .result-sub { font-size: 16px; }
             .surf-bet-buttons .surf-btn { font-size: 14px; padding: 8px; }
+            .surf-display .surf-trail .trail-line { width: 25px; }
         }
     </style>
 </head>
@@ -1236,6 +1283,19 @@
         <div class="flex-between mb-8"><span class="badge badge-blue"><i class="fas fa-water" style="margin-right:6px;"></i>Surf<span class="online-dot"></span></span><span class="badge" id="surfBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
         <div class="surf-container">
             <div class="surf-display" id="surfDisplay">
+                <!-- Trail effect container -->
+                <div class="surf-trail" id="surfTrail">
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                    <div class="trail-line"></div>
+                </div>
                 <img class="surf-gif" id="surfGif" src="" alt="Surf">
                 <div class="surf-countdown" id="surfCountdown">
                     <div class="count-ring">
@@ -1315,7 +1375,7 @@
     // ============================================================
     const DOG_GIFS = [
         'https://images.iimg.live/images/glorious-portfolio-1947.webp',
-        'https://images.iimg.live/images/radiant-picture-4066.webp',
+        'https://images.iimg.live/images/wonderful-work-4770.webp',
         'https://images.iimg.live/images/wonderful-work-3128.webp',
         'https://images.iimg.live/images/ultimate-photography-1463.webp',
         'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
@@ -1604,22 +1664,18 @@
                     state.displayName = user.first_name || 'xDll_Lud';
                     if (user.last_name) state.displayName += ' ' + user.last_name;
                     if (!user.username) state.username = state.displayName;
-                    // Get profile picture
                     if (user.photo_url) {
                         state.avatarUrl = user.photo_url;
                     } else {
-                        // Fallback: try to get from tg
                         try {
                             const tgUser = tg.initDataUnsafe?.user;
                             if (tgUser && tgUser.photo_url) state.avatarUrl = tgUser.photo_url;
                         } catch(e) {}
                     }
-                    // Update all avatar elements
                     updateAvatars();
                 }
             }
         } catch (e) {}
-        // If no avatar, set fallback
         if (!state.avatarUrl) {
             state.avatarUrl = 'https://images.iimg.live/images/excellent-photo-9680.webp';
             updateAvatars();
@@ -1634,7 +1690,6 @@
             profileAvatarImg.style.display = 'block';
             if (profileAvatarFallback) profileAvatarFallback.style.display = 'none';
         }
-        // Also update fallback
         if (profileAvatarFallback) {
             profileAvatarFallback.textContent = state.displayName.charAt(0).toUpperCase();
         }
@@ -2783,7 +2838,7 @@
     };
 
     // ============================================================
-    // SURF GAME
+    // SURF GAME (fixed balance deduction + trail effect)
     // ============================================================
     const surfGame = {
         running: false,
@@ -2800,6 +2855,8 @@
             let bet = parseInt(input.value) || 0;
             if (bet < 1) { triggerVibration(60, 'heavy'); return; }
             if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
+            // Deduct bet immediately
+            state.balance -= bet;
             this.bet = bet;
             document.getElementById('surfBetConfirm').disabled = true;
             document.getElementById('surfBetInput').disabled = true;
@@ -2825,13 +2882,15 @@
                 });
             }
             renderSurfPlayers();
+            updateSurfUI();
+            updateHomeUI();
             triggerVibration(20);
         },
 
         betSide(side) {
             if (this.running) return;
             if (!this.bet || this.bet <= 0) { triggerVibration(60, 'heavy'); return; }
-            if (state.balance < this.bet) { triggerVibration(60, 'heavy'); return; }
+            // we already deducted balance, no need to check again
             if (this.playerSide) { triggerVibration(30); return; }
 
             this.playerSide = side;
@@ -2856,9 +2915,11 @@
             const countdownEl = document.getElementById('surfCountdown');
             const resultEl = document.getElementById('surfResult');
             const gifEl = document.getElementById('surfGif');
+            const trailEl = document.getElementById('surfTrail');
             resultEl.classList.remove('show', 'win', 'lose');
             gifEl.classList.remove('show', 'left', 'right');
             gifEl.src = '';
+            trailEl.classList.remove('active', 'left', 'right');
             countdownEl.classList.add('show');
             this.updateCountdownRing(1);
 
@@ -2896,6 +2957,7 @@
             this.resultSide = Math.random() < 0.5 ? 'left' : 'right';
             const gifUrl = SURF_GIFS[Math.floor(Math.random() * SURF_GIFS.length)];
             const gifEl = document.getElementById('surfGif');
+            const trailEl = document.getElementById('surfTrail');
             gifEl.src = gifUrl;
             gifEl.classList.add('show');
             gifEl.className = 'surf-gif show';
@@ -2905,10 +2967,17 @@
             triggerVibration(30, 'medium');
 
             setTimeout(() => {
+                // Move surf
                 gifEl.classList.add(this.resultSide);
+                // Activate trail effect in the same direction
+                trailEl.classList.add('active', this.resultSide);
                 triggerVibration(40, 'medium');
 
+                // Wait for slide animation, then show result
                 setTimeout(() => {
+                    // Deactivate trail
+                    trailEl.classList.remove('active', 'left', 'right');
+
                     const win = this.playerSide === this.resultSide;
                     const winAmount = win ? Math.floor(this.bet * 2) : 0;
 
@@ -2974,6 +3043,8 @@
             document.getElementById('surfStatus').className = 'surf-status';
             const gifEl = document.getElementById('surfGif');
             gifEl.classList.remove('show', 'left', 'right');
+            const trailEl = document.getElementById('surfTrail');
+            trailEl.classList.remove('active', 'left', 'right');
             this.updateCountdownRing(1);
             document.getElementById('surfCountNum').textContent = '3';
             setTimeout(() => {
@@ -3059,7 +3130,7 @@
                 tg.ready();
             }
         } catch (e) {}
-        console.log('Casino loaded – Crash, Mines, Surf – with profile pictures.');
+        console.log('Casino loaded – Surf balance fixed, trail effect added.');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
