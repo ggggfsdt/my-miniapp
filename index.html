@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== RESET & BASE (same as before, omitted for brevity) ===== */
+        /* ===== RESET & BASE (same as before) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -894,7 +894,7 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0, 210, 160, 0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
 
-        /* ===== SURF GAME – black grid with trail effect ===== */
+        /* ===== SURF GAME – black grid with trail effect on the side ===== */
         .surf-container {
             background: #0a0a0c;
             border-radius: 20px;
@@ -940,7 +940,7 @@
             left: 78%;
             transform: translate(-50%, -50%) scale(0.85) rotate(6deg);
         }
-        /* TRAIL EFFECT */
+        /* TRAIL EFFECT – positioned on the side the surf is moving to */
         .surf-display .surf-trail {
             position: absolute;
             inset: 0;
@@ -948,6 +948,7 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.4s;
+            overflow: hidden;
         }
         .surf-display .surf-trail.active {
             opacity: 1;
@@ -955,37 +956,48 @@
         .surf-display .surf-trail .trail-line {
             position: absolute;
             top: 50%;
-            width: 40px;
+            width: 30px;
             height: 2px;
             background: linear-gradient(90deg, rgba(54, 160, 255, 0.8), transparent);
             border-radius: 2px;
-            transform: translateY(-50%);
+            transform: translateY(-50%) translateX(-20px);
+            opacity: 0;
             animation: trailMove 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
         }
-        .surf-display .surf-trail .trail-line:nth-child(1) { top: 30%; animation-delay: 0s; }
-        .surf-display .surf-trail .trail-line:nth-child(2) { top: 45%; animation-delay: 0.1s; }
-        .surf-display .surf-trail .trail-line:nth-child(3) { top: 60%; animation-delay: 0.2s; }
-        .surf-display .surf-trail .trail-line:nth-child(4) { top: 35%; animation-delay: 0.05s; }
-        .surf-display .surf-trail .trail-line:nth-child(5) { top: 55%; animation-delay: 0.15s; }
-        .surf-display .surf-trail .trail-line:nth-child(6) { top: 70%; animation-delay: 0.25s; }
-        .surf-display .surf-trail .trail-line:nth-child(7) { top: 25%; animation-delay: 0.08s; }
-        .surf-display .surf-trail .trail-line:nth-child(8) { top: 50%; animation-delay: 0.18s; }
-        .surf-display .surf-trail .trail-line:nth-child(9) { top: 40%; animation-delay: 0.12s; }
-        .surf-display .surf-trail .trail-line:nth-child(10) { top: 65%; animation-delay: 0.22s; }
-        @keyframes trailMove {
-            0% { transform: translateY(-50%) translateX(-20px) scaleX(0.6); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-50%) translateX(40px) scaleX(1.4); opacity: 0; }
+        /* For right movement: trail appears on the left side and moves right */
+        .surf-display .surf-trail.right .trail-line {
+            background: linear-gradient(90deg, rgba(54, 160, 255, 0.8), transparent);
+            animation-name: trailMoveRight;
+            left: 10%;
         }
+        @keyframes trailMoveRight {
+            0% { transform: translateY(-50%) translateX(-10px) scaleX(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-50%) translateX(40px) scaleX(1.5); opacity: 0; }
+        }
+        /* For left movement: trail appears on the right side and moves left */
         .surf-display .surf-trail.left .trail-line {
-            animation-name: trailMoveLeft;
             background: linear-gradient(270deg, rgba(54, 160, 255, 0.8), transparent);
+            animation-name: trailMoveLeft;
+            right: 10%;
+            left: auto;
         }
         @keyframes trailMoveLeft {
-            0% { transform: translateY(-50%) translateX(20px) scaleX(0.6); opacity: 0; }
+            0% { transform: translateY(-50%) translateX(10px) scaleX(0.5); opacity: 0; }
             50% { opacity: 1; }
-            100% { transform: translateY(-50%) translateX(-40px) scaleX(1.4); opacity: 0; }
+            100% { transform: translateY(-50%) translateX(-40px) scaleX(1.5); opacity: 0; }
         }
+        .surf-display .surf-trail .trail-line:nth-child(1) { top: 20%; animation-delay: 0s; }
+        .surf-display .surf-trail .trail-line:nth-child(2) { top: 35%; animation-delay: 0.1s; }
+        .surf-display .surf-trail .trail-line:nth-child(3) { top: 50%; animation-delay: 0.2s; }
+        .surf-display .surf-trail .trail-line:nth-child(4) { top: 65%; animation-delay: 0.05s; }
+        .surf-display .surf-trail .trail-line:nth-child(5) { top: 80%; animation-delay: 0.15s; }
+        .surf-display .surf-trail .trail-line:nth-child(6) { top: 27%; animation-delay: 0.25s; }
+        .surf-display .surf-trail .trail-line:nth-child(7) { top: 42%; animation-delay: 0.08s; }
+        .surf-display .surf-trail .trail-line:nth-child(8) { top: 57%; animation-delay: 0.18s; }
+        .surf-display .surf-trail .trail-line:nth-child(9) { top: 72%; animation-delay: 0.12s; }
+        .surf-display .surf-trail .trail-line:nth-child(10) { top: 88%; animation-delay: 0.22s; }
+
         .surf-display .surf-countdown {
             position: absolute;
             inset: 0;
@@ -1184,7 +1196,7 @@
             .surf-display .surf-result .result-icon { font-size: 36px; }
             .surf-display .surf-result .result-sub { font-size: 16px; }
             .surf-bet-buttons .surf-btn { font-size: 14px; padding: 8px; }
-            .surf-display .surf-trail .trail-line { width: 25px; }
+            .surf-display .surf-trail .trail-line { width: 20px; }
         }
     </style>
 </head>
@@ -2838,7 +2850,7 @@
     };
 
     // ============================================================
-    // SURF GAME (fixed balance deduction + trail effect)
+    // SURF GAME (balance fixed + trail on side)
     // ============================================================
     const surfGame = {
         running: false,
@@ -2890,7 +2902,6 @@
         betSide(side) {
             if (this.running) return;
             if (!this.bet || this.bet <= 0) { triggerVibration(60, 'heavy'); return; }
-            // we already deducted balance, no need to check again
             if (this.playerSide) { triggerVibration(30); return; }
 
             this.playerSide = side;
@@ -2969,7 +2980,7 @@
             setTimeout(() => {
                 // Move surf
                 gifEl.classList.add(this.resultSide);
-                // Activate trail effect in the same direction
+                // Activate trail on the side it's moving to
                 trailEl.classList.add('active', this.resultSide);
                 triggerVibration(40, 'medium');
 
@@ -3130,7 +3141,7 @@
                 tg.ready();
             }
         } catch (e) {}
-        console.log('Casino loaded – Surf balance fixed, trail effect added.');
+        console.log('Casino loaded – Surf balance fixed, trail appears on the side of movement.');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
