@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== RESET & BASE (unchanged) ===== */
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08080a; color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
         #app { max-width: 420px; width: 100%; background: linear-gradient(160deg, #111115, #0a0a0c); border-radius: 36px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.06); min-height: 760px; display: flex; flex-direction: column; position: relative; }
@@ -90,12 +90,51 @@
         .profile-detail .value { font-weight: 600; font-size: 14px; }
 
         /* ===== CRASH GRID ===== */
-        .grid-container { position: relative; height: 280px; background: #0a0a0c; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); margin: 10px 0 0 0; }
-        .grid-squares { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(6, 1fr); gap: 0; background: transparent; padding: 0; z-index: 0; }
+        .grid-container { position: relative; height: 280px; background: #0a0a0c; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); margin: 10px 0 0 0; transition: filter 0.5s ease, transform 0.5s ease; }
+        .grid-squares { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(6, 1fr); gap: 0; background: transparent; padding: 0; z-index: 0; transition: transform 0.5s ease; }
         .grid-square { background: transparent; border: 1px solid rgba(255,255,255,0.04); }
         .grid-square.corner { border-color: rgba(108,92,231,0.06); }
 
-        .wind-lines { position: absolute; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity 0.3s ease; transform: rotate(-20deg); transform-origin: center center; will-change: transform, opacity; }
+        /* ===== COUNTDOWN BLUR OVERLAY ===== */
+        .grid-container .countdown-blur-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            mask-image: radial-gradient(circle at 50% 50%, transparent 28%, black 42%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 28%, black 42%);
+            border-radius: 20px;
+        }
+        .grid-container.countdown-blur .countdown-blur-overlay {
+            opacity: 1;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .grid-container.countdown-blur .grid-squares {
+            transform: translateY(-12px);
+        }
+        .grid-container.countdown-blur .wind-lines,
+        .grid-container.countdown-blur .gif-overlay,
+        .grid-container.countdown-blur .moon-overlay,
+        .grid-container.countdown-blur .explosion-overlay,
+        .grid-container.countdown-blur .history-bar,
+        .grid-container.countdown-blur .progress-wrap {
+            filter: blur(8px);
+            transition: filter 0.4s ease;
+        }
+        .grid-container.countdown-blur .grid-squares {
+            filter: blur(0px) !important;
+        }
+        /* Keep grid squares sharp */
+        .grid-container.countdown-blur .grid-squares .grid-square {
+            filter: blur(0px) !important;
+        }
+
+        .wind-lines { position: absolute; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity 0.3s ease, filter 0.4s ease; transform: rotate(-20deg); transform-origin: center center; will-change: transform, opacity; }
         .wind-lines.active { opacity: 1; }
         .wind-lines .streak { position: absolute; height: 2px; border-radius: 50%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); will-change: transform; animation: windStreak linear infinite; }
         .wind-lines .streak:nth-child(odd) { height: 1.5px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
@@ -103,20 +142,26 @@
         .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
         @keyframes windStreak { 0% { transform: translate(0,0); opacity: 0; } 10% { opacity: 0.8; } 85% { opacity: 0.8; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 
-        .gif-overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(0deg) scale(1); z-index: 10; width: 80%; height: 80%; pointer-events: none; display: flex; align-items: center; justify-content: center; transition: none; will-change: transform; }
+        .gif-overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(0deg) scale(1); z-index: 10; width: 80%; height: 80%; pointer-events: none; display: flex; align-items: center; justify-content: center; transition: filter 0.4s ease; will-change: transform; }
         .gif-overlay img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 0 40px rgba(108,92,231,0.3)); transition: opacity 0.15s ease; }
         .gif-overlay img.active { display: block; animation: flyIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
         @keyframes flyIn { 0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } }
-        .explosion-overlay { position: absolute; inset: 0; z-index: 15; display: none; align-items: center; justify-content: center; pointer-events: none; }
+
+        .moon-overlay { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 0.4s ease, filter 0.4s ease; display: flex; align-items: center; justify-content: center; overflow: visible; }
+        .moon-overlay.active { opacity: 1; }
+        .moon-overlay img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 0 40px rgba(255,215,0,0.15)); position: absolute; top: -30%; left: -20%; transform: translate(0,0) scale(0.8); opacity: 0.6; transition: none; will-change: transform, opacity; }
+
+        .explosion-overlay { position: absolute; inset: 0; z-index: 15; display: none; align-items: center; justify-content: center; pointer-events: none; transition: filter 0.4s ease; }
         .explosion-overlay.active { display: flex; }
         .explosion-overlay img { width: 100%; height: 100%; object-fit: contain; animation: explosionAnim 0.8s ease-out forwards; }
         @keyframes explosionAnim { 0% { transform: scale(0.3); opacity: 0; } 30% { transform: scale(1.4); opacity: 1; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+
         .countdown-overlay { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
         .countdown-overlay.active { display: flex; }
         .countdown-number { font-size: 100px; font-weight: 900; color: #ffffff; text-shadow: 0 0 60px rgba(108,92,231,0.5), 0 0 120px rgba(108,92,231,0.2); animation: countdownPulse 1s ease-out forwards; opacity: 0; transform: scale(0.5); }
         @keyframes countdownPulse { 0% { opacity: 0; transform: scale(0.3); } 30% { opacity: 1; transform: scale(1.3); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
 
-        .history-bar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 12; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 4px 10px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.06); max-width: 92%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+        .history-bar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 12; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 4px 10px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.06); max-width: 92%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; transition: filter 0.4s ease; }
         .history-bar::-webkit-scrollbar { display: none; }
         .history-current { font-size: 18px; font-weight: 900; padding-right: 8px; border-right: 1px solid rgba(255,255,255,0.1); min-width: 50px; text-align: center; letter-spacing: -0.5px; white-space: nowrap; }
         .history-current .x { font-size: 12px; font-weight: 400; opacity: 0.5; }
@@ -127,7 +172,7 @@
         .history-item.purple { background: rgba(108,92,231,0.25); color: #a29bfe; border-color: rgba(108,92,231,0.15); }
         .history-item.crashed { background: rgba(255,107,107,0.2); color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        .progress-wrap { position: absolute; bottom: 2px; left: 12px; right: 12px; z-index: 11; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; opacity: 0; transition: opacity 0.6s ease; }
+        .progress-wrap { position: absolute; bottom: 2px; left: 12px; right: 12px; z-index: 11; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; opacity: 0; transition: opacity 0.6s ease, filter 0.4s ease; }
         .progress-wrap.active { opacity: 1; }
         .progress-fill { height: 100%; width: 0%; border-radius: 2px; background: #00d2a0; transition: none; box-shadow: 0 0 16px rgba(0,210,160,0.2); }
 
@@ -326,6 +371,8 @@
             .surf-bet-buttons .surf-btn { font-size: 14px; padding: 8px; }
             .surf-display .surf-trail .trail-line { width: 20px; }
             .main-action-btn { padding-top: 12px; padding-bottom: 10px; }
+            .moon-overlay img { width: 80px; height: 80px; }
+            .countdown-number { font-size: 70px; }
         }
     </style>
 </head>
@@ -372,6 +419,11 @@
         <div class="grid-container" id="gridContainer">
             <div class="grid-squares" id="gridSquares"></div>
             <div class="wind-lines" id="windLines"></div>
+            <!-- COUNTDOWN BLUR OVERLAY -->
+            <div class="countdown-blur-overlay" id="countdownBlurOverlay"></div>
+            <div class="moon-overlay" id="moonOverlay">
+                <img id="moonGif" src="https://images.iimg.live/images/ultimate-collection-3580.webp" alt="Moon">
+            </div>
             <div class="gif-overlay" id="rocketOverlay">
                 <img id="crashGif" src="" alt="Car/Rocket">
             </div>
@@ -515,6 +567,7 @@
     const ROCKET_GIFS = [
         'https://images.iimg.live/images/radiant-picture-4066.webp',
         'https://images.iimg.live/images/glorious-portfolio-1947.webp',
+        'https://images.iimg.live/images/wonderful-work-4770.webp',
         'https://images.iimg.live/images/ultimate-photography-1463.webp',
         'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
     ];
@@ -931,7 +984,7 @@
     }
 
     // ============================================================
-    // CRASH GAME – faster, non‑stop multiplier
+    // CRASH GAME – Moon at 3.7x, blur countdown
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -959,6 +1012,7 @@
         cashOutPending: false,
         isCarPhase: true,
         transitioning: false,
+        moonActive: false,
 
         // ---- Wind ----
         initWind() {
@@ -1023,6 +1077,52 @@
             }
         },
 
+        // ---- Moon effect (starts at 3.7x, slower) ----
+        updateMoon(mult) {
+            const moonOverlay = document.getElementById('moonOverlay');
+            const moonImg = document.getElementById('moonGif');
+            
+            if (mult >= 3.7 && this.isPlaying && !this.gameOver) {
+                this.moonActive = true;
+                moonOverlay.classList.add('active');
+                moonImg.style.display = 'block';
+                
+                // Progress: 0 at 3.7, 1 at 9.0 (slower journey)
+                const progress = Math.min(1, (mult - 3.7) / 5.3);
+                // Fade in: reach full opacity (0.65) by 5.5
+                const opacity = Math.min(0.65, 0.25 + (mult - 3.7) * 0.12);
+                // Position: from top-left (-20%, -30%) to bottom-right (120%, 130%)
+                const x = -20 + progress * 140;
+                const y = -30 + progress * 160;
+                const scale = 0.7 + progress * 0.5;
+                
+                moonImg.style.opacity = opacity;
+                moonImg.style.left = x + '%';
+                moonImg.style.top = y + '%';
+                moonImg.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                
+                if (progress >= 1.0) {
+                    const fadeOut = Math.min(1, (mult - 9.0) / 2.0);
+                    moonImg.style.opacity = opacity * (1 - fadeOut);
+                }
+            } else if (this.moonActive) {
+                this.moonActive = false;
+                moonOverlay.classList.remove('active');
+                moonImg.style.display = 'none';
+            }
+        },
+
+        // ---- Countdown blur ----
+        enableCountdownBlur() {
+            const container = document.getElementById('gridContainer');
+            container.classList.add('countdown-blur');
+        },
+
+        disableCountdownBlur() {
+            const container = document.getElementById('gridContainer');
+            container.classList.remove('countdown-blur');
+        },
+
         // ---- GIF display ----
         setCarImage() {
             const img = document.getElementById('crashGif');
@@ -1052,16 +1152,20 @@
             if (this.transitioning || !this.isCarPhase) return;
             this.transitioning = true;
             const img = document.getElementById('crashGif');
+            
             img.style.transition = 'opacity 0.15s ease';
             img.style.opacity = 0;
+            
             setTimeout(() => {
                 img.classList.remove('active');
                 img.src = '';
                 img.style.display = 'none';
+                
                 setTimeout(() => {
                     this.currentRocketGif = getRandomRocketGif();
                     img.style.display = 'block';
                     img.src = this.currentRocketGif;
+                    
                     const onLoad = () => {
                         img.onload = null;
                         img.style.transition = 'opacity 0.15s ease';
@@ -1071,7 +1175,9 @@
                         this.transitioning = false;
                     };
                     img.onload = onLoad;
-                    if (img.complete && img.naturalWidth > 0) onLoad();
+                    if (img.complete && img.naturalWidth > 0) {
+                        onLoad();
+                    }
                     setTimeout(() => {
                         if (this.transitioning) {
                             img.style.transition = 'opacity 0.15s ease';
@@ -1175,6 +1281,10 @@
             players = [];
             renderPlayers();
             this.setCarImage();
+            const moonOverlay = document.getElementById('moonOverlay');
+            moonOverlay.classList.remove('active');
+            document.getElementById('moonGif').style.display = 'none';
+            this.disableCountdownBlur();
         },
 
         createGrid() {
@@ -1205,7 +1315,8 @@
                 this.updateWindEffect();
                 this.updateProgressLine();
                 this.updateRotationAndZoom();
-                if (this.isCarPhase && this.multiplier >= 1.56 && !this.transitioning) {
+                this.updateMoon(m);
+                if (this.isCarPhase && m >= 1.56 && !this.transitioning) {
                     this.transitionToRocket();
                 }
                 updateLiveData();
@@ -1214,6 +1325,10 @@
                 this.updateWindEffect();
                 this.updateProgressLine();
                 updateLiveData();
+                const moonOverlay = document.getElementById('moonOverlay');
+                moonOverlay.classList.remove('active');
+                document.getElementById('moonGif').style.display = 'none';
+                this.moonActive = false;
             }
         },
 
@@ -1396,7 +1511,7 @@
             updateHomeUI();
         },
 
-        // ---- Slower countdown (1.2s per number) ----
+        // ---- Countdown with blur ----
         startCountdown() {
             if (this.isCountingDown || this.isPlaying) return;
             this.isCountingDown = true;
@@ -1404,6 +1519,14 @@
             this.hasCashedOut = false;
             this.roundId++;
             this.hideImage();
+            
+            // Enable blur
+            this.enableCountdownBlur();
+
+            const moonOverlay = document.getElementById('moonOverlay');
+            moonOverlay.classList.remove('active');
+            document.getElementById('moonGif').style.display = 'none';
+            this.moonActive = false;
 
             players = players.filter(p => p.isYou);
             if (players.length > 0) {
@@ -1438,6 +1561,8 @@
                     this.countdownId = null;
                     overlay.classList.remove('active');
                     this.isCountingDown = false;
+                    // Disable blur when countdown ends
+                    this.disableCountdownBlur();
                     this.startRound();
                     return;
                 }
@@ -1489,15 +1614,14 @@
             this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
         },
 
-        // ---- Faster, non‑stop multiplier growth ----
+        // ---- Fast & smooth multiplier ----
         gameLoop(timestamp) {
             if (!this.isPlaying) return;
             const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
             this.lastTime = timestamp;
             const mult = this.multiplier;
-            // Use a more aggressive formula: base 0.04, exponent 1.2, multiplier 1.5
-            const speedFactor = 0.04 + 0.09 * Math.pow(mult, 1.2);
-            const inc = delta * speedFactor * 1.5;
+            const speedFactor = 0.04 + 0.12 * mult;
+            const inc = delta * speedFactor * 1.2;
             this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
 
             this.updateRotationAndZoom();
@@ -1511,6 +1635,14 @@
                 triggerExplosionVibration();
 
                 this.hideImage();
+                const moonOverlay = document.getElementById('moonOverlay');
+                moonOverlay.classList.remove('active');
+                document.getElementById('moonGif').style.display = 'none';
+                this.moonActive = false;
+                
+                // Ensure blur is off on crash
+                this.disableCountdownBlur();
+
                 const explosionOverlay = document.getElementById('explosionOverlay');
                 explosionOverlay.classList.add('active');
                 const explosionImg = document.getElementById('explosionGif');
@@ -1817,513 +1949,4 @@
                         img.style.display = 'block';
                         img.style.borderRadius = '4px';
                         symbol.appendChild(img);
-                        setTimeout(() => {
-                            if (symbol.contains(img)) {
-                                symbol.removeChild(img);
-                                symbol.innerHTML = '';
-                            }
-                        }, this.mineGifDuration);
-                    } else {
-                        tile.classList.add('safe');
-                        const img = document.createElement('img');
-                        img.src = this.gemGif;
-                        img.alt = 'Gem';
-                        img.style.width = '80%';
-                        img.style.height = '80%';
-                        img.style.objectFit = 'contain';
-                        img.style.display = 'block';
-                        img.style.borderRadius = '4px';
-                        symbol.appendChild(img);
-                    }
-                } else {
-                    tile.classList.remove('revealed', 'mine', 'safe');
-                    symbol.innerHTML = '';
-                }
-            }
-        },
-
-        clickTile(index) {
-            if (!this.gameActive || this.gameOver || this.revealed[index] || this.hasCashedOut) return;
-            this.revealed[index] = true;
-            if (this.board[index] === 1) {
-                triggerExplosionVibration();
-                this.gameOver = true;
-                this.gameActive = false;
-                state.losses++;
-                state.totalGames++;
-                for (let i = 0; i < this.board.length; i++) {
-                    if (this.board[i] === 1) this.revealed[i] = true;
-                }
-                this.updateGrid();
-                this.updateUI();
-                updateHomeUI();
-                this.addHistory('loss', this.multiplier);
-                return;
-            }
-            triggerVibration(15, 'light');
-            this.revealedSafe++;
-            const totalTiles = this.gridSize * this.gridSize;
-            const mineRatio = this.minesCount / totalTiles;
-            let inc = 0.008 + 0.25 * mineRatio;
-            inc = Math.max(0.01, Math.min(0.35, inc));
-            let newMult = this.multiplier * (1 + inc);
-            if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
-            this.multiplier = parseFloat(newMult.toFixed(3));
-            if (this.revealedSafe === this.safeCount) {
-                this.gameOver = true;
-                this.gameActive = false;
-                const win = Math.floor(this.bet * this.multiplier);
-                state.balance += win;
-                state.wins++;
-                state.totalGames++;
-                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-                state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
-                if (state.recentWinners.length > 10) state.recentWinners.pop();
-                showNotification(win, win);
-                this.updateGrid();
-                this.updateUI();
-                updateHomeUI();
-                this.addHistory('win', this.multiplier);
-                triggerVibration(50, 'medium');
-                return;
-            }
-            this.updateGrid();
-            this.updateUI();
-        },
-
-        mainAction() {
-            if (this.gameActive && !this.gameOver) {
-                if (!this.hasCashedOut && !this.isCashingOut && this.revealedSafe > 0) {
-                    this.initiateCashOut();
-                }
-                return;
-            }
-            if (this.gameOver) {
-                this.generateGrid();
-                return;
-            }
-            const row = document.getElementById('minesBetInputRow');
-            const isOpen = row.classList.contains('open');
-            if (isOpen) {
-                this.confirmBet();
-            } else {
-                row.classList.add('open');
-                document.getElementById('minesBetInput').focus();
-                this.updateMainButton();
-            }
-        },
-
-        confirmBet() {
-            const input = document.getElementById('minesBetInput');
-            let bet = parseInt(input.value) || 0;
-            if (bet < 1) { triggerVibration(60, 'heavy'); return; }
-            if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
-            this.bet = bet;
-            document.getElementById('minesBetInputRow').classList.remove('open');
-            this.startGame();
-        },
-
-        startGame() {
-            if (this.bet > state.balance) {
-                document.getElementById('minesMessage').textContent = 'Not enough balance!';
-                document.getElementById('minesMessage').className = 'mines-message danger';
-                return;
-            }
-            state.balance -= this.bet;
-            const totalTiles = this.gridSize * this.gridSize;
-            const minesToPlace = Math.min(this.minesCount, totalTiles - 1);
-            const minMines = this.getMinMines();
-            if (minesToPlace === minMines) {
-                this.startingMultiplier = 1.00;
-            } else {
-                const mineRatio = minesToPlace / totalTiles;
-                let base = 0.90 + 1.20 * mineRatio;
-                const gridBonus = (this.gridSize - 3) * 0.02;
-                this.startingMultiplier = Math.min(2.50, base + gridBonus);
-            }
-            this.multiplier = this.startingMultiplier;
-            this.gameActive = true;
-            this.gameOver = false;
-            this.hasCashedOut = false;
-            this.revealedSafe = 0;
-            const total = this.gridSize * this.gridSize;
-            this.board = new Array(total).fill(0);
-            let placed = 0;
-            const mines = Math.min(this.minesCount, total - 1);
-            while (placed < mines) {
-                const idx = Math.floor(Math.random() * total);
-                if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
-            }
-            this.safeCount = total - mines;
-            this.revealed = new Array(total).fill(false);
-            const tiles = document.querySelectorAll('.mines-grid .tile');
-            tiles.forEach(tile => {
-                tile.classList.remove('revealed', 'mine', 'safe');
-                tile.querySelector('.symbol').innerHTML = '';
-                tile.classList.add('show');
-            });
-            this.updateUI();
-            this.updateMainButton();
-            updateHomeUI();
-            triggerVibration(30, 'light');
-        },
-
-        initiateCashOut() {
-            if (this.isCashingOut) return;
-            this.isCashingOut = true;
-            triggerCashOutVibration();
-            const btn = document.getElementById('minesMainActionBtn');
-            btn.disabled = true;
-            setTimeout(() => {
-                if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
-                    this.executeCashOut();
-                }
-                this.isCashingOut = false;
-                btn.disabled = false;
-            }, 300);
-        },
-
-        executeCashOut() {
-            if (!this.gameActive || this.gameOver || this.hasCashedOut) return;
-            this.hasCashedOut = true;
-            const win = Math.floor(this.bet * this.multiplier);
-            state.balance += win;
-            state.wins++;
-            state.totalGames++;
-            if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
-            state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
-            if (state.recentWinners.length > 10) state.recentWinners.pop();
-            showNotification(win, win);
-            this.gameActive = false;
-            this.gameOver = true;
-            this.hasCashedOut = false;
-            this.updateUI();
-            this.updateMainButton();
-            updateHomeUI();
-            triggerVibration(30, 'light');
-        },
-
-        setGridSize(size, mines) {
-            if (this.gameActive) return;
-            if (size > 5) {
-                const msg = document.getElementById('minesMessage');
-                msg.textContent = 'Coming soon!';
-                msg.className = 'mines-message';
-                setTimeout(() => this.updateUI(), 1000);
-                return;
-            }
-            this.gridSize = size;
-            const minMines = this.getMinMines();
-            const maxMines = this.getMaxMines();
-            this.minesCount = Math.max(minMines, Math.min(maxMines, mines));
-            document.getElementById('minesCount').textContent = this.minesCount;
-            this.updatePresets();
-            this.generateGrid();
-            this.updateUI();
-        }
-    };
-
-    // ============================================================
-    // SURF GAME (unchanged)
-    // ============================================================
-    const surfGame = {
-        running: false,
-        countdown: 3,
-        countdownId: null,
-        bet: 0,
-        playerSide: null,
-        resultSide: null,
-        history: [],
-        countdownProgress: 0,
-
-        confirmBet() {
-            const input = document.getElementById('surfBetInput');
-            let bet = parseInt(input.value) || 0;
-            if (bet < 1) { triggerVibration(60, 'heavy'); return; }
-            if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
-            state.balance -= bet;
-            this.bet = bet;
-            document.getElementById('surfBetConfirm').disabled = true;
-            document.getElementById('surfBetInput').disabled = true;
-            document.getElementById('surfStatus').textContent = `Bet placed: ${bet}⭐. Pick a side!`;
-            document.getElementById('surfStatus').className = 'surf-status waiting';
-            document.getElementById('surfLeftBtn').disabled = false;
-            document.getElementById('surfRightBtn').disabled = false;
-            const existing = surfPlayers.find(p => p.isYou);
-            if (existing) {
-                existing.bet = bet;
-                existing.side = null;
-                existing.result = null;
-                existing.winAmount = null;
-            } else {
-                surfPlayers.push({
-                    name: state.displayName,
-                    avatar: state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp',
-                    bet: bet,
-                    side: null,
-                    result: null,
-                    winAmount: null,
-                    isYou: true,
-                });
-            }
-            renderSurfPlayers();
-            updateSurfUI();
-            updateHomeUI();
-            triggerVibration(20);
-        },
-
-        betSide(side) {
-            if (this.running) return;
-            if (!this.bet || this.bet <= 0) { triggerVibration(60, 'heavy'); return; }
-            if (this.playerSide) { triggerVibration(30); return; }
-
-            this.playerSide = side;
-            document.getElementById('surfLeftBtn').disabled = true;
-            document.getElementById('surfRightBtn').disabled = true;
-            document.getElementById('surfStatus').textContent = `You bet ${side.toUpperCase()}! Waiting for round...`;
-            document.getElementById('surfStatus').className = 'surf-status waiting';
-            triggerVibration(20);
-
-            const user = surfPlayers.find(p => p.isYou);
-            if (user) { user.side = side; }
-            renderSurfPlayers();
-
-            this.startCountdown();
-        },
-
-        startCountdown() {
-            if (this.running) return;
-            this.running = true;
-            this.countdown = 3;
-            this.countdownProgress = 1;
-            const countdownEl = document.getElementById('surfCountdown');
-            const resultEl = document.getElementById('surfResult');
-            const gifEl = document.getElementById('surfGif');
-            const trailEl = document.getElementById('surfTrail');
-            resultEl.classList.remove('show', 'win', 'lose');
-            gifEl.classList.remove('show', 'left', 'right');
-            gifEl.src = '';
-            trailEl.classList.remove('active', 'left', 'right');
-            countdownEl.classList.add('show');
-            this.updateCountdownRing(1);
-
-            document.getElementById('surfStatus').textContent = 'Round starting...';
-            document.getElementById('surfStatus').className = 'surf-status waiting';
-
-            this.countdownId = setInterval(() => {
-                this.countdown--;
-                this.countdownProgress = this.countdown / 3;
-                this.updateCountdownRing(this.countdownProgress);
-                const numEl = document.getElementById('surfCountNum');
-                numEl.textContent = this.countdown;
-                numEl.classList.add('pulse');
-                setTimeout(() => numEl.classList.remove('pulse'), 200);
-                triggerVibration(20, 'light');
-
-                if (this.countdown <= 0) {
-                    clearInterval(this.countdownId);
-                    this.countdownId = null;
-                    countdownEl.classList.remove('show');
-                    this.playRound();
-                    return;
-                }
-            }, 1000);
-        },
-
-        updateCountdownRing(progress) {
-            const circle = document.getElementById('surfProgress');
-            const circumference = 326.7;
-            const offset = circumference * (1 - progress);
-            circle.style.strokeDashoffset = offset;
-        },
-
-        playRound() {
-            this.resultSide = Math.random() < 0.5 ? 'left' : 'right';
-            const gifUrl = SURF_GIFS[Math.floor(Math.random() * SURF_GIFS.length)];
-            const gifEl = document.getElementById('surfGif');
-            const trailEl = document.getElementById('surfTrail');
-            gifEl.src = gifUrl;
-            gifEl.classList.add('show');
-            gifEl.className = 'surf-gif show';
-
-            document.getElementById('surfStatus').textContent = `Surfing to the ${this.resultSide.toUpperCase()}!`;
-            document.getElementById('surfStatus').className = 'surf-status';
-            triggerVibration(30, 'medium');
-
-            setTimeout(() => {
-                gifEl.classList.add(this.resultSide);
-                trailEl.classList.add('active', this.resultSide);
-                triggerVibration(40, 'medium');
-
-                setTimeout(() => {
-                    trailEl.classList.remove('active', 'left', 'right');
-
-                    const win = this.playerSide === this.resultSide;
-                    const winAmount = win ? Math.floor(this.bet * 2) : 0;
-
-                    if (win) {
-                        state.balance += winAmount;
-                        state.wins++;
-                        state.totalGames++;
-                        state.recentWinners.unshift({ name: 'You (Surf)', amount: winAmount });
-                        if (state.recentWinners.length > 10) state.recentWinners.pop();
-                        showNotification(winAmount, winAmount);
-                        document.getElementById('surfStatus').textContent = `WIN! You got ${winAmount}⭐!`;
-                        document.getElementById('surfStatus').className = 'surf-status success';
-                        const resultEl = document.getElementById('surfResult');
-                        document.getElementById('resultIcon').innerHTML = '<i class="fas fa-check-circle"></i>';
-                        document.getElementById('resultText').textContent = 'WIN';
-                        document.getElementById('resultSub').innerHTML = `+${winAmount} ${starImg()}`;
-                        resultEl.className = 'surf-result show win';
-                        triggerVibration(80, 'heavy');
-                    } else {
-                        state.losses++;
-                        state.totalGames++;
-                        document.getElementById('surfStatus').textContent = `LOSE! The surf went ${this.resultSide}.`;
-                        document.getElementById('surfStatus').className = 'surf-status fail';
-                        const resultEl = document.getElementById('surfResult');
-                        document.getElementById('resultIcon').innerHTML = '<i class="fas fa-times-circle"></i>';
-                        document.getElementById('resultText').textContent = 'LOSE';
-                        document.getElementById('resultSub').innerHTML = `-${this.bet} ${starImg()}`;
-                        resultEl.className = 'surf-result show lose';
-                        triggerVibration(100, 'heavy');
-                    }
-
-                    const user = surfPlayers.find(p => p.isYou);
-                    if (user) {
-                        user.result = win ? 'won' : 'lost';
-                        user.winAmount = winAmount;
-                    }
-                    renderSurfPlayers();
-                    this.addHistory(this.resultSide, win);
-                    updateHomeUI();
-                    updateProfile();
-                    document.getElementById('surfBalance').innerHTML =
-                        `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-
-                    setTimeout(() => {
-                        const resultEl = document.getElementById('surfResult');
-                        resultEl.classList.remove('show');
-                        this.resetRound();
-                    }, 2800);
-                }, 900);
-            }, 500);
-        },
-
-        resetRound() {
-            this.running = false;
-            this.bet = 0;
-            this.playerSide = null;
-            this.resultSide = null;
-            document.getElementById('surfBetConfirm').disabled = false;
-            document.getElementById('surfBetInput').disabled = false;
-            document.getElementById('surfLeftBtn').disabled = true;
-            document.getElementById('surfRightBtn').disabled = true;
-            document.getElementById('surfStatus').textContent = 'Place your bet and pick a side';
-            document.getElementById('surfStatus').className = 'surf-status';
-            const gifEl = document.getElementById('surfGif');
-            gifEl.classList.remove('show', 'left', 'right');
-            const trailEl = document.getElementById('surfTrail');
-            trailEl.classList.remove('active', 'left', 'right');
-            this.updateCountdownRing(1);
-            document.getElementById('surfCountNum').textContent = '3';
-            setTimeout(() => {
-                surfPlayers = surfPlayers.filter(p => p.isYou || p.result === null);
-                renderSurfPlayers();
-            }, 300);
-        },
-
-        addHistory(side, win) {
-            this.history.unshift({ side, win });
-            if (this.history.length > 20) this.history.pop();
-            this.renderHistory();
-        },
-
-        renderHistory() {
-            const container = document.getElementById('surfHistory');
-            if (this.history.length === 0) {
-                container.innerHTML = '<span style="color:#555;font-size:12px;">No rounds yet</span>';
-                return;
-            }
-            let html = '';
-            for (const h of this.history) {
-                const cls = h.win ? 'win' : 'loss';
-                const icon = h.side === 'left' ? '<i class="fas fa-arrow-left"></i>' : '<i class="fas fa-arrow-right"></i>';
-                const label = h.win ? '+' : '-';
-                html += `<span class="h-item ${cls}"><span class="side-icon">${icon}</span> ${label}</span>`;
-            }
-            container.innerHTML = html;
-        }
-    };
-
-    // ============================================================
-    // PRESET BUTTON HANDLERS
-    // ============================================================
-    document.querySelectorAll('.grid-presets button').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const size = parseInt(this.dataset.size);
-            const mines = parseInt(this.dataset.mines);
-            if (this.classList.contains('coming-soon')) {
-                const msg = document.getElementById('minesMessage');
-                msg.textContent = 'Coming soon!';
-                msg.className = 'mines-message';
-                setTimeout(() => minesGame.updateUI(), 1000);
-                return;
-            }
-            minesGame.setGridSize(size, mines);
-        });
-    });
-
-    // ============================================================
-    // VISIBILITY CHANGE
-    // ============================================================
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-            if (crashGame.isPlaying) crashGame.stopContinuousVibration();
-        } else {
-            if (crashGame.isPlaying) crashGame.startContinuousVibration();
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame.startGameCycle();
-            }
-        }
-    });
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    function init() {
-        getTelegramUser();
-        updateHomeUI();
-        updateProfile();
-        crashGame.init();
-        minesGame.init();
-        minesGame.setGridSize(3, 1);
-        surfGame.renderHistory();
-        document.getElementById('surfLeftBtn').disabled = true;
-        document.getElementById('surfRightBtn').disabled = true;
-        surfGame.updateCountdownRing(1);
-
-        try {
-            if (window.Telegram?.WebApp) {
-                const tg = window.Telegram.WebApp;
-                tg.expand();
-                tg.ready();
-            }
-        } catch (e) {}
-        console.log('Casino loaded – faster non‑stop multiplier, slower countdown, fast rocket switch.');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
-        surfGame.renderHistory();
-    });
-
-    document.addEventListener('DOMContentLoaded', init);
-    if (document.readyState === 'complete') {
-        init();
-        if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
-        surfGame.renderHistory();
-    }
-</script>
-</body>
-</html>
+                       
