@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Casino + Upgrade</title>
+    <title>Casino + NFT Upgrade</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -191,8 +191,6 @@
         .player-item .status.cashed { color: #00d2a0; border: 1px solid rgba(0,210,160,0.2); }
         .player-item .status.crashed { color: #ff6b6b; border: 1px solid rgba(255,107,107,0.2); }
         .player-item .status.waiting { color: #888; border: 1px solid rgba(255,255,255,0.06); }
-        .player-item .status.won { color: #00d2a0; border: 1px solid rgba(0,210,160,0.2); }
-        .player-item .status.lost { color: #ff6b6b; border: 1px solid rgba(255,107,107,0.2); }
         .player-progress { position: absolute; left: 0; top: 0; height: 100%; width: 0%; border-radius: 12px; opacity: 0.25; transition: width 0.1s linear, background 0.3s; pointer-events: none; z-index: 1; }
         .player-progress.green { background: #00d2a0; }
         .player-progress.blue { background: #54a0ff; }
@@ -271,14 +269,17 @@
 
         /* ===== UPGRADE & INVENTORY STYLES (new) ===== */
         .upgrade-wheel-container { position: relative; width: 260px; height: 260px; margin: 20px auto; }
-        #upgradeWheel { display: block; margin: 0 auto; }
-        .wheel-arrow { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 30px; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.8); z-index: 10; pointer-events: none; }
+        #upgradeWheel { display: block; margin: 0 auto; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05); }
         .upgrade-selectors { display: flex; flex-direction: column; gap: 12px; }
         .upgrade-select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; }
         .upgrade-select img { width: 60px; height: 60px; object-fit: contain; border-radius: 12px; }
         .upgrade-select .info { flex: 1; }
         .upgrade-select .info .name { font-weight: 600; font-size: 16px; }
         .upgrade-select .info .price { color: #ffd700; font-size: 14px; display: flex; align-items: center; gap: 4px; }
+        .btn-select-upgrade { background: rgba(108,92,231,0.2); color: #a29bfe; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
+        .btn-upgrade:disabled { opacity: 0.5; }
+
         .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .inventory-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; text-align: center; }
         .inventory-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; }
@@ -287,7 +288,6 @@
         .inventory-item .actions button { flex: 1; padding: 6px; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .inventory-item .actions button:active { transform: scale(0.94); }
         .btn-sell { background: rgba(255,107,107,0.2); color: #ff6b6b; }
-        .btn-select-upgrade { background: rgba(108,92,231,0.2); color: #a29bfe; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .shop-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.02); margin-bottom: 8px; }
         .shop-item img { width: 50px; height: 50px; object-fit: contain; border-radius: 10px; }
         .shop-item .info { flex: 1; }
@@ -295,8 +295,6 @@
         .shop-item .info .price { color: #ffd700; font-size: 13px; }
         .btn-buy { background: linear-gradient(135deg, #00b894, #00d2a0); color: white; border: none; padding: 8px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-buy:active { transform: scale(0.94); }
-        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
-        .btn-upgrade:disabled { opacity: 0.5; }
 
         @media (max-width: 420px) {
             .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
@@ -408,14 +406,45 @@
         <div class="mines-history" id="minesHistory"></div>
     </div>
 
-    <!-- UPGRADE (new, replaces Surf) -->
+    <!-- UPGRADE (only wheel + selectors, no inventory) -->
     <div id="page-upgrade" class="page">
         <div class="flex-between mb-8">
             <span class="badge badge-blue"><i class="fas fa-arrow-up" style="margin-right:6px;"></i>Upgrade<span class="online-dot"></span></span>
             <span class="badge" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
         </div>
+        <div class="card">
+            <div class="card-title">Select NFTs to Upgrade</div>
+            <div class="upgrade-selectors">
+                <div class="upgrade-select">
+                    <img id="fromNftImg" src="" alt="Select">
+                    <div class="info">
+                        <div class="name" id="fromNftName">Select NFT</div>
+                        <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                    </div>
+                    <button class="btn-select-upgrade" onclick="selectUpgradeFrom()">Choose</button>
+                </div>
+                <div class="upgrade-select">
+                    <img id="toNftImg" src="" alt="Desired">
+                    <div class="info">
+                        <div class="name" id="toNftName">Desired NFT</div>
+                        <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                    </div>
+                    <button class="btn-select-upgrade" onclick="selectUpgradeTo()">Choose</button>
+                </div>
+            </div>
+            <div class="upgrade-wheel-container">
+                <canvas id="upgradeWheel" width="260" height="260"></canvas>
+            </div>
+            <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>Upgrade</button>
+        </div>
+    </div>
 
-        <!-- Shop -->
+    <!-- INVENTORY (new dedicated page) -->
+    <div id="page-inventory" class="page">
+        <div class="flex-between mb-8">
+            <span class="badge badge-gold"><i class="fas fa-box" style="margin-right:6px;"></i>Inventory</span>
+            <span class="badge" id="inventoryBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
+        </div>
         <div class="card">
             <div class="card-title">NFT Shop</div>
             <div class="shop-item">
@@ -435,41 +464,10 @@
                 <button class="btn-buy" onclick="buyNFT('snoop_cigar')">Buy</button>
             </div>
         </div>
-
-        <!-- Inventory -->
         <div class="card">
-            <div class="card-title">My Inventory</div>
+            <div class="card-title">My Collection</div>
             <div class="inventory-grid" id="inventoryGrid"></div>
-            <div id="inventoryEmpty" class="text-muted" style="text-align:center; padding:20px;">No NFTs yet. Buy from shop!</div>
-        </div>
-
-        <!-- Upgrade section -->
-        <div class="card">
-            <div class="card-title">NFT Upgrade</div>
-            <div class="upgrade-selectors">
-                <div class="upgrade-select">
-                    <img id="fromNftImg" src="" alt="Select">
-                    <div class="info">
-                        <div class="name" id="fromNftName">Select NFT</div>
-                        <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
-                    </div>
-                    <button class="btn-select-upgrade" onclick="selectUpgradeFrom()">Choose</button>
-                </div>
-                <div class="upgrade-select">
-                    <img id="toNftImg" src="" alt="Desired">
-                    <div class="info">
-                        <div class="name" id="toNftName">Desired NFT</div>
-                        <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
-                    </div>
-                    <button class="btn-select-upgrade" onclick="selectUpgradeTo()">Choose</button>
-                </div>
-            </div>
-
-            <div class="upgrade-wheel-container">
-                <canvas id="upgradeWheel" width="260" height="260"></canvas>
-                <div class="wheel-arrow"><i class="fas fa-caret-down"></i></div>
-            </div>
-            <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>Upgrade</button>
+            <div id="inventoryEmpty" class="text-muted" style="text-align:center; padding:20px;">No NFTs yet. Buy from shop or win in games!</div>
         </div>
     </div>
 
@@ -506,6 +504,7 @@
         <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
         <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
         <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgrade</span></button>
+        <button class="nav-item" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inventory</span></button>
         <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
     </div>
 </div>
@@ -588,6 +587,7 @@
         rocket: document.getElementById('page-rocket'),
         mines: document.getElementById('page-mines'),
         upgrade: document.getElementById('page-upgrade'),
+        inventory: document.getElementById('page-inventory'),
         profile: document.getElementById('page-profile'),
     };
     const navItems = document.querySelectorAll('.nav-item');
@@ -755,8 +755,11 @@
         if (page === 'profile') { updateProfile(); }
         if (page === 'upgrade') {
             document.getElementById('upgradeBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-            renderInventory();
             updateUpgradeSelectors();
+        }
+        if (page === 'inventory') {
+            document.getElementById('inventoryBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+            renderInventory();
         }
     }
 
@@ -821,6 +824,9 @@
         updateAvatars();
         if (document.getElementById('page-upgrade')?.classList.contains('active')) {
             document.getElementById('upgradeBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+        }
+        if (document.getElementById('page-inventory')?.classList.contains('active')) {
+            document.getElementById('inventoryBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
         }
     }
 
@@ -894,7 +900,28 @@
     }
 
     // ============================================================
-    // CRASH GAME (completely unchanged)
+    // NFT REWARD LOGIC (new)
+    // ============================================================
+    function addNFTToInventory(nftId) {
+        const nft = NFT_DB[nftId];
+        if (!nft) return;
+        state.inventory.push({ ...nft });
+        renderInventory();
+        // Show a special notification
+        const notif = document.getElementById('notification');
+        notifAmount.innerHTML = `🎁 You got a <b>${nft.name}</b> NFT!`;
+        notif.style.display = 'flex';
+        void notif.offsetHeight;
+        notif.style.transform = 'translateY(0)';
+        clearTimeout(notif._timeout);
+        notif._timeout = setTimeout(() => {
+            notif.style.transform = 'translateY(-120%)';
+            setTimeout(() => { notif.style.display = 'none'; }, 400);
+        }, 2000);
+    }
+
+    // ============================================================
+    // CRASH GAME (unchanged, but now rewards NFT on cash out >= 2x)
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -1397,6 +1424,11 @@
             this.updateUI();
             this.updateMainButton();
             updateHomeUI();
+
+            // NFT reward: if multiplier >= 2, give Chill Flame
+            if (this.multiplier >= 2.0) {
+                addNFTToInventory('chill_flame');
+            }
         },
 
         startCountdown() {
@@ -1589,7 +1621,7 @@
     };
 
     // ============================================================
-    // MINES GAME (unchanged)
+    // MINES GAME (unchanged, but also rewards Chill Flame on win >= 320⭐)
     // ============================================================
     const minesGame = {
         gridSize: 3,
@@ -1894,6 +1926,8 @@
                 updateHomeUI();
                 this.addHistory('win', this.multiplier);
                 triggerVibration(50, 'medium');
+                // NFT reward for jackpot
+                if (win >= 320) addNFTToInventory('chill_flame');
                 return;
             }
             this.updateGrid();
@@ -2010,6 +2044,8 @@
             this.updateMainButton();
             updateHomeUI();
             triggerVibration(30, 'light');
+            // NFT reward for cash out
+            if (win >= 320) addNFTToInventory('chill_flame');
         },
 
         setGridSize(size, mines) {
@@ -2033,7 +2069,7 @@
     };
 
     // ============================================================
-    // INVENTORY & UPGRADE (new)
+    // INVENTORY & UPGRADE (modified: inventory now separate, wheel redesigned)
     // ============================================================
     function buyNFT(nftId) {
         const nft = NFT_DB[nftId];
@@ -2089,16 +2125,16 @@
         fromNftId: null,
         toNftId: null,
         spinning: false,
-        wheelAngle: 0,
+        arrowAngle: 0,
         canvas: document.getElementById('upgradeWheel'),
         ctx: null,
 
         init() {
             this.ctx = this.canvas.getContext('2d');
-            this.drawWheel(0);
+            this.drawWheelAndArrow(0);
         },
 
-        drawWheel(angle = 0) {
+        drawWheelAndArrow(arrowAngle) {
             const ctx = this.ctx;
             const w = this.canvas.width;
             const h = this.canvas.height;
@@ -2106,53 +2142,107 @@
             const radius = 110;
             ctx.clearRect(0, 0, w, h);
 
+            // Outer decorative ring
             ctx.beginPath();
-            ctx.arc(cx, cy, radius+6, 0, Math.PI*2);
-            ctx.fillStyle = '#1a1a1e';
+            ctx.arc(cx, cy, radius+8, 0, Math.PI*2);
+            const outerGrad = ctx.createLinearGradient(0,0,w,h);
+            outerGrad.addColorStop(0, '#2a2a2e');
+            outerGrad.addColorStop(1, '#1a1a1e');
+            ctx.fillStyle = outerGrad;
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.lineWidth = 2;
             ctx.stroke();
 
+            // Wheel background
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, 2*Math.PI);
+            const bgGrad = ctx.createRadialGradient(cx, cy, radius*0.3, cx, cy, radius);
+            bgGrad.addColorStop(0, '#2c2c30');
+            bgGrad.addColorStop(1, '#0f0f13');
+            ctx.fillStyle = bgGrad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Segments (static, drawn without rotation)
+            const segmentCount = 2;
+            const greenAngle = 0.6 * 2 * Math.PI;
+            const redAngle = 0.4 * 2 * Math.PI;
+
+            // Green segment (60%)
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, radius, -Math.PI/2, -Math.PI/2 + greenAngle);
+            ctx.closePath();
+            const greenGrad = ctx.createLinearGradient(cx, cy-radius, cx, cy+radius);
+            greenGrad.addColorStop(0, '#00e676');
+            greenGrad.addColorStop(1, '#009624');
+            ctx.fillStyle = greenGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Red segment (40%)
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, radius, -Math.PI/2 + greenAngle, -Math.PI/2 + 2*Math.PI);
+            ctx.closePath();
+            const redGrad = ctx.createLinearGradient(cx, cy-radius, cx, cy+radius);
+            redGrad.addColorStop(0, '#ff5252');
+            redGrad.addColorStop(1, '#b71c1c');
+            ctx.fillStyle = redGrad;
+            ctx.fill();
+            ctx.stroke();
+
+            // Segment divider lines
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + radius * Math.cos(-Math.PI/2), cy + radius * Math.sin(-Math.PI/2));
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            const lineAngle = -Math.PI/2 + greenAngle;
+            ctx.lineTo(cx + radius * Math.cos(lineAngle), cy + radius * Math.sin(lineAngle));
+            ctx.stroke();
+
+            // Center knob
+            ctx.beginPath();
+            ctx.arc(cx, cy, 14, 0, 2*Math.PI);
+            const knobGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 14);
+            knobGrad.addColorStop(0, '#fff');
+            knobGrad.addColorStop(1, '#aaa');
+            ctx.fillStyle = knobGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Rotating Arrow
             ctx.save();
             ctx.translate(cx, cy);
-            ctx.rotate(angle);
-
-            const greenStart = -Math.PI/2;
-            const greenEnd = greenStart + 0.6 * 2 * Math.PI;
+            ctx.rotate(arrowAngle);
+            // Draw arrow pointing outward from center
             ctx.beginPath();
-            ctx.moveTo(0,0);
-            ctx.arc(0, 0, radius, greenStart, greenEnd);
+            ctx.moveTo(radius - 12, 0);
+            ctx.lineTo(radius + 5, -8);
+            ctx.lineTo(radius + 5, 8);
             ctx.closePath();
-            ctx.fillStyle = '#00d2a0';
+            ctx.fillStyle = '#ffd700';
             ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(0,0);
-            ctx.arc(0, 0, radius, greenEnd, greenStart + 2*Math.PI);
-            ctx.closePath();
-            ctx.fillStyle = '#ff6b6b';
-            ctx.fill();
-
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(0,0);
-            ctx.lineTo(0, -radius);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5;
             ctx.stroke();
+            // Arrow shaft
             ctx.beginPath();
-            ctx.moveTo(0,0);
-            const lineX = radius * Math.cos(greenEnd - greenStart);
-            const lineY = radius * Math.sin(greenEnd - greenStart);
-            ctx.lineTo(lineX, lineY);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(0, 0, 12, 0, 2*Math.PI);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-            ctx.lineWidth = 2;
+            ctx.moveTo(0, 0);
+            ctx.lineTo(radius - 12, 0);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
             ctx.stroke();
             ctx.restore();
         },
@@ -2171,23 +2261,25 @@
             } else {
                 finalAngleOnWheel = 0.6 * 2 * Math.PI + Math.random() * 0.4 * 2 * Math.PI;
             }
-            const targetRotation = -Math.PI/2 - finalAngleOnWheel + totalRotation;
-            const startRotation = this.wheelAngle;
+            // Arrow angle: 0 points to the right (3 o'clock). Wheel's green starts at top (-PI/2).
+            // We want the arrow to land such that when arrowAngle = finalAngleOnWheel - PI/2, it points at the segment.
+            const targetArrowAngle = -Math.PI/2 + finalAngleOnWheel + totalRotation;
+            const startArrowAngle = this.arrowAngle;
             const startTime = performance.now();
 
             const animate = (now) => {
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / spinDuration, 1);
                 const easeOut = 1 - Math.pow(1 - progress, 3);
-                this.wheelAngle = startRotation + (targetRotation - startRotation) * easeOut;
-                this.drawWheel(this.wheelAngle);
+                this.arrowAngle = startArrowAngle + (targetArrowAngle - startArrowAngle) * easeOut;
+                this.drawWheelAndArrow(this.arrowAngle);
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
                     this.spinning = false;
-                    this.wheelAngle = targetRotation;
-                    this.drawWheel(this.wheelAngle);
+                    this.arrowAngle = targetArrowAngle;
+                    this.drawWheelAndArrow(this.arrowAngle);
                     this.resolveSpin(finalAngleOnWheel);
                 }
             };
@@ -2329,7 +2421,7 @@
                 tg.ready();
             }
         } catch (e) {}
-        console.log('Casino + Upgrade loaded. Moon appears after 5x.');
+        console.log('Casino + NFT Upgrade loaded.');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
