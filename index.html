@@ -453,53 +453,7 @@
         </div>
         <div class="mines-history" id="minesHistory"></div>
     </div>
-
-    <!-- SURF -->
-    <div id="page-surf" class="page">
-        <div class="flex-between mb-8"><span class="badge badge-blue"><i class="fas fa-water" style="margin-right:6px;"></i>Surf<span class="online-dot"></span></span><span class="badge" id="surfBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
-        <div class="surf-container">
-            <div class="surf-display" id="surfDisplay">
-                <div class="surf-trail" id="surfTrail">
-                    <div class="trail-line"></div><div class="trail-line"></div><div class="trail-line"></div><div class="trail-line"></div>
-                    <div class="trail-line"></div><div class="trail-line"></div><div class="trail-line"></div><div class="trail-line"></div>
-                    <div class="trail-line"></div><div class="trail-line"></div>
-                </div>
-                <img class="surf-gif" id="surfGif" src="" alt="Surf">
-                <div class="surf-countdown" id="surfCountdown">
-                    <div class="count-ring">
-                        <svg viewBox="0 0 120 120">
-                            <circle class="bg" cx="60" cy="60" r="52"/>
-                            <circle class="progress" id="surfProgress" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"/>
-                        </svg>
-                        <div class="num" id="surfCountNum">3</div>
-                    </div>
-                </div>
-                <div class="surf-result" id="surfResult">
-                    <div class="result-icon" id="resultIcon"><i class="fas fa-check-circle"></i></div>
-                    <div class="result-text" id="resultText">WIN</div>
-                    <div class="result-sub" id="resultSub">+0 <img src="https://images.iimg.live/images/radiant-capture-7834.webp" alt="⭐"></div>
-                </div>
-            </div>
-            <div class="surf-status" id="surfStatus">Place your bet and pick a side</div>
-            <div class="surf-bet-input-row">
-                <input type="number" id="surfBetInput" value="10" min="1" step="1" placeholder="Bet amount">
-                <button class="surf-bet-confirm-btn" id="surfBetConfirm" onclick="surfGame.confirmBet()">Confirm</button>
-            </div>
-            <div class="surf-bet-buttons">
-                <button class="surf-btn left" id="surfLeftBtn" onclick="surfGame.betSide('left')">
-                    <i class="fas fa-arrow-left"></i> Left
-                    <span class="sub">2x multiplier</span>
-                </button>
-                <button class="surf-btn right" id="surfRightBtn" onclick="surfGame.betSide('right')">
-                    Right <i class="fas fa-arrow-right"></i>
-                    <span class="sub">2x multiplier</span>
-                </button>
-            </div>
-            <div class="surf-history" id="surfHistory"></div>
-            <div class="players-list" id="surfPlayersList"><div class="empty">No bets placed yet</div></div>
-        </div>
-    </div>
-
+    
     <!-- PROFILE -->
     <div id="page-profile" class="page">
         <div class="profile-header">
@@ -556,15 +510,7 @@
     ];
     function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
 
-    // ============================================================
-    // SURF GIFS
-    // ============================================================
-    const SURF_GIFS = [
-        'https://images.iimg.live/images/majestic-picture-6954.webp',
-        'https://images.iimg.live/images/prime-capture-5873.webp',
-        'https://images.iimg.live/images/dynamic-art-8933.webp'
-    ];
-
+  
     // ============================================================
     // STATE
     // ============================================================
@@ -1229,6 +1175,8 @@
             } else {
                 wrap.classList.remove('active');
                 fill.style.width = '0%';
+                add bool nft 1500 
+                or 350 win or lost
             }
         },
 
@@ -2388,7 +2336,27 @@
             }
         }
     });
+inventory:
+coolig:public bool dir 5>>
+    then add new tab;
+    if clicked on tab open;
+    store nfts
+    create bool nfts
 
+      
+    // ============================================================
+    // Upgrade
+    // ============================================================
+    dir add wheel5;
+    wheel spin value 6
+    after the spin win> loose 
+    loose < win
+    if lost then delete bool nft 
+    if win  add new nft as new bool to inventory 
+    add small interface
+    as a wheel
+    
+    
     // ============================================================
     // INIT
     // ============================================================
@@ -2428,3 +2396,5 @@
 </script>
 </body>
 </html>
+
+
