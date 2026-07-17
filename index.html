@@ -280,7 +280,7 @@
         .upgrade-select .info { text-align: center; }
         .upgrade-select .info .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .upgrade-select .info .price { color: #ffd700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 2px; }
-        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); margin-top: 8px; }
+        .btn-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); margin: 8px auto 0 auto; padding: 16px 32px; font-size: 18px; border-radius: 20px; width: fit-content; display: block; }
         .btn-upgrade:disabled { opacity: 0.5; }
 
         /* NFT Selection Overlay */
@@ -900,27 +900,50 @@
     }
 
     // ============================================================
-    // NFT REWARD LOGIC
+    // NFT REWARD LOGIC (improved: exchange win for NFT + excess)
     // ============================================================
-    function addNFTToInventory(nftId) {
-        const nft = NFT_DB[nftId];
-        if (!nft) return;
-        state.inventory.push({ ...nft });
-        renderInventory();
-        const notif = document.getElementById('notification');
-        notifAmount.innerHTML = `🎁 You got a <b>${nft.name}</b> NFT!`;
-        notif.style.display = 'flex';
-        void notif.offsetHeight;
-        notif.style.transform = 'translateY(0)';
-        clearTimeout(notif._timeout);
-        notif._timeout = setTimeout(() => {
-            notif.style.transform = 'translateY(-120%)';
-            setTimeout(() => { notif.style.display = 'none'; }, 400);
-        }, 2000);
+    function maybeRewardNFT(winAmount) {
+        const nft = NFT_DB['chill_flame'];  // always chill flame for now
+        if (winAmount >= nft.price) {
+            const excess = winAmount - nft.price;
+            // Subtract price from balance first (we already added full win in game logic, so we need to correct)
+            // Actually, we need to adjust: we'll not add full win, but add excess and give NFT.
+            // We'll modify game win handling to call this function BEFORE updating balance.
+            // So we'll change the callers accordingly.
+            return { nft: nft, excess: excess };
+        }
+        return null;
+    }
+
+    // Updated version used by Crash/Mines after they calculate win
+    function processGameWin(win) {
+        const reward = maybeRewardNFT(win);
+        if (reward) {
+            // Add excess stars to balance, give NFT
+            state.balance += reward.excess;
+            state.inventory.push({ ...reward.nft });
+            // Show special notification
+            const notif = document.getElementById('notification');
+            notifAmount.innerHTML = `🎁 ${reward.nft.name} +${reward.excess} ${starImg('star-icon-xs')}`;
+            notif.style.display = 'flex';
+            void notif.offsetHeight;
+            notif.style.transform = 'translateY(0)';
+            clearTimeout(notif._timeout);
+            notif._timeout = setTimeout(() => {
+                notif.style.transform = 'translateY(-120%)';
+                setTimeout(() => { notif.style.display = 'none'; }, 400);
+            }, 2000);
+            renderInventory();
+            updateHomeUI();
+            updateProfile();
+        } else {
+            // No NFT, add full win normally
+            state.balance += win;
+        }
     }
 
     // ============================================================
-    // CRASH GAME (unchanged, but NFT reward on cash out >= 2x)
+    // CRASH GAME (modified win handling)
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -1403,13 +1426,14 @@
             if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
             this.hasCashedOut = true;
             const win = Math.floor(this.bet * this.multiplier);
-            state.balance += win;
             state.wins++;
             state.totalGames++;
             if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
             state.recentWinners.unshift({ name: 'You', amount: win });
             if (state.recentWinners.length > 10) state.recentWinners.pop();
-            showNotification(win, win);
+
+            // Process win (maybe give NFT + excess)
+            processGameWin(win);
 
             const user = players.find(p => p.isYou);
             if (user) {
@@ -1423,11 +1447,6 @@
             this.updateUI();
             this.updateMainButton();
             updateHomeUI();
-
-            // NFT reward: if multiplier >= 2, give Chill Flame
-            if (this.multiplier >= 2.0) {
-                addNFTToInventory('chill_flame');
-            }
         },
 
         startCountdown() {
@@ -1620,7 +1639,7 @@
     };
 
     // ============================================================
-    // MINES GAME (unchanged, NFT reward on win >= 320⭐)
+    // MINES GAME (modified win handling)
     // ============================================================
     const minesGame = {
         gridSize: 3,
@@ -1913,19 +1932,19 @@
                 this.gameOver = true;
                 this.gameActive = false;
                 const win = Math.floor(this.bet * this.multiplier);
-                state.balance += win;
                 state.wins++;
                 state.totalGames++;
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-                showNotification(win, win);
+
+                processGameWin(win);
+
                 this.updateGrid();
                 this.updateUI();
                 updateHomeUI();
                 this.addHistory('win', this.multiplier);
                 triggerVibration(50, 'medium');
-                if (win >= 320) addNFTToInventory('chill_flame');
                 return;
             }
             this.updateGrid();
@@ -2028,13 +2047,14 @@
             if (!this.gameActive || this.gameOver || this.hasCashedOut) return;
             this.hasCashedOut = true;
             const win = Math.floor(this.bet * this.multiplier);
-            state.balance += win;
             state.wins++;
             state.totalGames++;
             if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
             state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
             if (state.recentWinners.length > 10) state.recentWinners.pop();
-            showNotification(win, win);
+
+            processGameWin(win);
+
             this.gameActive = false;
             this.gameOver = true;
             this.hasCashedOut = false;
@@ -2042,7 +2062,6 @@
             this.updateMainButton();
             updateHomeUI();
             triggerVibration(30, 'light');
-            if (win >= 320) addNFTToInventory('chill_flame');
         },
 
         setGridSize(size, mines) {
@@ -2102,7 +2121,7 @@
     }
 
     // ============================================================
-    // UPGRADE SELECTION & WHEEL (final version)
+    // UPGRADE SELECTION & WHEEL (final version, arrow starts top)
     // ============================================================
     let activeSelectionType = null;
 
@@ -2152,6 +2171,11 @@
         upgradeGame.toNftId = nftId;
         closeNftSelection();
         updateUpgradeSelectors();
+        // Immediately show the desired NFT in the wheel center
+        const centerImg = document.getElementById('wheelCenterNft');
+        const toNft = NFT_DB[upgradeGame.toNftId];
+        centerImg.src = toNft.gif;
+        centerImg.style.display = 'block';
     }
 
     function closeNftSelection() {
@@ -2163,13 +2187,13 @@
         fromNftId: null,
         toNftId: null,
         spinning: false,
-        arrowAngle: 0,
+        arrowAngle: -Math.PI/2,   // start pointing up
         canvas: document.getElementById('upgradeWheel'),
         ctx: null,
 
         init() {
             this.ctx = this.canvas.getContext('2d');
-            this.drawWheelAndArrow(0);
+            this.drawWheelAndArrow(this.arrowAngle);
         },
 
         drawWheelAndArrow(arrowAngle) {
@@ -2208,11 +2232,11 @@
             ctx.fillStyle = redGrad;
             ctx.fill();
 
-            // Thin outer circle line
+            // Thin outer circle line (1px)
             ctx.beginPath();
             ctx.arc(cx, cy, outerR, 0, 2*Math.PI);
             ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             // Spinning arrow (only arrowhead)
@@ -2233,7 +2257,7 @@
             if (this.spinning || !this.fromNftId || !this.toNftId) return;
             this.spinning = true;
             document.getElementById('upgradeBtn').disabled = true;
-            document.getElementById('wheelCenterNft').style.display = 'none';
+            // Do not hide the center image – it already shows the desired NFT
 
             const duration = 5000 + Math.random() * 2000;
             const startAngle = this.arrowAngle;
@@ -2244,7 +2268,9 @@
             } else {
                 finalAngleOnWheel = 0.6 * 2 * Math.PI + Math.random() * 0.4 * 2 * Math.PI;
             }
-            const targetArrowAngle = startAngle + 2*Math.PI * (6 + Math.floor(Math.random()*4)) + finalAngleOnWheel - (Math.PI/2);
+            // Arrow should end at top (-PI/2) plus the offset?
+            // We want the arrow to point at the final sector, then return to top.
+            const targetArrowAngle = -Math.PI/2 + finalAngleOnWheel + 2*Math.PI * (6 + Math.floor(Math.random()*4));
 
             const startTime = performance.now();
             const animateSpin = (now) => {
@@ -2259,41 +2285,34 @@
                 } else {
                     this.spinning = false;
                     const landed = ((targetArrowAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-                    const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);
+                    const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);   // because start is -PI/2
                     const isGreen = relativeAngle < 0.6 * 2 * Math.PI;
                     this.resolveSpin(isGreen);
 
-                    // Show desired NFT in center
-                    const toNft = NFT_DB[this.toNftId];
-                    const centerImg = document.getElementById('wheelCenterNft');
-                    centerImg.src = toNft.gif;
-                    centerImg.style.display = 'block';
-
-                    // Smooth return to top (arrow angle 0)
+                    // Return arrow to top smoothly
                     const returnDuration = 800;
                     const returnStartAngle = this.arrowAngle;
                     const returnStartTime = performance.now();
                     const animateReturn = (now2) => {
                         const t2 = Math.min((now2 - returnStartTime) / returnDuration, 1);
                         const eased2 = t2 < 0.5 ? 2 * t2 * t2 : 1 - Math.pow(-2 * t2 + 2, 2) / 2;
-                        this.arrowAngle = returnStartAngle * (1 - eased2);
+                        // Interpolate to top angle (-PI/2)
+                        const deltaAngle = returnStartAngle - (-Math.PI/2);
+                        this.arrowAngle = returnStartAngle - deltaAngle * eased2;
                         this.drawWheelAndArrow(this.arrowAngle);
                         if (t2 < 1) {
                             requestAnimationFrame(animateReturn);
                         } else {
-                            this.arrowAngle = 0;
-                            this.drawWheelAndArrow(0);
+                            this.arrowAngle = -Math.PI/2;
+                            this.drawWheelAndArrow(this.arrowAngle);
                             this.fromNftId = null;
                             this.toNftId = null;
                             document.getElementById('upgradeBtn').disabled = false;
+                            document.getElementById('wheelCenterNft').style.display = 'none';
                             updateUpgradeSelectors();
                         }
                     };
                     requestAnimationFrame(animateReturn);
-
-                    setTimeout(() => {
-                        centerImg.style.display = 'none';
-                    }, 2500);
                 }
             };
             requestAnimationFrame(animateSpin);
@@ -2348,10 +2367,14 @@
             toImg.style.display = 'block';
             toPlaceholder.style.display = 'none';
             toName.textContent = nft.name;
+            // Show desired NFT in wheel center immediately
+            document.getElementById('wheelCenterNft').src = nft.gif;
+            document.getElementById('wheelCenterNft').style.display = 'block';
         } else {
             toImg.style.display = 'none';
             toPlaceholder.style.display = 'block';
             toName.textContent = 'Desired NFT';
+            document.getElementById('wheelCenterNft').style.display = 'none';
         }
 
         const fromOwned = state.inventory.some(n => n.id === upgradeGame.fromNftId);
