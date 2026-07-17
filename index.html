@@ -267,19 +267,19 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        /* ===== UPGRADE & INVENTORY STYLES ===== */
-        .upgrade-wheel-container { position: relative; width: 260px; height: 260px; margin: 20px auto; }
+        /* ===== UPGRADE & INVENTORY STYLES (modified) ===== */
+        .upgrade-wheel-container { position: relative; width: 230px; height: 230px; margin: 12px auto; }
         #upgradeWheel { display: block; margin: 0 auto; border-radius: 50%; }
-        .upgrade-selectors { display: flex; flex-direction: column; gap: 12px; }
-        .upgrade-select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .upgrade-selectors { display: flex; flex-direction: row; gap: 10px; margin-bottom: 12px; }
+        .upgrade-select { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: background 0.2s; min-width: 0; }
         .upgrade-select:active { background: rgba(255,255,255,0.05); }
-        .upgrade-select .nft-square { width: 56px; height: 56px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
+        .upgrade-select .nft-square { width: 48px; height: 48px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
         .upgrade-select .nft-square img { width: 100%; height: 100%; object-fit: contain; }
-        .upgrade-select .nft-square .placeholder { color: #555; font-size: 10px; }
-        .upgrade-select .info { flex: 1; }
-        .upgrade-select .info .name { font-weight: 600; font-size: 16px; }
-        .upgrade-select .info .price { color: #ffd700; font-size: 14px; display: flex; align-items: center; gap: 4px; }
-        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); margin-top: 16px; }
+        .upgrade-select .nft-square .placeholder { color: #555; font-size: 9px; }
+        .upgrade-select .info { text-align: center; }
+        .upgrade-select .info .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .upgrade-select .info .price { color: #ffd700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 2px; }
+        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); margin-top: 8px; }
         .btn-upgrade:disabled { opacity: 0.5; }
 
         /* NFT Selection Overlay */
@@ -423,20 +423,22 @@
             <span class="badge badge-blue"><i class="fas fa-arrow-up" style="margin-right:6px;"></i>Upgrade<span class="online-dot"></span></span>
             <span class="badge" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
         </div>
-        <div class="card">
-            <div class="card-title">Select NFTs to Upgrade</div>
+        <div class="card" style="padding: 12px;">
+            <div class="card-title" style="margin-bottom: 8px;">Select NFTs to Upgrade</div>
             <div class="upgrade-selectors">
+                <!-- Your NFT (left) -->
                 <div class="upgrade-select" onclick="openNftSelection('from')">
                     <div class="nft-square" id="fromNftSquare">
                         <img id="fromNftImg" src="" style="display:none;">
                         <span class="placeholder" id="fromPlaceholder">Choose</span>
                     </div>
                     <div class="info">
-                        <div class="name" id="fromNftName">Select NFT</div>
+                        <div class="name" id="fromNftName">Your NFT</div>
                         <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
                     </div>
                 </div>
-                <div class="upgrade-select" onclick="openNftSelection('to')">
+                <!-- Desired NFT (right) -->
+                <div class="upgrade-select" onclick="openDesiredSelection()">
                     <div class="nft-square" id="toNftSquare">
                         <img id="toNftImg" src="" style="display:none;">
                         <span class="placeholder" id="toPlaceholder">Choose</span>
@@ -448,7 +450,7 @@
                 </div>
             </div>
             <div class="upgrade-wheel-container">
-                <canvas id="upgradeWheel" width="260" height="260"></canvas>
+                <canvas id="upgradeWheel" width="230" height="230"></canvas>
             </div>
             <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>Upgrade</button>
         </div>
@@ -2100,23 +2102,22 @@
     // ============================================================
     // UPGRADE SELECTION & WHEEL
     // ============================================================
-    let activeSelectionType = null; // 'from' or 'to'
+    let activeSelectionType = null;
 
     function openNftSelection(type) {
-        // type is 'from' (low tier) or 'to' (high tier)
+        // type is 'from' – choose low-tier NFT from inventory
         activeSelectionType = type;
-        const tier = type === 'from' ? 'low' : 'high';
-        const eligible = state.inventory.filter(n => NFT_DB[n.id]?.tier === tier);
+        const eligible = state.inventory.filter(n => NFT_DB[n.id]?.tier === 'low');
         const grid = document.getElementById('nftSelectionGrid');
         const overlay = document.getElementById('nftSelectionOverlay');
 
         if (eligible.length === 0) {
-            alert(`No ${tier}-tier NFTs in your inventory.`);
+            alert('You need a low-tier NFT (Chill Flame) in your inventory.');
             return;
         }
 
         grid.innerHTML = eligible.map(nft => `
-            <div class="nft-selection-item" onclick="selectNft('${nft.id}')">
+            <div class="nft-selection-item" onclick="selectNftFromInventory('${nft.id}')">
                 <img src="${nft.gif}" alt="${nft.name}">
                 <div class="name">${nft.name}</div>
             </div>
@@ -2124,20 +2125,38 @@
         overlay.classList.add('active');
     }
 
+    function selectNftFromInventory(nftId) {
+        upgradeGame.fromNftId = nftId;
+        closeNftSelection();
+        updateUpgradeSelectors();
+    }
+
+    function openDesiredSelection() {
+        // Desired NFT – choose from high-tier DB (not inventory)
+        const highNfts = Object.values(NFT_DB).filter(n => n.tier === 'high');
+        const grid = document.getElementById('nftSelectionGrid');
+        const overlay = document.getElementById('nftSelectionOverlay');
+
+        if (highNfts.length === 0) return;
+
+        grid.innerHTML = highNfts.map(nft => `
+            <div class="nft-selection-item" onclick="selectDesiredNft('${nft.id}')">
+                <img src="${nft.gif}" alt="${nft.name}">
+                <div class="name">${nft.name}</div>
+            </div>
+        `).join('');
+        overlay.classList.add('active');
+    }
+
+    function selectDesiredNft(nftId) {
+        upgradeGame.toNftId = nftId;
+        closeNftSelection();
+        updateUpgradeSelectors();
+    }
+
     function closeNftSelection() {
         document.getElementById('nftSelectionOverlay').classList.remove('active');
         activeSelectionType = null;
-    }
-
-    function selectNft(nftId) {
-        if (!activeSelectionType) return;
-        if (activeSelectionType === 'from') {
-            upgradeGame.fromNftId = nftId;
-        } else {
-            upgradeGame.toNftId = nftId;
-        }
-        closeNftSelection();
-        updateUpgradeSelectors();
     }
 
     const upgradeGame = {
@@ -2158,36 +2177,20 @@
             const w = this.canvas.width;
             const h = this.canvas.height;
             const cx = w/2, cy = h/2;
-            const radius = 110;
+            const radius = 105;
             ctx.clearRect(0, 0, w, h);
 
-            // Outer decorative ring
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius+8, 0, Math.PI*2);
-            const outerGrad = ctx.createLinearGradient(0,0,w,h);
-            outerGrad.addColorStop(0, '#2a2a2e');
-            outerGrad.addColorStop(1, '#1a1a1e');
-            ctx.fillStyle = outerGrad;
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // Wheel background with subtle radial gradient
+            // Wheel background – no strokes, just subtle gradient
             ctx.beginPath();
             ctx.arc(cx, cy, radius, 0, 2*Math.PI);
-            const bgGrad = ctx.createRadialGradient(cx, cy, radius*0.3, cx, cy, radius);
-            bgGrad.addColorStop(0, '#2c2c30');
-            bgGrad.addColorStop(1, '#0f0f13');
+            const bgGrad = ctx.createRadialGradient(cx, cy, radius*0.2, cx, cy, radius);
+            bgGrad.addColorStop(0, '#1e1e22');
+            bgGrad.addColorStop(1, '#0a0a0c');
             ctx.fillStyle = bgGrad;
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-            ctx.lineWidth = 3;
-            ctx.stroke();
 
-            // Segments (drawn without rotation)
+            // Segments (no outline)
             const greenAngle = 0.6 * 2 * Math.PI;
-            // Green segment
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, radius, -Math.PI/2, -Math.PI/2 + greenAngle);
@@ -2197,11 +2200,7 @@
             greenGrad.addColorStop(1, '#009624');
             ctx.fillStyle = greenGrad;
             ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 1;
-            ctx.stroke();
 
-            // Red segment
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, radius, -Math.PI/2 + greenAngle, -Math.PI/2 + 2*Math.PI);
@@ -2211,22 +2210,8 @@
             redGrad.addColorStop(1, '#b71c1c');
             ctx.fillStyle = redGrad;
             ctx.fill();
-            ctx.stroke();
 
-            // Divider lines
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.lineTo(cx + radius * Math.cos(-Math.PI/2), cy + radius * Math.sin(-Math.PI/2));
-            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            const lineAngle = -Math.PI/2 + greenAngle;
-            ctx.lineTo(cx + radius * Math.cos(lineAngle), cy + radius * Math.sin(lineAngle));
-            ctx.stroke();
-
-            // Center knob
+            // Center knob – simple, clean
             ctx.beginPath();
             ctx.arc(cx, cy, 14, 0, 2*Math.PI);
             const knobGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 14);
@@ -2234,35 +2219,18 @@
             knobGrad.addColorStop(1, '#aaa');
             ctx.fillStyle = knobGrad;
             ctx.fill();
-            ctx.strokeStyle = '#222';
-            ctx.lineWidth = 2;
-            ctx.stroke();
 
-            // Rotating Arrow (sleek white pointer with shadow)
+            // Spinning arrow (only the arrowhead, no shaft, no stroke)
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(arrowAngle);
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 6;
             ctx.beginPath();
-            ctx.moveTo(radius - 10, 0);
-            ctx.lineTo(radius + 8, -7);
-            ctx.lineTo(radius + 8, 7);
+            ctx.moveTo(radius - 6, 0);
+            ctx.lineTo(radius + 8, -8);
+            ctx.lineTo(radius + 8, 8);
             ctx.closePath();
             ctx.fillStyle = '#ffffff';
             ctx.fill();
-            ctx.strokeStyle = '#cccccc';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-            ctx.shadowColor = 'transparent';
-            // Arrow shaft
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(radius - 10, 0);
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            ctx.stroke();
             ctx.restore();
         },
 
@@ -2271,7 +2239,6 @@
             this.spinning = true;
             document.getElementById('upgradeBtn').disabled = true;
 
-            // Custom easing: slow start, fast middle, slow end (easeInOutCubic)
             const duration = 5000 + Math.random() * 2000;
             const startAngle = this.arrowAngle;
             const rand = Math.random();
@@ -2287,7 +2254,6 @@
             const animate = (now) => {
                 const elapsed = now - startTime;
                 const t = Math.min(elapsed / duration, 1);
-                // easeInOutCubic
                 const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                 this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
                 this.drawWheelAndArrow(this.arrowAngle);
@@ -2352,7 +2318,7 @@
         } else {
             fromImg.style.display = 'none';
             fromPlaceholder.style.display = 'block';
-            fromName.textContent = 'Select NFT';
+            fromName.textContent = 'Your NFT';
         }
 
         if (upgradeGame.toNftId) {
