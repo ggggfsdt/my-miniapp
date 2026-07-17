@@ -903,26 +903,19 @@
     // NFT REWARD LOGIC (improved: exchange win for NFT + excess)
     // ============================================================
     function maybeRewardNFT(winAmount) {
-        const nft = NFT_DB['chill_flame'];  // always chill flame for now
+        const nft = NFT_DB['chill_flame'];
         if (winAmount >= nft.price) {
             const excess = winAmount - nft.price;
-            // Subtract price from balance first (we already added full win in game logic, so we need to correct)
-            // Actually, we need to adjust: we'll not add full win, but add excess and give NFT.
-            // We'll modify game win handling to call this function BEFORE updating balance.
-            // So we'll change the callers accordingly.
             return { nft: nft, excess: excess };
         }
         return null;
     }
 
-    // Updated version used by Crash/Mines after they calculate win
     function processGameWin(win) {
         const reward = maybeRewardNFT(win);
         if (reward) {
-            // Add excess stars to balance, give NFT
             state.balance += reward.excess;
             state.inventory.push({ ...reward.nft });
-            // Show special notification
             const notif = document.getElementById('notification');
             notifAmount.innerHTML = `🎁 ${reward.nft.name} +${reward.excess} ${starImg('star-icon-xs')}`;
             notif.style.display = 'flex';
@@ -937,7 +930,6 @@
             updateHomeUI();
             updateProfile();
         } else {
-            // No NFT, add full win normally
             state.balance += win;
         }
     }
@@ -1432,7 +1424,6 @@
             state.recentWinners.unshift({ name: 'You', amount: win });
             if (state.recentWinners.length > 10) state.recentWinners.pop();
 
-            // Process win (maybe give NFT + excess)
             processGameWin(win);
 
             const user = players.find(p => p.isYou);
@@ -2232,11 +2223,11 @@
             ctx.fillStyle = redGrad;
             ctx.fill();
 
-            // Thin outer circle line (1px)
+            // Thin outer circle line (0.5px)
             ctx.beginPath();
             ctx.arc(cx, cy, outerR, 0, 2*Math.PI);
-            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 0.5;
             ctx.stroke();
 
             // Spinning arrow (only arrowhead)
@@ -2257,7 +2248,6 @@
             if (this.spinning || !this.fromNftId || !this.toNftId) return;
             this.spinning = true;
             document.getElementById('upgradeBtn').disabled = true;
-            // Do not hide the center image – it already shows the desired NFT
 
             const duration = 5000 + Math.random() * 2000;
             const startAngle = this.arrowAngle;
@@ -2268,8 +2258,6 @@
             } else {
                 finalAngleOnWheel = 0.6 * 2 * Math.PI + Math.random() * 0.4 * 2 * Math.PI;
             }
-            // Arrow should end at top (-PI/2) plus the offset?
-            // We want the arrow to point at the final sector, then return to top.
             const targetArrowAngle = -Math.PI/2 + finalAngleOnWheel + 2*Math.PI * (6 + Math.floor(Math.random()*4));
 
             const startTime = performance.now();
@@ -2285,7 +2273,7 @@
                 } else {
                     this.spinning = false;
                     const landed = ((targetArrowAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-                    const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);   // because start is -PI/2
+                    const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);
                     const isGreen = relativeAngle < 0.6 * 2 * Math.PI;
                     this.resolveSpin(isGreen);
 
@@ -2296,7 +2284,6 @@
                     const animateReturn = (now2) => {
                         const t2 = Math.min((now2 - returnStartTime) / returnDuration, 1);
                         const eased2 = t2 < 0.5 ? 2 * t2 * t2 : 1 - Math.pow(-2 * t2 + 2, 2) / 2;
-                        // Interpolate to top angle (-PI/2)
                         const deltaAngle = returnStartAngle - (-Math.PI/2);
                         this.arrowAngle = returnStartAngle - deltaAngle * eased2;
                         this.drawWheelAndArrow(this.arrowAngle);
@@ -2367,7 +2354,6 @@
             toImg.style.display = 'block';
             toPlaceholder.style.display = 'none';
             toName.textContent = nft.name;
-            // Show desired NFT in wheel center immediately
             document.getElementById('wheelCenterNft').src = nft.gif;
             document.getElementById('wheelCenterNft').style.display = 'block';
         } else {
