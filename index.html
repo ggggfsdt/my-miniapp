@@ -267,18 +267,30 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        /* ===== UPGRADE & INVENTORY STYLES (new) ===== */
+        /* ===== UPGRADE & INVENTORY STYLES ===== */
         .upgrade-wheel-container { position: relative; width: 260px; height: 260px; margin: 20px auto; }
-        #upgradeWheel { display: block; margin: 0 auto; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05); }
+        #upgradeWheel { display: block; margin: 0 auto; border-radius: 50%; }
         .upgrade-selectors { display: flex; flex-direction: column; gap: 12px; }
-        .upgrade-select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; }
-        .upgrade-select img { width: 60px; height: 60px; object-fit: contain; border-radius: 12px; }
+        .upgrade-select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .upgrade-select:active { background: rgba(255,255,255,0.05); }
+        .upgrade-select .nft-square { width: 56px; height: 56px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
+        .upgrade-select .nft-square img { width: 100%; height: 100%; object-fit: contain; }
+        .upgrade-select .nft-square .placeholder { color: #555; font-size: 10px; }
         .upgrade-select .info { flex: 1; }
         .upgrade-select .info .name { font-weight: 600; font-size: 16px; }
         .upgrade-select .info .price { color: #ffd700; font-size: 14px; display: flex; align-items: center; gap: 4px; }
-        .btn-select-upgrade { background: rgba(108,92,231,0.2); color: #a29bfe; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
+        .btn-upgrade { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); margin-top: 16px; }
         .btn-upgrade:disabled { opacity: 0.5; }
+
+        /* NFT Selection Overlay */
+        .nft-selection-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .nft-selection-overlay.active { display: flex; }
+        .nft-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 340px; width: 100%; }
+        .nft-selection-item { background: rgba(255,255,255,0.04); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.06); }
+        .nft-selection-item:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
+        .nft-selection-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; }
+        .nft-selection-item .name { font-weight: 600; font-size: 14px; }
+        .nft-selection-close { margin-top: 20px; color: #888; font-size: 14px; cursor: pointer; padding: 8px 20px; background: rgba(255,255,255,0.06); border-radius: 20px; }
 
         .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .inventory-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; text-align: center; }
@@ -288,13 +300,6 @@
         .inventory-item .actions button { flex: 1; padding: 6px; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .inventory-item .actions button:active { transform: scale(0.94); }
         .btn-sell { background: rgba(255,107,107,0.2); color: #ff6b6b; }
-        .shop-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.02); margin-bottom: 8px; }
-        .shop-item img { width: 50px; height: 50px; object-fit: contain; border-radius: 10px; }
-        .shop-item .info { flex: 1; }
-        .shop-item .info .name { font-weight: 600; }
-        .shop-item .info .price { color: #ffd700; font-size: 13px; }
-        .btn-buy { background: linear-gradient(135deg, #00b894, #00d2a0); color: white; border: none; padding: 8px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-buy:active { transform: scale(0.94); }
 
         @media (max-width: 420px) {
             .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
@@ -321,6 +326,12 @@
         <i class="fas fa-check-circle notif-icon"></i>
         <span class="notif-text">Successfully claimed your bet</span>
         <span class="notif-amount" id="notifAmount"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> +0</span>
+    </div>
+
+    <!-- NFT Selection Overlay (global) -->
+    <div class="nft-selection-overlay" id="nftSelectionOverlay">
+        <div class="nft-selection-grid" id="nftSelectionGrid"></div>
+        <div class="nft-selection-close" onclick="closeNftSelection()">Cancel</div>
     </div>
 
     <!-- HOME -->
@@ -406,7 +417,7 @@
         <div class="mines-history" id="minesHistory"></div>
     </div>
 
-    <!-- UPGRADE (only wheel + selectors, no inventory) -->
+    <!-- UPGRADE (redesigned) -->
     <div id="page-upgrade" class="page">
         <div class="flex-between mb-8">
             <span class="badge badge-blue"><i class="fas fa-arrow-up" style="margin-right:6px;"></i>Upgrade<span class="online-dot"></span></span>
@@ -415,21 +426,25 @@
         <div class="card">
             <div class="card-title">Select NFTs to Upgrade</div>
             <div class="upgrade-selectors">
-                <div class="upgrade-select">
-                    <img id="fromNftImg" src="" alt="Select">
+                <div class="upgrade-select" onclick="openNftSelection('from')">
+                    <div class="nft-square" id="fromNftSquare">
+                        <img id="fromNftImg" src="" style="display:none;">
+                        <span class="placeholder" id="fromPlaceholder">Choose</span>
+                    </div>
                     <div class="info">
                         <div class="name" id="fromNftName">Select NFT</div>
                         <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
                     </div>
-                    <button class="btn-select-upgrade" onclick="selectUpgradeFrom()">Choose</button>
                 </div>
-                <div class="upgrade-select">
-                    <img id="toNftImg" src="" alt="Desired">
+                <div class="upgrade-select" onclick="openNftSelection('to')">
+                    <div class="nft-square" id="toNftSquare">
+                        <img id="toNftImg" src="" style="display:none;">
+                        <span class="placeholder" id="toPlaceholder">Choose</span>
+                    </div>
                     <div class="info">
                         <div class="name" id="toNftName">Desired NFT</div>
                         <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
                     </div>
-                    <button class="btn-select-upgrade" onclick="selectUpgradeTo()">Choose</button>
                 </div>
             </div>
             <div class="upgrade-wheel-container">
@@ -439,35 +454,16 @@
         </div>
     </div>
 
-    <!-- INVENTORY (new dedicated page) -->
+    <!-- INVENTORY (no shop) -->
     <div id="page-inventory" class="page">
         <div class="flex-between mb-8">
             <span class="badge badge-gold"><i class="fas fa-box" style="margin-right:6px;"></i>Inventory</span>
             <span class="badge" id="inventoryBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
         </div>
         <div class="card">
-            <div class="card-title">NFT Shop</div>
-            <div class="shop-item">
-                <img src="https://images.iimg.live/images/perfect-art-8369.webp" alt="Chill Flame">
-                <div class="info">
-                    <div class="name">Chill Flame</div>
-                    <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> 320</div>
-                </div>
-                <button class="btn-buy" onclick="buyNFT('chill_flame')">Buy</button>
-            </div>
-            <div class="shop-item">
-                <img src="https://images.iimg.live/images/excellent-masterpiece-4116.webp" alt="Snoop Cigar">
-                <div class="info">
-                    <div class="name">Snoop Cigar</div>
-                    <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> 1500</div>
-                </div>
-                <button class="btn-buy" onclick="buyNFT('snoop_cigar')">Buy</button>
-            </div>
-        </div>
-        <div class="card">
             <div class="card-title">My Collection</div>
             <div class="inventory-grid" id="inventoryGrid"></div>
-            <div id="inventoryEmpty" class="text-muted" style="text-align:center; padding:20px;">No NFTs yet. Buy from shop or win in games!</div>
+            <div id="inventoryEmpty" class="text-muted" style="text-align:center; padding:20px;">No NFTs yet. Win them in games!</div>
         </div>
     </div>
 
@@ -900,14 +896,13 @@
     }
 
     // ============================================================
-    // NFT REWARD LOGIC (new)
+    // NFT REWARD LOGIC
     // ============================================================
     function addNFTToInventory(nftId) {
         const nft = NFT_DB[nftId];
         if (!nft) return;
         state.inventory.push({ ...nft });
         renderInventory();
-        // Show a special notification
         const notif = document.getElementById('notification');
         notifAmount.innerHTML = `🎁 You got a <b>${nft.name}</b> NFT!`;
         notif.style.display = 'flex';
@@ -921,7 +916,7 @@
     }
 
     // ============================================================
-    // CRASH GAME (unchanged, but now rewards NFT on cash out >= 2x)
+    // CRASH GAME (unchanged, but NFT reward on cash out >= 2x)
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -1621,7 +1616,7 @@
     };
 
     // ============================================================
-    // MINES GAME (unchanged, but also rewards Chill Flame on win >= 320⭐)
+    // MINES GAME (unchanged, NFT reward on win >= 320⭐)
     // ============================================================
     const minesGame = {
         gridSize: 3,
@@ -1926,7 +1921,6 @@
                 updateHomeUI();
                 this.addHistory('win', this.multiplier);
                 triggerVibration(50, 'medium');
-                // NFT reward for jackpot
                 if (win >= 320) addNFTToInventory('chill_flame');
                 return;
             }
@@ -2044,7 +2038,6 @@
             this.updateMainButton();
             updateHomeUI();
             triggerVibration(30, 'light');
-            // NFT reward for cash out
             if (win >= 320) addNFTToInventory('chill_flame');
         },
 
@@ -2069,25 +2062,8 @@
     };
 
     // ============================================================
-    // INVENTORY & UPGRADE (modified: inventory now separate, wheel redesigned)
+    // INVENTORY (no shop, sell only)
     // ============================================================
-    function buyNFT(nftId) {
-        const nft = NFT_DB[nftId];
-        if (!nft) return triggerVibration(60, 'heavy');
-        if (state.balance < nft.price) {
-            triggerVibration(60, 'heavy');
-            return;
-        }
-        state.balance -= nft.price;
-        state.inventory.push({ ...nft });
-        updateHomeUI();
-        updateProfile();
-        renderInventory();
-        updateUpgradeSelectors();
-        triggerVibration(30, 'light');
-        showNotification(nft.price, nft.price);
-    }
-
     function sellNFT(index) {
         const nft = state.inventory[index];
         if (!nft) return;
@@ -2119,6 +2095,49 @@
                 </div>
             </div>
         `).join('');
+    }
+
+    // ============================================================
+    // UPGRADE SELECTION & WHEEL
+    // ============================================================
+    let activeSelectionType = null; // 'from' or 'to'
+
+    function openNftSelection(type) {
+        // type is 'from' (low tier) or 'to' (high tier)
+        activeSelectionType = type;
+        const tier = type === 'from' ? 'low' : 'high';
+        const eligible = state.inventory.filter(n => NFT_DB[n.id]?.tier === tier);
+        const grid = document.getElementById('nftSelectionGrid');
+        const overlay = document.getElementById('nftSelectionOverlay');
+
+        if (eligible.length === 0) {
+            alert(`No ${tier}-tier NFTs in your inventory.`);
+            return;
+        }
+
+        grid.innerHTML = eligible.map(nft => `
+            <div class="nft-selection-item" onclick="selectNft('${nft.id}')">
+                <img src="${nft.gif}" alt="${nft.name}">
+                <div class="name">${nft.name}</div>
+            </div>
+        `).join('');
+        overlay.classList.add('active');
+    }
+
+    function closeNftSelection() {
+        document.getElementById('nftSelectionOverlay').classList.remove('active');
+        activeSelectionType = null;
+    }
+
+    function selectNft(nftId) {
+        if (!activeSelectionType) return;
+        if (activeSelectionType === 'from') {
+            upgradeGame.fromNftId = nftId;
+        } else {
+            upgradeGame.toNftId = nftId;
+        }
+        closeNftSelection();
+        updateUpgradeSelectors();
     }
 
     const upgradeGame = {
@@ -2154,7 +2173,7 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Wheel background
+            // Wheel background with subtle radial gradient
             ctx.beginPath();
             ctx.arc(cx, cy, radius, 0, 2*Math.PI);
             const bgGrad = ctx.createRadialGradient(cx, cy, radius*0.3, cx, cy, radius);
@@ -2162,16 +2181,13 @@
             bgGrad.addColorStop(1, '#0f0f13');
             ctx.fillStyle = bgGrad;
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
             ctx.lineWidth = 3;
             ctx.stroke();
 
-            // Segments (static, drawn without rotation)
-            const segmentCount = 2;
+            // Segments (drawn without rotation)
             const greenAngle = 0.6 * 2 * Math.PI;
-            const redAngle = 0.4 * 2 * Math.PI;
-
-            // Green segment (60%)
+            // Green segment
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, radius, -Math.PI/2, -Math.PI/2 + greenAngle);
@@ -2182,10 +2198,10 @@
             ctx.fillStyle = greenGrad;
             ctx.fill();
             ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.stroke();
 
-            // Red segment (40%)
+            // Red segment
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, radius, -Math.PI/2 + greenAngle, -Math.PI/2 + 2*Math.PI);
@@ -2197,7 +2213,7 @@
             ctx.fill();
             ctx.stroke();
 
-            // Segment divider lines
+            // Divider lines
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(cx + radius * Math.cos(-Math.PI/2), cy + radius * Math.sin(-Math.PI/2));
@@ -2222,26 +2238,29 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Rotating Arrow
+            // Rotating Arrow (sleek white pointer with shadow)
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(arrowAngle);
-            // Draw arrow pointing outward from center
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 6;
             ctx.beginPath();
-            ctx.moveTo(radius - 12, 0);
-            ctx.lineTo(radius + 5, -8);
-            ctx.lineTo(radius + 5, 8);
+            ctx.moveTo(radius - 10, 0);
+            ctx.lineTo(radius + 8, -7);
+            ctx.lineTo(radius + 8, 7);
             ctx.closePath();
-            ctx.fillStyle = '#ffd700';
+            ctx.fillStyle = '#ffffff';
             ctx.fill();
-            ctx.strokeStyle = '#000';
+            ctx.strokeStyle = '#cccccc';
             ctx.lineWidth = 1.5;
             ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
             // Arrow shaft
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.lineTo(radius - 12, 0);
-            ctx.strokeStyle = '#ffd700';
+            ctx.lineTo(radius - 10, 0);
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 3;
             ctx.stroke();
             ctx.restore();
@@ -2252,8 +2271,9 @@
             this.spinning = true;
             document.getElementById('upgradeBtn').disabled = true;
 
-            const spinDuration = 4000 + Math.random() * 2000;
-            const totalRotation = (5 + Math.random() * 5) * 2 * Math.PI;
+            // Custom easing: slow start, fast middle, slow end (easeInOutCubic)
+            const duration = 5000 + Math.random() * 2000;
+            const startAngle = this.arrowAngle;
             const rand = Math.random();
             let finalAngleOnWheel;
             if (rand < 0.6) {
@@ -2261,34 +2281,34 @@
             } else {
                 finalAngleOnWheel = 0.6 * 2 * Math.PI + Math.random() * 0.4 * 2 * Math.PI;
             }
-            // Arrow angle: 0 points to the right (3 o'clock). Wheel's green starts at top (-PI/2).
-            // We want the arrow to land such that when arrowAngle = finalAngleOnWheel - PI/2, it points at the segment.
-            const targetArrowAngle = -Math.PI/2 + finalAngleOnWheel + totalRotation;
-            const startArrowAngle = this.arrowAngle;
-            const startTime = performance.now();
+            const targetArrowAngle = startAngle + 2*Math.PI * (6 + Math.floor(Math.random()*4)) + finalAngleOnWheel - (Math.PI/2);
 
+            const startTime = performance.now();
             const animate = (now) => {
                 const elapsed = now - startTime;
-                const progress = Math.min(elapsed / spinDuration, 1);
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                this.arrowAngle = startArrowAngle + (targetArrowAngle - startArrowAngle) * easeOut;
+                const t = Math.min(elapsed / duration, 1);
+                // easeInOutCubic
+                const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
                 this.drawWheelAndArrow(this.arrowAngle);
 
-                if (progress < 1) {
+                if (t < 1) {
                     requestAnimationFrame(animate);
                 } else {
                     this.spinning = false;
                     this.arrowAngle = targetArrowAngle;
                     this.drawWheelAndArrow(this.arrowAngle);
-                    this.resolveSpin(finalAngleOnWheel);
+                    const landed = ((targetArrowAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+                    const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);
+                    const isGreen = relativeAngle < 0.6 * 2 * Math.PI;
+                    this.resolveSpin(isGreen);
                 }
             };
             requestAnimationFrame(animate);
             triggerVibration(40, 'medium');
         },
 
-        resolveSpin(landedAngle) {
-            const isGreen = landedAngle < 0.6 * 2 * Math.PI;
+        resolveSpin(isGreen) {
             const fromNft = NFT_DB[this.fromNftId];
             const toNft = NFT_DB[this.toNftId];
             const fromIdx = state.inventory.findIndex(n => n.id === fromNft.id);
@@ -2316,25 +2336,34 @@
 
     function updateUpgradeSelectors() {
         const fromImg = document.getElementById('fromNftImg');
-        const fromName = document.getElementById('fromNftName');
+        const fromPlaceholder = document.getElementById('fromPlaceholder');
         const toImg = document.getElementById('toNftImg');
+        const toPlaceholder = document.getElementById('toPlaceholder');
+        const fromName = document.getElementById('fromNftName');
         const toName = document.getElementById('toNftName');
         const upgradeBtn = document.getElementById('upgradeBtn');
 
         if (upgradeGame.fromNftId) {
             const nft = NFT_DB[upgradeGame.fromNftId];
             fromImg.src = nft.gif;
+            fromImg.style.display = 'block';
+            fromPlaceholder.style.display = 'none';
             fromName.textContent = nft.name;
         } else {
-            fromImg.src = '';
+            fromImg.style.display = 'none';
+            fromPlaceholder.style.display = 'block';
             fromName.textContent = 'Select NFT';
         }
+
         if (upgradeGame.toNftId) {
             const nft = NFT_DB[upgradeGame.toNftId];
             toImg.src = nft.gif;
+            toImg.style.display = 'block';
+            toPlaceholder.style.display = 'none';
             toName.textContent = nft.name;
         } else {
-            toImg.src = '';
+            toImg.style.display = 'none';
+            toPlaceholder.style.display = 'block';
             toName.textContent = 'Desired NFT';
         }
 
@@ -2344,32 +2373,13 @@
         upgradeBtn.disabled = !(validFrom && validTo && fromOwned && !upgradeGame.spinning);
     }
 
-    function selectUpgradeFrom() {
-        const lowNfts = state.inventory.filter(n => NFT_DB[n.id]?.tier === 'low');
-        if (lowNfts.length === 0) {
-            alert('You need a low-tier NFT (Chill Flame) to upgrade.');
-            return;
-        }
-        upgradeGame.fromNftId = lowNfts[0].id;
-        updateUpgradeSelectors();
-        triggerVibration(20);
-    }
-
-    function selectUpgradeTo() {
-        const highNfts = Object.values(NFT_DB).filter(n => n.tier === 'high');
-        if (highNfts.length === 0) return;
-        upgradeGame.toNftId = highNfts[0].id;
-        updateUpgradeSelectors();
-        triggerVibration(20);
-    }
-
     function spinUpgrade() {
         if (!upgradeGame.fromNftId || !upgradeGame.toNftId || upgradeGame.spinning) return;
         upgradeGame.spin();
     }
 
     // ============================================================
-    // PRESET BUTTON HANDLERS (unchanged)
+    // PRESET BUTTON HANDLERS
     // ============================================================
     document.querySelectorAll('.grid-presets button').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -2387,7 +2397,7 @@
     });
 
     // ============================================================
-    // VISIBILITY CHANGE (unchanged)
+    // VISIBILITY CHANGE
     // ============================================================
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
@@ -2421,7 +2431,7 @@
                 tg.ready();
             }
         } catch (e) {}
-        console.log('Casino + NFT Upgrade loaded.');
+        console.log('Casino + NFT Upgrade fully loaded.');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
