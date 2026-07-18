@@ -294,6 +294,17 @@
         .nft-selection-item .name { font-weight: 600; font-size: 14px; }
         .nft-selection-close { margin-top: 20px; color: #888; font-size: 14px; cursor: pointer; padding: 8px 20px; background: rgba(255,255,255,0.06); border-radius: 20px; }
 
+        /* Win Popup (for upgrade success) */
+        .win-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .win-popup.active { display: flex; }
+        .win-popup .win-card { background: rgba(30,30,30,0.95); border-radius: 24px; padding: 30px 24px; max-width: 320px; width: 100%; border: 1px solid rgba(255,215,0,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+        .win-popup .money-gif { width: 140px; height: 140px; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
+        .win-popup .nft-img { width: 90px; height: 90px; object-fit: contain; border-radius: 16px; margin-bottom: 8px; }
+        .win-popup .win-title { font-size: 24px; font-weight: 800; color: #ffd700; margin-bottom: 4px; }
+        .win-popup .win-subtitle { font-size: 16px; color: #ccc; }
+        .win-popup button { margin-top: 16px; padding: 12px 32px; border: none; border-radius: 20px; background: linear-gradient(135deg, #00b894, #00d2a0); color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .win-popup button:active { transform: scale(0.94); }
+
         .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .inventory-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; text-align: center; }
         .inventory-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; }
@@ -329,6 +340,17 @@
         <i class="fas fa-check-circle notif-icon"></i>
         <span class="notif-text">Successfully claimed your bet</span>
         <span class="notif-amount" id="notifAmount"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> +0</span>
+    </div>
+
+    <!-- Win Popup (for upgrade success) -->
+    <div class="win-popup" id="winPopup">
+        <div class="win-card">
+            <img class="money-gif" id="winMoneyGif" src="" alt="Money">
+            <img class="nft-img" id="winNftImg" src="" alt="NFT">
+            <div class="win-title">Congratulations!</div>
+            <div class="win-subtitle" id="winSubtitle"></div>
+            <button onclick="closeWinPopup()">Collect</button>
+        </div>
     </div>
 
     <!-- NFT Selection Overlay (global) -->
@@ -508,7 +530,7 @@
         <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
         <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
         <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
-        <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgrade</span></button>
+        <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgr</span></button>
         <button class="nav-item" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inventory</span></button>
         <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
     </div>
@@ -532,6 +554,15 @@
         'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
     ];
     function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
+
+    const MONEY_GIFS = [
+        'https://images.iimg.live/images/radiant-shot-1354.webp',
+        'https://images.iimg.live/images/brilliant-snapshot-1531.webp',
+        'https://images.iimg.live/images/fantastic-vision-3450.webp',
+        'https://images.iimg.live/images/cool-picture-8835.webp',
+        'https://images.iimg.live/images/excellent-snapshot-7013.webp'
+    ];
+    function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
     // ============================================================
     // STATE & NFT DATA
@@ -557,11 +588,11 @@
             gif: 'https://images.iimg.live/images/perfect-art-8369.webp',
             tier: 'low'
         },
-        snoop_cigar: {
-            id: 'snoop_cigar',
-            name: 'Snoop Cigar',
-            price: 1500,
-            gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
+        liberty_figure: {
+            id: 'liberty_figure',
+            name: 'Liberty Figure',
+            price: 525,
+            gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp',
             tier: 'high'
         },
         timeless_book: {
@@ -569,6 +600,13 @@
             name: 'Timeless Book',
             price: 500,
             gif: 'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
+            tier: 'high'
+        },
+        snoop_cigar: {
+            id: 'snoop_cigar',
+            name: 'Snoop Cigar',
+            price: 1500,
+            gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
             tier: 'high'
         },
         rare_bird: {
@@ -616,6 +654,23 @@
     // ---- Helper star image ----
     function starImg(className = 'star-icon-xs') {
         return `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="${className}" alt="⭐">`;
+    }
+
+    // ============================================================
+    // WIN POPUP (for upgrade success only)
+    // ============================================================
+    function showWinPopup(nft) {
+        const popup = document.getElementById('winPopup');
+        document.getElementById('winMoneyGif').src = getRandomMoneyGif();
+        document.getElementById('winNftImg').src = nft.gif;
+        document.getElementById('winSubtitle').textContent = nft.name;
+        popup.classList.add('active');
+        // auto close after 4 seconds
+        setTimeout(() => { popup.classList.remove('active'); }, 4000);
+    }
+
+    function closeWinPopup() {
+        document.getElementById('winPopup').classList.remove('active');
     }
 
     // ============================================================
@@ -919,7 +974,7 @@
     }
 
     // ============================================================
-    // REWARD LOGIC: best NFT for win amount
+    // REWARD LOGIC (unchanged)
     // ============================================================
     function processGameWin(win) {
         const sortedNfts = Object.values(NFT_DB).sort((a,b) => b.price - a.price);
@@ -953,7 +1008,7 @@
     }
 
     // ============================================================
-    // CRASH GAME (modified win handling)
+    // CRASH GAME (unchanged)
     // ============================================================
     const crashGame = {
         multiplier: 1.00,
@@ -1648,7 +1703,7 @@
     };
 
     // ============================================================
-    // MINES GAME (modified win handling)
+    // MINES GAME (unchanged)
     // ============================================================
     const minesGame = {
         gridSize: 3,
@@ -2138,7 +2193,7 @@
     }
 
     // ============================================================
-    // UPGRADE SELECTION & WHEEL (smooth chance animation)
+    // UPGRADE SELECTION & WHEEL (popup on success)
     // ============================================================
     let activeSelectionType = null;
 
@@ -2264,7 +2319,6 @@
         },
 
         animateToChance(newChance) {
-            // Cancel any existing chance animation
             if (this.chanceAnimationId) {
                 cancelAnimationFrame(this.chanceAnimationId);
                 this.chanceAnimationId = null;
@@ -2282,7 +2336,6 @@
             const animate = (now) => {
                 const elapsed = now - startTime;
                 const t = Math.min(elapsed / duration, 1);
-                // easeInOutQuad
                 const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
                 this.chance = startChance + diff * eased;
                 this.drawWheelAndArrow(this.arrowAngle);
@@ -2369,6 +2422,8 @@
                 state.inventory.push({ ...toNft });
                 showNotification(toNft.price, toNft.price);
                 triggerVibration(80, 'heavy');
+                // Show the win popup
+                showWinPopup(toNft);
             } else {
                 state.inventory.splice(fromIdx, 1);
                 triggerVibration(100, 'heavy');
@@ -2421,11 +2476,10 @@
         const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId] && NFT_DB[upgradeGame.toNftId].price > (validFrom ? NFT_DB[upgradeGame.fromNftId].price : 0);
 
         if (validFrom && validTo) {
-            const profit = NFT_DB[upgradeGame.toNftId].price - NFT_DB[upgradeGame.fromNftId].price;
-            let newChance = 1 - (profit / 2000) * 0.8;
-            newChance = Math.min(0.95, Math.max(0.3, newChance));
+            const multiplier = NFT_DB[upgradeGame.toNftId].price / NFT_DB[upgradeGame.fromNftId].price;
+            let newChance = 1 / multiplier;
+            newChance = Math.min(0.95, Math.max(0.05, newChance));
             upgradeBtnText.textContent = `Upgrade (${Math.round(newChance * 100)}%)`;
-            // Animate the wheel segments to the new chance
             upgradeGame.animateToChance(newChance);
         } else {
             upgradeGame.animateToChance(0.6);
