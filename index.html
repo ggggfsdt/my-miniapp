@@ -280,8 +280,9 @@
         .upgrade-select .info { text-align: center; }
         .upgrade-select .info .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .upgrade-select .info .price { color: #ffd700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 2px; }
-        .btn-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); margin: 8px auto 0 auto; padding: 16px 32px; font-size: 18px; border-radius: 20px; width: fit-content; display: block; }
+        .btn-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); margin: 8px auto 0 auto; padding: 16px 36px; font-size: 18px; border-radius: 20px; width: fit-content; display: flex; align-items: center; gap: 8px; }
         .btn-upgrade:disabled { opacity: 0.5; }
+        .btn-upgrade .arrow-icon { font-size: 20px; }
 
         /* NFT Selection Overlay */
         .nft-selection-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -298,9 +299,10 @@
         .inventory-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; }
         .inventory-item .name { font-weight: 600; }
         .inventory-item .actions { display: flex; gap: 6px; margin-top: 8px; }
-        .inventory-item .actions button { flex: 1; padding: 6px; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .inventory-item .actions button { flex: 1; padding: 6px 8px; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
         .inventory-item .actions button:active { transform: scale(0.94); }
         .btn-sell { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+        .btn-inventory-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); color: white; }
 
         @media (max-width: 420px) {
             .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
@@ -439,7 +441,7 @@
                     </div>
                 </div>
                 <!-- Desired NFT (right) -->
-                <div class="upgrade-select" onclick="openDesiredSelection()">
+                <div class="upgrade-select" onclick="openNftSelection('to')">
                     <div class="nft-square" id="toNftSquare">
                         <img id="toNftImg" src="" style="display:none;">
                         <span class="placeholder" id="toPlaceholder">Choose</span>
@@ -454,11 +456,14 @@
                 <canvas id="upgradeWheel" width="230" height="230"></canvas>
                 <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT">
             </div>
-            <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>Upgrade</button>
+            <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
+                <span id="upgradeBtnText">Upgrade</span>
+                <i class="fas fa-arrow-up arrow-icon"></i>
+            </button>
         </div>
     </div>
 
-    <!-- INVENTORY (no shop) -->
+    <!-- INVENTORY (with upgrade button) -->
     <div id="page-inventory" class="page">
         <div class="flex-between mb-8">
             <span class="badge badge-gold"><i class="fas fa-box" style="margin-right:6px;"></i>Inventory</span>
@@ -557,6 +562,20 @@
             name: 'Snoop Cigar',
             price: 1500,
             gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
+            tier: 'high'
+        },
+        timeless_book: {
+            id: 'timeless_book',
+            name: 'Timeless Book',
+            price: 500,
+            gif: 'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
+            tier: 'high'
+        },
+        rare_bird: {
+            id: 'rare_bird',
+            name: 'Rare Bird',
+            price: 2190,
+            gif: 'https://images.iimg.live/images/majestic-memory-3550.webp',
             tier: 'high'
         }
     };
@@ -900,24 +919,23 @@
     }
 
     // ============================================================
-    // NFT REWARD LOGIC (improved: exchange win for NFT + excess)
+    // REWARD LOGIC: best NFT for win amount
     // ============================================================
-    function maybeRewardNFT(winAmount) {
-        const nft = NFT_DB['chill_flame'];
-        if (winAmount >= nft.price) {
-            const excess = winAmount - nft.price;
-            return { nft: nft, excess: excess };
-        }
-        return null;
-    }
-
     function processGameWin(win) {
-        const reward = maybeRewardNFT(win);
-        if (reward) {
-            state.balance += reward.excess;
-            state.inventory.push({ ...reward.nft });
+        const sortedNfts = Object.values(NFT_DB).sort((a,b) => b.price - a.price);
+        let awardedNft = null;
+        for (const nft of sortedNfts) {
+            if (win >= nft.price) {
+                awardedNft = nft;
+                break;
+            }
+        }
+        if (awardedNft) {
+            const excess = win - awardedNft.price;
+            state.balance += excess;
+            state.inventory.push({ ...awardedNft });
             const notif = document.getElementById('notification');
-            notifAmount.innerHTML = `🎁 ${reward.nft.name} +${reward.excess} ${starImg('star-icon-xs')}`;
+            notifAmount.innerHTML = `🎁 ${awardedNft.name} +${excess} ${starImg('star-icon-xs')}`;
             notif.style.display = 'flex';
             void notif.offsetHeight;
             notif.style.transform = 'translateY(0)';
@@ -2076,7 +2094,7 @@
     };
 
     // ============================================================
-    // INVENTORY (no shop, sell only)
+    // INVENTORY (sell + upgrade button)
     // ============================================================
     function sellNFT(index) {
         const nft = state.inventory[index];
@@ -2088,6 +2106,13 @@
         renderInventory();
         updateUpgradeSelectors();
         triggerVibration(30, 'light');
+    }
+
+    function goToUpgradeWithNft(nftId) {
+        upgradeGame.fromNftId = nftId;
+        upgradeGame.toNftId = null; // reset desired
+        navigateTo('upgrade');
+        updateUpgradeSelectors();
     }
 
     function renderInventory() {
@@ -2106,29 +2131,38 @@
                 <div class="name">${nft.name}</div>
                 <div class="actions">
                     <button class="btn-sell" onclick="sellNFT(${idx})">Sell</button>
+                    <button class="btn-inventory-upgrade" onclick="goToUpgradeWithNft('${nft.id}')">Upgrade</button>
                 </div>
             </div>
         `).join('');
     }
 
     // ============================================================
-    // UPGRADE SELECTION & WHEEL (final version, arrow starts top)
+    // UPGRADE SELECTION & WHEEL (smooth chance animation)
     // ============================================================
     let activeSelectionType = null;
 
     function openNftSelection(type) {
         activeSelectionType = type;
-        const eligible = state.inventory.filter(n => NFT_DB[n.id]?.tier === 'low');
+        let eligible;
+        if (type === 'from') {
+            eligible = state.inventory.slice(); // any NFT you own
+        } else {
+            if (!upgradeGame.fromNftId) {
+                alert('Select your NFT first.');
+                return;
+            }
+            const sourcePrice = NFT_DB[upgradeGame.fromNftId].price;
+            eligible = Object.values(NFT_DB).filter(n => n.price > sourcePrice);
+        }
         const grid = document.getElementById('nftSelectionGrid');
         const overlay = document.getElementById('nftSelectionOverlay');
-
         if (eligible.length === 0) {
-            alert('You need a low-tier NFT (Chill Flame) in your inventory.');
+            alert('No eligible NFTs.');
             return;
         }
-
         grid.innerHTML = eligible.map(nft => `
-            <div class="nft-selection-item" onclick="selectNftFromInventory('${nft.id}')">
+            <div class="nft-selection-item" onclick="selectNft('${nft.id}', '${type}')">
                 <img src="${nft.gif}" alt="${nft.name}">
                 <div class="name">${nft.name}</div>
             </div>
@@ -2136,37 +2170,20 @@
         overlay.classList.add('active');
     }
 
-    function selectNftFromInventory(nftId) {
-        upgradeGame.fromNftId = nftId;
+    function selectNft(nftId, type) {
+        if (type === 'from') {
+            upgradeGame.fromNftId = nftId;
+            if (upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId].price <= NFT_DB[nftId].price) {
+                upgradeGame.toNftId = null;
+            }
+        } else {
+            upgradeGame.toNftId = nftId;
+            const centerImg = document.getElementById('wheelCenterNft');
+            centerImg.src = NFT_DB[nftId].gif;
+            centerImg.style.display = 'block';
+        }
         closeNftSelection();
         updateUpgradeSelectors();
-    }
-
-    function openDesiredSelection() {
-        const highNfts = Object.values(NFT_DB).filter(n => n.tier === 'high');
-        const grid = document.getElementById('nftSelectionGrid');
-        const overlay = document.getElementById('nftSelectionOverlay');
-
-        if (highNfts.length === 0) return;
-
-        grid.innerHTML = highNfts.map(nft => `
-            <div class="nft-selection-item" onclick="selectDesiredNft('${nft.id}')">
-                <img src="${nft.gif}" alt="${nft.name}">
-                <div class="name">${nft.name}</div>
-            </div>
-        `).join('');
-        overlay.classList.add('active');
-    }
-
-    function selectDesiredNft(nftId) {
-        upgradeGame.toNftId = nftId;
-        closeNftSelection();
-        updateUpgradeSelectors();
-        // Immediately show the desired NFT in the wheel center
-        const centerImg = document.getElementById('wheelCenterNft');
-        const toNft = NFT_DB[upgradeGame.toNftId];
-        centerImg.src = toNft.gif;
-        centerImg.style.display = 'block';
     }
 
     function closeNftSelection() {
@@ -2178,9 +2195,12 @@
         fromNftId: null,
         toNftId: null,
         spinning: false,
-        arrowAngle: -Math.PI/2,   // start pointing up
+        arrowAngle: -Math.PI/2,
         canvas: document.getElementById('upgradeWheel'),
         ctx: null,
+        chance: 0.6,
+        targetChance: 0.6,
+        chanceAnimationId: null,
 
         init() {
             this.ctx = this.canvas.getContext('2d');
@@ -2193,12 +2213,11 @@
             const h = this.canvas.height;
             const cx = w/2, cy = h/2;
             const outerR = 105;
-            const innerR = 35;
+            const innerR = 50;
 
             ctx.clearRect(0, 0, w, h);
 
-            // Draw ring sectors (green and red)
-            const greenAngle = 0.6 * 2 * Math.PI;
+            const greenAngle = this.chance * 2 * Math.PI;
             const startAngle = -Math.PI/2;
 
             // Green ring
@@ -2223,14 +2242,14 @@
             ctx.fillStyle = redGrad;
             ctx.fill();
 
-            // Thin outer circle line (0.5px)
+            // Very thin outer circle (0.1px)
             ctx.beginPath();
             ctx.arc(cx, cy, outerR, 0, 2*Math.PI);
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 0.1;
             ctx.stroke();
 
-            // Spinning arrow (only arrowhead)
+            // Arrow
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(arrowAngle);
@@ -2244,6 +2263,40 @@
             ctx.restore();
         },
 
+        animateToChance(newChance) {
+            // Cancel any existing chance animation
+            if (this.chanceAnimationId) {
+                cancelAnimationFrame(this.chanceAnimationId);
+                this.chanceAnimationId = null;
+            }
+            this.targetChance = newChance;
+            const startChance = this.chance;
+            const diff = newChance - startChance;
+            if (Math.abs(diff) < 0.001) {
+                this.chance = newChance;
+                this.drawWheelAndArrow(this.arrowAngle);
+                return;
+            }
+            const duration = 400; // ms
+            const startTime = performance.now();
+            const animate = (now) => {
+                const elapsed = now - startTime;
+                const t = Math.min(elapsed / duration, 1);
+                // easeInOutQuad
+                const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                this.chance = startChance + diff * eased;
+                this.drawWheelAndArrow(this.arrowAngle);
+                if (t < 1) {
+                    this.chanceAnimationId = requestAnimationFrame(animate);
+                } else {
+                    this.chance = newChance;
+                    this.drawWheelAndArrow(this.arrowAngle);
+                    this.chanceAnimationId = null;
+                }
+            };
+            this.chanceAnimationId = requestAnimationFrame(animate);
+        },
+
         spin() {
             if (this.spinning || !this.fromNftId || !this.toNftId) return;
             this.spinning = true;
@@ -2253,10 +2306,10 @@
             const startAngle = this.arrowAngle;
             const rand = Math.random();
             let finalAngleOnWheel;
-            if (rand < 0.6) {
-                finalAngleOnWheel = Math.random() * 0.6 * 2 * Math.PI;
+            if (rand < this.chance) {
+                finalAngleOnWheel = Math.random() * this.chance * 2 * Math.PI;
             } else {
-                finalAngleOnWheel = 0.6 * 2 * Math.PI + Math.random() * 0.4 * 2 * Math.PI;
+                finalAngleOnWheel = this.chance * 2 * Math.PI + Math.random() * (1 - this.chance) * 2 * Math.PI;
             }
             const targetArrowAngle = -Math.PI/2 + finalAngleOnWheel + 2*Math.PI * (6 + Math.floor(Math.random()*4));
 
@@ -2274,10 +2327,9 @@
                     this.spinning = false;
                     const landed = ((targetArrowAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
                     const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);
-                    const isGreen = relativeAngle < 0.6 * 2 * Math.PI;
+                    const isGreen = relativeAngle < this.chance * 2 * Math.PI;
                     this.resolveSpin(isGreen);
 
-                    // Return arrow to top smoothly
                     const returnDuration = 800;
                     const returnStartAngle = this.arrowAngle;
                     const returnStartTime = performance.now();
@@ -2335,6 +2387,7 @@
         const fromName = document.getElementById('fromNftName');
         const toName = document.getElementById('toNftName');
         const upgradeBtn = document.getElementById('upgradeBtn');
+        const upgradeBtnText = document.getElementById('upgradeBtnText');
 
         if (upgradeGame.fromNftId) {
             const nft = NFT_DB[upgradeGame.fromNftId];
@@ -2364,8 +2417,21 @@
         }
 
         const fromOwned = state.inventory.some(n => n.id === upgradeGame.fromNftId);
-        const validFrom = upgradeGame.fromNftId && NFT_DB[upgradeGame.fromNftId]?.tier === 'low';
-        const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId]?.tier === 'high';
+        const validFrom = upgradeGame.fromNftId && NFT_DB[upgradeGame.fromNftId];
+        const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId] && NFT_DB[upgradeGame.toNftId].price > (validFrom ? NFT_DB[upgradeGame.fromNftId].price : 0);
+
+        if (validFrom && validTo) {
+            const profit = NFT_DB[upgradeGame.toNftId].price - NFT_DB[upgradeGame.fromNftId].price;
+            let newChance = 1 - (profit / 2000) * 0.8;
+            newChance = Math.min(0.95, Math.max(0.3, newChance));
+            upgradeBtnText.textContent = `Upgrade (${Math.round(newChance * 100)}%)`;
+            // Animate the wheel segments to the new chance
+            upgradeGame.animateToChance(newChance);
+        } else {
+            upgradeGame.animateToChance(0.6);
+            upgradeBtnText.textContent = 'Upgrade';
+        }
+
         upgradeBtn.disabled = !(validFrom && validTo && fromOwned && !upgradeGame.spinning);
     }
 
