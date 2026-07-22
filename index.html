@@ -116,20 +116,21 @@
             width: 100%;
             height: 100%;
         }
-        /* Ball image overlay – perfectly centered with percentage positioning */
+        /* Ball image overlay – bigger, perfectly centered */
         #bounceBallImg {
             position: absolute;
             pointer-events: none;
             z-index: 10;
-            width: 28px;
-            height: 28px;
+            width: 36px;
+            height: 36px;
             object-fit: contain;
             display: block;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            filter: drop-shadow(0 0 8px rgba(84, 160, 255, 0.3));
+            filter: drop-shadow(0 0 10px rgba(84, 160, 255, 0.4));
+            transition: none;
         }
         .bounce-info {
             display: flex;
@@ -415,7 +416,7 @@
             .main-action-btn { padding-top: 12px; padding-bottom: 10px; }
             .moon-overlay img { width: 80px; height: 80px; }
             .quick-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            #bounceBallImg { width: 24px; height: 24px; }
+            #bounceBallImg { width: 32px; height: 32px; }
         }
     </style>
 </head>
@@ -2733,7 +2734,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FIXED: PERFECT CENTERING, BIGGER BALL, LONGER DURATION
+        // BOUNCE GAME – BIGGER GIF, FASTER SLOWDOWN, LOSS GIF VISIBLE
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -2743,16 +2744,16 @@
             cornerRadius: 50,
             borderWidth: 20,
             segments: [],
-            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 14 }, // Bigger ball
+            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 18 }, // Bigger ball
             bet: 10,
             totalMultiplier: 1.0,
             isPlaying: false,
             gameOver: false,
             animId: null,
-            friction: 0.9995, // Lower friction = longer duration
-            speedThreshold: 0.02, // Lower threshold = longer duration
+            friction: 0.998, // Faster slowdown
+            speedThreshold: 0.05,
             segmentCount: 16,
-            constantSpeedDuration: 8000, // 8 seconds of constant speed
+            constantSpeedDuration: 4000, // 4 seconds then slowdown
             startTime: 0,
             floatingTexts: [],
             // Arrow properties
@@ -2779,12 +2780,14 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
                 
-                // Set ball image – visible from start, perfectly centered
+                // Set ball image – visible from start, perfectly centered, bigger
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
                 this.ballElement.style.left = '50%';
                 this.ballElement.style.top = '50%';
                 this.ballElement.style.transform = 'translate(-50%, -50%)';
+                this.ballElement.style.width = '36px';
+                this.ballElement.style.height = '36px';
                 this.isLossBall = false;
                 
                 this.generateSegments();
@@ -2904,7 +2907,7 @@
                     }
                     const p1 = innerSeg[0];
                     const p2 = innerSeg[innerSeg.length - 1];
-                    // Durability: 1-2 (slightly smaller)
+                    // Durability: 1-2
                     const durability = 1 + Math.floor(Math.random() * 2);
                     const multiplier = weighted[Math.floor(Math.random() * weighted.length)];
                     this.segments.push({
@@ -3185,10 +3188,9 @@
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
 
-                // Hide ball image after game ends
-                if (this.ballElement) {
-                    this.ballElement.style.display = 'none';
-                }
+                // IMPORTANT: Keep ball visible on loss to show the loss GIF
+                // On win, we also keep it visible (shows normal GIF)
+                // Only hide if starting a new round
 
                 const resultEl = document.getElementById('bounceResult');
                 resultEl.style.display = 'block';
@@ -3206,6 +3208,10 @@
                     triggerVibration(50, 'medium');
                     showNotification(winAmount, winAmount);
                     processGameWin(winAmount);
+                    // Keep normal ball visible
+                    if (this.ballElement) {
+                        this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                    }
                 } else {
                     state.losses++;
                     state.totalGames++;
@@ -3213,6 +3219,10 @@
                     resultEl.textContent = `Lost ${this.bet}⭐`;
                     this.playLoseSound();
                     triggerVibration(80, 'heavy');
+                    // Keep loss ball visible
+                    if (this.ballElement) {
+                        this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
+                    }
                 }
                 updateHomeUI();
                 updateProfile();
@@ -3414,7 +3424,7 @@
             upgradeGame.init();
             renderInventory();
             updateUpgradeSelectors();
-            console.log('Casino + NFT Upgrade loaded with Bounce (fixed centering, bigger ball, longer duration)');
+            console.log('Casino + NFT Upgrade loaded with Bounce (bigger GIF, faster slowdown, loss GIF visible)');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
