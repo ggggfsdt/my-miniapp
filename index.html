@@ -116,18 +116,20 @@
             width: 100%;
             height: 100%;
         }
-        /* Ball image overlay – centered, visible from start */
+        /* Ball image overlay – perfectly centered with percentage positioning */
         #bounceBallImg {
             position: absolute;
             pointer-events: none;
             z-index: 10;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
             display: block;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 8px rgba(84, 160, 255, 0.3));
         }
         .bounce-info {
             display: flex;
@@ -413,7 +415,7 @@
             .main-action-btn { padding-top: 12px; padding-bottom: 10px; }
             .moon-overlay img { width: 80px; height: 80px; }
             .quick-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            #bounceBallImg { width: 20px; height: 20px; }
+            #bounceBallImg { width: 24px; height: 24px; }
         }
     </style>
 </head>
@@ -2731,7 +2733,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FIXED: DURABILITY 1-2, BALL GIF CENTERED, VISIBLE FROM START
+        // BOUNCE GAME – FIXED: PERFECT CENTERING, BIGGER BALL, LONGER DURATION
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -2741,16 +2743,16 @@
             cornerRadius: 50,
             borderWidth: 20,
             segments: [],
-            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 10 },
+            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 14 }, // Bigger ball
             bet: 10,
             totalMultiplier: 1.0,
             isPlaying: false,
             gameOver: false,
             animId: null,
-            friction: 0.999,
-            speedThreshold: 0.05,
+            friction: 0.9995, // Lower friction = longer duration
+            speedThreshold: 0.02, // Lower threshold = longer duration
             segmentCount: 16,
-            constantSpeedDuration: 5000,
+            constantSpeedDuration: 8000, // 8 seconds of constant speed
             startTime: 0,
             floatingTexts: [],
             // Arrow properties
@@ -2777,7 +2779,7 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
                 
-                // Set ball image - visible from start
+                // Set ball image – visible from start, perfectly centered
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
                 this.ballElement.style.left = '50%';
@@ -2874,7 +2876,7 @@
                 const totalPts = outerPts.length;
                 const ptsPerSeg = Math.floor(totalPts / this.segmentCount);
                 
-                // Multiplier probabilities (rarity) – high multipliers are rare
+                // Multiplier probabilities (rarity)
                 const multiplierPool = [
                     { value: 5.0, weight: 2 },
                     { value: 4.0, weight: 3 },
@@ -2932,8 +2934,8 @@
                 // Show ball at center
                 this.ballElement.style.display = 'block';
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                this.ballElement.style.left = this.circle.x + 'px';
-                this.ballElement.style.top = this.circle.y + 'px';
+                this.ballElement.style.left = '50%';
+                this.ballElement.style.top = '50%';
                 this.spinStartTime = performance.now();
                 this.arrowAngle = Math.random() * 2 * Math.PI;
                 if (this.launchTimeout) clearTimeout(this.launchTimeout);
@@ -2985,6 +2987,8 @@
                 this.isLossBall = false;
                 this.ballElement.style.display = 'block';
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                this.ballElement.style.left = '50%';
+                this.ballElement.style.top = '50%';
                 document.getElementById('bounceResult').style.display = 'none';
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
@@ -3045,10 +3049,12 @@
                 this.circle.x += this.circle.vx * dt;
                 this.circle.y += this.circle.vy * dt;
 
-                // Update ball image position – centered
+                // Update ball image position – using PERCENTAGES for perfect centering
                 if (this.ballElement) {
-                    this.ballElement.style.left = this.circle.x + 'px';
-                    this.ballElement.style.top = this.circle.y + 'px';
+                    const percentX = (this.circle.x / this.width) * 100;
+                    const percentY = (this.circle.y / this.height) * 100;
+                    this.ballElement.style.left = percentX + '%';
+                    this.ballElement.style.top = percentY + '%';
                 }
 
                 const speed = Math.sqrt(this.circle.vx * this.circle.vx + this.circle.vy * this.circle.vy);
@@ -3082,7 +3088,6 @@
                             this.circle.x += normX * overlap;
                             this.circle.y += normY * overlap;
                             seg.durability--;
-                            // Hit sound + light vibration
                             this.playHitSound();
                             triggerVibration(15, 'light');
                             if (seg.durability <= 0) {
@@ -3409,7 +3414,7 @@
             upgradeGame.init();
             renderInventory();
             updateUpgradeSelectors();
-            console.log('Casino + NFT Upgrade loaded with Bounce (1-2 durability, centered GIF, visible from start)');
+            console.log('Casino + NFT Upgrade loaded with Bounce (fixed centering, bigger ball, longer duration)');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
