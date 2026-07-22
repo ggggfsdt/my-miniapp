@@ -638,7 +638,7 @@
                 <img id="bounceBallImg" src="https://images.iimg.live/images/stellar-work-2795.webp" alt="Ball">
             </div>
             <div class="bounce-info">
-                <span>Multiplier: <span class="multiplier" id="bounceMultiplier">1.00</span>x</span>
+                <span>Multiplier: <span class="multiplier" id="bounceMultiplier">0.20</span>x</span>
                 <span>Bet: <span id="bounceBetDisplay">10</span>⭐</span>
             </div>
             <div class="bounce-controls">
@@ -2734,7 +2734,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – BIGGER GIF, FASTER SLOWDOWN, LOSS GIF VISIBLE
+        // BOUNCE GAME – THREE-STAGE SPEED, REBALANCED MULTIPLIERS
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -2744,16 +2744,16 @@
             cornerRadius: 50,
             borderWidth: 20,
             segments: [],
-            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 18 }, // Bigger ball
+            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 18 },
             bet: 10,
-            totalMultiplier: 1.0,
+            totalMultiplier: 0.2, // starts at 0.2x
             isPlaying: false,
             gameOver: false,
             animId: null,
-            friction: 0.998, // Faster slowdown
+            friction: 0.998,
             speedThreshold: 0.05,
             segmentCount: 16,
-            constantSpeedDuration: 4000, // 4 seconds then slowdown
+            constantSpeedDuration: 4000,
             startTime: 0,
             floatingTexts: [],
             // Arrow properties
@@ -2780,7 +2780,7 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
                 
-                // Set ball image – visible from start, perfectly centered, bigger
+                // Set ball image
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
                 this.ballElement.style.left = '50%';
@@ -2879,15 +2879,14 @@
                 const totalPts = outerPts.length;
                 const ptsPerSeg = Math.floor(totalPts / this.segmentCount);
                 
-                // Multiplier probabilities (rarity)
+                // NEW MULTIPLIER POOL: 0.1x most common, 3.0x rarest
                 const multiplierPool = [
-                    { value: 5.0, weight: 2 },
-                    { value: 4.0, weight: 3 },
-                    { value: 3.0, weight: 5 },
-                    { value: 2.0, weight: 10 },
-                    { value: 1.0, weight: 20 },
-                    { value: 0.5, weight: 30 },
-                    { value: 0.2, weight: 30 }
+                    { value: 3.0, weight: 1 },
+                    { value: 2.0, weight: 2 },
+                    { value: 1.0, weight: 5 },
+                    { value: 0.5, weight: 15 },
+                    { value: 0.2, weight: 25 },
+                    { value: 0.1, weight: 52 }
                 ];
                 let weighted = [];
                 for (let item of multiplierPool) {
@@ -2907,7 +2906,6 @@
                     }
                     const p1 = innerSeg[0];
                     const p2 = innerSeg[innerSeg.length - 1];
-                    // Durability: 1-2
                     const durability = 1 + Math.floor(Math.random() * 2);
                     const multiplier = weighted[Math.floor(Math.random() * weighted.length)];
                     this.segments.push({
@@ -2934,7 +2932,6 @@
                 this.isLaunched = false;
                 this.isPlaying = false;
                 this.isLossBall = false;
-                // Show ball at center
                 this.ballElement.style.display = 'block';
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.left = '50%';
@@ -2962,7 +2959,8 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                const speed = 80 + Math.random() * 60;
+                // VERY FAST initial speed
+                const speed = 220 + Math.random() * 80;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
                 document.getElementById('bounceStartBtn').textContent = 'Playing...';
@@ -2984,7 +2982,8 @@
                 if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
                 this.bet = bet;
                 state.balance -= this.bet;
-                this.totalMultiplier = 1.0;
+                // Start at 0.2x
+                this.totalMultiplier = 0.2;
                 this.gameOver = false;
                 this.floatingTexts = [];
                 this.isLossBall = false;
@@ -3036,23 +3035,34 @@
                     }
                 }
 
-                // Physics
+                // Physics – THREE-STAGE SPEED PROFILE
                 if (!this.isPlaying) return;
 
                 const now = performance.now();
                 const elapsed = now - this.startTime;
+                let currentFriction = 1.0;
 
-                if (elapsed < this.constantSpeedDuration) {
-                    // no friction
+                // Phase 1: 0-2.5s – VERY FAST (no friction)
+                // Phase 2: 2.5-6s – MEDIUM CRUISE (low friction)
+                // Phase 3: 6s+ – RAPID SLOWDOWN (higher friction)
+                if (elapsed > 2500 && elapsed <= 6000) {
+                    currentFriction = 0.998;
+                } else if (elapsed > 6000) {
+                    currentFriction = 0.993;
                 } else {
-                    this.circle.vx *= this.friction;
-                    this.circle.vy *= this.friction;
+                    currentFriction = 1.0;
+                }
+
+                // Apply friction only after the initial fast phase
+                if (elapsed > 2500) {
+                    this.circle.vx *= currentFriction;
+                    this.circle.vy *= currentFriction;
                 }
 
                 this.circle.x += this.circle.vx * dt;
                 this.circle.y += this.circle.vy * dt;
 
-                // Update ball image position – using PERCENTAGES for perfect centering
+                // Update ball image position
                 if (this.ballElement) {
                     const percentX = (this.circle.x / this.width) * 100;
                     const percentY = (this.circle.y / this.height) * 100;
@@ -3061,7 +3071,7 @@
                 }
 
                 const speed = Math.sqrt(this.circle.vx * this.circle.vx + this.circle.vy * this.circle.vy);
-                if (speed < this.speedThreshold && elapsed > this.constantSpeedDuration) {
+                if (speed < this.speedThreshold && elapsed > 2500) {
                     this.endGame(true);
                     return;
                 }
@@ -3188,10 +3198,6 @@
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
 
-                // IMPORTANT: Keep ball visible on loss to show the loss GIF
-                // On win, we also keep it visible (shows normal GIF)
-                // Only hide if starting a new round
-
                 const resultEl = document.getElementById('bounceResult');
                 resultEl.style.display = 'block';
                 if (win) {
@@ -3208,7 +3214,6 @@
                     triggerVibration(50, 'medium');
                     showNotification(winAmount, winAmount);
                     processGameWin(winAmount);
-                    // Keep normal ball visible
                     if (this.ballElement) {
                         this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                     }
@@ -3219,7 +3224,6 @@
                     resultEl.textContent = `Lost ${this.bet}⭐`;
                     this.playLoseSound();
                     triggerVibration(80, 'heavy');
-                    // Keep loss ball visible
                     if (this.ballElement) {
                         this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
                     }
@@ -3342,12 +3346,11 @@
                 }
                 ctx.globalAlpha = 1;
 
-                // Arrow (white)
+                // Arrow
                 if (this.isSpinning || !this.isLaunched) {
                     ctx.save();
                     ctx.translate(cx, cy);
                     ctx.rotate(this.arrowAngle);
-                    // Shaft
                     ctx.beginPath();
                     ctx.moveTo(30, 0);
                     ctx.lineTo(65, 0);
@@ -3356,7 +3359,6 @@
                     ctx.shadowColor = 'rgba(255,255,255,0.3)';
                     ctx.shadowBlur = 15;
                     ctx.stroke();
-                    // Head
                     ctx.beginPath();
                     ctx.moveTo(65, 0);
                     ctx.lineTo(55, -10);
@@ -3366,7 +3368,6 @@
                     ctx.shadowColor = 'rgba(255,255,255,0.3)';
                     ctx.shadowBlur = 20;
                     ctx.fill();
-                    // Center dot
                     ctx.beginPath();
                     ctx.arc(0, 0, 6, 0, 2 * Math.PI);
                     ctx.fillStyle = '#ffffff';
@@ -3424,7 +3425,7 @@
             upgradeGame.init();
             renderInventory();
             updateUpgradeSelectors();
-            console.log('Casino + NFT Upgrade loaded with Bounce (bigger GIF, faster slowdown, loss GIF visible)');
+            console.log('Casino + NFT Upgrade loaded with Bounce (3-stage speed, 0.1-3.0 multipliers)');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
