@@ -116,17 +116,17 @@
             width: 100%;
             height: 100%;
         }
-        /* Ball image overlay for animated GIF */
+        /* Ball image overlay – centered, visible from start */
         #bounceBallImg {
             position: absolute;
             pointer-events: none;
             z-index: 10;
-            width: 40px;
-            height: 40px;
+            width: 24px;
+            height: 24px;
             object-fit: contain;
-            display: none;
-            left: 0;
-            top: 0;
+            display: block;
+            left: 50%;
+            top: 50%;
             transform: translate(-50%, -50%);
         }
         .bounce-info {
@@ -413,6 +413,7 @@
             .main-action-btn { padding-top: 12px; padding-bottom: 10px; }
             .moon-overlay img { width: 80px; height: 80px; }
             .quick-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            #bounceBallImg { width: 20px; height: 20px; }
         }
     </style>
 </head>
@@ -2730,7 +2731,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – ANIMATED GIF, RARE MULTIPLIERS, HIGHER DURABILITY, SOUNDS
+        // BOUNCE GAME – FIXED: DURABILITY 1-2, BALL GIF CENTERED, VISIBLE FROM START
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -2776,9 +2777,12 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
                 
-                // Set ball image
+                // Set ball image - visible from start
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                this.ballElement.style.display = 'none';
+                this.ballElement.style.display = 'block';
+                this.ballElement.style.left = '50%';
+                this.ballElement.style.top = '50%';
+                this.ballElement.style.transform = 'translate(-50%, -50%)';
                 this.isLossBall = false;
                 
                 this.generateSegments();
@@ -2870,7 +2874,7 @@
                 const totalPts = outerPts.length;
                 const ptsPerSeg = Math.floor(totalPts / this.segmentCount);
                 
-                // Multiplier probabilities (rarity)
+                // Multiplier probabilities (rarity) – high multipliers are rare
                 const multiplierPool = [
                     { value: 5.0, weight: 2 },
                     { value: 4.0, weight: 3 },
@@ -2880,7 +2884,6 @@
                     { value: 0.5, weight: 30 },
                     { value: 0.2, weight: 30 }
                 ];
-                // Build weighted array
                 let weighted = [];
                 for (let item of multiplierPool) {
                     for (let i = 0; i < item.weight; i++) {
@@ -2899,9 +2902,8 @@
                     }
                     const p1 = innerSeg[0];
                     const p2 = innerSeg[innerSeg.length - 1];
-                    // Durability 2-4
-                    const durability = 2 + Math.floor(Math.random() * 3);
-                    // Pick random multiplier from weighted pool
+                    // Durability: 1-2 (slightly smaller)
+                    const durability = 1 + Math.floor(Math.random() * 2);
                     const multiplier = weighted[Math.floor(Math.random() * weighted.length)];
                     this.segments.push({
                         outer: outerSeg,
@@ -2927,8 +2929,11 @@
                 this.isLaunched = false;
                 this.isPlaying = false;
                 this.isLossBall = false;
-                this.ballElement.style.display = 'none';
+                // Show ball at center
+                this.ballElement.style.display = 'block';
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                this.ballElement.style.left = this.circle.x + 'px';
+                this.ballElement.style.top = this.circle.y + 'px';
                 this.spinStartTime = performance.now();
                 this.arrowAngle = Math.random() * 2 * Math.PI;
                 if (this.launchTimeout) clearTimeout(this.launchTimeout);
@@ -2950,10 +2955,8 @@
                 this.isLaunched = true;
                 this.isPlaying = true;
                 this.isLossBall = false;
-                this.ballElement.style.display = 'block';
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // Slower speed: 80-140
                 const speed = 80 + Math.random() * 60;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -2980,7 +2983,8 @@
                 this.gameOver = false;
                 this.floatingTexts = [];
                 this.isLossBall = false;
-                this.ballElement.style.display = 'none';
+                this.ballElement.style.display = 'block';
+                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 document.getElementById('bounceResult').style.display = 'none';
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
@@ -3041,7 +3045,7 @@
                 this.circle.x += this.circle.vx * dt;
                 this.circle.y += this.circle.vy * dt;
 
-                // Update ball image position
+                // Update ball image position – centered
                 if (this.ballElement) {
                     this.ballElement.style.left = this.circle.x + 'px';
                     this.ballElement.style.top = this.circle.y + 'px';
@@ -3078,7 +3082,7 @@
                             this.circle.x += normX * overlap;
                             this.circle.y += normY * overlap;
                             seg.durability--;
-                            // Play hit sound
+                            // Hit sound + light vibration
                             this.playHitSound();
                             triggerVibration(15, 'light');
                             if (seg.durability <= 0) {
@@ -3176,7 +3180,7 @@
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
 
-                // Hide ball image
+                // Hide ball image after game ends
                 if (this.ballElement) {
                     this.ballElement.style.display = 'none';
                 }
@@ -3405,7 +3409,7 @@
             upgradeGame.init();
             renderInventory();
             updateUpgradeSelectors();
-            console.log('Casino + NFT Upgrade loaded with Bounce (animated GIF, rare multipliers, sounds)');
+            console.log('Casino + NFT Upgrade loaded with Bounce (1-2 durability, centered GIF, visible from start)');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
