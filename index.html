@@ -31,15 +31,14 @@
         #loadingScreen .title {
             font-size: 40px;
             font-weight: 900;
-            color: #ffffff; /* white, no gradient */
+            color: #ffffff;
             margin-bottom: 28px;
             letter-spacing: 2px;
             text-shadow: 0 0 60px rgba(255, 215, 0, 0.12);
         }
-        /* Main GIF – larger and free */
         #loadingScreen .main-gif {
             display: block;
-            max-width: 320px;  /* bigger */
+            max-width: 320px;
             width: 80%;
             height: auto;
             object-fit: contain;
@@ -48,19 +47,20 @@
             border-radius: 0;
             box-shadow: none;
             background: transparent;
+            will-change: transform;
         }
-        /* Loading circle GIF – small, smooth */
+        /* Loading circle – bigger */
         #loadingScreen .spinner-gif {
             display: block;
-            width: 48px;
-            height: 48px;
+            width: 64px;
+            height: 64px;
             object-fit: contain;
             margin-bottom: 12px;
             border: none;
             border-radius: 0;
             box-shadow: none;
             background: transparent;
-            animation: none;
+            will-change: transform;
         }
         #loadingScreen .loading-text {
             color: #666;
@@ -546,6 +546,7 @@
             border-radius: 50%;
             filter: drop-shadow(0 0 10px rgba(84, 160, 255, 0.4));
             transition: none;
+            will-change: transform;
         }
         .bounce-info {
             display: flex;
@@ -829,6 +830,7 @@
             display: none;
             filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
             transition: opacity 0.15s ease;
+            will-change: transform, opacity;
         }
         .gif-overlay img.active {
             display: block;
@@ -865,6 +867,7 @@
             height: 100%;
             object-fit: contain;
             animation: explosionAnim 0.8s ease-out forwards;
+            will-change: transform, opacity;
         }
         @keyframes explosionAnim {
             0% {
@@ -1284,6 +1287,7 @@
             height: 60px;
             object-fit: contain;
             border-radius: 8px;
+            will-change: transform;
         }
         .main-action-btn {
             display: flex;
@@ -1741,6 +1745,7 @@
             display: none;
             z-index: 5;
             pointer-events: none;
+            will-change: transform;
         }
         .upgrade-selectors {
             display: flex;
@@ -1780,6 +1785,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            will-change: transform;
         }
         .upgrade-select .nft-square .placeholder {
             color: #555;
@@ -1864,6 +1870,7 @@
             object-fit: contain;
             border-radius: 12px;
             margin-bottom: 8px;
+            will-change: transform;
         }
         .nft-selection-item .name {
             font-weight: 600;
@@ -1910,6 +1917,7 @@
             object-fit: contain;
             margin-bottom: 16px;
             filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            will-change: transform;
         }
         .win-popup .nft-img {
             width: 90px;
@@ -1917,6 +1925,7 @@
             object-fit: contain;
             border-radius: 16px;
             margin-bottom: 8px;
+            will-change: transform;
         }
         .win-popup .win-title {
             font-size: 24px;
@@ -1962,6 +1971,7 @@
             object-fit: contain;
             border-radius: 12px;
             margin-bottom: 8px;
+            will-change: transform;
         }
         .inventory-item .name {
             font-weight: 600;
@@ -2058,6 +2068,10 @@
             #loadingScreen .title {
                 font-size: 30px;
             }
+            #loadingScreen .spinner-gif {
+                width: 56px;
+                height: 56px;
+            }
         }
     </style>
 </head>
@@ -2066,8 +2080,8 @@
     <!-- ===== LOADING SCREEN – pure, no box ===== -->
     <div id="loadingScreen">
         <div class="title">Dll_Lud</div>
-        <img class="main-gif" src="https://images.iimg.live/images/stellar-masterpiece-3002.webp" alt="Loading" id="loadingGif">
-        <img class="spinner-gif" src="https://images.iimg.live/images/excellent-art-9247.webp" alt="Loading circle" id="loadingSpinner">
+        <img class="main-gif" src="https://images.iimg.live/images/stellar-masterpiece-3002.webp" alt="Loading" id="loadingGif" decoding="async" loading="eager">
+        <img class="spinner-gif" src="https://images.iimg.live/images/excellent-art-9247.webp" alt="Loading circle" id="loadingSpinner" decoding="async" loading="eager">
         <div class="loading-text">Loading Casino...</div>
     </div>
 
@@ -2144,13 +2158,13 @@
                 <div class="grid-squares" id="gridSquares"></div>
                 <div class="wind-lines" id="windLines"></div>
                 <div class="moon-overlay" id="moonOverlay">
-                    <img id="moonGif" src="https://images.iimg.live/images/ultimate-collection-3580.webp" alt="Moon">
+                    <img id="moonGif" src="https://images.iimg.live/images/ultimate-collection-3580.webp" alt="Moon" decoding="async">
                 </div>
                 <div class="gif-overlay" id="rocketOverlay">
-                    <img id="crashGif" src="" alt="Car/Rocket">
+                    <img id="crashGif" src="" alt="Car/Rocket" decoding="async">
                 </div>
                 <div class="explosion-overlay" id="explosionOverlay">
-                    <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion">
+                    <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion" decoding="async">
                 </div>
                 <div class="countdown-overlay" id="countdownOverlay">
                     <div class="countdown-number" id="countdownNumber">3</div>
@@ -2204,7 +2218,7 @@
                 <div class="upgrade-selectors">
                     <div class="upgrade-select" onclick="openNftSelection('from')">
                         <div class="nft-square" id="fromNftSquare">
-                            <img id="fromNftImg" src="" style="display:none;">
+                            <img id="fromNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="fromPlaceholder">Choose</span>
                         </div>
                         <div class="info">
@@ -2214,7 +2228,7 @@
                     </div>
                     <div class="upgrade-select" onclick="openNftSelection('to')">
                         <div class="nft-square" id="toNftSquare">
-                            <img id="toNftImg" src="" style="display:none;">
+                            <img id="toNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="toPlaceholder">Choose</span>
                         </div>
                         <div class="info">
@@ -2225,7 +2239,7 @@
                 </div>
                 <div class="upgrade-wheel-container" id="wheelContainer">
                     <canvas id="upgradeWheel" width="280" height="280"></canvas>
-                    <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT">
+                    <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
                 </div>
                 <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
                     <span id="upgradeBtnText">Upgrade</span>
@@ -2250,7 +2264,7 @@
         <!-- PROFILE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="fallback" id="profileAvatarFallback">XD</div></div>
+                <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" decoding="async"><div class="fallback" id="profileAvatarFallback">XD</div></div>
                 <div class="profile-name" id="profileName">xDll_Lud</div>
                 <div class="profile-username" id="profileUsername">@xDll_Lud</div>
             </div>
@@ -2284,7 +2298,7 @@
             </div>
             <div id="bounceCanvasWrap">
                 <canvas id="bounceCanvas" width="400" height="400"></canvas>
-                <img id="bounceBallImg" src="https://images.iimg.live/images/stellar-work-2795.webp" alt="Ball">
+                <img id="bounceBallImg" src="https://images.iimg.live/images/stellar-work-2795.webp" alt="Ball" decoding="async">
             </div>
             <div class="bounce-info">
                 <span>Multiplier: <span class="multiplier" id="bounceMultiplier">0.20</span>x</span>
@@ -2310,6 +2324,17 @@
 
     <script>
         // ============================================================
+        // TELEGRAM WEBAPP – FULL SCREEN EXPAND
+        // ============================================================
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.expand(); // makes app full screen
+                tg.enableClosingConfirmation(); // optional
+            }
+        } catch (e) {}
+
+        // ============================================================
         // GIF PRELOADER – CACHE ALL GIFS FOR INSTANT PLAYBACK
         // ============================================================
         const GIF_CACHE = {};
@@ -2319,6 +2344,7 @@
                 if (GIF_CACHE[url]) { resolve(GIF_CACHE[url]); return; }
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
+                img.decoding = 'async';
                 img.onload = () => { GIF_CACHE[url] = img;
                     resolve(img); };
                 img.onerror = () => { GIF_CACHE[url] = null;
@@ -2583,7 +2609,7 @@
                     progressWidth = 0;
                 }
                 const avatarContent = isYou ?
-                    `<img src="${state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp'}" alt="${name}">` :
+                    `<img src="${state.avatarUrl || 'https://images.iimg.live/images/excellent-photo-9680.webp'}" alt="${name}" decoding="async">` :
                     `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
                 const playerId = 'p_' + i;
                 html += `
@@ -2598,7 +2624,7 @@
                         <div class="status ${statusClass}">${statusText}</div>
                     </div>
                     <div class="player-cash-gif" id="cashGif_${playerId}">
-                        <img src="https://images.iimg.live/images/vibrant-memory-9307.webp" alt="Cash Out">
+                        <img src="https://images.iimg.live/images/vibrant-memory-9307.webp" alt="Cash Out" decoding="async">
                     </div>
                 </div>
             `;
@@ -3840,6 +3866,7 @@
                             img.style.objectFit = 'contain';
                             img.style.display = 'block';
                             img.style.borderRadius = '4px';
+                            img.decoding = 'async';
                             symbol.appendChild(img);
                             setTimeout(() => {
                                 if (symbol.contains(img)) {
@@ -3857,6 +3884,7 @@
                             img.style.objectFit = 'contain';
                             img.style.display = 'block';
                             img.style.borderRadius = '4px';
+                            img.decoding = 'async';
                             symbol.appendChild(img);
                         }
                     } else {
@@ -4084,7 +4112,7 @@
             emptyMsg.style.display = 'none';
             grid.innerHTML = state.inventory.map((nft, idx) => `
             <div class="inventory-item">
-                <img src="${nft.gif}" alt="${nft.name}">
+                <img src="${nft.gif}" alt="${nft.name}" decoding="async">
                 <div class="name">${nft.name}</div>
                 <div class="actions">
                     <button class="btn-sell" onclick="sellNFT(${idx})">Sell</button>
@@ -4182,7 +4210,7 @@
             }
             grid.innerHTML = eligible.map(nft => `
             <div class="nft-selection-item" onclick="selectNft('${nft.id}', '${type}')">
-                <img src="${nft.gif}" alt="${nft.name}">
+                <img src="${nft.gif}" alt="${nft.name}" decoding="async">
                 <div class="name">${nft.name}</div>
             </div>
         `).join('');
