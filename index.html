@@ -31,18 +31,16 @@
         #loadingScreen .title {
             font-size: 40px;
             font-weight: 900;
-            background: linear-gradient(135deg, #ffd700, #f0932b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff; /* white, no gradient */
             margin-bottom: 28px;
             letter-spacing: 2px;
             text-shadow: 0 0 60px rgba(255, 215, 0, 0.12);
         }
-        /* Main GIF – no container, just the image */
+        /* Main GIF – larger and free */
         #loadingScreen .main-gif {
             display: block;
-            max-width: 260px;
-            width: 100%;
+            max-width: 320px;  /* bigger */
+            width: 80%;
             height: auto;
             object-fit: contain;
             margin-bottom: 28px;
@@ -2054,7 +2052,8 @@
                 height: 32px;
             }
             #loadingScreen .main-gif {
-                max-width: 180px;
+                max-width: 220px;
+                width: 70%;
             }
             #loadingScreen .title {
                 font-size: 30px;
@@ -2328,7 +2327,7 @@
             });
         }
 
-        // All GIFs used in the app – add the new loading circle too
+        // All GIFs used in the app
         const ALL_GIF_URLS = [
             // Loading screen
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
@@ -5162,10 +5161,17 @@
             // Preload all GIFs – this ensures smooth playback
             await preloadAllGifs();
 
-            // Give the loading screen a moment to show, then fade out
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-            }, 600);
+            // Force a minimum display time for the loading screen (2.5 seconds)
+            const minDisplayTime = 2500;
+            const startTime = performance.now();
+
+            // Wait for preload to finish, then ensure min time elapsed
+            const elapsed = performance.now() - startTime;
+            const remaining = Math.max(0, minDisplayTime - elapsed);
+            await new Promise(resolve => setTimeout(resolve, remaining));
+
+            // Hide loading screen
+            loadingScreen.classList.add('hidden');
 
             getTelegramUser();
             updateHomeUI();
