@@ -8,68 +8,482 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
+        /* ===== LOADING SCREEN – pure, no box ===== */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #08080a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+            opacity: 1;
+            visibility: visible;
+            padding: 20px;
+        }
+        #loadingScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        #loadingScreen .title {
+            font-size: 40px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #f0932b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 28px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.12);
+        }
+        /* Main GIF – no container, just the image */
+        #loadingScreen .main-gif {
+            display: block;
+            max-width: 260px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 28px;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            background: transparent;
+        }
+        /* Loading circle GIF – small, smooth */
+        #loadingScreen .spinner-gif {
+            display: block;
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            background: transparent;
+            animation: none;
+        }
+        #loadingScreen .loading-text {
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            animation: pulseText 1.8s ease-in-out infinite;
+        }
+        @keyframes pulseText {
+            0%,
+            100% {
+                opacity: 0.35;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
         /* ===== RESET & BASE ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08080a; color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
-        #app { max-width: 420px; width: 100%; background: linear-gradient(160deg, #111115, #0a0a0c); border-radius: 36px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.06); min-height: 760px; display: flex; flex-direction: column; position: relative; }
-        #notification { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 16px; margin: 10px 16px 0 16px; padding: 10px 18px; display: none; align-items: center; justify-content: center; gap: 10px; transform: translateY(-120%); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-        #notification.show { display: flex; }
-        #notification .notif-icon { color: #00d2a0; font-size: 16px; }
-        #notification .notif-text { color: #e0e0e0; font-size: 14px; font-weight: 500; }
-        #notification .notif-amount { display: inline-flex; align-items: center; gap: 4px; color: #ffd700; font-size: 16px; font-weight: 700; }
-        .page { display: none; flex: 1; padding: 18px 16px 70px 16px; overflow-y: auto; max-height: 740px; scroll-behavior: smooth; }
-        .page.active { display: block; }
-        .page::-webkit-scrollbar { width: 3px; }
-        .page::-webkit-scrollbar-track { background: transparent; }
-        .page::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
-        .bottom-nav { position: sticky; bottom: 0; left: 0; right: 0; background: rgba(20,20,25,0.95); backdrop-filter: blur(30px); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-around; padding: 6px 0 12px 0; border-radius: 0 0 36px 36px; margin-top: -10px; z-index: 20; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; background: transparent; border: none; color: #555; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); padding: 4px 16px; border-radius: 16px; position: relative; letter-spacing: 0.3px; }
-        .nav-item .icon { font-size: 22px; transition: all 0.3s; opacity: 0.5; }
-        .nav-item .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; }
-        .nav-item.active { color: #fff; }
-        .nav-item.active .icon { opacity: 1; transform: translateY(-2px) scale(1.1); }
-        .card { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 14px; }
-        .card-title { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
-        .flex { display: flex; align-items: center; gap: 10px; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .text-muted { color: #555; font-size: 13px; }
-        .gap-8 { gap: 8px; }
-        .mb-8 { margin-bottom: 8px; }
-        .btn { padding: 14px 20px; border: none; border-radius: 16px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); color: white; text-align: center; flex: 1; position: relative; overflow: hidden; letter-spacing: 0.3px; }
-        .btn:active { transform: scale(0.94); }
-        .btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
-        .btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
-        .btn-success { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); }
-        .badge { background: rgba(255,255,255,0.06); padding: 6px 14px; border-radius: 30px; font-size: 11px; font-weight: 600; color: #888; border: 1px solid rgba(255,255,255,0.04); letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 4px; }
-        .badge-gold { background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.15); color: #ffd700; }
-        .badge-blue { background: rgba(54,160,255,0.1); border-color: rgba(54,160,255,0.15); color: #54a0ff; }
-        .online-dot { display: inline-block; width: 10px; height: 10px; background: #00ff88; border-radius: 50%; margin-left: 8px; box-shadow: 0 0 12px rgba(0,255,136,0.6); animation: pulse-dot 1.5s ease-in-out infinite; }
-        @keyframes pulse-dot { 0% { opacity: 0.4; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.4; transform: scale(0.8); } }
-        .home-header { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px 18px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; display: flex; align-items: center; gap: 14px; }
-        .home-avatar { width: 52px; height: 52px; border-radius: 16px; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.08); box-shadow: 0 4px 16px rgba(108,92,231,0.2); }
-        .home-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .home-user { flex: 1; }
-        .home-user .greeting { font-size: 14px; color: #888; font-weight: 500; }
-        .home-user .username { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .home-balance-wrap { text-align: right; }
-        .home-balance-wrap .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
-        .home-balance-wrap .amount { font-size: 28px; font-weight: 900; display: flex; align-items: center; justify-content: flex-end; gap: 6px; background: linear-gradient(135deg, #ffd700, #f0932b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .balance-icon { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,215,0,0.5)); margin-top: 6px; }
-        .badge .balance-icon { width: 30px; height: 30px; margin-top: 2px; margin-right: 2px; }
-        .star-icon-sm { width: 20px; height: 20px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(255,215,0,0.4)); display: inline-block; vertical-align: middle; }
-        .star-icon-xs { width: 16px; height: 16px; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,215,0,0.3)); display: inline-block; vertical-align: middle; }
-        .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; margin-bottom: 6px; }
-        .quick-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden; width: 100%; }
-        .quick-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(108,92,231,0.05), transparent); opacity: 0; transition: opacity 0.3s; }
-        .quick-card:active { transform: scale(0.97); }
-        .quick-card:active::before { opacity: 1; }
-        .quick-card .icon { font-size: 32px; display: block; margin-bottom: 8px; color: #fff; opacity: 0.9; }
-        .quick-card .label { font-size: 16px; font-weight: 700; color: #fff; }
-        .quick-card .desc { font-size: 12px; color: #555; margin-top: 2px; }
-        .quick-card.glow-purple { box-shadow: 0 0 30px rgba(108,92,231,0.05); }
-        .quick-card.glow-green { box-shadow: 0 0 30px rgba(0,210,160,0.05); }
-        .quick-card.glow-blue { box-shadow: 0 0 30px rgba(54,160,255,0.05); }
-        .quick-card.glow-gold { box-shadow: 0 0 30px rgba(255,215,0,0.05); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #08080a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        #app {
+            max-width: 420px;
+            width: 100%;
+            background: linear-gradient(160deg, #111115, #0a0a0c);
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            min-height: 760px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        #notification {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            margin: 10px 16px 0 16px;
+            padding: 10px 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transform: translateY(-120%);
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+        #notification.show {
+            display: flex;
+        }
+        #notification .notif-icon {
+            color: #00d2a0;
+            font-size: 16px;
+        }
+        #notification .notif-text {
+            color: #e0e0e0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #notification .notif-amount {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .page {
+            display: none;
+            flex: 1;
+            padding: 18px 16px 70px 16px;
+            overflow-y: auto;
+            max-height: 740px;
+            scroll-behavior: smooth;
+        }
+        .page.active {
+            display: block;
+        }
+        .page::-webkit-scrollbar {
+            width: 3px;
+        }
+        .page::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .page::-webkit-scrollbar-thumb {
+            background: #2a2a2e;
+            border-radius: 10px;
+        }
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 25, 0.95);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 12px 0;
+            border-radius: 0 0 36px 36px;
+            margin-top: -10px;
+            z-index: 20;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: transparent;
+            border: none;
+            color: #555;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 4px 16px;
+            border-radius: 16px;
+            position: relative;
+            letter-spacing: 0.3px;
+        }
+        .nav-item .icon {
+            font-size: 22px;
+            transition: all 0.3s;
+            opacity: 0.5;
+        }
+        .nav-item .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .nav-item.active {
+            color: #fff;
+        }
+        .nav-item.active .icon {
+            opacity: 1;
+            transform: translateY(-2px) scale(1.1);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 14px;
+        }
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+        }
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .text-muted {
+            color: #555;
+            font-size: 13px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: white;
+            text-align: center;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+        .btn:active {
+            transform: scale(0.94);
+        }
+        .btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .badge {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-gold {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+        }
+        .badge-blue {
+            background: rgba(54, 160, 255, 0.1);
+            border-color: rgba(54, 160, 255, 0.15);
+            color: #54a0ff;
+        }
+        .online-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            margin-left: 8px;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+        .home-header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .home-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.2);
+        }
+        .home-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .home-user {
+            flex: 1;
+        }
+        .home-user .greeting {
+            font-size: 14px;
+            color: #888;
+            font-weight: 500;
+        }
+        .home-user .username {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .home-balance-wrap {
+            text-align: right;
+        }
+        .home-balance-wrap .label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .home-balance-wrap .amount {
+            font-size: 28px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            background: linear-gradient(135deg, #ffd700, #f0932b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .balance-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+            margin-top: 6px;
+        }
+        .badge .balance-icon {
+            width: 30px;
+            height: 30px;
+            margin-top: 2px;
+            margin-right: 2px;
+        }
+        .star-icon-sm {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .star-icon-xs {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .quick-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+        .quick-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .quick-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .quick-card:active {
+            transform: scale(0.97);
+        }
+        .quick-card:active::before {
+            opacity: 1;
+        }
+        .quick-card .icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            opacity: 0.9;
+        }
+        .quick-card .label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .quick-card .desc {
+            font-size: 12px;
+            color: #555;
+            margin-top: 2px;
+        }
+        .quick-card.glow-purple {
+            box-shadow: 0 0 30px rgba(108, 92, 231, 0.05);
+        }
+        .quick-card.glow-green {
+            box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
+        }
+        .quick-card.glow-blue {
+            box-shadow: 0 0 30px rgba(54, 160, 255, 0.05);
+        }
+        .quick-card.glow-gold {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
+        }
 
         /* ===== BOUNCE PAGE ===== */
         #page-bounce {
@@ -77,7 +491,9 @@
             display: none;
             flex-direction: column;
         }
-        #page-bounce.active { display: flex; }
+        #page-bounce.active {
+            display: flex;
+        }
         .bounce-header {
             display: flex;
             justify-content: space-between;
@@ -93,7 +509,9 @@
             padding: 8px 12px 8px 4px;
             transition: color 0.2s;
         }
-        .bounce-header .back-btn:hover { color: #fff; }
+        .bounce-header .back-btn:hover {
+            color: #fff;
+        }
         .bounce-header .title {
             font-size: 20px;
             font-weight: 700;
@@ -116,7 +534,6 @@
             width: 100%;
             height: 100%;
         }
-        /* Ball image overlay – bigger, perfectly centered */
         #bounceBallImg {
             position: absolute;
             pointer-events: none;
@@ -143,7 +560,7 @@
             color: #ffd700;
             font-weight: 700;
             display: inline-block;
-            transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .bounce-controls {
             display: flex;
@@ -153,8 +570,8 @@
         }
         .bounce-controls input {
             flex: 1;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 10px 14px;
             color: #fff;
@@ -176,8 +593,13 @@
             white-space: nowrap;
             min-width: 100px;
         }
-        .bounce-controls button:active { transform: scale(0.94); }
-        .bounce-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .bounce-controls button:active {
+            transform: scale(0.94);
+        }
+        .bounce-controls button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
         .bounce-result {
             margin-top: 10px;
             padding: 12px;
@@ -185,242 +607,1470 @@
             text-align: center;
             font-weight: 700;
             font-size: 18px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             display: none;
         }
-        .bounce-result.win { color: #00d2a0; border-color: rgba(0,210,160,0.2); display: block; }
-        .bounce-result.lose { color: #ff6b6b; border-color: rgba(255,107,107,0.2); display: block; }
+        .bounce-result.win {
+            color: #00d2a0;
+            border-color: rgba(0, 210, 160, 0.2);
+            display: block;
+        }
+        .bounce-result.lose {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.2);
+            display: block;
+        }
 
         /* ===== PROFILE, etc. ===== */
-        .profile-header { text-align: center; padding: 20px 0 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); margin-bottom: 16px; }
-        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; margin: 0 auto 12px auto; border: 2px solid rgba(255,255,255,0.08); box-shadow: 0 4px 24px rgba(108,92,231,0.2); position: relative; }
-        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .profile-avatar .fallback { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 36px; font-weight: 700; position: absolute; inset: 0; }
-        .profile-avatar img:not([src]) + .fallback, .profile-avatar img.error + .fallback { display: flex; }
-        .profile-name { font-size: 22px; font-weight: 800; color: #fff; }
-        .profile-username { font-size: 14px; color: #888; margin-top: 2px; }
-        .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
-        .profile-stat { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 14px 8px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
-        .profile-stat .value { font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .profile-stat .label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-        .profile-stat .value.gold { color: #ffd700; }
-        .profile-stat .value.green { color: #00d2a0; }
-        .profile-stat .value.purple { color: #a29bfe; }
-        .profile-stat .value.pink { color: #fd79a8; }
-        .profile-detail { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .profile-detail:last-child { border-bottom: none; }
-        .profile-detail .label { color: #666; font-size: 14px; }
-        .profile-detail .value { font-weight: 600; font-size: 14px; }
+        .profile-header {
+            text-align: center;
+            padding: 20px 0 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 16px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 12px auto;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 24px rgba(108, 92, 231, 0.2);
+            position: relative;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .profile-avatar .fallback {
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            font-size: 36px;
+            font-weight: 700;
+            position: absolute;
+            inset: 0;
+        }
+        .profile-avatar img:not([src])+.fallback,
+        .profile-avatar img.error+.fallback {
+            display: flex;
+        }
+        .profile-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .profile-username {
+            font-size: 14px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .profile-stat {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .profile-stat .value {
+            font-size: 22px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .profile-stat .label {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .profile-stat .value.gold {
+            color: #ffd700;
+        }
+        .profile-stat .value.green {
+            color: #00d2a0;
+        }
+        .profile-stat .value.purple {
+            color: #a29bfe;
+        }
+        .profile-stat .value.pink {
+            color: #fd79a8;
+        }
+        .profile-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .profile-detail:last-child {
+            border-bottom: none;
+        }
+        .profile-detail .label {
+            color: #666;
+            font-size: 14px;
+        }
+        .profile-detail .value {
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-        /* ===== CRASH, MINES, UPGRADE, INVENTORY (unchanged) ===== */
-        .grid-container { position: relative; height: 280px; background: #0a0a0c; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); margin: 10px 0 0 0; }
-        .grid-squares { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(6, 1fr); gap: 0; background: transparent; padding: 0; z-index: 0; }
-        .grid-square { background: transparent; border: 1px solid rgba(255,255,255,0.04); }
-        .grid-square.corner { border-color: rgba(108,92,231,0.06); }
-        .wind-lines { position: absolute; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity 0.3s ease; transform: rotate(-20deg); transform-origin: center center; will-change: transform, opacity; }
-        .wind-lines.active { opacity: 1; }
-        .wind-lines .streak { position: absolute; height: 2px; border-radius: 50%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); will-change: transform; animation: windStreak linear infinite; }
-        .wind-lines .streak:nth-child(odd) { height: 1.5px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
-        .wind-lines .streak:nth-child(3n) { height: 2.5px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); }
-        .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
-        @keyframes windStreak { 0% { transform: translate(0,0); opacity: 0; } 10% { opacity: 0.8; } 85% { opacity: 0.8; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
-        .gif-overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(0deg) scale(1); z-index: 10; width: 80%; height: 80%; pointer-events: none; display: flex; align-items: center; justify-content: center; transition: none; will-change: transform; }
-        .gif-overlay img { width: 100%; height: 100%; object-fit: contain; display: none; filter: drop-shadow(0 0 40px rgba(108,92,231,0.3)); transition: opacity 0.15s ease; }
-        .gif-overlay img.active { display: block; animation: flyIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-        @keyframes flyIn { 0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } }
-        .explosion-overlay { position: absolute; inset: 0; z-index: 15; display: none; align-items: center; justify-content: center; pointer-events: none; }
-        .explosion-overlay.active { display: flex; }
-        .explosion-overlay img { width: 100%; height: 100%; object-fit: contain; animation: explosionAnim 0.8s ease-out forwards; }
-        @keyframes explosionAnim { 0% { transform: scale(0.3); opacity: 0; } 30% { transform: scale(1.4); opacity: 1; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-        .countdown-overlay { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
-        .countdown-overlay.active { display: flex; }
-        .countdown-number { font-size: 100px; font-weight: 900; color: #ffffff; text-shadow: 0 0 60px rgba(108,92,231,0.5), 0 0 120px rgba(108,92,231,0.2); animation: countdownPulse 1s ease-out forwards; opacity: 0; transform: scale(0.5); }
-        @keyframes countdownPulse { 0% { opacity: 0; transform: scale(0.3); } 30% { opacity: 1; transform: scale(1.3); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
-        .moon-overlay { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: center; justify-content: center; overflow: visible; }
-        .moon-overlay.active { opacity: 1; }
-        .moon-overlay img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 0 40px rgba(255,215,0,0.15)); position: absolute; top: -30%; left: -20%; transform: translate(0,0) scale(0.8); opacity: 0.6; transition: none; will-change: transform, opacity; }
-        .history-bar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 12; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 4px 10px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.06); max-width: 92%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
-        .history-bar::-webkit-scrollbar { display: none; }
-        .history-current { font-size: 18px; font-weight: 900; padding-right: 8px; border-right: 1px solid rgba(255,255,255,0.1); min-width: 50px; text-align: center; letter-spacing: -0.5px; white-space: nowrap; }
-        .history-current .x { font-size: 12px; font-weight: 400; opacity: 0.5; }
-        .history-past { display: flex; gap: 3px; flex-wrap: nowrap; }
-        .history-item { padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; background: rgba(255,255,255,0.06); color: #888; border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s; }
-        .history-item.green { background: rgba(0,210,160,0.2); color: #00d2a0; border-color: rgba(0,210,160,0.15); }
-        .history-item.blue { background: rgba(54,160,255,0.2); color: #54a0ff; border-color: rgba(54,160,255,0.15); }
-        .history-item.purple { background: rgba(108,92,231,0.25); color: #a29bfe; border-color: rgba(108,92,231,0.15); }
-        .history-item.crashed { background: rgba(255,107,107,0.2); color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
-        .progress-wrap { position: absolute; bottom: 2px; left: 12px; right: 12px; z-index: 11; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; opacity: 0; transition: opacity 0.6s ease; }
-        .progress-wrap.active { opacity: 1; }
-        .progress-fill { height: 100%; width: 0%; border-radius: 2px; background: #00d2a0; transition: none; box-shadow: 0 0 16px rgba(0,210,160,0.2); }
-        .bet-container { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 0 0; }
-        .bet-input-row { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 4px; border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; max-height: 0; overflow: hidden; opacity: 0; padding: 0 4px; margin: 0; }
-        .bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
-        .bet-input-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 700; padding: 8px 12px; outline: none; min-width: 0; }
-        .bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .bet-input-row .bet-confirm-btn { padding: 8px 20px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; transition: all 0.2s; white-space: nowrap; }
-        .bet-input-row .bet-confirm-btn:active { transform: scale(0.92); }
-        .bet-input-row .bet-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .players-list { background: rgba(255,255,255,0.02); border-radius: 16px; padding: 8px 4px; border: 1px solid rgba(255,255,255,0.03); max-height: 120px; overflow-y: auto; margin-top: 4px; position: relative; }
-        .players-list::-webkit-scrollbar { width: 2px; }
-        .players-list::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
-        .players-list .empty { color: #555; font-size: 13px; text-align: center; padding: 6px 0; }
-        .player-item { display: flex; flex-direction: column; position: relative; padding: 4px 8px; border-radius: 12px; margin-bottom: 2px; background: rgba(255,255,255,0.02); overflow: hidden; opacity: 0; transform: translateX(-20px) scale(0.95); animation: slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; animation-delay: var(--anim-delay,0s); }
-        @keyframes slideIn { 0% { opacity: 0; transform: translateX(-20px) scale(0.95); } 100% { opacity: 1; transform: translateX(0) scale(1); } }
-        .player-item .player-main { display: flex; align-items: center; gap: 10px; width: 100%; z-index: 2; position: relative; }
-        .player-item .avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
-        .player-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .player-item .avatar .initials { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 11px; font-weight: 700; }
-        .player-item .info { flex: 1; }
-        .player-item .info .name { font-size: 13px; font-weight: 600; color: #e0e0e0; }
-        .player-item .info .name .you { color: #ffd700; font-size: 10px; font-weight: 700; margin-left: 4px; }
-        .player-item .info .bet-amount { font-size: 11px; color: #888; display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
-        .player-item .info .bet-amount .live-mult { color: #54a0ff; font-weight: 600; }
-        .player-item .status { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; text-align: center; white-space: nowrap; z-index: 2; }
-        .player-item .status.betting { color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
-        .player-item .status.cashed { color: #00d2a0; border: 1px solid rgba(0,210,160,0.2); }
-        .player-item .status.crashed { color: #ff6b6b; border: 1px solid rgba(255,107,107,0.2); }
-        .player-item .status.waiting { color: #888; border: 1px solid rgba(255,255,255,0.06); }
-        .player-progress { position: absolute; left: 0; top: 0; height: 100%; width: 0%; border-radius: 12px; opacity: 0.25; transition: width 0.1s linear, background 0.3s; pointer-events: none; z-index: 1; }
-        .player-progress.green { background: #00d2a0; }
-        .player-progress.blue { background: #54a0ff; }
-        .player-progress.red { background: #ff6b6b; }
-        .player-progress.gold { background: #ffd700; }
-        .player-cash-gif { position: absolute; inset: 0; z-index: 5; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.15); border-radius: 12px; backdrop-filter: blur(2px); }
-        .player-cash-gif.show { display: flex; }
-        .player-cash-gif img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; }
-        .main-action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0px; padding: 14px 12px 12px 12px; padding-top: 14px; border: none; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); color: white; text-align: center; width: 100%; letter-spacing: 0.3px; position: relative; overflow: hidden; min-height: 44px; line-height: 1.2; }
-        .main-action-btn:active { transform: scale(0.94); }
-        .main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
-        #mainActionText { font-size: 14px; font-weight: 700; line-height: 1.3; }
-        #mainActionSub { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.8); line-height: 1.2; min-height: 14px; }
-        .main-action-btn.place-bet { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
-        .main-action-btn.cash-out { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); }
-        .main-action-btn.waiting { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 20px rgba(0,0,0,0.3); cursor: not-allowed; }
-        .main-action-btn.confirm-bet { background: linear-gradient(135deg, #f9ca24, #f0932b); box-shadow: 0 4px 20px rgba(249,202,36,0.3); }
-        .main-action-btn.round-in-progress { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
-        .main-action-btn.bet-placed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
-        .main-action-btn.cashed-out { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
-        .main-action-btn.crashed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        /* ===== CRASH, MINES, UPGRADE, INVENTORY ===== */
+        .grid-container {
+            position: relative;
+            height: 280px;
+            background: #0a0a0c;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin: 10px 0 0 0;
+        }
+        .grid-squares {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 0;
+            background: transparent;
+            padding: 0;
+            z-index: 0;
+        }
+        .grid-square {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .grid-square.corner {
+            border-color: rgba(108, 92, 231, 0.06);
+        }
+        .wind-lines {
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            transform: rotate(-20deg);
+            transform-origin: center center;
+            will-change: transform, opacity;
+        }
+        .wind-lines.active {
+            opacity: 1;
+        }
+        .wind-lines .streak {
+            position: absolute;
+            height: 2px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            will-change: transform;
+            animation: windStreak linear infinite;
+        }
+        .wind-lines .streak:nth-child(odd) {
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        }
+        .wind-lines .streak:nth-child(3n) {
+            height: 2.5px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+        }
+        .wind-lines .streak:nth-child(5n) {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+        @keyframes windStreak {
+            0% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            85% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy));
+                opacity: 0;
+            }
+        }
+        .gif-overlay {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            z-index: 10;
+            width: 80%;
+            height: 80%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: none;
+            will-change: transform;
+        }
+        .gif-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+            filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
+            transition: opacity 0.15s ease;
+        }
+        .gif-overlay img.active {
+            display: block;
+            animation: flyIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes flyIn {
+            0% {
+                transform: scale(0.2) translateY(60px) rotate(-10deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3) translateY(-15px) rotate(5deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        .explosion-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 15;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .explosion-overlay.active {
+            display: flex;
+        }
+        .explosion-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: explosionAnim 0.8s ease-out forwards;
+        }
+        @keyframes explosionAnim {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            30% {
+                transform: scale(1.4);
+                opacity: 1;
+            }
+            60% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .countdown-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+        }
+        .countdown-overlay.active {
+            display: flex;
+        }
+        .countdown-number {
+            font-size: 100px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 60px rgba(108, 92, 231, 0.5), 0 0 120px rgba(108, 92, 231, 0.2);
+            animation: countdownPulse 1s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        @keyframes countdownPulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+        }
+        .moon-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+        .moon-overlay.active {
+            opacity: 1;
+        }
+        .moon-overlay img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.15));
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            transform: translate(0, 0) scale(0.8);
+            opacity: 0.6;
+            transition: none;
+            will-change: transform, opacity;
+        }
+        .history-bar {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            max-width: 92%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            scrollbar-width: none;
+        }
+        .history-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .history-current {
+            font-size: 18px;
+            font-weight: 900;
+            padding-right: 8px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 50px;
+            text-align: center;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+        .history-current .x {
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.5;
+        }
+        .history-past {
+            display: flex;
+            gap: 3px;
+            flex-wrap: nowrap;
+        }
+        .history-item {
+            padding: 1px 6px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.06);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+        .history-item.green {
+            background: rgba(0, 210, 160, 0.2);
+            color: #00d2a0;
+            border-color: rgba(0, 210, 160, 0.15);
+        }
+        .history-item.blue {
+            background: rgba(54, 160, 255, 0.2);
+            color: #54a0ff;
+            border-color: rgba(54, 160, 255, 0.15);
+        }
+        .history-item.purple {
+            background: rgba(108, 92, 231, 0.25);
+            color: #a29bfe;
+            border-color: rgba(108, 92, 231, 0.15);
+        }
+        .history-item.crashed {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.15);
+        }
+        .progress-wrap {
+            position: absolute;
+            bottom: 2px;
+            left: 12px;
+            right: 12px;
+            z-index: 11;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .progress-wrap.active {
+            opacity: 1;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            background: #00d2a0;
+            transition: none;
+            box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
+        }
+        .bet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 2px 0 0 0;
+        }
+        .bet-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 4px;
+            margin: 0;
+        }
+        .bet-input-row.open {
+            max-height: 60px;
+            opacity: 1;
+            padding: 4px;
+            margin: 0;
+        }
+        .bet-input-row input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 0;
+        }
+        .bet-input-row input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .bet-input-row .bet-confirm-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .bet-input-row .bet-confirm-btn:active {
+            transform: scale(0.92);
+        }
+        .bet-input-row .bet-confirm-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .players-list {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 8px 4px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 4px;
+            position: relative;
+        }
+        .players-list::-webkit-scrollbar {
+            width: 2px;
+        }
+        .players-list::-webkit-scrollbar-thumb {
+            background: #2a2a2e;
+            border-radius: 10px;
+        }
+        .players-list .empty {
+            color: #555;
+            font-size: 13px;
+            text-align: center;
+            padding: 6px 0;
+        }
+        .player-item {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-bottom: 2px;
+            background: rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateX(-20px) scale(0.95);
+            animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: var(--anim-delay, 0s);
+        }
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        .player-item .player-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            z-index: 2;
+            position: relative;
+        }
+        .player-item .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .player-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .player-item .avatar .initials {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .player-item .info {
+            flex: 1;
+        }
+        .player-item .info .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        .player-item .info .name .you {
+            color: #ffd700;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .player-item .info .bet-amount {
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-wrap: wrap;
+        }
+        .player-item .info .bet-amount .live-mult {
+            color: #54a0ff;
+            font-weight: 600;
+        }
+        .player-item .status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            text-align: center;
+            white-space: nowrap;
+            z-index: 2;
+        }
+        .player-item .status.betting {
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        .player-item .status.cashed {
+            color: #00d2a0;
+            border: 1px solid rgba(0, 210, 160, 0.2);
+        }
+        .player-item .status.crashed {
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        .player-item .status.waiting {
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .player-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            opacity: 0.25;
+            transition: width 0.1s linear, background 0.3s;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .player-progress.green {
+            background: #00d2a0;
+        }
+        .player-progress.blue {
+            background: #54a0ff;
+        }
+        .player-progress.red {
+            background: #ff6b6b;
+        }
+        .player-progress.gold {
+            background: #ffd700;
+        }
+        .player-cash-gif {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            backdrop-filter: blur(2px);
+        }
+        .player-cash-gif.show {
+            display: flex;
+        }
+        .player-cash-gif img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .main-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0px;
+            padding: 14px 12px 12px 12px;
+            padding-top: 14px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: white;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            line-height: 1.2;
+        }
+        .main-action-btn:active {
+            transform: scale(0.94);
+        }
+        .main-action-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        #mainActionText {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        #mainActionSub {
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.2;
+            min-height: 14px;
+        }
+        .main-action-btn.place-bet {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+        }
+        .main-action-btn.cash-out {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .main-action-btn.waiting {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+        .main-action-btn.confirm-bet {
+            background: linear-gradient(135deg, #f9ca24, #f0932b);
+            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+        .main-action-btn.round-in-progress {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .main-action-btn.bet-placed {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .main-action-btn.cashed-out {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .main-action-btn.crashed {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
 
         /* MINES */
-        .mines-header { background: rgba(255,255,255,0.02); border-radius: 20px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.04); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .mines-header .multiplier { font-size: 24px; font-weight: 900; color: #00d2a0; letter-spacing: -0.5px; }
-        .mines-header .multiplier .x { font-size: 16px; font-weight: 400; opacity: 0.5; margin-left: 2px; }
-        .grid-presets { display: flex; gap: 4px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
-        .grid-presets button { padding: 3px 10px; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; background: rgba(255,255,255,0.02); color: #888; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-        .grid-presets button.active { background: rgba(108,92,231,0.15); border-color: rgba(108,92,231,0.2); color: #fff; }
-        .grid-presets button.coming-soon { opacity: 0.5; cursor: default; }
-        .mines-grid-wrapper { position: relative; margin: 8px 0 12px 0; }
-        .mines-grid { display: grid; gap: 8px; justify-content: center; margin: 0 auto; }
-        .mines-grid .tile-wrapper { position: relative; aspect-ratio: 1/1; border-radius: 24px; cursor: pointer; perspective: 800px; }
-        .mines-grid .tile-wrapper .shadow { position: absolute; inset: 5px 0 0 5px; border-radius: 24px; background: #060608; opacity: 0.6; z-index: 0; transition: all 0.3s; }
-        .mines-grid .tile-wrapper .tile { position: relative; z-index: 1; width: 100%; height: 100%; background: #141418; border-radius: 24px; display: flex; align-items: center; justify-content: center; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 2px 0 rgba(255,255,255,0.04), 0 4px 16px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.04); color: #fff; opacity: 0; transform: scale(0.7) rotateX(20deg) translateY(10px); pointer-events: none; font-weight: 700; user-select: none; }
-        .mines-grid .tile-wrapper .tile.show { opacity: 1; transform: scale(1) rotateX(0deg) translateY(0); pointer-events: auto; }
-        .mines-grid .tile-wrapper:active .tile { transform: scale(0.94); }
-        .mines-grid .tile-wrapper .tile .symbol { font-size: 28px; line-height: 1; opacity: 0; transform: scale(0.3) rotate(-30deg); transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); display: flex; align-items: center; justify-content: center; }
-        .mines-grid .tile-wrapper .tile.revealed .symbol { opacity: 1; transform: scale(1) rotate(0deg); }
-        .mines-grid .tile-wrapper .tile.revealed { transform: scale(0.97); border-color: transparent; }
-        .mines-grid .tile-wrapper .tile.revealed.safe { background: #0d2018; border-color: rgba(0,210,160,0.12); box-shadow: 0 0 30px rgba(0,210,160,0.06); }
-        .mines-grid .tile-wrapper .tile.revealed.safe .symbol { color: #00d2a0; }
-        .mines-grid .tile-wrapper .tile.revealed.mine { background: #201010; border-color: rgba(255,80,80,0.12); box-shadow: 0 0 30px rgba(255,80,80,0.06); }
-        .mines-grid .tile-wrapper .tile.revealed.mine .symbol { color: #ff6b6b; }
-        .mines-message { text-align: center; padding: 12px; border-radius: 16px; font-size: 14px; font-weight: 500; min-height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); margin-bottom: 10px; color: #888; }
-        .mines-message.success { color: #00d2a0; border-color: rgba(0,210,160,0.1); }
-        .mines-message.danger { color: #ff6b6b; border-color: rgba(255,107,107,0.1); }
-        .mines-message.gold { color: #ffd700; border-color: rgba(255,215,0,0.1); }
-        .mines-bet-container { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-        .mines-bet-input-row { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 4px; border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; max-height: 0; overflow: hidden; opacity: 0; padding: 0 4px; margin: 0; }
-        .mines-bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
-        .mines-bet-input-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 700; padding: 8px 12px; outline: none; min-width: 0; }
-        .mines-bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .mines-bet-input-row .mines-bet-confirm-btn { padding: 8px 20px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; transition: all 0.2s; white-space: nowrap; }
-        .mines-bet-input-row .mines-bet-confirm-btn:active { transform: scale(0.92); }
-        .mines-main-action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0px; padding: 10px 12px 10px 12px; padding-top: 6px; border: none; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); color: white; text-align: center; width: 100%; letter-spacing: 0.3px; position: relative; overflow: hidden; min-height: 44px; line-height: 1.2; }
-        .mines-main-action-btn:active { transform: scale(0.94); }
-        .mines-main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
-        .mines-main-action-btn .sub-text { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.8); line-height: 1.2; min-height: 14px; }
-        .mines-main-action-btn.place-bet { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
-        .mines-main-action-btn.cash-out { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); }
-        .mines-main-action-btn.waiting { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 20px rgba(0,0,0,0.3); cursor: not-allowed; }
-        .mines-main-action-btn.confirm-bet { background: linear-gradient(135deg, #f9ca24, #f0932b); box-shadow: 0 4px 20px rgba(249,202,36,0.3); }
-        .mines-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 6px; margin-bottom: 4px; }
-        .mines-controls .control-group { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.02); padding: 4px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.04); }
-        .mines-controls .control-group .label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
-        .mines-controls .control-group button { width: 24px; height: 24px; border: none; border-radius: 6px; background: rgba(255,255,255,0.04); color: #fff; font-size: 14px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
-        .mines-controls .control-group button:active { background: rgba(255,255,255,0.1); transform: scale(0.92); }
-        .mines-controls .control-group .val { font-size: 15px; font-weight: 700; min-width: 22px; text-align: center; color: #fff; }
-        .mines-history { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-        .mines-history .h-item { padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); color: #888; }
-        .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
-        .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
+        .mines-header {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mines-header .multiplier {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00d2a0;
+            letter-spacing: -0.5px;
+        }
+        .mines-header .multiplier .x {
+            font-size: 16px;
+            font-weight: 400;
+            opacity: 0.5;
+            margin-left: 2px;
+        }
+        .grid-presets {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .grid-presets button {
+            padding: 3px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #888;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .grid-presets button.active {
+            background: rgba(108, 92, 231, 0.15);
+            border-color: rgba(108, 92, 231, 0.2);
+            color: #fff;
+        }
+        .grid-presets button.coming-soon {
+            opacity: 0.5;
+            cursor: default;
+        }
+        .mines-grid-wrapper {
+            position: relative;
+            margin: 8px 0 12px 0;
+        }
+        .mines-grid {
+            display: grid;
+            gap: 8px;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .mines-grid .tile-wrapper {
+            position: relative;
+            aspect-ratio: 1/1;
+            border-radius: 24px;
+            cursor: pointer;
+            perspective: 800px;
+        }
+        .mines-grid .tile-wrapper .shadow {
+            position: absolute;
+            inset: 5px 0 0 5px;
+            border-radius: 24px;
+            background: #060608;
+            opacity: 0.6;
+            z-index: 0;
+            transition: all 0.3s;
+        }
+        .mines-grid .tile-wrapper .tile {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            background: #141418;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #fff;
+            opacity: 0;
+            transform: scale(0.7) rotateX(20deg) translateY(10px);
+            pointer-events: none;
+            font-weight: 700;
+            user-select: none;
+        }
+        .mines-grid .tile-wrapper .tile.show {
+            opacity: 1;
+            transform: scale(1) rotateX(0deg) translateY(0);
+            pointer-events: auto;
+        }
+        .mines-grid .tile-wrapper:active .tile {
+            transform: scale(0.94);
+        }
+        .mines-grid .tile-wrapper .tile .symbol {
+            font-size: 28px;
+            line-height: 1;
+            opacity: 0;
+            transform: scale(0.3) rotate(-30deg);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mines-grid .tile-wrapper .tile.revealed .symbol {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+        .mines-grid .tile-wrapper .tile.revealed {
+            transform: scale(0.97);
+            border-color: transparent;
+        }
+        .mines-grid .tile-wrapper .tile.revealed.safe {
+            background: #0d2018;
+            border-color: rgba(0, 210, 160, 0.12);
+            box-shadow: 0 0 30px rgba(0, 210, 160, 0.06);
+        }
+        .mines-grid .tile-wrapper .tile.revealed.safe .symbol {
+            color: #00d2a0;
+        }
+        .mines-grid .tile-wrapper .tile.revealed.mine {
+            background: #201010;
+            border-color: rgba(255, 80, 80, 0.12);
+            box-shadow: 0 0 30px rgba(255, 80, 80, 0.06);
+        }
+        .mines-grid .tile-wrapper .tile.revealed.mine .symbol {
+            color: #ff6b6b;
+        }
+        .mines-message {
+            text-align: center;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 10px;
+            color: #888;
+        }
+        .mines-message.success {
+            color: #00d2a0;
+            border-color: rgba(0, 210, 160, 0.1);
+        }
+        .mines-message.danger {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.1);
+        }
+        .mines-message.gold {
+            color: #ffd700;
+            border-color: rgba(255, 215, 0, 0.1);
+        }
+        .mines-bet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .mines-bet-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 4px;
+            margin: 0;
+        }
+        .mines-bet-input-row.open {
+            max-height: 60px;
+            opacity: 1;
+            padding: 4px;
+            margin: 0;
+        }
+        .mines-bet-input-row input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 0;
+        }
+        .mines-bet-input-row input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .mines-bet-input-row .mines-bet-confirm-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .mines-bet-input-row .mines-bet-confirm-btn:active {
+            transform: scale(0.92);
+        }
+        .mines-main-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0px;
+            padding: 10px 12px 10px 12px;
+            padding-top: 6px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: white;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            line-height: 1.2;
+        }
+        .mines-main-action-btn:active {
+            transform: scale(0.94);
+        }
+        .mines-main-action-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: none;
+        }
+        .mines-main-action-btn .sub-text {
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.2;
+            min-height: 14px;
+        }
+        .mines-main-action-btn.place-bet {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+        }
+        .mines-main-action-btn.cash-out {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .mines-main-action-btn.waiting {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+        .mines-main-action-btn.confirm-bet {
+            background: linear-gradient(135deg, #f9ca24, #f0932b);
+            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+        .mines-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 6px;
+            margin-bottom: 4px;
+        }
+        .mines-controls .control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4px 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .mines-controls .control-group .label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+        .mines-controls .control-group button {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mines-controls .control-group button:active {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(0.92);
+        }
+        .mines-controls .control-group .val {
+            font-size: 15px;
+            font-weight: 700;
+            min-width: 22px;
+            text-align: center;
+            color: #fff;
+        }
+        .mines-history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .mines-history .h-item {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #888;
+        }
+        .mines-history .h-item.win {
+            color: #00d2a0;
+            border-color: rgba(0, 210, 160, 0.15);
+        }
+        .mines-history .h-item.loss {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.15);
+        }
 
         /* UPGRADE */
-        .upgrade-wheel-container { position: relative; width: 280px; height: 280px; margin: 16px auto; transition: filter 0.3s; }
-        #upgradeWheel { display: block; margin: 0 auto; border-radius: 50%; }
-        .wheel-center-nft { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; object-fit: contain; border-radius: 12px; display: none; z-index: 5; pointer-events: none; }
-        .upgrade-selectors { display: flex; flex-direction: row; gap: 12px; margin-bottom: 16px; }
-        .upgrade-select { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; min-width: 0; }
-        .upgrade-select:active { background: rgba(255,255,255,0.05); }
-        .upgrade-select .nft-square { width: 60px; height: 60px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
-        .upgrade-select .nft-square img { width: 100%; height: 100%; object-fit: contain; }
-        .upgrade-select .nft-square .placeholder { color: #555; font-size: 10px; }
-        .upgrade-select .info { text-align: center; }
-        .upgrade-select .info .name { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-        .upgrade-select .info .price { color: #ffd700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 2px; }
-        .btn-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); margin: 12px auto 0 auto; padding: 18px 40px; font-size: 20px; border-radius: 20px; width: fit-content; display: flex; align-items: center; gap: 8px; }
-        .btn-upgrade:disabled { opacity: 0.5; }
-        .btn-upgrade .arrow-icon { font-size: 22px; }
+        .upgrade-wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 16px auto;
+            transition: filter 0.3s;
+        }
+        #upgradeWheel {
+            display: block;
+            margin: 0 auto;
+            border-radius: 50%;
+        }
+        .wheel-center-nft {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 12px;
+            display: none;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .upgrade-selectors {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .upgrade-select {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 0;
+        }
+        .upgrade-select:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .upgrade-select .nft-square {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upgrade-select .nft-square img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .upgrade-select .nft-square .placeholder {
+            color: #555;
+            font-size: 10px;
+        }
+        .upgrade-select .info {
+            text-align: center;
+        }
+        .upgrade-select .info .name {
+            font-weight: 600;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .upgrade-select .info .price {
+            color: #ffd700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+        .btn-upgrade {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+            margin: 12px auto 0 auto;
+            padding: 18px 40px;
+            font-size: 20px;
+            border-radius: 20px;
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-upgrade:disabled {
+            opacity: 0.5;
+        }
+        .btn-upgrade .arrow-icon {
+            font-size: 22px;
+        }
 
-        .nft-selection-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .nft-selection-overlay.active { display: flex; }
-        .nft-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 340px; width: 100%; }
-        .nft-selection-item { background: rgba(255,255,255,0.04); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.06); }
-        .nft-selection-item:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
-        .nft-selection-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; }
-        .nft-selection-item .name { font-weight: 600; font-size: 14px; }
-        .nft-selection-close { margin-top: 20px; color: #888; font-size: 14px; cursor: pointer; padding: 8px 20px; background: rgba(255,255,255,0.06); border-radius: 20px; }
+        .nft-selection-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .nft-selection-overlay.active {
+            display: flex;
+        }
+        .nft-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 340px;
+            width: 100%;
+        }
+        .nft-selection-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .nft-selection-item:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .nft-selection-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .nft-selection-item .name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .nft-selection-close {
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+        }
 
-        .win-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .win-popup.active { display: flex; }
-        .win-popup .win-card { background: rgba(30,30,30,0.95); border-radius: 24px; padding: 30px 24px; max-width: 320px; width: 100%; border: 1px solid rgba(255,215,0,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
-        .win-popup .money-gif { width: 140px; height: 140px; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
-        .win-popup .nft-img { width: 90px; height: 90px; object-fit: contain; border-radius: 16px; margin-bottom: 8px; }
-        .win-popup .win-title { font-size: 24px; font-weight: 800; color: #ffd700; margin-bottom: 4px; }
-        .win-popup .win-subtitle { font-size: 16px; color: #ccc; }
-        .win-popup button { margin-top: 16px; padding: 12px 32px; border: none; border-radius: 20px; background: linear-gradient(135deg, #00b894, #00d2a0); color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .win-popup button:active { transform: scale(0.94); }
+        .win-popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        .win-popup.active {
+            display: flex;
+        }
+        .win-popup .win-card {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 24px;
+            padding: 30px 24px;
+            max-width: 320px;
+            width: 100%;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+        .win-popup .money-gif {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+        }
+        .win-popup .nft-img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 16px;
+            margin-bottom: 8px;
+        }
+        .win-popup .win-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 4px;
+        }
+        .win-popup .win-subtitle {
+            font-size: 16px;
+            color: #ccc;
+        }
+        .win-popup button {
+            margin-top: 16px;
+            padding: 12px 32px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .win-popup button:active {
+            transform: scale(0.94);
+        }
 
-        .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .inventory-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; text-align: center; }
-        .inventory-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; }
-        .inventory-item .name { font-weight: 600; }
-        .inventory-item .actions { display: flex; gap: 6px; margin-top: 8px; }
-        .inventory-item .actions button { flex: 1; padding: 6px 8px; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-        .inventory-item .actions button:active { transform: scale(0.94); }
-        .btn-sell { background: rgba(255,107,107,0.2); color: #ff6b6b; }
-        .btn-inventory-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); color: white; }
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+        .inventory-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .inventory-item .name {
+            font-weight: 600;
+        }
+        .inventory-item .actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .inventory-item .actions button {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .inventory-item .actions button:active {
+            transform: scale(0.94);
+        }
+        .btn-sell {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .btn-inventory-upgrade {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            color: white;
+        }
 
         @media (max-width: 420px) {
-            .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
-            .mines-grid { gap: 6px; }
-            .mines-header .multiplier { font-size: 20px; }
-            .grid-presets button { font-size: 9px; padding: 2px 7px; }
-            .mines-grid .tile-wrapper { border-radius: 18px; }
-            .mines-grid .tile-wrapper .tile { border-radius: 18px; }
-            .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
-            .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
-            .badge .balance-icon { width: 26px; height: 26px; margin-top: 1px; }
-            .star-icon-sm { width: 16px; height: 16px; }
-            .star-icon-xs { width: 14px; height: 14px; }
-            .main-action-btn { padding-top: 12px; padding-bottom: 10px; }
-            .moon-overlay img { width: 80px; height: 80px; }
-            .quick-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            #bounceBallImg { width: 32px; height: 32px; }
+            .mines-grid .tile-wrapper .tile .symbol {
+                font-size: 22px;
+            }
+            .mines-grid {
+                gap: 6px;
+            }
+            .mines-header .multiplier {
+                font-size: 20px;
+            }
+            .grid-presets button {
+                font-size: 9px;
+                padding: 2px 7px;
+            }
+            .mines-grid .tile-wrapper {
+                border-radius: 18px;
+            }
+            .mines-grid .tile-wrapper .tile {
+                border-radius: 18px;
+            }
+            .mines-grid .tile-wrapper .shadow {
+                border-radius: 18px;
+                inset: 4px 0 0 4px;
+            }
+            .balance-icon {
+                width: 30px;
+                height: 30px;
+                margin-top: 5px;
+            }
+            .badge .balance-icon {
+                width: 26px;
+                height: 26px;
+                margin-top: 1px;
+            }
+            .star-icon-sm {
+                width: 16px;
+                height: 16px;
+            }
+            .star-icon-xs {
+                width: 14px;
+                height: 14px;
+            }
+            .main-action-btn {
+                padding-top: 12px;
+                padding-bottom: 10px;
+            }
+            .moon-overlay img {
+                width: 80px;
+                height: 80px;
+            }
+            .quick-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            #bounceBallImg {
+                width: 32px;
+                height: 32px;
+            }
+            #loadingScreen .main-gif {
+                max-width: 180px;
+            }
+            #loadingScreen .title {
+                font-size: 30px;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- ===== LOADING SCREEN – pure, no box ===== -->
+    <div id="loadingScreen">
+        <div class="title">Dll_Lud</div>
+        <img class="main-gif" src="https://images.iimg.live/images/stellar-masterpiece-3002.webp" alt="Loading" id="loadingGif">
+        <img class="spinner-gif" src="https://images.iimg.live/images/excellent-art-9247.webp" alt="Loading circle" id="loadingSpinner">
+        <div class="loading-text">Loading Casino...</div>
+    </div>
 
     <div id="app">
         <!-- NOTIFICATION -->
@@ -661,12 +2311,77 @@
 
     <script>
         // ============================================================
-        // CAR & ROCKET GIFS
+        // GIF PRELOADER – CACHE ALL GIFS FOR INSTANT PLAYBACK
+        // ============================================================
+        const GIF_CACHE = {};
+
+        function preloadGif(url) {
+            return new Promise((resolve) => {
+                if (GIF_CACHE[url]) { resolve(GIF_CACHE[url]); return; }
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => { GIF_CACHE[url] = img;
+                    resolve(img); };
+                img.onerror = () => { GIF_CACHE[url] = null;
+                    resolve(null); };
+                img.src = url;
+            });
+        }
+
+        // All GIFs used in the app – add the new loading circle too
+        const ALL_GIF_URLS = [
+            // Loading screen
+            'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
+            'https://images.iimg.live/images/excellent-art-9247.webp',
+            // Star / balance icon
+            'https://images.iimg.live/images/radiant-capture-7834.webp',
+            // Bounce
+            'https://images.iimg.live/images/stellar-work-2795.webp',
+            'https://images.iimg.live/images/stellar-collection-3896.webp',
+            // Crash - cars
+            'https://images.iimg.live/images/cool-gallery-5268.webp',
+            'https://images.iimg.live/images/fantastic-image-2034.webp',
+            // Crash - rockets
+            'https://images.iimg.live/images/radiant-picture-4066.webp',
+            'https://images.iimg.live/images/glorious-portfolio-1947.webp',
+            'https://images.iimg.live/images/wonderful-work-4770.webp',
+            'https://images.iimg.live/images/ultimate-photography-1463.webp',
+            'https://images.iimg.live/images/radiant-masterpiece-3049.webp',
+            // Crash - moon & explosion
+            'https://images.iimg.live/images/ultimate-collection-3580.webp',
+            'https://images.iimg.live/images/excellent-photo-4696.webp',
+            // Money GIFs
+            'https://images.iimg.live/images/radiant-shot-1354.webp',
+            'https://images.iimg.live/images/brilliant-snapshot-1531.webp',
+            'https://images.iimg.live/images/fantastic-vision-3450.webp',
+            'https://images.iimg.live/images/cool-picture-8835.webp',
+            'https://images.iimg.live/images/excellent-snapshot-7013.webp',
+            // NFT GIFs
+            'https://images.iimg.live/images/perfect-art-8369.webp',
+            'https://images.iimg.live/images/wonderful-moment-9250.webp',
+            'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
+            'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
+            'https://images.iimg.live/images/majestic-memory-3550.webp',
+            // Misc
+            'https://images.iimg.live/images/excellent-photo-9680.webp',
+            'https://images.iimg.live/images/vibrant-memory-9307.webp',
+            'https://images.iimg.live/images/vibrant-scene-3805.webp',
+            'https://images.iimg.live/images/glorious-memory-8181.webp'
+        ];
+
+        async function preloadAllGifs() {
+            const promises = ALL_GIF_URLS.map(url => preloadGif(url));
+            await Promise.all(promises);
+        }
+
+        // ============================================================
+        // CAR & ROCKET GIFS (use cached)
         // ============================================================
         const CAR_GIFS = [
             'https://images.iimg.live/images/cool-gallery-5268.webp',
             'https://images.iimg.live/images/fantastic-image-2034.webp'
         ];
+
         function getRandomCarGif() { return CAR_GIFS[Math.floor(Math.random() * CAR_GIFS.length)]; }
 
         const ROCKET_GIFS = [
@@ -676,6 +2391,7 @@
             'https://images.iimg.live/images/ultimate-photography-1463.webp',
             'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
         ];
+
         function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
 
         const MONEY_GIFS = [
@@ -685,18 +2401,21 @@
             'https://images.iimg.live/images/cool-picture-8835.webp',
             'https://images.iimg.live/images/excellent-snapshot-7013.webp'
         ];
+
         function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
         // ============================================================
         // AUDIO (simple beeps)
         // ============================================================
         let audioCtx = null;
+
         function getAudioCtx() {
             if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             }
             return audioCtx;
         }
+
         function playBeep(freq = 800, duration = 0.08, volume = 0.3) {
             try {
                 const ctx = getAudioCtx();
@@ -823,7 +2542,7 @@
         }
 
         // ============================================================
-        // RENDER PLAYERS (Crash) - unchanged
+        // RENDER PLAYERS (Crash)
         // ============================================================
         function renderPlayers() {
             const activePlayers = players.filter(p => p.bet > 0);
@@ -974,14 +2693,17 @@
         function navigateTo(page) {
             Object.keys(pages).forEach(key => { pages[key].classList.toggle('active', key === page); });
             navItems.forEach(item => { item.classList.toggle('active', item.dataset.page === page); });
-            if (page === 'rocket') { crashGame.startGameCycle(); renderPlayers(); }
+            if (page === 'rocket') { crashGame.startGameCycle();
+                renderPlayers(); }
             if (page === 'profile') { updateProfile(); }
             if (page === 'upgrade') {
-                document.getElementById('upgradeBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('upgradeBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 updateUpgradeSelectors();
             }
             if (page === 'inventory') {
-                document.getElementById('inventoryBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('inventoryBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 renderInventory();
             }
             if (page === 'bounce') {
@@ -1032,7 +2754,8 @@
 
         function updateHomeUI() {
             homeUsername.textContent = state.displayName;
-            homeBalance.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+            homeBalance.innerHTML =
+                `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
             if (state.recentWinners.length === 0) {
                 recentWinnersEl.textContent = 'No wins yet';
                 recentWinnersEl.style.color = '#555';
@@ -1044,18 +2767,22 @@
             }
             updateAvatars();
             if (document.getElementById('page-upgrade')?.classList.contains('active')) {
-                document.getElementById('upgradeBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('upgradeBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
             }
             if (document.getElementById('page-inventory')?.classList.contains('active')) {
-                document.getElementById('inventoryBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('inventoryBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
             }
             if (document.getElementById('page-bounce')?.classList.contains('active')) {
-                document.getElementById('bounceBalance').innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('bounceBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
             }
         }
 
         function updateProfile() {
-            profileBalance.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:34px;height:34px;margin-top:4px;" alt="⭐"> ${state.balance.toLocaleString()}`;
+            profileBalance.innerHTML =
+                `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" style="width:34px;height:34px;margin-top:4px;" alt="⭐"> ${state.balance.toLocaleString()}`;
             profileGames.textContent = state.totalGames;
             profileWins.textContent = state.wins;
             profileBest.textContent = `${state.bestMultiplier.toFixed(2)}x`;
@@ -1083,7 +2810,8 @@
         }
 
         function triggerCashOutVibration() {
-            try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } } catch (e) {}
+            try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } } catch (
+            e) {}
             try { if (navigator.vibrate) navigator.vibrate(50); } catch (e) {}
         }
 
@@ -1093,7 +2821,8 @@
             const delays = [0, 120, 240, 380];
             for (let i = 0; i < 4; i++) {
                 setTimeout(() => {
-                    try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred(types[i]); } } catch (e) {}
+                    try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred(types[
+                            i]); } } catch (e) {}
                     try { if (navigator.vibrate) navigator.vibrate(durations[i]); } catch (e) {}
                 }, delays[i]);
             }
@@ -1127,7 +2856,7 @@
         // REWARD LOGIC
         // ============================================================
         function processGameWin(win) {
-            const sortedNfts = Object.values(NFT_DB).sort((a,b) => b.price - a.price);
+            const sortedNfts = Object.values(NFT_DB).sort((a, b) => b.price - a.price);
             let awardedNft = null;
             for (const nft of sortedNfts) {
                 if (win >= nft.price) {
@@ -1158,7 +2887,7 @@
         }
 
         // ============================================================
-        // CRASH GAME (unchanged)
+        // CRASH GAME
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -1210,10 +2939,9 @@
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
-                if (mult > this.windStart && mult < 2.83) { phase = 0; }
-                else if (mult >= 2.83 && mult < 2.9) { phase = 1; }
-                else if (mult >= 2.9 && mult < this.windReappear) { phase = 2; }
-                else if (mult >= this.windReappear) { phase = 3; }
+                if (mult > this.windStart && mult < 2.83) { phase = 0; } else if (mult >= 2.83 && mult < 2.9) { phase =
+                    1; } else if (mult >= 2.9 && mult < this.windReappear) { phase = 2; } else if (mult >= this
+                    .windReappear) { phase = 3; }
                 this.windPhase = phase;
 
                 if (mult > this.windStart && this.isPlaying && phase !== 2) {
@@ -1253,23 +2981,23 @@
             updateMoon(mult) {
                 const moonOverlay = document.getElementById('moonOverlay');
                 const moonImg = document.getElementById('moonGif');
-                
+
                 if (mult >= 5.0 && this.isPlaying && !this.gameOver) {
                     this.moonActive = true;
                     moonOverlay.classList.add('active');
                     moonImg.style.display = 'block';
-                    
+
                     const progress = Math.min(1, (mult - 5.0) / 4.0);
                     const opacity = Math.min(0.65, 0.35 + (mult - 5.0) * 0.12);
                     const x = -20 + progress * 140;
                     const y = -30 + progress * 160;
                     const scale = 0.7 + progress * 0.5;
-                    
+
                     moonImg.style.opacity = opacity;
                     moonImg.style.left = x + '%';
                     moonImg.style.top = y + '%';
                     moonImg.style.transform = `translate(-50%, -50%) scale(${scale})`;
-                    
+
                     if (progress >= 1.0) {
                         const fadeOut = Math.min(1, (mult - 9.0) / 2.0);
                         moonImg.style.opacity = opacity * (1 - fadeOut);
@@ -1285,7 +3013,12 @@
                 const img = document.getElementById('crashGif');
                 img.style.transition = 'none';
                 this.currentCarGif = getRandomCarGif();
-                img.src = this.currentCarGif;
+                const cached = GIF_CACHE[this.currentCarGif];
+                if (cached) {
+                    img.src = cached.src;
+                } else {
+                    img.src = this.currentCarGif;
+                }
                 img.style.display = 'block';
                 img.style.opacity = 1;
                 img.classList.add('active');
@@ -1297,7 +3030,12 @@
                 const img = document.getElementById('crashGif');
                 img.style.transition = 'none';
                 this.currentRocketGif = getRandomRocketGif();
-                img.src = this.currentRocketGif;
+                const cached = GIF_CACHE[this.currentRocketGif];
+                if (cached) {
+                    img.src = cached.src;
+                } else {
+                    img.src = this.currentRocketGif;
+                }
                 img.style.display = 'block';
                 img.style.opacity = 1;
                 img.classList.add('active');
@@ -1309,20 +3047,25 @@
                 if (this.transitioning || !this.isCarPhase) return;
                 this.transitioning = true;
                 const img = document.getElementById('crashGif');
-                
+
                 img.style.transition = 'opacity 0.15s ease';
                 img.style.opacity = 0;
-                
+
                 setTimeout(() => {
                     img.classList.remove('active');
                     img.src = '';
                     img.style.display = 'none';
-                    
+
                     setTimeout(() => {
                         this.currentRocketGif = getRandomRocketGif();
                         img.style.display = 'block';
-                        img.src = this.currentRocketGif;
-                        
+                        const cached = GIF_CACHE[this.currentRocketGif];
+                        if (cached) {
+                            img.src = cached.src;
+                        } else {
+                            img.src = this.currentRocketGif;
+                        }
+
                         const onLoad = () => {
                             img.onload = null;
                             img.style.transition = 'opacity 0.15s ease';
@@ -1359,7 +3102,8 @@
             updateRotationAndZoom() {
                 const effectiveMult = Math.min(this.multiplier, 3.0);
                 this.targetAngle = 12 - (effectiveMult - 1) * 24;
-                const stiffness = 8.0, damping = 4.0;
+                const stiffness = 8.0,
+                    damping = 4.0;
                 const springForce = (this.targetAngle - this.currentAngle) * stiffness;
                 const dampingForce = -this.velocity * damping;
                 const acceleration = springForce + dampingForce;
@@ -1373,7 +3117,8 @@
                     const zoomProgress = Math.min(1, (mult - 5.0) / 5.0);
                     this.targetScale = 1.0 - zoomProgress * 0.3;
                 } else { this.targetScale = 1.0; }
-                const scaleStiffness = 6.0, scaleDamping = 3.5;
+                const scaleStiffness = 6.0,
+                    scaleDamping = 3.5;
                 const scaleForce = (this.targetScale - this.currentScale) * scaleStiffness;
                 const scaleDampForce = -this.scaleVelocity * scaleDamping;
                 const scaleAccel = scaleForce + scaleDampForce;
@@ -1382,7 +3127,8 @@
                 this.currentScale = Math.max(0.5, Math.min(1.2, this.currentScale));
 
                 const overlay = document.getElementById('rocketOverlay');
-                overlay.style.transform = `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
+                overlay.style.transform =
+                `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
             },
 
             updateProgressLine() {
@@ -1422,7 +3168,8 @@
             },
 
             stopContinuousVibration() {
-                if (this.vibrationInterval) { clearInterval(this.vibrationInterval); this.vibrationInterval = null; }
+                if (this.vibrationInterval) { clearInterval(this.vibrationInterval);
+                    this.vibrationInterval = null; }
             },
 
             init() {
@@ -1441,12 +3188,14 @@
 
             createGrid() {
                 const container = document.getElementById('gridSquares');
-                const rows = 6, cols = 8;
+                const rows = 6,
+                    cols = 8;
                 container.innerHTML = '';
                 for (let i = 0; i < rows * cols; i++) {
                     const square = document.createElement('div');
                     square.className = 'grid-square';
-                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) square.classList.add('corner');
+                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) square.classList.add(
+                        'corner');
                     container.appendChild(square);
                 }
             },
@@ -1806,7 +3555,8 @@
                     this.updateUI();
                     this.updateMainButton();
                     updateHomeUI();
-                    if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
+                    if (this.animationId) { cancelAnimationFrame(this.animationId);
+                        this.animationId = null; }
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
                     setTimeout(() => {
@@ -1849,11 +3599,12 @@
                 }
             },
 
-            addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop(); this.renderHistory(); }
+            addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop();
+                this.renderHistory(); }
         };
 
         // ============================================================
-        // MINES GAME (unchanged)
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -1943,7 +3694,8 @@
                 const minesToPlace = Math.min(this.minesCount, total - 1);
                 while (placed < minesToPlace) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
+                    if (this.board[idx] === 0) { this.board[idx] = 1;
+                        placed++; }
                 }
                 this.safeCount = total - minesToPlace;
                 this.revealedSafe = 0;
@@ -2226,7 +3978,8 @@
                 const mines = Math.min(this.minesCount, total - 1);
                 while (placed < mines) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
+                    if (this.board[idx] === 0) { this.board[idx] = 1;
+                        placed++; }
                 }
                 this.safeCount = total - mines;
                 this.revealed = new Array(total).fill(false);
@@ -2343,13 +4096,14 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL (unchanged)
+        // UPGRADE SELECTION & WHEEL
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
+
         function getAudioContext() {
             if (!audioCtx2) {
-                audioCtx2 = new (window.AudioContext || window.webkitAudioContext)();
+                audioCtx2 = new(window.AudioContext || window.webkitAudioContext)();
             }
             return audioCtx2;
         }
@@ -2461,13 +4215,13 @@
             fromNftId: null,
             toNftId: null,
             spinning: false,
-            arrowAngle: -Math.PI/2,
+            arrowAngle: -Math.PI / 2,
             canvas: document.getElementById('upgradeWheel'),
             ctx: null,
             chance: 1.0,
             targetChance: 1.0,
             chanceAnimationId: null,
-            lastTickAngle: -Math.PI/2,
+            lastTickAngle: -Math.PI / 2,
             tickThreshold: 30 * Math.PI / 180,
 
             init() {
@@ -2479,20 +4233,21 @@
                 const ctx = this.ctx;
                 const w = this.canvas.width;
                 const h = this.canvas.height;
-                const cx = w/2, cy = h/2;
+                const cx = w / 2,
+                    cy = h / 2;
                 const outerR = 105;
                 const innerR = 50;
 
                 ctx.clearRect(0, 0, w, h);
 
                 const greenAngle = this.chance * 2 * Math.PI;
-                const startAngle = -Math.PI/2;
+                const startAngle = -Math.PI / 2;
 
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
                 ctx.closePath();
-                const greenGrad = ctx.createLinearGradient(cx, cy-outerR, cx, cy+outerR);
+                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                 greenGrad.addColorStop(0, '#00e676');
                 greenGrad.addColorStop(1, '#009624');
                 ctx.fillStyle = greenGrad;
@@ -2500,10 +4255,10 @@
 
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
-                    ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2*Math.PI);
-                    ctx.arc(cx, cy, innerR, startAngle + 2*Math.PI, startAngle + greenAngle, true);
+                    ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
+                    ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
                     ctx.closePath();
-                    const redGrad = ctx.createLinearGradient(cx, cy-outerR, cx, cy+outerR);
+                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                     redGrad.addColorStop(0, '#ff5252');
                     redGrad.addColorStop(1, '#b71c1c');
                     ctx.fillStyle = redGrad;
@@ -2511,7 +4266,7 @@
                 }
 
                 ctx.beginPath();
-                ctx.arc(cx, cy, outerR, 0, 2*Math.PI);
+                ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.05)';
                 ctx.lineWidth = 0.1;
                 ctx.stroke();
@@ -2579,7 +4334,8 @@
                 } else {
                     finalAngleOnWheel = this.chance * 2 * Math.PI + Math.random() * (1 - this.chance) * 2 * Math.PI;
                 }
-                const targetArrowAngle = -Math.PI/2 + finalAngleOnWheel + 2*Math.PI * (6 + Math.floor(Math.random()*4));
+                const targetArrowAngle = -Math.PI / 2 + finalAngleOnWheel + 2 * Math.PI * (6 + Math.floor(Math.random() *
+                4));
 
                 const startTime = performance.now();
                 const animateSpin = (now) => {
@@ -2591,7 +4347,8 @@
 
                     const angleDiff = Math.abs(this.arrowAngle - this.lastTickAngle);
                     if (angleDiff >= this.tickThreshold) {
-                        const speed = Math.abs(targetArrowAngle - startAngle) * (eased < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 - t)) / duration;
+                        const speed = Math.abs(targetArrowAngle - startAngle) * (eased < 0.5 ? 12 * t * t : 6 * (1 - t) *
+                            (1 - t)) / duration;
                         const freq = 400 + speed * 100;
                         const vol = Math.min(0.4, 0.1 + speed * 0.005);
                         playTick(vol, freq);
@@ -2602,8 +4359,8 @@
                         requestAnimationFrame(animateSpin);
                     } else {
                         this.spinning = false;
-                        const landed = ((targetArrowAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-                        const relativeAngle = (landed + Math.PI/2) % (2*Math.PI);
+                        const landed = ((targetArrowAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                        const relativeAngle = (landed + Math.PI / 2) % (2 * Math.PI);
                         const isGreen = relativeAngle < this.chance * 2 * Math.PI;
                         this.resolveSpin(isGreen);
 
@@ -2622,7 +4379,7 @@
                         const animateReturn = (now2) => {
                             const t2 = Math.min((now2 - returnStartTime) / returnDuration, 1);
                             const eased2 = t2 < 0.5 ? 2 * t2 * t2 : 1 - Math.pow(-2 * t2 + 2, 2) / 2;
-                            const deltaAngle = returnStartAngle - (-Math.PI/2);
+                            const deltaAngle = returnStartAngle - (-Math.PI / 2);
                             let bounce = 0;
                             if (t2 > 0.8) {
                                 const b = (t2 - 0.8) / 0.2;
@@ -2633,7 +4390,7 @@
                             if (t2 < 1) {
                                 requestAnimationFrame(animateReturn);
                             } else {
-                                this.arrowAngle = -Math.PI/2;
+                                this.arrowAngle = -Math.PI / 2;
                                 this.drawWheelAndArrow(this.arrowAngle);
                                 this.fromNftId = null;
                                 this.toNftId = null;
@@ -2712,7 +4469,8 @@
 
             const fromOwned = state.inventory.some(n => n.id === upgradeGame.fromNftId);
             const validFrom = upgradeGame.fromNftId && NFT_DB[upgradeGame.fromNftId];
-            const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId] && NFT_DB[upgradeGame.toNftId].price > (validFrom ? NFT_DB[upgradeGame.fromNftId].price : 0);
+            const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId] && NFT_DB[upgradeGame.toNftId].price > (
+                validFrom ? NFT_DB[upgradeGame.fromNftId].price : 0);
 
             if (validFrom && validTo) {
                 const multiplier = NFT_DB[upgradeGame.toNftId].price / NFT_DB[upgradeGame.fromNftId].price;
@@ -2734,7 +4492,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – THREE-STAGE SPEED, REBALANCED MULTIPLIERS
+        // BOUNCE GAME
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -2746,7 +4504,7 @@
             segments: [],
             circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 18 },
             bet: 10,
-            totalMultiplier: 0.2, // starts at 0.2x
+            totalMultiplier: 0.2,
             isPlaying: false,
             gameOver: false,
             animId: null,
@@ -2756,7 +4514,6 @@
             constantSpeedDuration: 4000,
             startTime: 0,
             floatingTexts: [],
-            // Arrow properties
             arrowAngle: 0,
             isSpinning: false,
             spinSpeed: 0,
@@ -2765,13 +4522,13 @@
             maxSpinSpeed: 8,
             isLaunched: false,
             launchTimeout: null,
-            // Ball image element
             ballElement: document.getElementById('bounceBallImg'),
             isLossBall: false,
-            // Sound play functions
+
             playHitSound() { playBeep(600, 0.06, 0.2); },
             playBreakSound() { playBeep(1000, 0.1, 0.35); },
-            playWinSound() { playBeep(800, 0.15, 0.3); playBeep(1000, 0.15, 0.3); },
+            playWinSound() { playBeep(800, 0.15, 0.3);
+                playBeep(1000, 0.15, 0.3); },
             playLoseSound() { playBeep(400, 0.2, 0.3); },
 
             init() {
@@ -2779,8 +4536,7 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
-                
-                // Set ball image
+
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
                 this.ballElement.style.left = '50%';
@@ -2789,7 +4545,7 @@
                 this.ballElement.style.width = '36px';
                 this.ballElement.style.height = '36px';
                 this.isLossBall = false;
-                
+
                 this.generateSegments();
                 this.resetCircle();
                 this.draw();
@@ -2878,8 +4634,7 @@
 
                 const totalPts = outerPts.length;
                 const ptsPerSeg = Math.floor(totalPts / this.segmentCount);
-                
-                // NEW MULTIPLIER POOL: 0.1x most common, 3.0x rarest
+
                 const multiplierPool = [
                     { value: 3.0, weight: 1 },
                     { value: 2.0, weight: 2 },
@@ -2959,7 +4714,6 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // VERY FAST initial speed
                 const speed = 220 + Math.random() * 80;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -2982,7 +4736,6 @@
                 if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
                 this.bet = bet;
                 state.balance -= this.bet;
-                // Start at 0.2x
                 this.totalMultiplier = 0.2;
                 this.gameOver = false;
                 this.floatingTexts = [];
@@ -3022,7 +4775,6 @@
             update() {
                 const dt = 1 / 60;
 
-                // Arrow spinning
                 if (this.isSpinning) {
                     const now = performance.now();
                     const elapsed = (now - this.spinStartTime) / 1000;
@@ -3035,16 +4787,12 @@
                     }
                 }
 
-                // Physics – THREE-STAGE SPEED PROFILE
                 if (!this.isPlaying) return;
 
                 const now = performance.now();
                 const elapsed = now - this.startTime;
                 let currentFriction = 1.0;
 
-                // Phase 1: 0-2.5s – VERY FAST (no friction)
-                // Phase 2: 2.5-6s – MEDIUM CRUISE (low friction)
-                // Phase 3: 6s+ – RAPID SLOWDOWN (higher friction)
                 if (elapsed > 2500 && elapsed <= 6000) {
                     currentFriction = 0.998;
                 } else if (elapsed > 6000) {
@@ -3053,7 +4801,6 @@
                     currentFriction = 1.0;
                 }
 
-                // Apply friction only after the initial fast phase
                 if (elapsed > 2500) {
                     this.circle.vx *= currentFriction;
                     this.circle.vy *= currentFriction;
@@ -3062,7 +4809,6 @@
                 this.circle.x += this.circle.vx * dt;
                 this.circle.y += this.circle.vy * dt;
 
-                // Update ball image position
                 if (this.ballElement) {
                     const percentX = (this.circle.x / this.width) * 100;
                     const percentY = (this.circle.y / this.height) * 100;
@@ -3076,7 +4822,6 @@
                     return;
                 }
 
-                // Collision with segments
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const dist = this.distToSegment(this.circle.x, this.circle.y, seg.x1, seg.y1, seg.x2, seg.y2);
@@ -3115,7 +4860,6 @@
                     }
                 }
 
-                // Floating texts
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
                     ft.y -= 60 * dt;
@@ -3126,7 +4870,6 @@
                     }
                 }
 
-                // Check if circle is outside the arena
                 if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
                     this.isLossBall = true;
                     if (this.ballElement) {
@@ -3194,7 +4937,8 @@
                     clearTimeout(this.launchTimeout);
                     this.launchTimeout = null;
                 }
-                if (this.animId) { cancelAnimationFrame(this.animId); this.animId = null; }
+                if (this.animId) { cancelAnimationFrame(this.animId);
+                    this.animId = null; }
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
 
@@ -3248,7 +4992,6 @@
                 const halfH = (h - 20) / 2 - this.borderWidth;
                 const r = Math.max(0, this.cornerRadius - this.borderWidth);
 
-                // Arena background
                 ctx.beginPath();
                 ctx.moveTo(cx - halfW + r, cy - halfH);
                 ctx.lineTo(cx + halfW - r, cy - halfH);
@@ -3263,7 +5006,6 @@
                 ctx.fillStyle = '#060608';
                 ctx.fill();
 
-                // Outer border
                 const outerR = this.cornerRadius;
                 const outerW = w - 20;
                 const outerH = h - 20;
@@ -3295,7 +5037,6 @@
                 ctx.fillStyle = '#111115';
                 ctx.fill();
 
-                // Segments
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const ratio = seg.durability / seg.maxDurability;
@@ -3326,7 +5067,6 @@
                     ctx.stroke();
                 }
 
-                // Floating texts
                 for (let ft of this.floatingTexts) {
                     const alpha = Math.min(1, ft.life / 0.3);
                     const scale = ft.scale;
@@ -3346,7 +5086,6 @@
                 }
                 ctx.globalAlpha = 1;
 
-                // Arrow
                 if (this.isSpinning || !this.isLaunched) {
                     ctx.save();
                     ctx.translate(cx, cy);
@@ -3407,7 +5146,8 @@
             } else {
                 if (crashGame.isPlaying) crashGame.startContinuousVibration();
                 if (document.getElementById('page-rocket').classList.contains('active')) {
-                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame.startGameCycle();
+                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame
+                        .startGameCycle();
                 }
             }
         });
@@ -3415,7 +5155,18 @@
         // ============================================================
         // INIT
         // ============================================================
-        function init() {
+        async function init() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.remove('hidden');
+
+            // Preload all GIFs – this ensures smooth playback
+            await preloadAllGifs();
+
+            // Give the loading screen a moment to show, then fade out
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+            }, 600);
+
             getTelegramUser();
             updateHomeUI();
             updateProfile();
@@ -3425,17 +5176,24 @@
             upgradeGame.init();
             renderInventory();
             updateUpgradeSelectors();
-            console.log('Casino + NFT Upgrade loaded with Bounce (3-stage speed, 0.1-3.0 multipliers)');
+
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.startGameCycle();
+            }
+
+            console.log('✅ Casino loaded with all GIFs pre-cached – smooth animations ready!');
+            console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
         });
 
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(init, 100);
+        });
         if (document.readyState === 'complete') {
-            init();
-            if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
+            setTimeout(init, 100);
         }
     </script>
 </body>
