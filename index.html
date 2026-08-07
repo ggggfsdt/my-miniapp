@@ -8,7 +8,7 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ===== LOADING SCREEN – pure, no box ===== */
+        /* ===== LOADING SCREEN ===== */
         #loadingScreen {
             position: fixed;
             inset: 0;
@@ -49,7 +49,6 @@
             background: transparent;
             will-change: transform;
         }
-        /* Loading circle – bigger */
         #loadingScreen .spinner-gif {
             display: block;
             width: 64px;
@@ -420,10 +419,12 @@
             display: inline-block;
             vertical-align: middle;
         }
+
+        /* ===== HOME – SINGLE COLUMN GAME BUTTONS ===== */
         .quick-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-top: 4px;
             margin-bottom: 6px;
         }
@@ -431,13 +432,16 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 20px;
-            padding: 20px 12px;
+            padding: 16px 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
             width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
         .quick-card::before {
             content: '';
@@ -454,11 +458,16 @@
             opacity: 1;
         }
         .quick-card .icon {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 8px;
+            font-size: 28px;
             color: #fff;
             opacity: 0.9;
+            flex-shrink: 0;
+            width: 44px;
+            text-align: center;
+        }
+        .quick-card .card-content {
+            flex: 1;
+            text-align: left;
         }
         .quick-card .label {
             font-size: 16px;
@@ -468,7 +477,7 @@
         .quick-card .desc {
             font-size: 12px;
             color: #555;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         .quick-card.glow-purple {
             box-shadow: 0 0 30px rgba(108, 92, 231, 0.05);
@@ -548,6 +557,41 @@
             transition: none;
             will-change: transform;
         }
+        /* ===== BOUNCE NFT REWARD OVERLAY ===== */
+        #bounceNftOverlay {
+            position: absolute;
+            inset: 0;
+            z-index: 8;
+            pointer-events: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #bounceNftOverlay.show {
+            display: flex;
+            opacity: 0.25;
+        }
+        #bounceNftOverlay img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 16px;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            opacity: 0;
+            transform: scale(0.7);
+        }
+        #bounceNftOverlay img.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        #bounceNftOverlay img.hidden-img {
+            opacity: 0;
+            transform: scale(0.7);
+        }
+
         .bounce-info {
             display: flex;
             justify-content: space-between;
@@ -1289,6 +1333,8 @@
             border-radius: 8px;
             will-change: transform;
         }
+
+        /* ===== CASH OUT BUTTON WITH NFT INDICATOR ===== */
         .main-action-btn {
             display: flex;
             flex-direction: column;
@@ -1370,7 +1416,45 @@
             opacity: 0.6;
         }
 
-        /* MINES */
+        /* NFT indicator inside cash out button */
+        .main-action-btn .nft-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.08);
+        }
+        .main-action-btn .nft-indicator.show {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+        .main-action-btn .nft-indicator img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            opacity: 0;
+            transform: scale(0.7);
+        }
+        .main-action-btn .nft-indicator img.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .main-action-btn .nft-indicator img.hidden-img {
+            opacity: 0;
+            transform: scale(0.7);
+        }
+
+        /* ===== MINES ===== */
         .mines-header {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 20px;
@@ -1646,6 +1730,43 @@
         .mines-main-action-btn.confirm-bet {
             background: linear-gradient(135deg, #f9ca24, #f0932b);
             box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
+        }
+        /* NFT indicator inside mines cash out */
+        .mines-main-action-btn .nft-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.08);
+        }
+        .mines-main-action-btn .nft-indicator.show {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+        .mines-main-action-btn .nft-indicator img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            opacity: 0;
+            transform: scale(0.7);
+        }
+        .mines-main-action-btn .nft-indicator img.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .mines-main-action-btn .nft-indicator img.hidden-img {
+            opacity: 0;
+            transform: scale(0.7);
         }
         .mines-controls {
             display: flex;
@@ -2054,8 +2175,18 @@
                 height: 80px;
             }
             .quick-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
+                gap: 8px;
+            }
+            .quick-card {
+                padding: 12px 14px;
+                gap: 12px;
+            }
+            .quick-card .icon {
+                font-size: 22px;
+                width: 34px;
+            }
+            .quick-card .label {
+                font-size: 14px;
             }
             #bounceBallImg {
                 width: 32px;
@@ -2072,12 +2203,26 @@
                 width: 56px;
                 height: 56px;
             }
+            #bounceNftOverlay img {
+                width: 70px;
+                height: 70px;
+            }
+            .main-action-btn .nft-indicator {
+                width: 28px;
+                height: 28px;
+                right: 4px;
+            }
+            .mines-main-action-btn .nft-indicator {
+                width: 28px;
+                height: 28px;
+                right: 4px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== LOADING SCREEN – pure, no box ===== -->
+    <!-- ===== LOADING SCREEN ===== -->
     <div id="loadingScreen">
         <div class="title">Dll_Lud</div>
         <img class="main-gif" src="https://images.iimg.live/images/stellar-masterpiece-3002.webp" alt="Loading" id="loadingGif" decoding="async" loading="eager">
@@ -2126,23 +2271,31 @@
             <div class="quick-grid">
                 <div class="quick-card glow-purple" onclick="navigateTo('rocket')">
                     <span class="icon"><i class="fas fa-rocket"></i></span>
-                    <div class="label">Crash</div>
-                    <div class="desc">Fly high, cash out!</div>
+                    <div class="card-content">
+                        <div class="label">Crash</div>
+                        <div class="desc">Fly high, cash out!</div>
+                    </div>
                 </div>
                 <div class="quick-card glow-green" onclick="navigateTo('mines')">
                     <span class="icon"><i class="fas fa-gem"></i></span>
-                    <div class="label">Mines</div>
-                    <div class="desc">Find the gems</div>
+                    <div class="card-content">
+                        <div class="label">Mines</div>
+                        <div class="desc">Find the gems</div>
+                    </div>
                 </div>
                 <div class="quick-card glow-blue" onclick="navigateTo('upgrade')">
                     <span class="icon"><i class="fas fa-arrow-up"></i></span>
-                    <div class="label">Upgrade</div>
-                    <div class="desc">NFT Upgrade Wheel</div>
+                    <div class="card-content">
+                        <div class="label">Upgrade</div>
+                        <div class="desc">NFT Upgrade Wheel</div>
+                    </div>
                 </div>
                 <div class="quick-card glow-gold" onclick="navigateTo('bounce')">
                     <span class="icon"><i class="fas fa-arrows-alt"></i></span>
-                    <div class="label">Bounce</div>
-                    <div class="desc">Break segments, collect multipliers</div>
+                    <div class="card-content">
+                        <div class="label">Bounce</div>
+                        <div class="desc">Break segments, collect multipliers</div>
+                    </div>
                 </div>
             </div>
             <div class="card recent-winners-card">
@@ -2179,7 +2332,11 @@
             </div>
             <div class="bet-container">
                 <div class="bet-input-row" id="betInputRow"><input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount"><button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button></div>
-                <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()"><span id="mainActionText">Place Bet</span><span id="mainActionSub"></span></button>
+                <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
+                    <span id="mainActionText">Place Bet</span>
+                    <span id="mainActionSub"></span>
+                    <div class="nft-indicator" id="crashNftIndicator"><img id="crashNftImg" src="" alt="NFT"></div>
+                </button>
                 <div class="players-list" id="playersList"><div class="empty">No bets placed yet</div></div>
             </div>
         </div>
@@ -2199,7 +2356,11 @@
             <div class="mines-message" id="minesMessage">Press "Start" to play</div>
             <div class="mines-bet-container">
                 <div class="mines-bet-input-row" id="minesBetInputRow"><input type="number" id="minesBetInput" value="10" min="1" step="1" placeholder="Bet amount"><button class="mines-bet-confirm-btn" onclick="minesGame.confirmBet()">Confirm</button></div>
-                <button class="mines-main-action-btn place-bet" id="minesMainActionBtn" onclick="minesGame.mainAction()"><span id="minesMainActionText">Place Bet</span><span class="sub-text" id="minesMainActionSub"></span></button>
+                <button class="mines-main-action-btn place-bet" id="minesMainActionBtn" onclick="minesGame.mainAction()">
+                    <span id="minesMainActionText">Place Bet</span>
+                    <span class="sub-text" id="minesMainActionSub"></span>
+                    <div class="nft-indicator" id="minesNftIndicator"><img id="minesNftImg" src="" alt="NFT"></div>
+                </button>
             </div>
             <div class="mines-controls">
                 <div class="control-group"><span class="label">Mines</span><button onclick="minesGame.changeMines(-1)"><i class="fas fa-minus"></i></button><span class="val" id="minesCount">1</span><button onclick="minesGame.changeMines(1)"><i class="fas fa-plus"></i></button></div>
@@ -2299,6 +2460,10 @@
             <div id="bounceCanvasWrap">
                 <canvas id="bounceCanvas" width="400" height="400"></canvas>
                 <img id="bounceBallImg" src="https://images.iimg.live/images/stellar-work-2795.webp" alt="Ball" decoding="async">
+                <!-- NFT overlay for bounce -->
+                <div id="bounceNftOverlay">
+                    <img id="bounceNftImg" src="" alt="NFT Prize">
+                </div>
             </div>
             <div class="bounce-info">
                 <span>Multiplier: <span class="multiplier" id="bounceMultiplier">0.20</span>x</span>
@@ -2329,8 +2494,8 @@
         try {
             if (window.Telegram && window.Telegram.WebApp) {
                 const tg = window.Telegram.WebApp;
-                tg.expand(); // makes app full screen
-                tg.enableClosingConfirmation(); // optional
+                tg.expand();
+                tg.enableClosingConfirmation();
             }
         } catch (e) {}
 
@@ -2353,43 +2518,33 @@
             });
         }
 
-        // All GIFs used in the app – add the new Plush Pepe too
+        // All GIFs used in the app
         const ALL_GIF_URLS = [
-            // Loading screen
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
             'https://images.iimg.live/images/excellent-art-9247.webp',
-            // Star / balance icon
             'https://images.iimg.live/images/radiant-capture-7834.webp',
-            // Bounce
             'https://images.iimg.live/images/stellar-work-2795.webp',
             'https://images.iimg.live/images/stellar-collection-3896.webp',
-            // Crash - cars
             'https://images.iimg.live/images/cool-gallery-5268.webp',
             'https://images.iimg.live/images/fantastic-image-2034.webp',
-            // Crash - rockets
             'https://images.iimg.live/images/radiant-picture-4066.webp',
             'https://images.iimg.live/images/glorious-portfolio-1947.webp',
             'https://images.iimg.live/images/wonderful-work-4770.webp',
             'https://images.iimg.live/images/ultimate-photography-1463.webp',
             'https://images.iimg.live/images/radiant-masterpiece-3049.webp',
-            // Crash - moon & explosion
             'https://images.iimg.live/images/ultimate-collection-3580.webp',
             'https://images.iimg.live/images/excellent-photo-4696.webp',
-            // Money GIFs
             'https://images.iimg.live/images/radiant-shot-1354.webp',
             'https://images.iimg.live/images/brilliant-snapshot-1531.webp',
             'https://images.iimg.live/images/fantastic-vision-3450.webp',
             'https://images.iimg.live/images/cool-picture-8835.webp',
             'https://images.iimg.live/images/excellent-snapshot-7013.webp',
-            // NFT GIFs
             'https://images.iimg.live/images/perfect-art-8369.webp',
             'https://images.iimg.live/images/wonderful-moment-9250.webp',
             'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
             'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
             'https://images.iimg.live/images/majestic-memory-3550.webp',
-            // New Plush Pepe NFT
             'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
-            // Misc
             'https://images.iimg.live/images/excellent-photo-9680.webp',
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
             'https://images.iimg.live/images/vibrant-scene-3805.webp',
@@ -2402,7 +2557,7 @@
         }
 
         // ============================================================
-        // CAR & ROCKET GIFS (use cached)
+        // CAR & ROCKET GIFS
         // ============================================================
         const CAR_GIFS = [
             'https://images.iimg.live/images/cool-gallery-5268.webp',
@@ -2432,7 +2587,7 @@
         function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
         // ============================================================
-        // AUDIO (simple beeps)
+        // AUDIO
         // ============================================================
         let audioCtx = null;
 
@@ -2460,7 +2615,7 @@
         }
 
         // ============================================================
-        // STATE & NFT DATA – ADDED PLUSH PEPE
+        // STATE & NFT DATA
         // ============================================================
         const state = {
             balance: 1000,
@@ -2483,19 +2638,19 @@
                 gif: 'https://images.iimg.live/images/perfect-art-8369.webp',
                 tier: 'low'
             },
-            liberty_figure: {
-                id: 'liberty_figure',
-                name: 'Liberty Figure',
-                price: 525,
-                gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp',
-                tier: 'high'
-            },
             timeless_book: {
                 id: 'timeless_book',
                 name: 'Timeless Book',
                 price: 500,
                 gif: 'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
-                tier: 'high'
+                tier: 'medium'
+            },
+            liberty_figure: {
+                id: 'liberty_figure',
+                name: 'Liberty Figure',
+                price: 525,
+                gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp',
+                tier: 'medium'
             },
             snoop_cigar: {
                 id: 'snoop_cigar',
@@ -2509,9 +2664,8 @@
                 name: 'Rare Bird',
                 price: 2190,
                 gif: 'https://images.iimg.live/images/majestic-memory-3550.webp',
-                tier: 'high'
+                tier: 'epic'
             },
-            // NEW: Plush Pepe – costs 468,466 stars
             plush_pepe: {
                 id: 'plush_pepe',
                 name: 'Plush Pepe',
@@ -2520,6 +2674,9 @@
                 tier: 'legendary'
             }
         };
+
+        // Sort NFTs by price (lowest to highest) for tier lookup
+        const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
 
         // -------- DOM refs ----------
         const homeBalance = document.getElementById('homeBalance');
@@ -2555,13 +2712,73 @@
 
         let players = [];
 
-        // ---- Helper star image ----
         function starImg(className = 'star-icon-xs') {
             return `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="${className}" alt="⭐">`;
         }
 
         // ============================================================
-        // WIN POPUP (for upgrade success only)
+        // NFT INDICATOR HELPERS
+        // ============================================================
+        function getBestNftForWin(winAmount) {
+            let best = null;
+            for (const nft of SORTED_NFTS) {
+                if (winAmount >= nft.price) {
+                    best = nft;
+                } else {
+                    break;
+                }
+            }
+            return best;
+        }
+
+        function updateNftIndicator(imgElement, containerElement, winAmount) {
+            if (!imgElement || !containerElement) return;
+            const nft = getBestNftForWin(winAmount);
+            if (nft) {
+                // Show the NFT with smooth transition
+                if (imgElement.src !== nft.gif) {
+                    // Fade out old, change src, fade in
+                    imgElement.className = 'hidden-img';
+                    setTimeout(() => {
+                        imgElement.src = nft.gif;
+                        // Force reflow
+                        void imgElement.offsetHeight;
+                        imgElement.className = 'visible';
+                    }, 300);
+                } else {
+                    imgElement.className = 'visible';
+                }
+                containerElement.classList.add('show');
+            } else {
+                containerElement.classList.remove('show');
+            }
+        }
+
+        function updateBounceNftOverlay(winAmount) {
+            const overlay = document.getElementById('bounceNftOverlay');
+            const img = document.getElementById('bounceNftImg');
+            if (!overlay || !img) return;
+            const nft = getBestNftForWin(winAmount);
+            if (nft && winAmount > 0) {
+                if (img.src !== nft.gif) {
+                    img.className = 'hidden-img';
+                    setTimeout(() => {
+                        img.src = nft.gif;
+                        void img.offsetHeight;
+                        img.className = 'visible';
+                    }, 300);
+                } else {
+                    img.className = 'visible';
+                }
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+                img.className = 'hidden-img';
+            }
+        }
+
+        // ============================================================
+        // WIN POPUP
         // ============================================================
         function showWinPopup(nft) {
             const popup = document.getElementById('winPopup');
@@ -3255,6 +3472,13 @@
                     if (this.isCarPhase && m >= 1.56 && !this.transitioning) {
                         this.transitionToRocket();
                     }
+                    // Update NFT indicator for crash
+                    const winAmount = Math.floor(this.bet * this.multiplier);
+                    updateNftIndicator(
+                        document.getElementById('crashNftImg'),
+                        document.getElementById('crashNftIndicator'),
+                        winAmount
+                    );
                     updateLiveData();
                 } else if (this.gameOver) {
                     this.updateMainButton();
@@ -3265,6 +3489,8 @@
                     moonOverlay.classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
+                    // Hide NFT indicator on crash
+                    document.getElementById('crashNftIndicator').classList.remove('show');
                 }
             },
 
@@ -3304,7 +3530,8 @@
                 if (this.isPlaying) {
                     if (this.bet > 0 && !this.hasCashedOut) {
                         mainText.textContent = 'Cash Out';
-                        subText.textContent = (this.bet * this.multiplier).toFixed(1);
+                        const winAmount = Math.floor(this.bet * this.multiplier);
+                        subText.textContent = winAmount.toFixed(0);
                         btn.className = 'main-action-btn cash-out';
                         btn.disabled = false;
                     } else if (this.bet > 0 && this.hasCashedOut) {
@@ -3445,6 +3672,8 @@
                 this.updateUI();
                 this.updateMainButton();
                 updateHomeUI();
+                // Hide NFT indicator after cash out
+                document.getElementById('crashNftIndicator').classList.remove('show');
             },
 
             startCountdown() {
@@ -3594,6 +3823,8 @@
                         this.animationId = null; }
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
+                    // Hide NFT indicator on crash
+                    document.getElementById('crashNftIndicator').classList.remove('show');
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -3639,7 +3870,7 @@
         };
 
         // ============================================================
-        // MINES GAME – BIGGER X MULTIPLIER
+        // MINES GAME – BIGGER X MULTIPLIER + NFT INDICATOR
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -3656,7 +3887,7 @@
             revealedSafe: 0,
             history: [],
             isCashingOut: false,
-            maxMultiplier: 99.99, // HUGE increase – allows massive multipliers
+            maxMultiplier: 99.99,
             gemGif: 'https://images.iimg.live/images/vibrant-scene-3805.webp',
             mineGif: 'https://images.iimg.live/images/glorious-memory-8181.webp',
             mineGifDuration: 2100,
@@ -3795,6 +4026,17 @@
                 }
                 this.updateMainButton();
                 this.renderHistory();
+                // Update NFT indicator for mines
+                if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
+                    const winAmount = Math.floor(this.bet * this.multiplier);
+                    updateNftIndicator(
+                        document.getElementById('minesNftImg'),
+                        document.getElementById('minesNftIndicator'),
+                        winAmount
+                    );
+                } else {
+                    document.getElementById('minesNftIndicator').classList.remove('show');
+                }
             },
 
             updateMainButton() {
@@ -3811,7 +4053,8 @@
                         btn.disabled = true;
                     } else if (canCashOut) {
                         mainText.textContent = 'Cash Out';
-                        subText.textContent = (this.bet * this.multiplier).toFixed(1);
+                        const winAmount = Math.floor(this.bet * this.multiplier);
+                        subText.textContent = winAmount.toFixed(0);
                         btn.className = 'mines-main-action-btn cash-out';
                         btn.disabled = false;
                     } else {
@@ -3825,6 +4068,7 @@
                     btn.className = 'mines-main-action-btn place-bet';
                     btn.disabled = false;
                     inputRow.classList.remove('open');
+                    document.getElementById('minesNftIndicator').classList.remove('show');
                 } else {
                     const isOpen = inputRow.classList.contains('open');
                     if (isOpen) {
@@ -3920,6 +4164,7 @@
                     this.updateUI();
                     updateHomeUI();
                     this.addHistory('loss', this.multiplier);
+                    document.getElementById('minesNftIndicator').classList.remove('show');
                     return;
                 }
                 triggerVibration(15, 'light');
@@ -3927,9 +4172,9 @@
                 const totalTiles = this.gridSize * this.gridSize;
                 const mineRatio = this.minesCount / totalTiles;
 
-                // BIGGER MULTIPLIER GROWTH – faster and higher scaling
-                let inc = 0.02 + 0.45 * mineRatio; // was 0.008 + 0.25 * mineRatio – much faster growth
-                inc = Math.max(0.02, Math.min(0.65, inc)); // wider range
+                // BIGGER MULTIPLIER GROWTH
+                let inc = 0.02 + 0.45 * mineRatio;
+                inc = Math.max(0.02, Math.min(0.65, inc));
 
                 let newMult = this.multiplier * (1 + inc);
                 if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
@@ -3952,6 +4197,7 @@
                     updateHomeUI();
                     this.addHistory('win', this.multiplier);
                     triggerVibration(50, 'medium');
+                    document.getElementById('minesNftIndicator').classList.remove('show');
                     return;
                 }
                 this.updateGrid();
@@ -4070,6 +4316,7 @@
                 this.updateMainButton();
                 updateHomeUI();
                 triggerVibration(30, 'light');
+                document.getElementById('minesNftIndicator').classList.remove('show');
             },
 
             setGridSize(size, mines) {
@@ -4093,7 +4340,7 @@
         };
 
         // ============================================================
-        // INVENTORY (sell + upgrade button)
+        // INVENTORY
         // ============================================================
         function sellNFT(index) {
             const nft = state.inventory[index];
@@ -4533,7 +4780,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – SLOWER BALL
+        // BOUNCE GAME – FASTER BALL + NFT OVERLAY
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -4572,6 +4819,34 @@
                 playBeep(1000, 0.15, 0.3); },
             playLoseSound() { playBeep(400, 0.2, 0.3); },
 
+            // Update NFT overlay
+            updateNftOverlay() {
+                if (!this.isPlaying || this.gameOver) {
+                    document.getElementById('bounceNftOverlay').classList.remove('show');
+                    return;
+                }
+                const winAmount = Math.floor(this.bet * this.totalMultiplier);
+                const nft = getBestNftForWin(winAmount);
+                const overlay = document.getElementById('bounceNftOverlay');
+                const img = document.getElementById('bounceNftImg');
+                if (nft && winAmount > 0) {
+                    if (img.src !== nft.gif) {
+                        img.className = 'hidden-img';
+                        setTimeout(() => {
+                            img.src = nft.gif;
+                            void img.offsetHeight;
+                            img.className = 'visible';
+                        }, 300);
+                    } else {
+                        img.className = 'visible';
+                    }
+                    overlay.classList.add('show');
+                } else {
+                    overlay.classList.remove('show');
+                    img.className = 'hidden-img';
+                }
+            },
+
             init() {
                 this.canvas = document.getElementById('bounceCanvas');
                 this.ctx = this.canvas.getContext('2d');
@@ -4604,6 +4879,8 @@
                     clearTimeout(this.launchTimeout);
                     this.launchTimeout = null;
                 }
+                // Hide NFT overlay on init
+                document.getElementById('bounceNftOverlay').classList.remove('show');
             },
 
             getRoundedRectPoints(cx, cy, w, h, r, n) {
@@ -4755,8 +5032,8 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // SLOWER BALL – reduced speed from 220-300 to 140-200
-                const speed = 140 + Math.random() * 60;
+                // FASTER BALL – increased speed from 140-200 to 200-280
+                const speed = 200 + Math.random() * 80;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
                 document.getElementById('bounceStartBtn').textContent = 'Playing...';
@@ -4791,6 +5068,10 @@
                 document.getElementById('bounceStartBtn').disabled = false;
                 document.getElementById('bounceBetDisplay').textContent = this.bet;
                 document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+
+                // Reset NFT overlay
+                document.getElementById('bounceNftOverlay').classList.remove('show');
+                document.getElementById('bounceNftImg').className = 'hidden-img';
 
                 this.generateSegments();
                 this.resetCircle();
@@ -4902,6 +5183,9 @@
                     }
                 }
 
+                // Update NFT overlay during play
+                this.updateNftOverlay();
+
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
                     ft.y -= 60 * dt;
@@ -4983,6 +5267,9 @@
                     this.animId = null; }
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
+
+                // Hide NFT overlay on game end
+                document.getElementById('bounceNftOverlay').classList.remove('show');
 
                 const resultEl = document.getElementById('bounceResult');
                 resultEl.style.display = 'block';
@@ -5201,19 +5488,14 @@
             const loadingScreen = document.getElementById('loadingScreen');
             loadingScreen.classList.remove('hidden');
 
-            // Preload all GIFs – this ensures smooth playback
             await preloadAllGifs();
 
-            // Force a minimum display time for the loading screen (2.5 seconds)
             const minDisplayTime = 2500;
             const startTime = performance.now();
-
-            // Wait for preload to finish, then ensure min time elapsed
             const elapsed = performance.now() - startTime;
             const remaining = Math.max(0, minDisplayTime - elapsed);
             await new Promise(resolve => setTimeout(resolve, remaining));
 
-            // Hide loading screen
             loadingScreen.classList.add('hidden');
 
             getTelegramUser();
@@ -5230,7 +5512,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded with all GIFs pre-cached – smooth animations ready!');
+            console.log('✅ Casino loaded – Bounce faster, Mines bigger multiplier, NFT indicators added!');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
