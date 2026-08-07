@@ -2353,7 +2353,7 @@
             });
         }
 
-        // All GIFs used in the app
+        // All GIFs used in the app – add the new Plush Pepe too
         const ALL_GIF_URLS = [
             // Loading screen
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
@@ -2387,6 +2387,8 @@
             'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
             'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
             'https://images.iimg.live/images/majestic-memory-3550.webp',
+            // New Plush Pepe NFT
+            'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
             // Misc
             'https://images.iimg.live/images/excellent-photo-9680.webp',
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
@@ -2458,7 +2460,7 @@
         }
 
         // ============================================================
-        // STATE & NFT DATA
+        // STATE & NFT DATA – ADDED PLUSH PEPE
         // ============================================================
         const state = {
             balance: 1000,
@@ -2508,6 +2510,14 @@
                 price: 2190,
                 gif: 'https://images.iimg.live/images/majestic-memory-3550.webp',
                 tier: 'high'
+            },
+            // NEW: Plush Pepe – costs 468,466 stars
+            plush_pepe: {
+                id: 'plush_pepe',
+                name: 'Plush Pepe',
+                price: 468466,
+                gif: 'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
+                tier: 'legendary'
             }
         };
 
@@ -3629,7 +3639,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME – BIGGER X MULTIPLIER
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -3646,7 +3656,7 @@
             revealedSafe: 0,
             history: [],
             isCashingOut: false,
-            maxMultiplier: 8.34,
+            maxMultiplier: 99.99, // HUGE increase – allows massive multipliers
             gemGif: 'https://images.iimg.live/images/vibrant-scene-3805.webp',
             mineGif: 'https://images.iimg.live/images/glorious-memory-8181.webp',
             mineGifDuration: 2100,
@@ -3916,11 +3926,15 @@
                 this.revealedSafe++;
                 const totalTiles = this.gridSize * this.gridSize;
                 const mineRatio = this.minesCount / totalTiles;
-                let inc = 0.008 + 0.25 * mineRatio;
-                inc = Math.max(0.01, Math.min(0.35, inc));
+
+                // BIGGER MULTIPLIER GROWTH – faster and higher scaling
+                let inc = 0.02 + 0.45 * mineRatio; // was 0.008 + 0.25 * mineRatio – much faster growth
+                inc = Math.max(0.02, Math.min(0.65, inc)); // wider range
+
                 let newMult = this.multiplier * (1 + inc);
                 if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
                 this.multiplier = parseFloat(newMult.toFixed(3));
+
                 if (this.revealedSafe === this.safeCount) {
                     this.gameOver = true;
                     this.gameActive = false;
@@ -4519,7 +4533,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME
+        // BOUNCE GAME – SLOWER BALL
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -4741,7 +4755,8 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                const speed = 220 + Math.random() * 80;
+                // SLOWER BALL – reduced speed from 220-300 to 140-200
+                const speed = 140 + Math.random() * 60;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
                 document.getElementById('bounceStartBtn').textContent = 'Playing...';
