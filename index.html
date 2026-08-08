@@ -2684,12 +2684,11 @@
         function updateGraphicsQuality(value) {
             settings.graphicsQuality = value;
             saveSettings();
-            // Refresh games that depend on quality
             if (document.getElementById('page-bounce').classList.contains('active')) {
                 bounceGame.init();
             }
             if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.initWind(); // rebuild wind with new count
+                crashGame.initWind();
             }
         }
 
@@ -3448,11 +3447,9 @@
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
-                // Quality-based streak count
                 let streakCount = 45;
                 if (settings.graphicsQuality === 'low') streakCount = 8;
                 else if (settings.graphicsQuality === 'medium') streakCount = 25;
-                // else high: 45
 
                 for (let i = 0; i < streakCount; i++) {
                     const streak = document.createElement('div');
@@ -3963,8 +3960,7 @@
                 this.updateMainButton();
                 updateHomeUI();
                 document.getElementById('crashNftIndicator').classList.remove('show');
-                // Reset bet for next round
-                this.bet = 0;
+                this.bet = 0; // Reset bet after cash out
             },
 
             startCountdown() {
@@ -4088,7 +4084,6 @@
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
 
-                    // Explosion overlay (skip on low quality)
                     if (settings.graphicsQuality !== 'low') {
                         const explosionOverlay = document.getElementById('explosionOverlay');
                         explosionOverlay.classList.add('active');
@@ -4098,7 +4093,6 @@
                         explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
                         setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
                     } else {
-                        // quick flash
                         const overlay = document.getElementById('explosionOverlay');
                         overlay.classList.add('active');
                         setTimeout(() => overlay.classList.remove('active'), 300);
@@ -4123,8 +4117,7 @@
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
                     document.getElementById('crashNftIndicator').classList.remove('show');
-                    // Reset bet after crash
-                    this.bet = 0;
+                    this.bet = 0; // Reset bet after crash
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -5153,7 +5146,6 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
 
-                // Quality-based segment count
                 if (settings.graphicsQuality === 'low') {
                     this.segmentCount = 10;
                 } else if (settings.graphicsQuality === 'medium') {
@@ -5802,23 +5794,34 @@
         });
 
         // ============================================================
-        // INIT – WITH FALLBACK TO HIDE LOADING SCREEN
+        // INIT – WITH TIMEOUT FOR LOADING SCREEN
         // ============================================================
         async function init() {
             const loadingScreen = document.getElementById('loadingScreen');
-            loadingScreen.classList.remove('hidden');
+            const startTime = performance.now();
 
             try {
-                await preloadAllGifs();
+                // Preload with a 5-second timeout
+                const preloadPromise = preloadAllGifs();
+                const timeoutPromise = new Promise(resolve => setTimeout(resolve, 5000));
+                await Promise.race([preloadPromise, timeoutPromise]);
+                console.log('Preload done or timed out');
+            } catch (e) {
+                console.warn('Preload error, continuing anyway', e);
+            }
 
-                const minDisplayTime = 2500;
-                const startTime = performance.now();
-                const elapsed = performance.now() - startTime;
-                const remaining = Math.max(0, minDisplayTime - elapsed);
-                await new Promise(resolve => setTimeout(resolve, remaining));
+            // Ensure minimum display time (2.5s)
+            const elapsed = performance.now() - startTime;
+            const minDisplay = 2500;
+            const remaining = Math.max(0, minDisplay - elapsed);
+            await new Promise(resolve => setTimeout(resolve, remaining));
 
-                loadingScreen.classList.add('hidden');
+            // Hide loading screen
+            loadingScreen.classList.add('hidden');
+            console.log('Loading screen hidden');
 
+            // Initialize app
+            try {
                 getTelegramUser();
                 loadSettings();
                 updateHomeUI();
@@ -5834,11 +5837,11 @@
                     crashGame.startGameCycle();
                 }
 
-                console.log('✅ Casino loaded with new NFTs and quality optimizations.');
+                console.log('✅ Casino loaded with new NFTs, quality optimizations, and loading fix.');
                 console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
-
-            } catch (err) {
-                console.error('Init error:', err);
+            } catch (e) {
+                console.error('Init error:', e);
+                // still hide loading screen if not already
                 loadingScreen.classList.add('hidden');
             }
         }
