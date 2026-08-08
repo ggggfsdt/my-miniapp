@@ -449,7 +449,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: none;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             will-change: transform;
         }
         .gif-overlay img {
@@ -769,11 +769,11 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        /* UPGRADE – BIGGER WHEEL */
+        /* UPGRADE – same as before, just spin longer */
         .upgrade-wheel-container {
             position: relative;
-            width: 380px;
-            height: 380px;
+            width: 340px;
+            height: 340px;
             margin: 16px auto;
             transition: filter 0.3s;
         }
@@ -781,16 +781,16 @@
             display: block;
             margin: 0 auto;
             border-radius: 50%;
-            width: 380px;
-            height: 380px;
+            width: 340px;
+            height: 340px;
         }
         .wheel-center-nft {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
             border-radius: 16px;
             display: none;
@@ -893,7 +893,7 @@
         }
         #crashNftOverlay.show {
             display: flex;
-            opacity: 0.35;
+            opacity: 0.3;
         }
         #crashNftOverlay img {
             width: 120px;
@@ -914,9 +914,9 @@
             transform: scale(0.7);
         }
 
-        /* Adjust rocket overlay when NFT is shown */
+        /* Rocket shrink + move down - smooth CSS transition */
         .gif-overlay.nft-active {
-            transform: translate(-50%, -50%) rotate(0deg) scale(0.6) translateY(20px) !important;
+            transform: translate(-50%, -20%) rotate(0deg) scale(0.55) !important;
         }
 
         @media (max-width: 420px) {
@@ -945,9 +945,9 @@
             .main-action-btn .nft-indicator { width: 28px; height: 28px; right: 4px; }
             .mines-main-action-btn .nft-indicator { width: 28px; height: 28px; right: 4px; }
             #settingsModal .settings-card { padding: 20px 16px; }
-            .upgrade-wheel-container { width: 300px; height: 300px; }
-            #upgradeWheel { width: 300px; height: 300px; }
-            .wheel-center-nft { width: 70px; height: 70px; }
+            .upgrade-wheel-container { width: 280px; height: 280px; }
+            #upgradeWheel { width: 280px; height: 280px; }
+            .wheel-center-nft { width: 60px; height: 60px; }
             #crashNftOverlay img { width: 80px; height: 80px; }
         }
     </style>
@@ -1149,7 +1149,7 @@
                     </div>
                 </div>
                 <div class="upgrade-wheel-container" id="wheelContainer">
-                    <canvas id="upgradeWheel" width="380" height="380"></canvas>
+                    <canvas id="upgradeWheel" width="340" height="340"></canvas>
                     <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
                 </div>
                 <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
@@ -1252,17 +1252,12 @@
         // ============================================================
         // SETTINGS STATE
         // ============================================================
-        const settings = {
-            vibration: true
-        };
+        const settings = { vibration: true };
 
         function loadSettings() {
             const saved = localStorage.getItem('casino_settings');
             if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    Object.assign(settings, parsed);
-                } catch (e) {}
+                try { Object.assign(settings, JSON.parse(saved)); } catch (e) {}
             }
             applySettingsUI();
         }
@@ -1273,11 +1268,8 @@
 
         function applySettingsUI() {
             const toggle = document.getElementById('vibrationToggle');
-            if (settings.vibration) {
-                toggle.classList.add('active');
-            } else {
-                toggle.classList.remove('active');
-            }
+            if (settings.vibration) toggle.classList.add('active');
+            else toggle.classList.remove('active');
         }
 
         function toggleVibration() {
@@ -1286,16 +1278,11 @@
             saveSettings();
         }
 
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('active');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
+        function openSettings() { document.getElementById('settingsModal').classList.add('active'); }
+        function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
 
         // ============================================================
-        // GIF PRELOADER – CACHE ALL GIFS FOR INSTANT PLAYBACK
+        // GIF PRELOADER
         // ============================================================
         const GIF_CACHE = {};
 
@@ -1341,7 +1328,6 @@
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
             'https://images.iimg.live/images/vibrant-scene-3805.webp',
             'https://images.iimg.live/images/glorious-memory-8181.webp',
-            // NEW NFT GIFs
             'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
             'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
             'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
@@ -1354,8 +1340,7 @@
         ];
 
         async function preloadAllGifs() {
-            const promises = ALL_GIF_URLS.map(url => preloadGif(url));
-            await Promise.all(promises);
+            await Promise.all(ALL_GIF_URLS.map(url => preloadGif(url)));
         }
 
         // ============================================================
@@ -1365,9 +1350,6 @@
             'https://images.iimg.live/images/cool-gallery-5268.webp',
             'https://images.iimg.live/images/fantastic-image-2034.webp'
         ];
-
-        function getRandomCarGif() { return CAR_GIFS[Math.floor(Math.random() * CAR_GIFS.length)]; }
-
         const ROCKET_GIFS = [
             'https://images.iimg.live/images/radiant-picture-4066.webp',
             'https://images.iimg.live/images/glorious-portfolio-1947.webp',
@@ -1375,9 +1357,6 @@
             'https://images.iimg.live/images/ultimate-photography-1463.webp',
             'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
         ];
-
-        function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
-
         const MONEY_GIFS = [
             'https://images.iimg.live/images/radiant-shot-1354.webp',
             'https://images.iimg.live/images/brilliant-snapshot-1531.webp',
@@ -1386,6 +1365,8 @@
             'https://images.iimg.live/images/excellent-snapshot-7013.webp'
         ];
 
+        function getRandomCarGif() { return CAR_GIFS[Math.floor(Math.random() * CAR_GIFS.length)]; }
+        function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
         function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
         // ============================================================
@@ -1394,9 +1375,7 @@
         let audioCtx = null;
 
         function getAudioCtx() {
-            if (!audioCtx) {
-                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             return audioCtx;
         }
 
@@ -1433,112 +1412,21 @@
         };
 
         const NFT_DB = {
-            chill_flame: {
-                id: 'chill_flame',
-                name: 'Chill Flame',
-                price: 320,
-                gif: 'https://images.iimg.live/images/perfect-art-8369.webp',
-                tier: 'low'
-            },
-            timeless_book: {
-                id: 'timeless_book',
-                name: 'Timeless Book',
-                price: 500,
-                gif: 'https://images.iimg.live/images/vibrant-snapshot-7656.webp',
-                tier: 'medium'
-            },
-            liberty_figure: {
-                id: 'liberty_figure',
-                name: 'Liberty Figure',
-                price: 525,
-                gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp',
-                tier: 'medium'
-            },
-            snoop_cigar: {
-                id: 'snoop_cigar',
-                name: 'Snoop Cigar',
-                price: 1500,
-                gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
-                tier: 'high'
-            },
-            rare_bird: {
-                id: 'rare_bird',
-                name: 'Rare Bird',
-                price: 2190,
-                gif: 'https://images.iimg.live/images/majestic-memory-3550.webp',
-                tier: 'epic'
-            },
-            plush_pepe: {
-                id: 'plush_pepe',
-                name: 'Plush Pepe',
-                price: 468466,
-                gif: 'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
-                tier: 'legendary'
-            },
-            // NEW NFTs
-            homemade_cake: {
-                id: 'homemade_cake',
-                name: 'Homemade Cake',
-                price: 640,
-                gif: 'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
-                tier: 'medium'
-            },
-            toy_bear: {
-                id: 'toy_bear',
-                name: 'Toy Bear',
-                price: 3365,
-                gif: 'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
-                tier: 'epic'
-            },
-            kissed_frog: {
-                id: 'kissed_frog',
-                name: 'Kissed Frog',
-                price: 4000,
-                gif: 'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
-                tier: 'epic'
-            },
-            jolly_chimp: {
-                id: 'jolly_chimp',
-                name: 'Jolly Chimp',
-                price: 630,
-                gif: 'https://i.postimg.cc/Gt1pLNc9/ezgif-5795a209619b1a80.gif',
-                tier: 'medium'
-            },
-            swag_bag: {
-                id: 'swag_bag',
-                name: 'Swag Bag',
-                price: 560,
-                gif: 'https://i.postimg.cc/nc2Lx0Nb/ezgif-56ec96aa9d12b9ac.gif',
-                tier: 'medium'
-            },
-            snoop_dog: {
-                id: 'snoop_dog',
-                name: 'Snoop Dog',
-                price: 630,
-                gif: 'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif',
-                tier: 'medium'
-            },
-            bling_blinky: {
-                id: 'bling_blinky',
-                name: 'Bling Blinky',
-                price: 2200,
-                gif: 'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif',
-                tier: 'high'
-            },
-            precious_peach: {
-                id: 'precious_peach',
-                name: 'Precious Peach',
-                price: 26400,
-                gif: 'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif',
-                tier: 'legendary'
-            },
-            voodoo_doll: {
-                id: 'voodoo_doll',
-                name: 'Voodoo Doll',
-                price: 3200,
-                gif: 'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
-                tier: 'epic'
-            }
+            chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320, gif: 'https://images.iimg.live/images/perfect-art-8369.webp', tier: 'low' },
+            timeless_book: { id: 'timeless_book', name: 'Timeless Book', price: 500, gif: 'https://images.iimg.live/images/vibrant-snapshot-7656.webp', tier: 'medium' },
+            liberty_figure: { id: 'liberty_figure', name: 'Liberty Figure', price: 525, gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp', tier: 'medium' },
+            snoop_cigar: { id: 'snoop_cigar', name: 'Snoop Cigar', price: 1500, gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp', tier: 'high' },
+            rare_bird: { id: 'rare_bird', name: 'Rare Bird', price: 2190, gif: 'https://images.iimg.live/images/majestic-memory-3550.webp', tier: 'epic' },
+            plush_pepe: { id: 'plush_pepe', name: 'Plush Pepe', price: 468466, gif: 'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif', tier: 'legendary' },
+            homemade_cake: { id: 'homemade_cake', name: 'Homemade Cake', price: 640, gif: 'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif', tier: 'medium' },
+            toy_bear: { id: 'toy_bear', name: 'Toy Bear', price: 3365, gif: 'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif', tier: 'epic' },
+            kissed_frog: { id: 'kissed_frog', name: 'Kissed Frog', price: 4000, gif: 'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif', tier: 'epic' },
+            jolly_chimp: { id: 'jolly_chimp', name: 'Jolly Chimp', price: 630, gif: 'https://i.postimg.cc/Gt1pLNc9/ezgif-5795a209619b1a80.gif', tier: 'medium' },
+            swag_bag: { id: 'swag_bag', name: 'Swag Bag', price: 560, gif: 'https://i.postimg.cc/nc2Lx0Nb/ezgif-56ec96aa9d12b9ac.gif', tier: 'medium' },
+            snoop_dog: { id: 'snoop_dog', name: 'Snoop Dog', price: 630, gif: 'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif', tier: 'medium' },
+            bling_blinky: { id: 'bling_blinky', name: 'Bling Blinky', price: 2200, gif: 'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif', tier: 'high' },
+            precious_peach: { id: 'precious_peach', name: 'Precious Peach', price: 26400, gif: 'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif', tier: 'legendary' },
+            voodoo_doll: { id: 'voodoo_doll', name: 'Voodoo Doll', price: 3200, gif: 'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif', tier: 'epic' }
         };
 
         const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
@@ -1574,7 +1462,6 @@
             bounce: document.getElementById('page-bounce')
         };
         const navItems = document.querySelectorAll('.nav-item');
-
         let players = [];
 
         function starImg(className = 'star-icon-xs') {
@@ -1587,11 +1474,8 @@
         function getBestNftForWin(winAmount) {
             let best = null;
             for (const nft of SORTED_NFTS) {
-                if (winAmount >= nft.price) {
-                    best = nft;
-                } else {
-                    break;
-                }
+                if (winAmount >= nft.price) best = nft;
+                else break;
             }
             return best;
         }
@@ -1648,12 +1532,9 @@
             document.getElementById('winNftImg').src = nft.gif;
             document.getElementById('winSubtitle').textContent = nft.name;
             popup.classList.add('active');
-            setTimeout(() => { popup.classList.remove('active'); }, 4000);
+            setTimeout(() => popup.classList.remove('active'), 4000);
         }
-
-        function closeWinPopup() {
-            document.getElementById('winPopup').classList.remove('active');
-        }
+        function closeWinPopup() { document.getElementById('winPopup').classList.remove('active'); }
 
         // ============================================================
         // RENDER PLAYERS (Crash)
@@ -1792,7 +1673,7 @@
                     if (p.hasCashedOut && !p._gifPlayed) {
                         cashGif.classList.add('show');
                         p._gifPlayed = true;
-                        setTimeout(() => { cashGif.classList.remove('show'); }, 3180);
+                        setTimeout(() => cashGif.classList.remove('show'), 3180);
                     } else if (!p.hasCashedOut) {
                         cashGif.classList.remove('show');
                         p._gifPlayed = false;
@@ -1808,7 +1689,7 @@
             Object.keys(pages).forEach(key => { pages[key].classList.toggle('active', key === page); });
             navItems.forEach(item => { item.classList.toggle('active', item.dataset.page === page); });
             if (page === 'rocket') { crashGame.startGameCycle(); renderPlayers(); }
-            if (page === 'profile') { updateProfile(); }
+            if (page === 'profile') updateProfile();
             if (page === 'upgrade') {
                 document.getElementById('upgradeBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
@@ -1819,9 +1700,7 @@
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 renderInventory();
             }
-            if (page === 'bounce') {
-                setTimeout(() => bounceGame.init(), 50);
-            }
+            if (page === 'bounce') setTimeout(() => bounceGame.init(), 50);
         }
 
         navItems.forEach(item => { item.addEventListener('click', () => navigateTo(item.dataset.page)); });
@@ -1839,9 +1718,7 @@
                         state.displayName = user.first_name || 'xDll_Lud';
                         if (user.last_name) state.displayName += ' ' + user.last_name;
                         if (!user.username) state.username = state.displayName;
-                        if (user.photo_url) {
-                            state.avatarUrl = user.photo_url;
-                        }
+                        if (user.photo_url) state.avatarUrl = user.photo_url;
                         updateAvatars();
                     }
                 }
@@ -1925,7 +1802,7 @@
 
         function triggerCashOutVibration() {
             if (!settings.vibration) return;
-            try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } } catch (e) {}
+            try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } catch (e) {}
             try { if (navigator.vibrate) navigator.vibrate(50); } catch (e) {}
         }
 
@@ -1936,7 +1813,7 @@
             const delays = [0, 120, 240, 380];
             for (let i = 0; i < 4; i++) {
                 setTimeout(() => {
-                    try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred(types[i]); } } catch (e) {}
+                    try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred(types[i]); } catch (e) {}
                     try { if (navigator.vibrate) navigator.vibrate(durations[i]); } catch (e) {}
                 }, delays[i]);
             }
@@ -1963,7 +1840,7 @@
             clearTimeout(notif._timeout);
             notif._timeout = setTimeout(() => {
                 notif.style.transform = 'translateY(-120%)';
-                setTimeout(() => { notif.style.display = 'none'; }, 400);
+                setTimeout(() => notif.style.display = 'none', 400);
             }, 1000);
         }
 
@@ -1974,10 +1851,7 @@
             const sortedNfts = Object.values(NFT_DB).sort((a, b) => b.price - a.price);
             let awardedNft = null;
             for (const nft of sortedNfts) {
-                if (win >= nft.price) {
-                    awardedNft = nft;
-                    break;
-                }
+                if (win >= nft.price) { awardedNft = nft; break; }
             }
             if (awardedNft) {
                 const excess = win - awardedNft.price;
@@ -1991,7 +1865,7 @@
                 clearTimeout(notif._timeout);
                 notif._timeout = setTimeout(() => {
                     notif.style.transform = 'translateY(-120%)';
-                    setTimeout(() => { notif.style.display = 'none'; }, 400);
+                    setTimeout(() => notif.style.display = 'none', 400);
                 }, 2000);
                 renderInventory();
                 updateHomeUI();
@@ -2002,7 +1876,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – with NFT overlay in center and rocket shrink
+        // CRASH GAME
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -2036,8 +1910,7 @@
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
-                const streakCount = 25;
-                for (let i = 0; i < streakCount; i++) {
+                for (let i = 0; i < 25; i++) {
                     const streak = document.createElement('div');
                     streak.className = 'streak';
                     const x = Math.random() * 120 - 10;
@@ -2056,10 +1929,10 @@
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
-                if (mult > this.windStart && mult < 2.83) { phase = 0; }
-                else if (mult >= 2.83 && mult < 2.9) { phase = 1; }
-                else if (mult >= 2.9 && mult < this.windReappear) { phase = 2; }
-                else if (mult >= this.windReappear) { phase = 3; }
+                if (mult > this.windStart && mult < 2.83) phase = 0;
+                else if (mult >= 2.83 && mult < 2.9) phase = 1;
+                else if (mult >= 2.9 && mult < this.windReappear) phase = 2;
+                else if (mult >= this.windReappear) phase = 3;
                 this.windPhase = phase;
 
                 if (mult > this.windStart && this.isPlaying && phase !== 2) {
@@ -2099,23 +1972,19 @@
             updateMoon(mult) {
                 const moonOverlay = document.getElementById('moonOverlay');
                 const moonImg = document.getElementById('moonGif');
-
                 if (mult >= 5.0 && this.isPlaying && !this.gameOver) {
                     this.moonActive = true;
                     moonOverlay.classList.add('active');
                     moonImg.style.display = 'block';
-
                     const progress = Math.min(1, (mult - 5.0) / 4.0);
                     const opacity = Math.min(0.65, 0.35 + (mult - 5.0) * 0.12);
                     const x = -20 + progress * 140;
                     const y = -30 + progress * 160;
                     const scale = 0.7 + progress * 0.5;
-
                     moonImg.style.opacity = opacity;
                     moonImg.style.left = x + '%';
                     moonImg.style.top = y + '%';
                     moonImg.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
                     if (progress >= 1.0) {
                         const fadeOut = Math.min(1, (mult - 9.0) / 2.0);
                         moonImg.style.opacity = opacity * (1 - fadeOut);
@@ -2127,7 +1996,6 @@
                 }
             },
 
-            // NFT overlay in center
             updateNftOverlay(winAmount) {
                 const overlay = document.getElementById('crashNftOverlay');
                 const img = document.getElementById('crashNftOverlayImg');
@@ -2146,7 +2014,6 @@
                         img.className = 'visible';
                     }
                     overlay.classList.add('show');
-                    // Shrink rocket and move down
                     document.getElementById('rocketOverlay').classList.add('nft-active');
                 } else {
                     this.nftActive = false;
@@ -2161,11 +2028,7 @@
                 img.style.transition = 'none';
                 this.currentCarGif = getRandomCarGif();
                 const cached = GIF_CACHE[this.currentCarGif];
-                if (cached) {
-                    img.src = cached.src;
-                } else {
-                    img.src = this.currentCarGif;
-                }
+                img.src = cached ? cached.src : this.currentCarGif;
                 img.style.display = 'block';
                 img.style.opacity = 1;
                 img.classList.add('active');
@@ -2178,11 +2041,7 @@
                 img.style.transition = 'none';
                 this.currentRocketGif = getRandomRocketGif();
                 const cached = GIF_CACHE[this.currentRocketGif];
-                if (cached) {
-                    img.src = cached.src;
-                } else {
-                    img.src = this.currentRocketGif;
-                }
+                img.src = cached ? cached.src : this.currentRocketGif;
                 img.style.display = 'block';
                 img.style.opacity = 1;
                 img.classList.add('active');
@@ -2194,25 +2053,17 @@
                 if (this.transitioning || !this.isCarPhase) return;
                 this.transitioning = true;
                 const img = document.getElementById('crashGif');
-
                 img.style.transition = 'opacity 0.15s ease';
                 img.style.opacity = 0;
-
                 setTimeout(() => {
                     img.classList.remove('active');
                     img.src = '';
                     img.style.display = 'none';
-
                     setTimeout(() => {
                         this.currentRocketGif = getRandomRocketGif();
                         img.style.display = 'block';
                         const cached = GIF_CACHE[this.currentRocketGif];
-                        if (cached) {
-                            img.src = cached.src;
-                        } else {
-                            img.src = this.currentRocketGif;
-                        }
-
+                        img.src = cached ? cached.src : this.currentRocketGif;
                         const onLoad = () => {
                             img.onload = null;
                             img.style.transition = 'opacity 0.15s ease';
@@ -2222,9 +2073,7 @@
                             this.transitioning = false;
                         };
                         img.onload = onLoad;
-                        if (img.complete && img.naturalWidth > 0) {
-                            onLoad();
-                        }
+                        if (img.complete && img.naturalWidth > 0) onLoad();
                         setTimeout(() => {
                             if (this.transitioning) {
                                 img.style.transition = 'opacity 0.15s ease';
@@ -2271,8 +2120,6 @@
                 this.currentScale += this.scaleVelocity * dt;
                 this.currentScale = Math.max(0.5, Math.min(1.2, this.currentScale));
 
-                // If NFT is active, we let CSS handle the extra transform via .nft-active class
-                // so we do not override it here.
                 if (!this.nftActive) {
                     const overlay = document.getElementById('rocketOverlay');
                     overlay.style.transform =
@@ -2329,8 +2176,7 @@
                 players = [];
                 renderPlayers();
                 this.setCarImage();
-                const moonOverlay = document.getElementById('moonOverlay');
-                moonOverlay.classList.remove('active');
+                document.getElementById('moonOverlay').classList.remove('active');
                 document.getElementById('moonGif').style.display = 'none';
                 document.getElementById('crashNftOverlay').classList.remove('show');
                 document.getElementById('crashNftOverlayImg').className = 'hidden-img';
@@ -2375,7 +2221,6 @@
                         document.getElementById('crashNftIndicator'),
                         winAmount
                     );
-                    // Update center NFT overlay
                     this.updateNftOverlay(winAmount);
                     updateLiveData();
                 } else if (this.gameOver) {
@@ -2383,8 +2228,7 @@
                     this.updateWindEffect();
                     this.updateProgressLine();
                     updateLiveData();
-                    const moonOverlay = document.getElementById('moonOverlay');
-                    moonOverlay.classList.remove('active');
+                    document.getElementById('moonOverlay').classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
                     document.getElementById('crashNftIndicator').classList.remove('show');
@@ -2542,7 +2386,7 @@
                 btn.disabled = true;
                 setTimeout(() => {
                     this.cashOutPending = false;
-                    if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) { this.executeCashOut(); }
+                    if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) this.executeCashOut();
                     btn.disabled = false;
                 }, 300);
             },
@@ -2556,9 +2400,7 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-
                 processGameWin(win);
-
                 const user = players.find(p => p.isYou);
                 if (user) {
                     user.hasCashedOut = true;
@@ -2583,8 +2425,7 @@
                 this.hasCashedOut = false;
                 this.roundId++;
                 this.hideImage();
-                const moonOverlay = document.getElementById('moonOverlay');
-                moonOverlay.classList.remove('active');
+                document.getElementById('moonOverlay').classList.remove('active');
                 document.getElementById('moonGif').style.display = 'none';
                 this.moonActive = false;
                 document.getElementById('crashNftOverlay').classList.remove('show');
@@ -2648,7 +2489,7 @@
                 } else {
                     this.bet = 0;
                     const user = players.find(p => p.isYou);
-                    if (user) { user.active = false; }
+                    if (user) user.active = false;
                     renderPlayers();
                 }
                 this.hasCashedOut = false;
@@ -2695,8 +2536,7 @@
                     triggerExplosionVibration();
 
                     this.hideImage();
-                    const moonOverlay = document.getElementById('moonOverlay');
-                    moonOverlay.classList.remove('active');
+                    document.getElementById('moonOverlay').classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
                     document.getElementById('crashNftOverlay').classList.remove('show');
@@ -2708,7 +2548,7 @@
                     explosionImg.style.animation = 'none';
                     void explosionImg.offsetHeight;
                     explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
-                    setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
+                    setTimeout(() => explosionOverlay.classList.remove('active'), 1200);
 
                     const user = players.find(p => p.isYou);
                     if (user && user.active && !user.hasCashedOut) {
@@ -2772,7 +2612,7 @@
         };
 
         // ============================================================
-        // MINES GAME – unchanged
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -2900,7 +2740,7 @@
                     wrappers.forEach((w, idx) => {
                         const tile = w.querySelector('.tile');
                         const delay = (idx % this.gridSize) * 25 + Math.floor(idx / this.gridSize) * 25;
-                        setTimeout(() => { tile.classList.add('show'); }, delay + 50);
+                        setTimeout(() => tile.classList.add('show'), delay + 50);
                     });
                 });
                 this.updateUI();
@@ -3071,14 +2911,11 @@
                 this.revealedSafe++;
                 const totalTiles = this.gridSize * this.gridSize;
                 const mineRatio = this.minesCount / totalTiles;
-
                 let inc = 0.02 + 0.45 * mineRatio;
                 inc = Math.max(0.02, Math.min(0.65, inc));
-
                 let newMult = this.multiplier * (1 + inc);
                 if (newMult > this.maxMultiplier) newMult = this.maxMultiplier;
                 this.multiplier = parseFloat(newMult.toFixed(3));
-
                 if (this.revealedSafe === this.safeCount) {
                     this.gameOver = true;
                     this.gameActive = false;
@@ -3088,9 +2925,7 @@
                     if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                     state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-
                     processGameWin(win);
-
                     this.updateGrid();
                     this.updateUI();
                     updateHomeUI();
@@ -3187,9 +3022,7 @@
                 const btn = document.getElementById('minesMainActionBtn');
                 btn.disabled = true;
                 setTimeout(() => {
-                    if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
-                        this.executeCashOut();
-                    }
+                    if (this.gameActive && !this.gameOver && !this.hasCashedOut) this.executeCashOut();
                     this.isCashingOut = false;
                     btn.disabled = false;
                 }, 300);
@@ -3204,9 +3037,7 @@
                 if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
                 state.recentWinners.unshift({ name: 'You (Mines)', amount: win });
                 if (state.recentWinners.length > 10) state.recentWinners.pop();
-
                 processGameWin(win);
-
                 this.gameActive = false;
                 this.gameOver = true;
                 this.hasCashedOut = false;
@@ -3282,15 +3113,13 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL – ENHANCED SPIN (longer)
+        // UPGRADE SELECTION & WHEEL – same as before, but spin longer
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
 
         function getAudioContext() {
-            if (!audioCtx2) {
-                audioCtx2 = new(window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx2) audioCtx2 = new(window.AudioContext || window.webkitAudioContext)();
             return audioCtx2;
         }
 
@@ -3384,9 +3213,8 @@
                 }
             } else {
                 upgradeGame.toNftId = nftId;
-                const centerImg = document.getElementById('wheelCenterNft');
-                centerImg.src = NFT_DB[nftId].gif;
-                centerImg.style.display = 'block';
+                document.getElementById('wheelCenterNft').src = NFT_DB[nftId].gif;
+                document.getElementById('wheelCenterNft').style.display = 'block';
             }
             closeNftSelection();
             updateUpgradeSelectors();
@@ -3408,7 +3236,7 @@
             targetChance: 1.0,
             chanceAnimationId: null,
             lastTickAngle: -Math.PI / 2,
-            tickThreshold: 25 * Math.PI / 180,
+            tickThreshold: 30 * Math.PI / 180,
 
             init() {
                 this.ctx = this.canvas.getContext('2d');
@@ -3420,8 +3248,8 @@
                 const w = this.canvas.width;
                 const h = this.canvas.height;
                 const cx = w / 2, cy = h / 2;
-                const outerR = 145; // bigger
-                const innerR = 65;
+                const outerR = 120;
+                const innerR = 52;
 
                 ctx.clearRect(0, 0, w, h);
 
@@ -3432,66 +3260,41 @@
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
                 ctx.closePath();
-                const greenGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                 greenGrad.addColorStop(0, '#00e676');
-                greenGrad.addColorStop(0.7, '#00c853');
                 greenGrad.addColorStop(1, '#009624');
                 ctx.fillStyle = greenGrad;
-                ctx.shadowColor = 'rgba(0,230,118,0.3)';
-                ctx.shadowBlur = 20;
                 ctx.fill();
-                ctx.shadowBlur = 0;
 
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
                     ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
                     ctx.closePath();
-                    const redGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                     redGrad.addColorStop(0, '#ff5252');
-                    redGrad.addColorStop(0.7, '#d32f2f');
                     redGrad.addColorStop(1, '#b71c1c');
                     ctx.fillStyle = redGrad;
-                    ctx.shadowColor = 'rgba(255,82,82,0.3)';
-                    ctx.shadowBlur = 20;
                     ctx.fill();
-                    ctx.shadowBlur = 0;
                 }
 
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.lineWidth = 0.1;
                 ctx.stroke();
 
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
-                ctx.shadowColor = 'rgba(255,255,255,0.5)';
-                ctx.shadowBlur = 25;
                 ctx.beginPath();
-                ctx.moveTo(outerR - 10, 0);
-                ctx.lineTo(outerR + 22, -16);
-                ctx.lineTo(outerR + 22, 16);
+                ctx.moveTo(outerR - 6, 0);
+                ctx.lineTo(outerR + 8, -8);
+                ctx.lineTo(outerR + 8, 8);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
-                ctx.shadowBlur = 0;
                 ctx.restore();
-
-                ctx.beginPath();
-                ctx.arc(cx, cy, 14, 0, 2 * Math.PI);
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(255,215,0,0.6)';
-                ctx.shadowBlur = 20;
-                ctx.fill();
-                ctx.shadowBlur = 0;
             },
 
             animateToChance(newChance) {
@@ -3531,7 +3334,7 @@
                 this.spinning = true;
                 document.getElementById('upgradeBtn').disabled = true;
                 const wheelContainer = document.getElementById('wheelContainer');
-                wheelContainer.style.filter = 'drop-shadow(0 0 30px rgba(0,210,160,0.8)) brightness(1.1)';
+                wheelContainer.style.filter = 'drop-shadow(0 0 15px rgba(0,210,160,0.6))';
 
                 this.lastTickAngle = this.arrowAngle;
 
@@ -3551,8 +3354,8 @@
             },
 
             startSpin() {
-                // Longer spin: 7-9 seconds
-                const duration = 7000 + Math.random() * 2000;
+                // LONGER SPIN: 8-10 seconds
+                const duration = 8000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
                 let finalAngleOnWheel;
@@ -3574,8 +3377,8 @@
                     const angleDiff = Math.abs(this.arrowAngle - this.lastTickAngle);
                     if (angleDiff >= this.tickThreshold) {
                         const speed = Math.abs(targetArrowAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 - t)) / duration;
-                        const freq = 400 + speed * 150;
-                        const vol = Math.min(0.4, 0.15 + speed * 0.008);
+                        const freq = 400 + speed * 100;
+                        const vol = Math.min(0.4, 0.1 + speed * 0.005);
                         playTick(vol, freq);
                         this.lastTickAngle = this.arrowAngle;
                     }
@@ -3596,13 +3399,13 @@
                         const container = document.getElementById('wheelContainer');
                         if (isGreen) {
                             container.style.filter = 'drop-shadow(0 0 50px rgba(0,210,160,1)) brightness(1.4)';
-                            setTimeout(() => { container.style.filter = 'none'; }, 500);
+                            setTimeout(() => container.style.filter = 'none', 500);
                         } else {
                             container.style.filter = 'drop-shadow(0 0 50px rgba(255,80,80,1)) brightness(0.8)';
-                            setTimeout(() => { container.style.filter = 'none'; }, 500);
+                            setTimeout(() => container.style.filter = 'none', 500);
                         }
 
-                        const returnDuration = 1000;
+                        const returnDuration = 800;
                         const returnStartAngle = this.arrowAngle;
                         const returnStartTime = performance.now();
                         const animateReturn = (now2) => {
@@ -3612,7 +3415,7 @@
                             let bounce = 0;
                             if (t2 > 0.8) {
                                 const b = (t2 - 0.8) / 0.2;
-                                bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.1;
+                                bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.08;
                             }
                             this.arrowAngle = returnStartAngle - deltaAngle * eased2 + bounce;
                             this.drawWheelAndArrow(this.arrowAngle);
@@ -3900,9 +3703,7 @@
                 ];
                 let weighted = [];
                 for (let item of multiplierPool) {
-                    for (let i = 0; i < item.weight; i++) {
-                        weighted.push(item.value);
-                    }
+                    for (let i = 0; i < item.weight; i++) weighted.push(item.value);
                 }
 
                 for (let i = 0; i < this.segmentCount; i++) {
@@ -3952,9 +3753,7 @@
                 this.lastFrameTime = 0;
                 if (this.launchTimeout) clearTimeout(this.launchTimeout);
                 this.launchTimeout = setTimeout(() => {
-                    if (this.isSpinning && !this.isLaunched) {
-                        this.launchBall();
-                    }
+                    if (this.isSpinning && !this.isLaunched) this.launchBall();
                     this.launchTimeout = null;
                 }, (this.spinDuration + 0.5) * 1000);
             },
@@ -3971,7 +3770,7 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // FASTER BALL
+                // FASTER BALL: 250-350
                 const speed = 250 + Math.random() * 100;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -3982,9 +3781,7 @@
             },
 
             handleStart() {
-                if (!this.isPlaying && !this.isSpinning) {
-                    this.startRound();
-                }
+                if (!this.isPlaying && !this.isSpinning) this.startRound();
             },
 
             startRound() {
@@ -4067,16 +3864,12 @@
                     ft.y -= 60 * this.fixedStep;
                     ft.life -= this.fixedStep;
                     ft.scale = 1 - (1 - ft.life / ft.maxLife) * 0.8;
-                    if (ft.life <= 0) {
-                        this.floatingTexts.splice(i, 1);
-                    }
+                    if (ft.life <= 0) this.floatingTexts.splice(i, 1);
                 }
 
                 if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
                     this.isLossBall = true;
-                    if (this.ballElement) {
-                        this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
-                    }
+                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
                     this.endGame(false);
                     return;
                 }
@@ -4087,13 +3880,9 @@
                 const elapsed = now - this.startTime;
 
                 let currentFriction = 1.0;
-                if (elapsed > 2500 && elapsed <= 6000) {
-                    currentFriction = 0.998;
-                } else if (elapsed > 6000) {
-                    currentFriction = 0.993;
-                } else {
-                    currentFriction = 1.0;
-                }
+                if (elapsed > 2500 && elapsed <= 6000) currentFriction = 0.998;
+                else if (elapsed > 6000) currentFriction = 0.993;
+                else currentFriction = 1.0;
 
                 if (elapsed > 2500) {
                     this.circle.vx *= currentFriction;
@@ -4128,10 +3917,7 @@
                         let normY = ny / len;
                         const cx = this.circle.x - seg.x1;
                         const cy = this.circle.y - seg.y1;
-                        if (cx * normX + cy * normY < 0) {
-                            normX = -normX;
-                            normY = -normY;
-                        }
+                        if (cx * normX + cy * normY < 0) { normX = -normX; normY = -normY; }
                         const vDot = this.circle.vx * normX + this.circle.vy * normY;
                         if (vDot < 0) {
                             this.circle.vx -= 2 * vDot * normX;
@@ -4227,9 +4013,7 @@
                     triggerVibration(50, 'medium');
                     showNotification(winAmount, winAmount);
                     processGameWin(winAmount);
-                    if (this.ballElement) {
-                        this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                    }
+                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 } else {
                     state.losses++;
                     state.totalGames++;
@@ -4237,9 +4021,7 @@
                     resultEl.textContent = `Lost ${this.bet}⭐`;
                     this.playLoseSound();
                     triggerVibration(80, 'heavy');
-                    if (this.ballElement) {
-                        this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
-                    }
+                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
                 }
                 updateHomeUI();
                 updateProfile();
@@ -4307,22 +4089,13 @@
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const ratio = seg.durability / seg.maxDurability;
-                    let color;
-                    if (ratio > 0.5) {
-                        color = '#1a1a20';
-                    } else {
-                        color = '#282830';
-                    }
+                    let color = ratio > 0.5 ? '#1a1a20' : '#282830';
                     ctx.beginPath();
                     const outer = seg.outer;
                     ctx.moveTo(outer[0].x, outer[0].y);
-                    for (let i = 1; i < outer.length; i++) {
-                        ctx.lineTo(outer[i].x, outer[i].y);
-                    }
+                    for (let i = 1; i < outer.length; i++) ctx.lineTo(outer[i].x, outer[i].y);
                     const inner = seg.inner;
-                    for (let i = inner.length - 1; i >= 0; i--) {
-                        ctx.lineTo(inner[i].x, inner[i].y);
-                    }
+                    for (let i = inner.length - 1; i >= 0; i--) ctx.lineTo(inner[i].x, inner[i].y);
                     ctx.closePath();
                     ctx.fillStyle = color;
                     ctx.shadowColor = 'rgba(255,255,255,0.02)';
@@ -4394,9 +4167,8 @@
                 const size = parseInt(this.dataset.size);
                 const mines = parseInt(this.dataset.mines);
                 if (this.classList.contains('coming-soon')) {
-                    const msg = document.getElementById('minesMessage');
-                    msg.textContent = 'Coming soon!';
-                    msg.className = 'mines-message';
+                    document.getElementById('minesMessage').textContent = 'Coming soon!';
+                    document.getElementById('minesMessage').className = 'mines-message';
                     setTimeout(() => minesGame.updateUI(), 1000);
                     return;
                 }
@@ -4419,7 +4191,7 @@
         });
 
         // ============================================================
-        // INIT – LOADING SCREEN ENABLED
+        // INIT
         // ============================================================
         async function init() {
             const loadingScreen = document.getElementById('loadingScreen');
@@ -4429,14 +4201,10 @@
                 const preloadPromise = preloadAllGifs();
                 const timeoutPromise = new Promise(resolve => setTimeout(resolve, 5000));
                 await Promise.race([preloadPromise, timeoutPromise]);
-                console.log('Preload done or timed out');
-            } catch (e) {
-                console.warn('Preload error, continuing anyway', e);
-            }
+            } catch (e) { console.warn('Preload error, continuing anyway', e); }
 
             const minDisplay = 2500;
-            const startTime = performance.now();
-            const elapsed = performance.now() - startTime;
+            const elapsed = performance.now();
             const remaining = Math.max(0, minDisplay - elapsed);
             await new Promise(resolve => setTimeout(resolve, remaining));
 
@@ -4457,16 +4225,14 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded: bigger wheel, longer spin, faster bounce, crash NFT overlay + rocket shrink.');
+            console.log('✅ Casino loaded – wheel spins longer (8-10s), rocket shrinks & moves down smoothly, bounce is faster.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(init, 100);
         } else {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(init, 100);
-            });
+            document.addEventListener('DOMContentLoaded', () => setTimeout(init, 100));
         }
         setTimeout(init, 500);
     </script>
