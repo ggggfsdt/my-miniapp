@@ -1185,17 +1185,6 @@
             height: 4px;
             border-radius: 2px;
             background: rgba(255, 255, 255, 0.08);
-            overflow: visible; /* allow markers to be visible */
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            /* make it relative for absolute positioning of markers */
-            position: absolute;
-            bottom: 2px;
-            left: 12px;
-            right: 12px;
-            height: 4px;
-            border-radius: 2px;
-            background: rgba(255, 255, 255, 0.08);
             overflow: visible;
             opacity: 0;
             transition: opacity 0.6s ease;
@@ -1210,55 +1199,35 @@
             background: #00d2a0;
             transition: none;
             box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
+            position: relative;
+            z-index: 1;
         }
 
-        /* ===== NFT MILESTONE MARKERS ON THE PROGRESS LINE ===== */
+        /* ===== NFT MILESTONE – just an image, no circles, with pop animation ===== */
         .nft-milestone {
             position: absolute;
             top: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
+            transform: translate(-50%, -50%) scale(0.6);
             z-index: 12;
             width: 28px;
             height: 28px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.6);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0.3;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.4;
             pointer-events: none;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             will-change: transform, opacity;
-        }
-        .nft-milestone.reached {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.2);
-            border-color: rgba(255, 215, 0, 0.6);
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
-            z-index: 13;
         }
         .nft-milestone img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            border-radius: 50%;
+            display: block;
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
         }
-        .nft-milestone .label {
-            position: absolute;
-            bottom: -16px;
-            font-size: 7px;
-            color: #888;
-            font-weight: 600;
-            white-space: nowrap;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 0 4px;
-            border-radius: 4px;
-        }
-        .nft-milestone.reached .label {
-            color: #ffd700;
+        .nft-milestone.reached {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.4);
+            z-index: 13;
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
         }
 
         /* ===== BET TOGGLE, INPUT, ETC ===== */
@@ -2712,10 +2681,6 @@
                 width: 22px;
                 height: 22px;
             }
-            .nft-milestone .label {
-                font-size: 6px;
-                bottom: -12px;
-            }
         }
     </style>
 </head>
@@ -3801,7 +3766,7 @@
             transitioning: false,
             moonActive: false,
             nftActive: false,
-            maxMultiplierForLine: 40, // max multiplier for milestone layout
+            maxMultiplierForLine: 5.0, // line fills from 1x to 5x
 
             initWind() {
                 const container = document.getElementById('windLines');
@@ -3938,33 +3903,40 @@
 
                 const maxMult = this.maxMultiplierForLine;
                 const minMult = 1.0;
-                // Find NFTs that are reachable within maxMult
+
+                // Determine bet image: star or NFT
+                let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
+                if (this.betType === 'nft' && this.betNftData) {
+                    betImage = this.betNftData.gif;
+                }
+
+                // First marker at 1x (start of line)
+                const firstMarker = document.createElement('div');
+                firstMarker.className = 'nft-milestone';
+                firstMarker.dataset.mult = 1.0;
+                firstMarker.style.left = '0%';
+                const img = document.createElement('img');
+                img.src = betImage;
+                img.alt = 'bet';
+                firstMarker.appendChild(img);
+                progressWrap.appendChild(firstMarker);
+
+                // Then NFT milestones
                 const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
-                // Limit to at most 6 most affordable to keep it clean
-                const displayNfts = reachable.slice(0, 6);
-
-                if (displayNfts.length === 0) return;
-
+                // Limit to at most 5 to keep it clean
+                const displayNfts = reachable.slice(0, 5);
                 displayNfts.forEach((nft) => {
                     const requiredMult = nft.price / bet;
-                    if (requiredMult < minMult) return;
-                    const pct = Math.min(100, ((requiredMult - minMult) / (maxMult - minMult)) * 100);
+                    if (requiredMult <= minMult) return;
+                    const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
                     const marker = document.createElement('div');
                     marker.className = 'nft-milestone';
                     marker.dataset.mult = requiredMult;
-                    marker.dataset.nftId = nft.id;
-                    // Position: left % based on pct
                     marker.style.left = pct + '%';
-
-                    const img = document.createElement('img');
-                    img.src = nft.gif;
-                    img.alt = nft.name;
-                    marker.appendChild(img);
-                    const label = document.createElement('span');
-                    label.className = 'label';
-                    label.textContent = `${requiredMult.toFixed(1)}x`;
-                    marker.appendChild(label);
-
+                    const img2 = document.createElement('img');
+                    img2.src = nft.gif;
+                    img2.alt = nft.name;
+                    marker.appendChild(img2);
                     progressWrap.appendChild(marker);
                 });
 
@@ -3973,15 +3945,24 @@
                 if (fill) {
                     fill.style.zIndex = 1;
                 }
-                // Markers already have z-index 12/13
+                // Markers have z-index 12/13
             },
 
             updateMilestoneStates(mult) {
                 const progressWrap = document.getElementById('progressWrap');
                 const markers = progressWrap.querySelectorAll('.nft-milestone');
+                // Find the highest multiplier <= current mult
+                let highest = null;
+                let highestMult = 1.0;
                 markers.forEach(marker => {
                     const mMult = parseFloat(marker.dataset.mult);
-                    if (mult >= mMult) {
+                    if (mMult <= mult && mMult >= highestMult) {
+                        highestMult = mMult;
+                        highest = marker;
+                    }
+                });
+                markers.forEach(marker => {
+                    if (marker === highest) {
                         marker.classList.add('reached');
                     } else {
                         marker.classList.remove('reached');
@@ -4298,7 +4279,6 @@
                     this.updateMainButton();
                     this.updateWindEffect();
                     this.updateProgressLine();
-                    // Update milestones to show reached up to crash point
                     this.updateMilestoneStates(this.multiplier);
                     updateLiveData();
                     document.getElementById('moonOverlay').classList.remove('active');
@@ -4307,7 +4287,6 @@
                     document.getElementById('crashNftOverlay').classList.remove('show');
                     document.getElementById('rocketOverlay').classList.remove('nft-active');
                 } else {
-                    // idle state
                     this.updateMilestoneStates(1.0);
                 }
             },
@@ -6530,20 +6509,13 @@
             upgradeGame.init();
             renderInventory();
             updateUpgradeSelectors();
-            // Initial inventory with some NFTs for testing
-            if (state.inventory.length === 0) {
-                state.inventory.push({ ...NFT_DB.chill_flame });
-                state.inventory.push({ ...NFT_DB.timeless_book });
-                state.inventory.push({ ...NFT_DB.snoop_cigar });
-                renderInventory();
-                crashGame.populateNftGrid();
-            }
+            // No default NFTs – inventory starts empty
 
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – NFT milestones on existing progress line.');
+            console.log('✅ Casino loaded – NFT milestones on existing progress line (clean GIFs).');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
