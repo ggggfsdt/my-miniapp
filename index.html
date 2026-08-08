@@ -769,7 +769,7 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        /* UPGRADE – same as before, just spin longer */
+        /* UPGRADE – same as original (340px, original gradient, arrow) */
         .upgrade-wheel-container {
             position: relative;
             width: 340px;
@@ -879,7 +879,7 @@
         .btn-sell { background: rgba(255,107,107,0.2); color: #ff6b6b; }
         .btn-inventory-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); color: white; }
 
-        /* CRASH NFT OVERLAY – center, transparent */
+        /* CRASH NFT OVERLAY – bigger, less transparent */
         #crashNftOverlay {
             position: absolute;
             inset: 0;
@@ -893,11 +893,11 @@
         }
         #crashNftOverlay.show {
             display: flex;
-            opacity: 0.3;
+            opacity: 0.5; /* less transparent */
         }
         #crashNftOverlay img {
-            width: 120px;
-            height: 120px;
+            width: 160px; /* bigger */
+            height: 160px;
             object-fit: contain;
             border-radius: 20px;
             filter: drop-shadow(0 0 40px rgba(255,215,0,0.3));
@@ -917,6 +917,21 @@
         /* Rocket shrink + move down - smooth CSS transition */
         .gif-overlay.nft-active {
             transform: translate(-50%, -20%) rotate(0deg) scale(0.55) !important;
+        }
+
+        /* Upgrade win animation – flying NFT to inventory tab */
+        .flying-nft {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            object-fit: contain;
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 40px rgba(255,215,0,0.6);
         }
 
         @media (max-width: 420px) {
@@ -948,7 +963,8 @@
             .upgrade-wheel-container { width: 280px; height: 280px; }
             #upgradeWheel { width: 280px; height: 280px; }
             .wheel-center-nft { width: 60px; height: 60px; }
-            #crashNftOverlay img { width: 80px; height: 80px; }
+            #crashNftOverlay img { width: 120px; height: 120px; }
+            .flying-nft { width: 60px; height: 60px; }
         }
     </style>
 </head>
@@ -1134,7 +1150,7 @@
                         </div>
                         <div class="info">
                             <div class="name" id="fromNftName">Your NFT</div>
-                            <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                            <div class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
                         </div>
                     </div>
                     <div class="upgrade-select" onclick="openNftSelection('to')">
@@ -1144,7 +1160,7 @@
                         </div>
                         <div class="info">
                             <div class="name" id="toNftName">Desired NFT</div>
-                            <div class="price"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                            <div class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
                         </div>
                     </div>
                 </div>
@@ -1873,6 +1889,43 @@
             } else {
                 state.balance += win;
             }
+        }
+
+        // ============================================================
+        // FLYING NFT ANIMATION (upgrade win)
+        // ============================================================
+        function flyNftToInventory(nft) {
+            const wheelCenter = document.getElementById('wheelCenterNft');
+            if (!wheelCenter) return;
+            const rect = wheelCenter.getBoundingClientRect();
+            const inventoryTab = document.querySelector('.nav-item[data-page="inventory"]');
+            if (!inventoryTab) return;
+            const invRect = inventoryTab.getBoundingClientRect();
+
+            // Create flying element
+            const flying = document.createElement('img');
+            flying.className = 'flying-nft';
+            flying.src = nft.gif;
+            flying.alt = nft.name;
+            flying.style.left = rect.left + rect.width / 2 - 40 + 'px';
+            flying.style.top = rect.top + rect.height / 2 - 40 + 'px';
+            flying.style.width = '80px';
+            flying.style.height = '80px';
+            document.body.appendChild(flying);
+
+            // Trigger reflow then animate
+            void flying.offsetHeight;
+            flying.style.left = invRect.left + invRect.width / 2 - 20 + 'px';
+            flying.style.top = invRect.top + invRect.height / 2 - 20 + 'px';
+            flying.style.width = '40px';
+            flying.style.height = '40px';
+            flying.style.opacity = '0';
+            flying.style.transform = 'scale(0.3)';
+
+            // Remove after animation
+            setTimeout(() => {
+                if (flying.parentNode) flying.remove();
+            }, 1500);
         }
 
         // ============================================================
@@ -3113,7 +3166,7 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL – same as before, but spin longer
+        // UPGRADE SELECTION & WHEEL – original look, longer spin
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -3256,6 +3309,7 @@
                 const greenAngle = this.chance * 2 * Math.PI;
                 const startAngle = -Math.PI / 2;
 
+                // Green segment
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
@@ -3266,6 +3320,7 @@
                 ctx.fillStyle = greenGrad;
                 ctx.fill();
 
+                // Red segment
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
@@ -3278,12 +3333,14 @@
                     ctx.fill();
                 }
 
+                // Outer border
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.05)';
                 ctx.lineWidth = 0.1;
                 ctx.stroke();
 
+                // Arrow
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
@@ -3338,6 +3395,7 @@
 
                 this.lastTickAngle = this.arrowAngle;
 
+                // Tension build-up
                 let tensionCount = 0;
                 const tensionMax = 3;
                 let tensionInterval = setInterval(() => {
@@ -3354,7 +3412,7 @@
             },
 
             startSpin() {
-                // LONGER SPIN: 8-10 seconds
+                // Longer spin: 8-10 seconds
                 const duration = 8000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
@@ -3451,6 +3509,8 @@
                     showNotification(toNft.price, toNft.price);
                     triggerVibration(80, 'heavy');
                     showWinPopup(toNft);
+                    // Trigger flying animation
+                    flyNftToInventory(toNft);
                 } else {
                     playLoseSound();
                     state.inventory.splice(fromIdx, 1);
@@ -3469,33 +3529,41 @@
             const toPlaceholder = document.getElementById('toPlaceholder');
             const fromName = document.getElementById('fromNftName');
             const toName = document.getElementById('toNftName');
+            const fromPrice = document.getElementById('fromPriceDisplay');
+            const toPrice = document.getElementById('toPriceDisplay');
             const upgradeBtn = document.getElementById('upgradeBtn');
             const upgradeBtnText = document.getElementById('upgradeBtnText');
 
+            // Update from NFT display
             if (upgradeGame.fromNftId) {
                 const nft = NFT_DB[upgradeGame.fromNftId];
                 fromImg.src = nft.gif;
                 fromImg.style.display = 'block';
                 fromPlaceholder.style.display = 'none';
                 fromName.textContent = nft.name;
+                fromPrice.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
             } else {
                 fromImg.style.display = 'none';
                 fromPlaceholder.style.display = 'block';
                 fromName.textContent = 'Your NFT';
+                fromPrice.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
             }
 
+            // Update to NFT display
             if (upgradeGame.toNftId) {
                 const nft = NFT_DB[upgradeGame.toNftId];
                 toImg.src = nft.gif;
                 toImg.style.display = 'block';
                 toPlaceholder.style.display = 'none';
                 toName.textContent = nft.name;
+                toPrice.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
                 document.getElementById('wheelCenterNft').src = nft.gif;
                 document.getElementById('wheelCenterNft').style.display = 'block';
             } else {
                 toImg.style.display = 'none';
                 toPlaceholder.style.display = 'block';
                 toName.textContent = 'Desired NFT';
+                toPrice.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
                 document.getElementById('wheelCenterNft').style.display = 'none';
             }
 
@@ -3770,7 +3838,7 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // FASTER BALL: 250-350
+                // FASTER BALL
                 const speed = 250 + Math.random() * 100;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -4225,7 +4293,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – wheel spins longer (8-10s), rocket shrinks & moves down smoothly, bounce is faster.');
+            console.log('✅ Casino loaded – wheel original (340px), longer spin, crash NFT bigger+less transparent, flying animation, price displayed.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
