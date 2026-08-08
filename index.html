@@ -479,6 +479,14 @@
             color: #555;
             margin-top: 1px;
         }
+        .quick-card .arrow {
+            font-size: 14px;
+            color: #555;
+            transition: color 0.3s, transform 0.3s;
+        }
+        .quick-card:active .arrow {
+            transform: translateX(4px);
+        }
         .quick-card.glow-purple {
             box-shadow: 0 0 30px rgba(108, 92, 231, 0.05);
         }
@@ -904,57 +912,9 @@
         .grid-square.corner {
             border-color: rgba(108, 92, 231, 0.06);
         }
-        .wind-lines {
-            position: absolute;
-            inset: 0;
-            z-index: 6;
-            pointer-events: none;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            transform: rotate(-20deg);
-            transform-origin: center center;
-            will-change: transform, opacity;
-        }
-        .wind-lines.active {
-            opacity: 1;
-        }
-        .wind-lines .streak {
-            position: absolute;
-            height: 2px;
-            border-radius: 50%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-            will-change: transform;
-            animation: windStreak linear infinite;
-        }
-        .wind-lines .streak:nth-child(odd) {
-            height: 1.5px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-        }
-        .wind-lines .streak:nth-child(3n) {
-            height: 2.5px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-        }
-        .wind-lines .streak:nth-child(5n) {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        }
-        @keyframes windStreak {
-            0% {
-                transform: translate(0, 0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.8;
-            }
-            85% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translate(var(--dx), var(--dy));
-                opacity: 0;
-            }
-        }
+
+        /* removed wind-lines */
+
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -1206,8 +1166,8 @@
         /* ===== NFT MILESTONE – just an image, no circles, with pop animation ===== */
         .nft-milestone {
             position: absolute;
-            top: 50%;
-            transform: translate(-50%, -50%) scale(0.6);
+            top: -12px; /* moved higher above the line */
+            transform: translateX(-50%) scale(0.6);
             z-index: 12;
             width: 28px;
             height: 28px;
@@ -1225,7 +1185,7 @@
         }
         .nft-milestone.reached {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1.4);
+            transform: translateX(-50%) scale(1.4);
             z-index: 13;
             filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
         }
@@ -2753,6 +2713,7 @@
                         <div class="label">Crash</div>
                         <div class="desc">Fly high, cash out!</div>
                     </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
                 <div class="quick-card glow-green" onclick="navigateTo('mines')">
                     <span class="icon"><i class="fas fa-gem"></i></span>
@@ -2760,6 +2721,7 @@
                         <div class="label">Mines</div>
                         <div class="desc">Find the gems</div>
                     </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
                 <div class="quick-card glow-blue" onclick="navigateTo('upgrade')">
                     <span class="icon"><i class="fas fa-arrow-up"></i></span>
@@ -2767,6 +2729,7 @@
                         <div class="label">Upgrade</div>
                         <div class="desc">NFT Upgrade Wheel</div>
                     </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
                 <div class="quick-card glow-gold" onclick="navigateTo('bounce')">
                     <span class="icon"><i class="fas fa-arrows-alt"></i></span>
@@ -2774,6 +2737,7 @@
                         <div class="label">Bounce</div>
                         <div class="desc">Break segments, collect multipliers</div>
                     </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
             </div>
             <div class="card recent-winners-card">
@@ -2787,7 +2751,7 @@
             <div class="flex-between mb-8"><span class="badge badge-gold"><i class="fas fa-rocket" style="margin-right:6px;"></i>Crash<span class="online-dot"></span></span><span class="badge" id="rocketBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
             <div class="grid-container" id="gridContainer">
                 <div class="grid-squares" id="gridSquares"></div>
-                <div class="wind-lines" id="windLines"></div>
+                <!-- wind-lines removed -->
                 <div class="moon-overlay" id="moonOverlay">
                     <img id="moonGif" src="https://images.iimg.live/images/ultimate-collection-3580.webp" alt="Moon" decoding="async">
                 </div>
@@ -2796,7 +2760,7 @@
                     <img id="crashNftOverlayImg" src="" alt="NFT" decoding="async">
                 </div>
                 <div class="gif-overlay" id="rocketOverlay">
-                    <img id="crashGif" src="" alt="Car/Rocket" decoding="async">
+                    <img id="crashGif" src="" alt="Rocket" decoding="async">
                 </div>
                 <div class="explosion-overlay" id="explosionOverlay">
                     <img id="explosionGif" src="https://images.iimg.live/images/excellent-photo-4696.webp" alt="Explosion" decoding="async">
@@ -3112,12 +3076,8 @@
         }
 
         // ============================================================
-        // CAR & ROCKET GIFS
+        // ROCKET GIFS (only rockets, no cars)
         // ============================================================
-        const CAR_GIFS = [
-            'https://images.iimg.live/images/cool-gallery-5268.webp',
-            'https://images.iimg.live/images/fantastic-image-2034.webp'
-        ];
         const ROCKET_GIFS = [
             'https://images.iimg.live/images/radiant-picture-4066.webp',
             'https://images.iimg.live/images/glorious-portfolio-1947.webp',
@@ -3133,7 +3093,6 @@
             'https://images.iimg.live/images/excellent-snapshot-7013.webp'
         ];
 
-        function getRandomCarGif() { return CAR_GIFS[Math.floor(Math.random() * CAR_GIFS.length)]; }
         function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
         function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
@@ -3753,8 +3712,7 @@
             isCashingOut: false,
             vibrationInterval: null,
             roundId: 0,
-            windStart: 1.2,
-            windReappear: 3.3,
+            // removed wind related
             currentAngle: 0,
             velocity: 0,
             targetAngle: 0,
@@ -3762,29 +3720,18 @@
             targetScale: 1,
             scaleVelocity: 0,
             cashOutPending: false,
-            isCarPhase: true,
+            // removed car phase
             transitioning: false,
             moonActive: false,
             nftActive: false,
             maxMultiplierForLine: 5.0, // line fills from 1x to 5x
 
-            initWind() {
-                const container = document.getElementById('windLines');
-                container.innerHTML = '';
-                for (let i = 0; i < 25; i++) {
-                    const streak = document.createElement('div');
-                    streak.className = 'streak';
-                    const x = Math.random() * 120 - 10;
-                    const y = Math.random() * 120 - 10;
-                    const width = 15 + Math.random() * 45;
-                    streak.style.left = x + '%';
-                    streak.style.top = y + '%';
-                    streak.style.width = width + '%';
-                    streak.style.animationDelay = (Math.random() * 1.5) + 's';
-                    streak.style.animationDuration = (0.8 + Math.random() * 0.6) + 's';
-                    container.appendChild(streak);
-                }
-            },
+            // Rocket struggle parameters
+            struggleTime: 0,
+            struggleAmplitude: 0.08,
+            struggleSpeed: 8,
+
+            // removed initWind
 
             toggleBetType() {
                 if (this.isPlaying) return;
@@ -3897,14 +3844,13 @@
                 oldMarkers.forEach(el => el.remove());
 
                 if (!bet || bet <= 0) {
-                    // No bet, hide markers
                     return;
                 }
 
                 const maxMult = this.maxMultiplierForLine;
                 const minMult = 1.0;
 
-                // Determine bet image: star or NFT
+                // Bet image (star or NFT)
                 let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
                 if (this.betType === 'nft' && this.betNftData) {
                     betImage = this.betNftData.gif;
@@ -3923,7 +3869,6 @@
 
                 // Then NFT milestones
                 const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
-                // Limit to at most 5 to keep it clean
                 const displayNfts = reachable.slice(0, 5);
                 displayNfts.forEach((nft) => {
                     const requiredMult = nft.price / bet;
@@ -3940,18 +3885,13 @@
                     progressWrap.appendChild(marker);
                 });
 
-                // Ensure progress fill is below markers (z-index)
                 const fill = document.getElementById('progressFill');
-                if (fill) {
-                    fill.style.zIndex = 1;
-                }
-                // Markers have z-index 12/13
+                if (fill) fill.style.zIndex = 1;
             },
 
             updateMilestoneStates(mult) {
                 const progressWrap = document.getElementById('progressWrap');
                 const markers = progressWrap.querySelectorAll('.nft-milestone');
-                // Find the highest multiplier <= current mult
                 let highest = null;
                 let highestMult = 1.0;
                 markers.forEach(marker => {
@@ -3972,49 +3912,7 @@
 
             // ----- end milestone -----
 
-            updateWindEffect() {
-                const windContainer = document.getElementById('windLines');
-                const mult = this.multiplier;
-                let phase = 0;
-                if (mult > this.windStart && mult < 2.83) phase = 0;
-                else if (mult >= 2.83 && mult < 2.9) phase = 1;
-                else if (mult >= 2.9 && mult < this.windReappear) phase = 2;
-                else if (mult >= this.windReappear) phase = 3;
-                this.windPhase = phase;
-
-                if (mult > this.windStart && this.isPlaying && phase !== 2) {
-                    const streaks = windContainer.querySelectorAll('.streak');
-                    const distBase = 60 + Math.min(80, (mult - this.windStart) * 35);
-                    if (phase === 0 || phase === 1) {
-                        windContainer.style.transform = 'rotate(-20deg)';
-                        let intensity;
-                        if (phase === 0) {
-                            intensity = Math.min(1, (mult - this.windStart) / 1.6);
-                            windContainer.style.opacity = 0.15 + intensity * 0.7;
-                        } else {
-                            const fadeProgress = (mult - 2.83) / 0.07;
-                            const baseOpacity = 0.15 + 0.7;
-                            windContainer.style.opacity = baseOpacity * (1 - fadeProgress);
-                        }
-                        windContainer.classList.add('active');
-                        streaks.forEach((s) => {
-                            s.style.setProperty('--dx', '-' + distBase + '%');
-                            s.style.setProperty('--dy', distBase + '%');
-                        });
-                    } else if (phase === 3) {
-                        windContainer.style.transform = 'rotate(0deg)';
-                        windContainer.style.opacity = 0.15 + 0.7;
-                        windContainer.classList.add('active');
-                        streaks.forEach((s) => {
-                            s.style.setProperty('--dx', '0%');
-                            s.style.setProperty('--dy', '-' + distBase + '%');
-                        });
-                    }
-                } else {
-                    windContainer.classList.remove('active');
-                    windContainer.style.opacity = 0;
-                }
-            },
+            // removed wind effect
 
             updateMoon(mult) {
                 const moonOverlay = document.getElementById('moonOverlay');
@@ -4070,19 +3968,7 @@
                 }
             },
 
-            setCarImage() {
-                const img = document.getElementById('crashGif');
-                img.style.transition = 'none';
-                this.currentCarGif = getRandomCarGif();
-                const cached = GIF_CACHE[this.currentCarGif];
-                img.src = cached ? cached.src : this.currentCarGif;
-                img.style.display = 'block';
-                img.style.opacity = 1;
-                img.classList.add('active');
-                this.isCarPhase = true;
-                this.transitioning = false;
-            },
-
+            // Always rocket, no car
             setRocketImage() {
                 const img = document.getElementById('crashGif');
                 img.style.transition = 'none';
@@ -4092,46 +3978,7 @@
                 img.style.display = 'block';
                 img.style.opacity = 1;
                 img.classList.add('active');
-                this.isCarPhase = false;
                 this.transitioning = false;
-            },
-
-            transitionToRocket() {
-                if (this.transitioning || !this.isCarPhase) return;
-                this.transitioning = true;
-                const img = document.getElementById('crashGif');
-                img.style.transition = 'opacity 0.15s ease';
-                img.style.opacity = 0;
-                setTimeout(() => {
-                    img.classList.remove('active');
-                    img.src = '';
-                    img.style.display = 'none';
-                    setTimeout(() => {
-                        this.currentRocketGif = getRandomRocketGif();
-                        img.style.display = 'block';
-                        const cached = GIF_CACHE[this.currentRocketGif];
-                        img.src = cached ? cached.src : this.currentRocketGif;
-                        const onLoad = () => {
-                            img.onload = null;
-                            img.style.transition = 'opacity 0.15s ease';
-                            img.style.opacity = 1;
-                            img.classList.add('active');
-                            this.isCarPhase = false;
-                            this.transitioning = false;
-                        };
-                        img.onload = onLoad;
-                        if (img.complete && img.naturalWidth > 0) onLoad();
-                        setTimeout(() => {
-                            if (this.transitioning) {
-                                img.style.transition = 'opacity 0.15s ease';
-                                img.style.opacity = 1;
-                                img.classList.add('active');
-                                this.isCarPhase = false;
-                                this.transitioning = false;
-                            }
-                        }, 300);
-                    }, 30);
-                }, 150);
             },
 
             hideImage() {
@@ -4155,19 +4002,42 @@
                 this.currentAngle += this.velocity * dt;
                 this.currentAngle = Math.max(-45, Math.min(45, this.currentAngle));
 
+                // Base scale from zoom (if any)
                 const mult = this.multiplier;
+                let baseScale = 1.0;
                 if (mult >= 5.0) {
                     const zoomProgress = Math.min(1, (mult - 5.0) / 5.0);
-                    this.targetScale = 1.0 - zoomProgress * 0.3;
-                } else { this.targetScale = 1.0; }
+                    baseScale = 1.0 - zoomProgress * 0.3;
+                }
+
+                // Struggle effect: oscillate scale when multiplier < 5
+                let struggle = 0;
+                if (this.isPlaying && mult < 5.0) {
+                    // Increase struggle time
+                    this.struggleTime += dt * this.struggleSpeed;
+                    // Amplitude decreases as multiplier approaches 5
+                    const amp = this.struggleAmplitude * (1 - mult / 5.0);
+                    struggle = amp * Math.sin(this.struggleTime);
+                } else {
+                    // Smoothly transition to no struggle
+                    this.struggleTime += dt * this.struggleSpeed;
+                    struggle = 0;
+                }
+
+                // Apply struggle to scale
+                let totalScale = baseScale + struggle;
+                // Clamp to reasonable range
+                totalScale = Math.max(0.5, Math.min(1.4, totalScale));
+
+                // Smoothly interpolate currentScale towards target
                 const scaleStiffness = 6.0,
                     scaleDamping = 3.5;
-                const scaleForce = (this.targetScale - this.currentScale) * scaleStiffness;
+                const scaleForce = (totalScale - this.currentScale) * scaleStiffness;
                 const scaleDampForce = -this.scaleVelocity * scaleDamping;
                 const scaleAccel = scaleForce + scaleDampForce;
                 this.scaleVelocity += scaleAccel * dt;
                 this.currentScale += this.scaleVelocity * dt;
-                this.currentScale = Math.max(0.5, Math.min(1.2, this.currentScale));
+                this.currentScale = Math.max(0.5, Math.min(1.4, this.currentScale));
 
                 if (!this.nftActive) {
                     const overlay = document.getElementById('rocketOverlay');
@@ -4219,13 +4089,13 @@
 
             init() {
                 this.createGrid();
-                this.initWind();
+                // removed initWind
                 this.updateUI();
                 this.renderHistory();
                 this.updateMainButton();
                 players = [];
                 renderPlayers();
-                this.setCarImage();
+                this.setRocketImage(); // always rocket
                 document.getElementById('moonOverlay').classList.remove('active');
                 document.getElementById('moonGif').style.display = 'none';
                 document.getElementById('crashNftOverlay').classList.remove('show');
@@ -4234,6 +4104,7 @@
                 this.setBetType('stars');
                 this.populateNftGrid();
                 this.updateNftMilestones(0);
+                this.struggleTime = 0;
             },
 
             createGrid() {
@@ -4263,21 +4134,15 @@
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 if (this.isPlaying) {
                     this.updateMainButton();
-                    this.updateWindEffect();
                     this.updateProgressLine();
                     this.updateRotationAndZoom();
                     this.updateMoon(m);
-                    // Update milestone states
                     this.updateMilestoneStates(m);
-                    if (this.isCarPhase && m >= 1.56 && !this.transitioning) {
-                        this.transitionToRocket();
-                    }
                     const winAmount = Math.floor(this.bet * this.multiplier);
                     this.updateNftOverlay(winAmount);
                     updateLiveData();
                 } else if (this.gameOver) {
                     this.updateMainButton();
-                    this.updateWindEffect();
                     this.updateProgressLine();
                     this.updateMilestoneStates(this.multiplier);
                     updateLiveData();
@@ -4513,7 +4378,6 @@
                     renderPlayers();
                     this.updateMainButton();
                     document.getElementById('betInputRow').classList.remove('open');
-                    // Add NFT milestones on progress line
                     this.updateNftMilestones(this.bet);
                     return;
                 }
@@ -4724,9 +4588,7 @@
                 this.gameOver = false;
                 this.lastTime = 0;
                 document.getElementById('explosionOverlay').classList.remove('active');
-                this.setCarImage();
-                document.getElementById('windLines').classList.remove('active');
-                document.getElementById('windLines').style.opacity = 0;
+                this.setRocketImage(); // always rocket
                 document.getElementById('progressWrap').classList.remove('active');
                 document.getElementById('progressFill').style.width = '0%';
                 this.currentAngle = 0;
@@ -4734,6 +4596,7 @@
                 this.currentScale = 1;
                 this.targetScale = 1;
                 this.scaleVelocity = 0;
+                this.struggleTime = 0;
                 this.updateUI();
                 this.updateMainButton();
                 this.startContinuousVibration();
@@ -4796,8 +4659,6 @@
                     updateHomeUI();
                     if (this.animationId) { cancelAnimationFrame(this.animationId);
                         this.animationId = null; }
-                    document.getElementById('windLines').classList.remove('active');
-                    document.getElementById('windLines').style.opacity = 0;
                     document.getElementById('crashNftIndicator').classList.remove('show');
                     this.bet = 0;
                     this.betNftId = null;
@@ -4856,7 +4717,7 @@
         };
 
         // ============================================================
-        // MINES GAME
+        // MINES GAME (unchanged)
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -5315,7 +5176,14 @@
         };
 
         // ============================================================
-        // INVENTORY
+        // INVENTORY, UPGRADE, BOUNCE – unchanged (omitted for brevity)
+        // ============================================================
+        // (Sell, renderInventory, upgradeGame, bounceGame remain as before)
+        // We'll keep them for completeness but they are not modified.
+        // They are defined below.
+
+        // ============================================================
+        // QUICK PLACEHOLDER FOR MISSING FUNCTIONS (sellNFT, upgrade etc.)
         // ============================================================
         function sellNFT(index) {
             const nft = state.inventory[index];
@@ -5362,9 +5230,7 @@
             }
         }
 
-        // ============================================================
-        // UPGRADE – EXACTLY THE ORIGINAL WORKING VERSION
-        // ============================================================
+        // ===== UPGRADE GAME =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -5805,9 +5671,7 @@
             upgradeGame.spin();
         }
 
-        // ============================================================
-        // BOUNCE GAME – FASTER BALL
-        // ============================================================
+        // ===== BOUNCE GAME =====
         const bounceGame = {
             canvas: null,
             ctx: null,
@@ -6515,7 +6379,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – NFT milestones on existing progress line (clean GIFs).');
+            console.log('✅ Casino loaded – UI arrows, rocket always, struggle animation, milestones fixed.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
