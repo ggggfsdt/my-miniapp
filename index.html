@@ -784,7 +784,6 @@
             width: 340px;
             height: 340px;
         }
-        /* Center NFT – no background, just GIF */
         .wheel-center-nft {
             position: absolute;
             top: 50%;
@@ -803,7 +802,25 @@
             border: none;
         }
         .upgrade-selectors { display: flex; flex-direction: row; gap: 12px; margin-bottom: 16px; }
-        .upgrade-select { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; min-width: 0; }
+        .upgrade-select {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.3s, cursor 0.3s;
+            min-width: 0;
+        }
+        .upgrade-select.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
         .upgrade-select:active { background: rgba(255,255,255,0.05); }
         .upgrade-select .nft-square { width: 60px; height: 60px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
         .upgrade-select .nft-square img { width: 100%; height: 100%; object-fit: contain; will-change: transform; }
@@ -1145,7 +1162,7 @@
             <div class="card" style="padding: 20px;">
                 <div class="card-title" style="margin-bottom: 12px; font-size: 14px;">Select NFTs to Upgrade</div>
                 <div class="upgrade-selectors">
-                    <div class="upgrade-select" onclick="openNftSelection('from')">
+                    <div class="upgrade-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
                         <div class="nft-square" id="fromNftSquare">
                             <img id="fromNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="fromPlaceholder">Choose</span>
@@ -1155,7 +1172,7 @@
                             <div class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
                         </div>
                     </div>
-                    <div class="upgrade-select" onclick="openNftSelection('to')">
+                    <div class="upgrade-select" id="upgradeToSelector" onclick="openNftSelection('to')">
                         <div class="nft-square" id="toNftSquare">
                             <img id="toNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="toPlaceholder">Choose</span>
@@ -1354,7 +1371,9 @@
             'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif',
             'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif',
             'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif',
-            'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif'
+            'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
+            // New Artisian Brick
+            'https://i.postimg.cc/02SjbFc2/brick.gif'
         ];
 
         async function preloadAllGifs() {
@@ -1444,7 +1463,9 @@
             snoop_dog: { id: 'snoop_dog', name: 'Snoop Dog', price: 630, gif: 'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif', tier: 'medium' },
             bling_blinky: { id: 'bling_blinky', name: 'Bling Blinky', price: 2200, gif: 'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif', tier: 'high' },
             precious_peach: { id: 'precious_peach', name: 'Precious Peach', price: 26400, gif: 'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif', tier: 'legendary' },
-            voodoo_doll: { id: 'voodoo_doll', name: 'Voodoo Doll', price: 3200, gif: 'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif', tier: 'epic' }
+            voodoo_doll: { id: 'voodoo_doll', name: 'Voodoo Doll', price: 3200, gif: 'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif', tier: 'epic' },
+            // NEW Artisian Brick
+            artisian_brick: { id: 'artisian_brick', name: 'Artisian Brick', price: 5330, gif: 'https://i.postimg.cc/02SjbFc2/brick.gif', tier: 'epic' }
         };
 
         const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
@@ -1553,7 +1574,6 @@
             document.getElementById('winSubtitle').textContent = nft.name;
             winPopupOnClose = onClose || null;
             popup.classList.add('active');
-            // Auto-close after 4 seconds
             clearTimeout(popup._autoClose);
             popup._autoClose = setTimeout(() => {
                 closeWinPopup();
@@ -1564,7 +1584,6 @@
             const popup = document.getElementById('winPopup');
             popup.classList.remove('active');
             clearTimeout(popup._autoClose);
-            // Call the onClose callback if it exists
             if (typeof winPopupOnClose === 'function') {
                 const cb = winPopupOnClose;
                 winPopupOnClose = null;
@@ -3184,6 +3203,7 @@
 
         // ============================================================
         // UPGRADE – EXACTLY THE ORIGINAL WORKING VERSION (only spin duration increased to 8-10s)
+        // plus locking the selectors during spin
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -3247,7 +3267,22 @@
             } catch (e) {}
         }
 
+        // Lock/unlock selectors
+        function setUpgradeLocked(locked) {
+            const fromSelector = document.getElementById('upgradeFromSelector');
+            const toSelector = document.getElementById('upgradeToSelector');
+            if (locked) {
+                fromSelector.classList.add('disabled');
+                toSelector.classList.add('disabled');
+            } else {
+                fromSelector.classList.remove('disabled');
+                toSelector.classList.remove('disabled');
+            }
+        }
+
         function openNftSelection(type) {
+            // If upgrade is locked (spinning), ignore click
+            if (upgradeGame.locked) return;
             activeSelectionType = type;
             let eligible;
             if (type === 'from') {
@@ -3300,6 +3335,7 @@
             fromNftId: null,
             toNftId: null,
             spinning: false,
+            locked: false, // added to lock selectors
             arrowAngle: -Math.PI / 2,
             canvas: document.getElementById('upgradeWheel'),
             ctx: null,
@@ -3403,6 +3439,8 @@
             spin() {
                 if (this.spinning || !this.fromNftId || !this.toNftId) return;
                 this.spinning = true;
+                this.locked = true; // lock selectors
+                setUpgradeLocked(true);
                 document.getElementById('upgradeBtn').disabled = true;
                 const wheelContainer = document.getElementById('wheelContainer');
                 wheelContainer.style.filter = 'drop-shadow(0 0 15px rgba(0,210,160,0.6))';
@@ -3425,7 +3463,7 @@
             },
 
             startSpin() {
-                // Longer spin: 8-10 seconds (original was 5-7s)
+                // Longer spin: 8-10 seconds
                 const duration = 8000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
@@ -3462,6 +3500,8 @@
                         requestAnimationFrame(animateSpin);
                     } else {
                         this.spinning = false;
+                        this.locked = false; // unlock selectors
+                        setUpgradeLocked(false);
                         const landed = ((targetArrowAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
                         const relativeAngle = (landed + Math.PI / 2) % (2 * Math.PI);
                         const isGreen = relativeAngle < this.chance * 2 * Math.PI;
@@ -3532,7 +3572,8 @@
                 }
                 updateHomeUI();
                 updateProfile();
-                renderInventory();
+                renderInventory(); // update inventory immediately
+                // Re-enable button after resolve (already done in startSpin)
             }
         };
 
@@ -4305,7 +4346,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – original wheel (340px) with longer spin (8-10s), center NFT clean, flying after popup.');
+            console.log('✅ Casino loaded – original wheel (340px) with longer spin (8-10s), center NFT clean, flying after popup, selectors locked during spin, new Artisian Brick added.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
