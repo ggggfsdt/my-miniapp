@@ -557,7 +557,6 @@
             transition: none;
             will-change: transform;
         }
-        /* ===== BOUNCE NFT REWARD OVERLAY ===== */
         #bounceNftOverlay {
             position: absolute;
             inset: 0;
@@ -665,12 +664,29 @@
             display: block;
         }
 
-        /* ===== PROFILE, etc. ===== */
+        /* ===== PROFILE & SETTINGS ===== */
         .profile-header {
             text-align: center;
             padding: 20px 0 16px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             margin-bottom: 16px;
+            position: relative;
+        }
+        .profile-header .settings-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 22px;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.3s;
+            padding: 8px;
+        }
+        .profile-header .settings-btn:active {
+            transform: rotate(60deg);
+            color: #fff;
         }
         .profile-avatar {
             width: 80px;
@@ -771,6 +787,109 @@
         .profile-detail .value {
             font-weight: 600;
             font-size: 14px;
+        }
+
+        /* ===== SETTINGS MODAL ===== */
+        #settingsModal {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #settingsModal.active {
+            display: flex;
+        }
+        #settingsModal .settings-card {
+            background: rgba(30, 30, 35, 0.95);
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 340px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+        #settingsModal .settings-card .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #fff;
+        }
+        #settingsModal .settings-card .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        #settingsModal .settings-card .setting-row:last-child {
+            border-bottom: none;
+        }
+        #settingsModal .settings-card .setting-row .label {
+            font-size: 14px;
+            color: #ccc;
+        }
+        #settingsModal .settings-card .setting-row .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #2a2a2e;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #settingsModal .settings-card .setting-row .toggle.active {
+            background: #00d2a0;
+        }
+        #settingsModal .settings-card .setting-row .toggle .knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        #settingsModal .settings-card .setting-row .toggle.active .knob {
+            transform: translateX(20px);
+        }
+        #settingsModal .settings-card .setting-row select {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            min-width: 80px;
+        }
+        #settingsModal .settings-card .setting-row select option {
+            background: #1a1a1e;
+            color: #fff;
+        }
+        #settingsModal .settings-card .close-btn {
+            margin-top: 20px;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+            text-align: center;
+        }
+        #settingsModal .settings-card .close-btn:active {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         /* ===== CRASH, MINES, UPGRADE, INVENTORY ===== */
@@ -1416,7 +1535,6 @@
             opacity: 0.6;
         }
 
-        /* NFT indicator inside cash out button */
         .main-action-btn .nft-indicator {
             position: absolute;
             right: 8px;
@@ -1731,7 +1849,6 @@
             background: linear-gradient(135deg, #f9ca24, #f0932b);
             box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
         }
-        /* NFT indicator inside mines cash out */
         .mines-main-action-btn .nft-indicator {
             position: absolute;
             right: 8px;
@@ -2217,6 +2334,9 @@
                 height: 28px;
                 right: 4px;
             }
+            #settingsModal .settings-card {
+                padding: 20px 16px;
+            }
         }
     </style>
 </head>
@@ -2253,6 +2373,28 @@
         <div class="nft-selection-overlay" id="nftSelectionOverlay">
             <div class="nft-selection-grid" id="nftSelectionGrid"></div>
             <div class="nft-selection-close" onclick="closeNftSelection()">Cancel</div>
+        </div>
+
+        <!-- ===== SETTINGS MODAL ===== -->
+        <div id="settingsModal">
+            <div class="settings-card">
+                <div class="title">Settings</div>
+                <div class="setting-row">
+                    <span class="label">Vibration</span>
+                    <div class="toggle" id="vibrationToggle" onclick="toggleVibration()">
+                        <div class="knob"></div>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <span class="label">Graphics Quality</span>
+                    <select id="graphicsQuality" onchange="updateGraphicsQuality(this.value)">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="close-btn" onclick="closeSettings()">Close</div>
+            </div>
         </div>
 
         <!-- HOME -->
@@ -2425,6 +2567,7 @@
         <!-- PROFILE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
+                <button class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
                 <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" decoding="async"><div class="fallback" id="profileAvatarFallback">XD</div></div>
                 <div class="profile-name" id="profileName">xDll_Lud</div>
                 <div class="profile-username" id="profileUsername">@xDll_Lud</div>
@@ -2460,7 +2603,6 @@
             <div id="bounceCanvasWrap">
                 <canvas id="bounceCanvas" width="400" height="400"></canvas>
                 <img id="bounceBallImg" src="https://images.iimg.live/images/stellar-work-2795.webp" alt="Ball" decoding="async">
-                <!-- NFT overlay for bounce -->
                 <div id="bounceNftOverlay">
                     <img id="bounceNftImg" src="" alt="NFT Prize">
                 </div>
@@ -2500,6 +2642,67 @@
         } catch (e) {}
 
         // ============================================================
+        // SETTINGS STATE
+        // ============================================================
+        const settings = {
+            vibration: true,
+            graphicsQuality: 'medium' // 'low', 'medium', 'high'
+        };
+
+        function loadSettings() {
+            const saved = localStorage.getItem('casino_settings');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(settings, parsed);
+                } catch (e) {}
+            }
+            applySettingsUI();
+        }
+
+        function saveSettings() {
+            localStorage.setItem('casino_settings', JSON.stringify(settings));
+        }
+
+        function applySettingsUI() {
+            const toggle = document.getElementById('vibrationToggle');
+            const select = document.getElementById('graphicsQuality');
+            if (settings.vibration) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+            select.value = settings.graphicsQuality;
+        }
+
+        function toggleVibration() {
+            settings.vibration = !settings.vibration;
+            applySettingsUI();
+            saveSettings();
+            // Apply vibration setting to all game loops
+            // The triggerVibration function checks this setting
+        }
+
+        function updateGraphicsQuality(value) {
+            settings.graphicsQuality = value;
+            saveSettings();
+            // Adjust game performance: segment count in bounce, particle count, etc.
+            // We can re-init bounce game with new settings if active
+            if (document.getElementById('page-bounce').classList.contains('active')) {
+                bounceGame.init();
+            }
+            // Also adjust upgrade wheel resolution? Not needed.
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        // ============================================================
         // GIF PRELOADER – CACHE ALL GIFS FOR INSTANT PLAYBACK
         // ============================================================
         const GIF_CACHE = {};
@@ -2518,7 +2721,6 @@
             });
         }
 
-        // All GIFs used in the app
         const ALL_GIF_URLS = [
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
             'https://images.iimg.live/images/excellent-art-9247.webp',
@@ -2675,7 +2877,6 @@
             }
         };
 
-        // Sort NFTs by price (lowest to highest) for tier lookup
         const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
 
         // -------- DOM refs ----------
@@ -2735,13 +2936,10 @@
             if (!imgElement || !containerElement) return;
             const nft = getBestNftForWin(winAmount);
             if (nft) {
-                // Show the NFT with smooth transition
                 if (imgElement.src !== nft.gif) {
-                    // Fade out old, change src, fade in
                     imgElement.className = 'hidden-img';
                     setTimeout(() => {
                         imgElement.src = nft.gif;
-                        // Force reflow
                         void imgElement.offsetHeight;
                         imgElement.className = 'visible';
                     }, 300);
@@ -2884,7 +3082,7 @@
                     progressWidth = Math.min(100, ((p.cashOutMultiplier || 1.0) - 1) / (maxMult - 1) * 100);
                     liveMultiplied = p.cashOutAmount || betAmount;
                 } else if (p.crashed) {
-                    statusClass = 'crashed';
+                    statusClass = 'cashed';
                     statusText = 'Crashed';
                     progressColor = 'red';
                     progressWidth = Math.min(100, ((crashGame.multiplier || 1.0) - 1) / (maxMult - 1) * 100);
@@ -3050,6 +3248,7 @@
         }
 
         function triggerVibration(duration = 30, type = 'light') {
+            if (!settings.vibration) return;
             try {
                 if (window.Telegram?.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -3062,12 +3261,14 @@
         }
 
         function triggerCashOutVibration() {
+            if (!settings.vibration) return;
             try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } } catch (
             e) {}
             try { if (navigator.vibrate) navigator.vibrate(50); } catch (e) {}
         }
 
         function triggerExplosionVibration() {
+            if (!settings.vibration) return;
             const durations = [60, 80, 100, 130];
             const types = ['light', 'medium', 'medium', 'heavy'];
             const delays = [0, 120, 240, 380];
@@ -3081,6 +3282,7 @@
         }
 
         function triggerContinuousVibration() {
+            if (!settings.vibration) return;
             const rocketPage = document.getElementById('page-rocket');
             if (!rocketPage?.classList.contains('active') || document.hidden) return;
             try { if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('light'); } catch (e) {}
@@ -3472,7 +3674,6 @@
                     if (this.isCarPhase && m >= 1.56 && !this.transitioning) {
                         this.transitionToRocket();
                     }
-                    // Update NFT indicator for crash
                     const winAmount = Math.floor(this.bet * this.multiplier);
                     updateNftIndicator(
                         document.getElementById('crashNftImg'),
@@ -3489,7 +3690,6 @@
                     moonOverlay.classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
-                    // Hide NFT indicator on crash
                     document.getElementById('crashNftIndicator').classList.remove('show');
                 }
             },
@@ -3672,7 +3872,6 @@
                 this.updateUI();
                 this.updateMainButton();
                 updateHomeUI();
-                // Hide NFT indicator after cash out
                 document.getElementById('crashNftIndicator').classList.remove('show');
             },
 
@@ -3823,7 +4022,6 @@
                         this.animationId = null; }
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
-                    // Hide NFT indicator on crash
                     document.getElementById('crashNftIndicator').classList.remove('show');
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
@@ -4026,7 +4224,6 @@
                 }
                 this.updateMainButton();
                 this.renderHistory();
-                // Update NFT indicator for mines
                 if (this.gameActive && !this.gameOver && !this.hasCashedOut) {
                     const winAmount = Math.floor(this.bet * this.multiplier);
                     updateNftIndicator(
@@ -4172,7 +4369,6 @@
                 const totalTiles = this.gridSize * this.gridSize;
                 const mineRatio = this.minesCount / totalTiles;
 
-                // BIGGER MULTIPLIER GROWTH
                 let inc = 0.02 + 0.45 * mineRatio;
                 inc = Math.max(0.02, Math.min(0.65, inc));
 
@@ -4780,7 +4976,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FASTER BALL + NFT OVERLAY
+        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -4812,6 +5008,9 @@
             launchTimeout: null,
             ballElement: document.getElementById('bounceBallImg'),
             isLossBall: false,
+            // Fixed timestep accumulator
+            accumulator: 0,
+            fixedStep: 1 / 60,
 
             playHitSound() { playBeep(600, 0.06, 0.2); },
             playBreakSound() { playBeep(1000, 0.1, 0.35); },
@@ -4819,7 +5018,6 @@
                 playBeep(1000, 0.15, 0.3); },
             playLoseSound() { playBeep(400, 0.2, 0.3); },
 
-            // Update NFT overlay
             updateNftOverlay() {
                 if (!this.isPlaying || this.gameOver) {
                     document.getElementById('bounceNftOverlay').classList.remove('show');
@@ -4853,6 +5051,15 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
 
+                // Adjust segment count based on graphics quality
+                if (settings.graphicsQuality === 'low') {
+                    this.segmentCount = 12;
+                } else if (settings.graphicsQuality === 'medium') {
+                    this.segmentCount = 16;
+                } else { // high
+                    this.segmentCount = 20;
+                }
+
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
                 this.ballElement.style.left = '50%';
@@ -4875,11 +5082,11 @@
                 document.getElementById('bounceStartBtn').disabled = false;
                 this.isLaunched = false;
                 this.isSpinning = false;
+                this.accumulator = 0;
                 if (this.launchTimeout) {
                     clearTimeout(this.launchTimeout);
                     this.launchTimeout = null;
                 }
-                // Hide NFT overlay on init
                 document.getElementById('bounceNftOverlay').classList.remove('show');
             },
 
@@ -5011,6 +5218,7 @@
                 this.ballElement.style.top = '50%';
                 this.spinStartTime = performance.now();
                 this.arrowAngle = Math.random() * 2 * Math.PI;
+                this.accumulator = 0;
                 if (this.launchTimeout) clearTimeout(this.launchTimeout);
                 this.launchTimeout = setTimeout(() => {
                     if (this.isSpinning && !this.isLaunched) {
@@ -5032,7 +5240,7 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // FASTER BALL – increased speed from 140-200 to 200-280
+                // Faster ball: 200-280
                 const speed = 200 + Math.random() * 80;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -5069,7 +5277,6 @@
                 document.getElementById('bounceBetDisplay').textContent = this.bet;
                 document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
 
-                // Reset NFT overlay
                 document.getElementById('bounceNftOverlay').classList.remove('show');
                 document.getElementById('bounceNftImg').className = 'hidden-img';
 
@@ -5096,7 +5303,7 @@
             },
 
             update() {
-                const dt = 1 / 60;
+                const dt = 1 / 60; // fixed timestep for physics
 
                 if (this.isSpinning) {
                     const now = performance.now();
@@ -5112,10 +5319,47 @@
 
                 if (!this.isPlaying) return;
 
+                // Accumulate time for fixed step
+                const now = performance.now();
+                const delta = this.lastFrameTime ? (now - this.lastFrameTime) / 1000 : 0;
+                this.lastFrameTime = now;
+                this.accumulator += delta;
+
+                while (this.accumulator >= this.fixedStep) {
+                    this.physicsStep(this.fixedStep);
+                    this.accumulator -= this.fixedStep;
+                }
+
+                // Update NFT overlay during play
+                this.updateNftOverlay();
+
+                // Update floating texts
+                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+                    const ft = this.floatingTexts[i];
+                    ft.y -= 60 * this.fixedStep;
+                    ft.life -= this.fixedStep;
+                    ft.scale = 1 - (1 - ft.life / ft.maxLife) * 0.8;
+                    if (ft.life <= 0) {
+                        this.floatingTexts.splice(i, 1);
+                    }
+                }
+
+                // Check if circle is outside the arena
+                if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
+                    this.isLossBall = true;
+                    if (this.ballElement) {
+                        this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
+                    }
+                    this.endGame(false);
+                    return;
+                }
+            },
+
+            physicsStep(dt) {
                 const now = performance.now();
                 const elapsed = now - this.startTime;
-                let currentFriction = 1.0;
 
+                let currentFriction = 1.0;
                 if (elapsed > 2500 && elapsed <= 6000) {
                     currentFriction = 0.998;
                 } else if (elapsed > 6000) {
@@ -5182,28 +5426,6 @@
                         }
                     }
                 }
-
-                // Update NFT overlay during play
-                this.updateNftOverlay();
-
-                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
-                    const ft = this.floatingTexts[i];
-                    ft.y -= 60 * dt;
-                    ft.life -= dt;
-                    ft.scale = 1 - (1 - ft.life / ft.maxLife) * 0.8;
-                    if (ft.life <= 0) {
-                        this.floatingTexts.splice(i, 1);
-                    }
-                }
-
-                if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
-                    this.isLossBall = true;
-                    if (this.ballElement) {
-                        this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
-                    }
-                    this.endGame(false);
-                    return;
-                }
             },
 
             createFloatingText(seg) {
@@ -5268,7 +5490,6 @@
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
 
-                // Hide NFT overlay on game end
                 document.getElementById('bounceNftOverlay').classList.remove('show');
 
                 const resultEl = document.getElementById('bounceResult');
@@ -5499,6 +5720,7 @@
             loadingScreen.classList.add('hidden');
 
             getTelegramUser();
+            loadSettings(); // load settings from localStorage
             updateHomeUI();
             updateProfile();
             crashGame.init();
@@ -5512,7 +5734,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Bounce faster, Mines bigger multiplier, NFT indicators added!');
+            console.log('✅ Casino loaded with settings, faster bounce, fixed timestep, NFT indicators.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
