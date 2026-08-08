@@ -69,22 +69,12 @@
             animation: pulseText 1.8s ease-in-out infinite;
         }
         @keyframes pulseText {
-            0%,
-            100% {
-                opacity: 0.35;
-            }
-            50% {
-                opacity: 1;
-            }
+            0%, 100% { opacity: 0.35; }
+            50% { opacity: 1; }
         }
 
         /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #08080a;
@@ -101,8 +91,8 @@
             background: linear-gradient(160deg, #111115, #0a0a0c);
             border-radius: 36px;
             overflow: hidden;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.06);
             min-height: 760px;
             display: flex;
             flex-direction: column;
@@ -112,7 +102,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(12px);
             border-radius: 16px;
             margin: 10px 16px 0 16px;
@@ -123,29 +113,13 @@
             gap: 10px;
             transform: translateY(-120%);
             transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
         }
-        #notification.show {
-            display: flex;
-        }
-        #notification .notif-icon {
-            color: #00d2a0;
-            font-size: 16px;
-        }
-        #notification .notif-text {
-            color: #e0e0e0;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        #notification .notif-amount {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: #ffd700;
-            font-size: 16px;
-            font-weight: 700;
-        }
+        #notification.show { display: flex; }
+        #notification .notif-icon { color: #00d2a0; font-size: 16px; }
+        #notification .notif-text { color: #e0e0e0; font-size: 14px; font-weight: 500; }
+        #notification .notif-amount { display: inline-flex; align-items: center; gap: 4px; color: #ffd700; font-size: 16px; font-weight: 700; }
         .page {
             display: none;
             flex: 1;
@@ -154,27 +128,18 @@
             max-height: 740px;
             scroll-behavior: smooth;
         }
-        .page.active {
-            display: block;
-        }
-        .page::-webkit-scrollbar {
-            width: 3px;
-        }
-        .page::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .page::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 10px;
-        }
+        .page.active { display: block; }
+        .page::-webkit-scrollbar { width: 3px; }
+        .page::-webkit-scrollbar-track { background: transparent; }
+        .page::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
         .bottom-nav {
             position: sticky;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(20, 20, 25, 0.95);
+            background: rgba(20,20,25,0.95);
             backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255,255,255,0.06);
             display: flex;
             justify-content: space-around;
             padding: 6px 0 12px 0;
@@ -199,59 +164,24 @@
             position: relative;
             letter-spacing: 0.3px;
         }
-        .nav-item .icon {
-            font-size: 22px;
-            transition: all 0.3s;
-            opacity: 0.5;
-        }
-        .nav-item .label {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-        .nav-item.active {
-            color: #fff;
-        }
-        .nav-item.active .icon {
-            opacity: 1;
-            transform: translateY(-2px) scale(1.1);
-        }
+        .nav-item .icon { font-size: 22px; transition: all 0.3s; opacity: 0.5; }
+        .nav-item .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; }
+        .nav-item.active { color: #fff; }
+        .nav-item.active .icon { opacity: 1; transform: translateY(-2px) scale(1.1); }
         .card {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255,255,255,0.03);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255,255,255,0.06);
             margin-bottom: 14px;
         }
-        .card-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
-        }
-        .flex {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .text-muted {
-            color: #555;
-            font-size: 13px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .mb-8 {
-            margin-bottom: 8px;
-        }
+        .card-title { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .flex { display: flex; align-items: center; gap: 10px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-muted { color: #555; font-size: 13px; }
+        .gap-8 { gap: 8px; }
+        .mb-8 { margin-bottom: 8px; }
         .btn {
             padding: 14px 20px;
             border: none;
@@ -267,45 +197,25 @@
             overflow: hidden;
             letter-spacing: 0.3px;
         }
-        .btn:active {
-            transform: scale(0.94);
-        }
-        .btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            transform: none;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-        }
+        .btn:active { transform: scale(0.94); }
+        .btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
+        .btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
+        .btn-success { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); }
         .badge {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255,255,255,0.06);
             padding: 6px 14px;
             border-radius: 30px;
             font-size: 11px;
             font-weight: 600;
             color: #888;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255,255,255,0.04);
             letter-spacing: 0.3px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
-        .badge-gold {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: rgba(255, 215, 0, 0.15);
-            color: #ffd700;
-        }
-        .badge-blue {
-            background: rgba(54, 160, 255, 0.1);
-            border-color: rgba(54, 160, 255, 0.15);
-            color: #54a0ff;
-        }
+        .badge-gold { background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.15); color: #ffd700; }
+        .badge-blue { background: rgba(54,160,255,0.1); border-color: rgba(54,160,255,0.15); color: #54a0ff; }
         .online-dot {
             display: inline-block;
             width: 10px;
@@ -313,124 +223,39 @@
             background: #00ff88;
             border-radius: 50%;
             margin-left: 8px;
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+            box-shadow: 0 0 12px rgba(0,255,136,0.6);
             animation: pulse-dot 1.5s ease-in-out infinite;
         }
-        @keyframes pulse-dot {
-            0% {
-                opacity: 0.4;
-                transform: scale(0.8);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
-            100% {
-                opacity: 0.4;
-                transform: scale(0.8);
-            }
-        }
+        @keyframes pulse-dot { 0% { opacity: 0.4; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.4; transform: scale(0.8); } }
         .home-header {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255,255,255,0.03);
             backdrop-filter: blur(10px);
             border-radius: 24px;
             padding: 20px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255,255,255,0.06);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 14px;
         }
-        .home-avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.2);
-        }
-        .home-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .home-user {
-            flex: 1;
-        }
-        .home-user .greeting {
-            font-size: 14px;
-            color: #888;
-            font-weight: 500;
-        }
-        .home-user .username {
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .home-balance-wrap {
-            text-align: right;
-        }
-        .home-balance-wrap .label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .home-balance-wrap .amount {
-            font-size: 28px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 6px;
-            background: linear-gradient(135deg, #ffd700, #f0932b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .balance-icon {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
-            margin-top: 6px;
-        }
-        .badge .balance-icon {
-            width: 30px;
-            height: 30px;
-            margin-top: 2px;
-            margin-right: 2px;
-        }
-        .star-icon-sm {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
-            display: inline-block;
-            vertical-align: middle;
-        }
-        .star-icon-xs {
-            width: 16px;
-            height: 16px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
-            display: inline-block;
-            vertical-align: middle;
-        }
+        .home-avatar { width: 52px; height: 52px; border-radius: 16px; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.08); box-shadow: 0 4px 16px rgba(108,92,231,0.2); }
+        .home-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .home-user { flex: 1; }
+        .home-user .greeting { font-size: 14px; color: #888; font-weight: 500; }
+        .home-user .username { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .home-balance-wrap { text-align: right; }
+        .home-balance-wrap .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .home-balance-wrap .amount { font-size: 28px; font-weight: 900; display: flex; align-items: center; justify-content: flex-end; gap: 6px; background: linear-gradient(135deg, #ffd700, #f0932b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .balance-icon { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,215,0,0.5)); margin-top: 6px; }
+        .badge .balance-icon { width: 30px; height: 30px; margin-top: 2px; margin-right: 2px; }
+        .star-icon-sm { width: 20px; height: 20px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(255,215,0,0.4)); display: inline-block; vertical-align: middle; }
+        .star-icon-xs { width: 16px; height: 16px; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,215,0,0.3)); display: inline-block; vertical-align: middle; }
 
         /* ===== HOME – SINGLE COLUMN GAME BUTTONS ===== */
-        .quick-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 4px;
-            margin-bottom: 6px;
-        }
+        .quick-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; margin-bottom: 6px; }
         .quick-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 20px;
             padding: 16px 16px;
             text-align: center;
@@ -443,54 +268,17 @@
             align-items: center;
             gap: 16px;
         }
-        .quick-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(108, 92, 231, 0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .quick-card:active {
-            transform: scale(0.97);
-        }
-        .quick-card:active::before {
-            opacity: 1;
-        }
-        .quick-card .icon {
-            font-size: 28px;
-            color: #fff;
-            opacity: 0.9;
-            flex-shrink: 0;
-            width: 44px;
-            text-align: center;
-        }
-        .quick-card .card-content {
-            flex: 1;
-            text-align: left;
-        }
-        .quick-card .label {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .quick-card .desc {
-            font-size: 12px;
-            color: #555;
-            margin-top: 1px;
-        }
-        .quick-card.glow-purple {
-            box-shadow: 0 0 30px rgba(108, 92, 231, 0.05);
-        }
-        .quick-card.glow-green {
-            box-shadow: 0 0 30px rgba(0, 210, 160, 0.05);
-        }
-        .quick-card.glow-blue {
-            box-shadow: 0 0 30px rgba(54, 160, 255, 0.05);
-        }
-        .quick-card.glow-gold {
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
-        }
+        .quick-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(108,92,231,0.05), transparent); opacity: 0; transition: opacity 0.3s; }
+        .quick-card:active { transform: scale(0.97); }
+        .quick-card:active::before { opacity: 1; }
+        .quick-card .icon { font-size: 28px; color: #fff; opacity: 0.9; flex-shrink: 0; width: 44px; text-align: center; }
+        .quick-card .card-content { flex: 1; text-align: left; }
+        .quick-card .label { font-size: 16px; font-weight: 700; color: #fff; }
+        .quick-card .desc { font-size: 12px; color: #555; margin-top: 1px; }
+        .quick-card.glow-purple { box-shadow: 0 0 30px rgba(108,92,231,0.05); }
+        .quick-card.glow-green { box-shadow: 0 0 30px rgba(0,210,160,0.05); }
+        .quick-card.glow-blue { box-shadow: 0 0 30px rgba(54,160,255,0.05); }
+        .quick-card.glow-gold { box-shadow: 0 0 30px rgba(255,215,0,0.05); }
 
         /* ===== BOUNCE PAGE ===== */
         #page-bounce {
@@ -498,49 +286,14 @@
             display: none;
             flex-direction: column;
         }
-        #page-bounce.active {
-            display: flex;
-        }
-        .bounce-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 0 8px 0;
-        }
-        .bounce-header .back-btn {
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 8px 12px 8px 4px;
-            transition: color 0.2s;
-        }
-        .bounce-header .back-btn:hover {
-            color: #fff;
-        }
-        .bounce-header .title {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .bounce-header .balance-badge {
-            font-size: 14px;
-        }
-        #bounceCanvasWrap {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1/1;
-            margin: 8px 0;
-            border-radius: 24px;
-            overflow: hidden;
-            background: #060608;
-            border: 1px solid #111115;
-        }
-        #bounceCanvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+        #page-bounce.active { display: flex; }
+        .bounce-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 8px 0; }
+        .bounce-header .back-btn { background: none; border: none; color: #aaa; font-size: 18px; cursor: pointer; padding: 8px 12px 8px 4px; transition: color 0.2s; }
+        .bounce-header .back-btn:hover { color: #fff; }
+        .bounce-header .title { font-size: 20px; font-weight: 700; }
+        .bounce-header .balance-badge { font-size: 14px; }
+        #bounceCanvasWrap { position: relative; width: 100%; aspect-ratio: 1/1; margin: 8px 0; border-radius: 24px; overflow: hidden; background: #060608; border: 1px solid #111115; }
+        #bounceCanvas { display: block; width: 100%; height: 100%; }
         #bounceBallImg {
             position: absolute;
             pointer-events: none;
@@ -553,7 +306,7 @@
             top: 50%;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            filter: drop-shadow(0 0 10px rgba(84, 160, 255, 0.4));
+            filter: drop-shadow(0 0 10px rgba(84,160,255,0.4));
             transition: none;
             will-change: transform;
         }
@@ -568,329 +321,68 @@
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-        #bounceNftOverlay.show {
-            display: flex;
-            opacity: 0.25;
-        }
-        #bounceNftOverlay img {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            border-radius: 16px;
-            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
-            transition: opacity 0.6s ease, transform 0.6s ease;
-            opacity: 0;
-            transform: scale(0.7);
-        }
-        #bounceNftOverlay img.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-        #bounceNftOverlay img.hidden-img {
-            opacity: 0;
-            transform: scale(0.7);
-        }
-
-        .bounce-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 4px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .bounce-info .multiplier {
-            color: #ffd700;
-            font-weight: 700;
-            display: inline-block;
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .bounce-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-            align-items: center;
-        }
-        .bounce-controls input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 10px 14px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            outline: none;
-            min-width: 0;
-        }
-        .bounce-controls button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: white;
-            transition: all 0.2s;
-            white-space: nowrap;
-            min-width: 100px;
-        }
-        .bounce-controls button:active {
-            transform: scale(0.94);
-        }
-        .bounce-controls button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .bounce-result {
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 18px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            display: none;
-        }
-        .bounce-result.win {
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.2);
-            display: block;
-        }
-        .bounce-result.lose {
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.2);
-            display: block;
-        }
+        #bounceNftOverlay.show { display: flex; opacity: 0.25; }
+        #bounceNftOverlay img { width: 100px; height: 100px; object-fit: contain; border-radius: 16px; filter: drop-shadow(0 0 30px rgba(255,215,0,0.2)); transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: scale(0.7); }
+        #bounceNftOverlay img.visible { opacity: 1; transform: scale(1); }
+        #bounceNftOverlay img.hidden-img { opacity: 0; transform: scale(0.7); }
+        .bounce-info { display: flex; justify-content: space-between; padding: 6px 4px; font-size: 14px; color: #aaa; }
+        .bounce-info .multiplier { color: #ffd700; font-weight: 700; display: inline-block; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+        .bounce-controls { display: flex; gap: 8px; margin-top: 6px; align-items: center; }
+        .bounce-controls input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 16px; font-weight: 600; outline: none; min-width: 0; }
+        .bounce-controls button { padding: 10px 24px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; transition: all 0.2s; white-space: nowrap; min-width: 100px; }
+        .bounce-controls button:active { transform: scale(0.94); }
+        .bounce-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .bounce-result { margin-top: 10px; padding: 12px; border-radius: 16px; text-align: center; font-weight: 700; font-size: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); display: none; }
+        .bounce-result.win { color: #00d2a0; border-color: rgba(0,210,160,0.2); display: block; }
+        .bounce-result.lose { color: #ff6b6b; border-color: rgba(255,107,107,0.2); display: block; }
 
         /* ===== PROFILE & SETTINGS ===== */
-        .profile-header {
-            text-align: center;
-            padding: 20px 0 16px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 16px;
-            position: relative;
-        }
-        .profile-header .settings-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 22px;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.3s;
-            padding: 8px;
-        }
-        .profile-header .settings-btn:active {
-            transform: rotate(60deg);
-            color: #fff;
-        }
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto 12px auto;
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 24px rgba(108, 92, 231, 0.2);
-            position: relative;
-        }
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .profile-avatar .fallback {
-            display: none;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: #fff;
-            font-size: 36px;
-            font-weight: 700;
-            position: absolute;
-            inset: 0;
-        }
-        .profile-avatar img:not([src])+.fallback,
-        .profile-avatar img.error+.fallback {
-            display: flex;
-        }
-        .profile-name {
-            font-size: 22px;
-            font-weight: 800;
-            color: #fff;
-        }
-        .profile-username {
-            font-size: 14px;
-            color: #888;
-            margin-top: 2px;
-        }
-        .profile-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-top: 8px;
-        }
-        .profile-stat {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            padding: 14px 8px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .profile-stat .value {
-            font-size: 22px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .profile-stat .label {
-            font-size: 10px;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-        .profile-stat .value.gold {
-            color: #ffd700;
-        }
-        .profile-stat .value.green {
-            color: #00d2a0;
-        }
-        .profile-stat .value.purple {
-            color: #a29bfe;
-        }
-        .profile-stat .value.pink {
-            color: #fd79a8;
-        }
-        .profile-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .profile-detail:last-child {
-            border-bottom: none;
-        }
-        .profile-detail .label {
-            color: #666;
-            font-size: 14px;
-        }
-        .profile-detail .value {
-            font-weight: 600;
-            font-size: 14px;
-        }
+        .profile-header { text-align: center; padding: 20px 0 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); margin-bottom: 16px; position: relative; }
+        .profile-header .settings-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; color: #888; font-size: 22px; cursor: pointer; transition: color 0.2s, transform 0.3s; padding: 8px; }
+        .profile-header .settings-btn:active { transform: rotate(60deg); color: #fff; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; margin: 0 auto 12px auto; border: 2px solid rgba(255,255,255,0.08); box-shadow: 0 4px 24px rgba(108,92,231,0.2); position: relative; }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .profile-avatar .fallback { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 36px; font-weight: 700; position: absolute; inset: 0; }
+        .profile-avatar img:not([src])+.fallback, .profile-avatar img.error+.fallback { display: flex; }
+        .profile-name { font-size: 22px; font-weight: 800; color: #fff; }
+        .profile-username { font-size: 14px; color: #888; margin-top: 2px; }
+        .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .profile-stat { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 14px 8px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+        .profile-stat .value { font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .profile-stat .label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .profile-stat .value.gold { color: #ffd700; }
+        .profile-stat .value.green { color: #00d2a0; }
+        .profile-stat .value.purple { color: #a29bfe; }
+        .profile-stat .value.pink { color: #fd79a8; }
+        .profile-detail { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .profile-detail:last-child { border-bottom: none; }
+        .profile-detail .label { color: #666; font-size: 14px; }
+        .profile-detail .value { font-weight: 600; font-size: 14px; }
 
         /* ===== SETTINGS MODAL ===== */
         #settingsModal {
             position: fixed;
             inset: 0;
             z-index: 3000;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(12px);
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        #settingsModal.active {
-            display: flex;
-        }
-        #settingsModal .settings-card {
-            background: rgba(30, 30, 35, 0.95);
-            border-radius: 24px;
-            padding: 28px 24px;
-            max-width: 340px;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-        }
-        #settingsModal .settings-card .title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #fff;
-        }
-        #settingsModal .settings-card .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        #settingsModal .settings-card .setting-row:last-child {
-            border-bottom: none;
-        }
-        #settingsModal .settings-card .setting-row .label {
-            font-size: 14px;
-            color: #ccc;
-        }
-        #settingsModal .settings-card .setting-row .toggle {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            background: #2a2a2e;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        #settingsModal .settings-card .setting-row .toggle.active {
-            background: #00d2a0;
-        }
-        #settingsModal .settings-card .setting-row .toggle .knob {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
-        #settingsModal .settings-card .setting-row .toggle.active .knob {
-            transform: translateX(20px);
-        }
-        #settingsModal .settings-card .setting-row select {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 6px 12px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            cursor: pointer;
-            min-width: 80px;
-        }
-        #settingsModal .settings-card .setting-row select option {
-            background: #1a1a1e;
-            color: #fff;
-        }
-        #settingsModal .settings-card .close-btn {
-            margin-top: 20px;
-            padding: 10px;
-            border: none;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            color: #888;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-            text-align: center;
-        }
-        #settingsModal .settings-card .close-btn:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
+        #settingsModal.active { display: flex; }
+        #settingsModal .settings-card { background: rgba(30,30,35,0.95); border-radius: 24px; padding: 28px 24px; max-width: 340px; width: 100%; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        #settingsModal .settings-card .title { font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; color: #fff; }
+        #settingsModal .settings-card .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        #settingsModal .settings-card .setting-row:last-child { border-bottom: none; }
+        #settingsModal .settings-card .setting-row .label { font-size: 14px; color: #ccc; }
+        #settingsModal .settings-card .setting-row .toggle { position: relative; width: 44px; height: 24px; background: #2a2a2e; border-radius: 12px; cursor: pointer; transition: background 0.3s; }
+        #settingsModal .settings-card .setting-row .toggle.active { background: #00d2a0; }
+        #settingsModal .settings-card .setting-row .toggle .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform 0.3s; }
+        #settingsModal .settings-card .setting-row .toggle.active .knob { transform: translateX(20px); }
+        #settingsModal .settings-card .close-btn { margin-top: 20px; padding: 10px; border: none; border-radius: 12px; background: rgba(255,255,255,0.06); color: #888; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; text-align: center; }
+        #settingsModal .settings-card .close-btn:active { background: rgba(255,255,255,0.1); }
 
         /* ===== CRASH, MINES, UPGRADE, INVENTORY ===== */
         .grid-container {
@@ -899,7 +391,7 @@
             background: #0a0a0c;
             border-radius: 20px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255,255,255,0.04);
             margin: 10px 0 0 0;
         }
         .grid-squares {
@@ -913,13 +405,8 @@
             padding: 0;
             z-index: 0;
         }
-        .grid-square {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .grid-square.corner {
-            border-color: rgba(108, 92, 231, 0.06);
-        }
+        .grid-square { background: transparent; border: 1px solid rgba(255,255,255,0.04); }
+        .grid-square.corner { border-color: rgba(108,92,231,0.06); }
         .wind-lines {
             position: absolute;
             inset: 0;
@@ -932,44 +419,23 @@
             transform-origin: center center;
             will-change: transform, opacity;
         }
-        .wind-lines.active {
-            opacity: 1;
-        }
+        .wind-lines.active { opacity: 1; }
         .wind-lines .streak {
             position: absolute;
             height: 2px;
             border-radius: 50%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
             will-change: transform;
             animation: windStreak linear infinite;
         }
-        .wind-lines .streak:nth-child(odd) {
-            height: 1.5px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-        }
-        .wind-lines .streak:nth-child(3n) {
-            height: 2.5px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-        }
-        .wind-lines .streak:nth-child(5n) {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        }
+        .wind-lines .streak:nth-child(odd) { height: 1.5px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
+        .wind-lines .streak:nth-child(3n) { height: 2.5px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); }
+        .wind-lines .streak:nth-child(5n) { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
         @keyframes windStreak {
-            0% {
-                transform: translate(0, 0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.8;
-            }
-            85% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translate(var(--dx), var(--dy));
-                opacity: 0;
-            }
+            0% { transform: translate(0,0); opacity: 0; }
+            10% { opacity: 0.8; }
+            85% { opacity: 0.8; }
+            100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
         }
         .gif-overlay {
             position: absolute;
@@ -991,27 +457,15 @@
             height: 100%;
             object-fit: contain;
             display: none;
-            filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
+            filter: drop-shadow(0 0 40px rgba(108,92,231,0.3));
             transition: opacity 0.15s ease;
             will-change: transform, opacity;
         }
-        .gif-overlay img.active {
-            display: block;
-            animation: flyIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .gif-overlay img.active { display: block; animation: flyIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
         @keyframes flyIn {
-            0% {
-                transform: scale(0.2) translateY(60px) rotate(-10deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.3) translateY(-15px) rotate(5deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1) translateY(0) rotate(0deg);
-                opacity: 1;
-            }
+            0% { transform: scale(0.2) translateY(60px) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.3) translateY(-15px) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
         }
         .explosion-overlay {
             position: absolute;
@@ -1022,33 +476,13 @@
             justify-content: center;
             pointer-events: none;
         }
-        .explosion-overlay.active {
-            display: flex;
-        }
-        .explosion-overlay img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            animation: explosionAnim 0.8s ease-out forwards;
-            will-change: transform, opacity;
-        }
+        .explosion-overlay.active { display: flex; }
+        .explosion-overlay img { width: 100%; height: 100%; object-fit: contain; animation: explosionAnim 0.8s ease-out forwards; will-change: transform, opacity; }
         @keyframes explosionAnim {
-            0% {
-                transform: scale(0.3);
-                opacity: 0;
-            }
-            30% {
-                transform: scale(1.4);
-                opacity: 1;
-            }
-            60% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0% { transform: scale(0.3); opacity: 0; }
+            30% { transform: scale(1.4); opacity: 1; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
         }
         .countdown-overlay {
             position: absolute;
@@ -1058,38 +492,16 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0,0,0,0.3);
             backdrop-filter: blur(2px);
         }
-        .countdown-overlay.active {
-            display: flex;
-        }
-        .countdown-number {
-            font-size: 100px;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 0 60px rgba(108, 92, 231, 0.5), 0 0 120px rgba(108, 92, 231, 0.2);
-            animation: countdownPulse 1s ease-out forwards;
-            opacity: 0;
-            transform: scale(0.5);
-        }
+        .countdown-overlay.active { display: flex; }
+        .countdown-number { font-size: 100px; font-weight: 900; color: #ffffff; text-shadow: 0 0 60px rgba(108,92,231,0.5), 0 0 120px rgba(108,92,231,0.2); animation: countdownPulse 1s ease-out forwards; opacity: 0; transform: scale(0.5); }
         @keyframes countdownPulse {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            30% {
-                opacity: 1;
-                transform: scale(1.3);
-            }
-            70% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(1.1);
-            }
+            0% { opacity: 0; transform: scale(0.3); }
+            30% { opacity: 1; transform: scale(1.3); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.1); }
         }
         .moon-overlay {
             position: absolute;
@@ -1103,22 +515,8 @@
             justify-content: center;
             overflow: visible;
         }
-        .moon-overlay.active {
-            opacity: 1;
-        }
-        .moon-overlay img {
-            width: 120px;
-            height: 120px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.15));
-            position: absolute;
-            top: -30%;
-            left: -20%;
-            transform: translate(0, 0) scale(0.8);
-            opacity: 0.6;
-            transition: none;
-            will-change: transform, opacity;
-        }
+        .moon-overlay.active { opacity: 1; }
+        .moon-overlay img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 0 40px rgba(255,215,0,0.15)); position: absolute; top: -30%; left: -20%; transform: translate(0,0) scale(0.8); opacity: 0.6; transition: none; will-change: transform, opacity; }
         .history-bar {
             position: absolute;
             bottom: 12px;
@@ -1128,70 +526,25 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(10px);
             padding: 4px 10px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255,255,255,0.06);
             max-width: 92%;
             overflow-x: auto;
             flex-wrap: nowrap;
             scrollbar-width: none;
         }
-        .history-bar::-webkit-scrollbar {
-            display: none;
-        }
-        .history-current {
-            font-size: 18px;
-            font-weight: 900;
-            padding-right: 8px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            min-width: 50px;
-            text-align: center;
-            letter-spacing: -0.5px;
-            white-space: nowrap;
-        }
-        .history-current .x {
-            font-size: 12px;
-            font-weight: 400;
-            opacity: 0.5;
-        }
-        .history-past {
-            display: flex;
-            gap: 3px;
-            flex-wrap: nowrap;
-        }
-        .history-item {
-            padding: 1px 6px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            white-space: nowrap;
-            background: rgba(255, 255, 255, 0.06);
-            color: #888;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: all 0.3s;
-        }
-        .history-item.green {
-            background: rgba(0, 210, 160, 0.2);
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.15);
-        }
-        .history-item.blue {
-            background: rgba(54, 160, 255, 0.2);
-            color: #54a0ff;
-            border-color: rgba(54, 160, 255, 0.15);
-        }
-        .history-item.purple {
-            background: rgba(108, 92, 231, 0.25);
-            color: #a29bfe;
-            border-color: rgba(108, 92, 231, 0.15);
-        }
-        .history-item.crashed {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.15);
-        }
+        .history-bar::-webkit-scrollbar { display: none; }
+        .history-current { font-size: 18px; font-weight: 900; padding-right: 8px; border-right: 1px solid rgba(255,255,255,0.1); min-width: 50px; text-align: center; letter-spacing: -0.5px; white-space: nowrap; }
+        .history-current .x { font-size: 12px; font-weight: 400; opacity: 0.5; }
+        .history-past { display: flex; gap: 3px; flex-wrap: nowrap; }
+        .history-item { padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; background: rgba(255,255,255,0.06); color: #888; border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s; }
+        .history-item.green { background: rgba(0,210,160,0.2); color: #00d2a0; border-color: rgba(0,210,160,0.15); }
+        .history-item.blue { background: rgba(54,160,255,0.2); color: #54a0ff; border-color: rgba(54,160,255,0.15); }
+        .history-item.purple { background: rgba(108,92,231,0.25); color: #a29bfe; border-color: rgba(108,92,231,0.15); }
+        .history-item.crashed { background: rgba(255,107,107,0.2); color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
         .progress-wrap {
             position: absolute;
             bottom: 2px;
@@ -1200,36 +553,22 @@
             z-index: 11;
             height: 4px;
             border-radius: 2px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255,255,255,0.08);
             overflow: hidden;
             opacity: 0;
             transition: opacity 0.6s ease;
         }
-        .progress-wrap.active {
-            opacity: 1;
-        }
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            border-radius: 2px;
-            background: #00d2a0;
-            transition: none;
-            box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
-        }
-        .bet-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 2px 0 0 0;
-        }
+        .progress-wrap.active { opacity: 1; }
+        .progress-fill { height: 100%; width: 0%; border-radius: 2px; background: #00d2a0; transition: none; box-shadow: 0 0 16px rgba(0,210,160,0.2); }
+        .bet-container { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 0 0; }
         .bet-input-row {
             display: flex;
             gap: 8px;
             align-items: center;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255,255,255,0.03);
             border-radius: 16px;
             padding: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255,255,255,0.06);
             transition: all 0.3s;
             max-height: 0;
             overflow: hidden;
@@ -1237,68 +576,25 @@
             padding: 0 4px;
             margin: 0;
         }
-        .bet-input-row.open {
-            max-height: 60px;
-            opacity: 1;
-            padding: 4px;
-            margin: 0;
-        }
-        .bet-input-row input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            padding: 8px 12px;
-            outline: none;
-            min-width: 0;
-        }
-        .bet-input-row input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-        }
-        .bet-input-row .bet-confirm-btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: white;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .bet-input-row .bet-confirm-btn:active {
-            transform: scale(0.92);
-        }
-        .bet-input-row .bet-confirm-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
+        .bet-input-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 700; padding: 8px 12px; outline: none; min-width: 0; }
+        .bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .bet-input-row .bet-confirm-btn { padding: 8px 20px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; transition: all 0.2s; white-space: nowrap; }
+        .bet-input-row .bet-confirm-btn:active { transform: scale(0.92); }
+        .bet-input-row .bet-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .players-list {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255,255,255,0.02);
             border-radius: 16px;
             padding: 8px 4px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.03);
             max-height: 120px;
             overflow-y: auto;
             margin-top: 4px;
             position: relative;
         }
-        .players-list::-webkit-scrollbar {
-            width: 2px;
-        }
-        .players-list::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 10px;
-        }
-        .players-list .empty {
-            color: #555;
-            font-size: 13px;
-            text-align: center;
-            padding: 6px 0;
-        }
+        .players-list::-webkit-scrollbar { width: 2px; }
+        .players-list::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
+        .players-list .empty { color: #555; font-size: 13px; text-align: center; padding: 6px 0; }
         .player-item {
             display: flex;
             flex-direction: column;
@@ -1306,152 +602,36 @@
             padding: 4px 8px;
             border-radius: 12px;
             margin-bottom: 2px;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255,255,255,0.02);
             overflow: hidden;
             opacity: 0;
             transform: translateX(-20px) scale(0.95);
-            animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
             animation-delay: var(--anim-delay, 0s);
         }
-        @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(-20px) scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-        .player-item .player-main {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            z-index: 2;
-            position: relative;
-        }
-        .player-item .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .player-item .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .player-item .avatar .initials {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .player-item .info {
-            flex: 1;
-        }
-        .player-item .info .name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #e0e0e0;
-        }
-        .player-item .info .name .you {
-            color: #ffd700;
-            font-size: 10px;
-            font-weight: 700;
-            margin-left: 4px;
-        }
-        .player-item .info .bet-amount {
-            font-size: 11px;
-            color: #888;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            flex-wrap: wrap;
-        }
-        .player-item .info .bet-amount .live-mult {
-            color: #54a0ff;
-            font-weight: 600;
-        }
-        .player-item .status {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 20px;
-            text-align: center;
-            white-space: nowrap;
-            z-index: 2;
-        }
-        .player-item .status.betting {
-            color: #ffd700;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-        }
-        .player-item .status.cashed {
-            color: #00d2a0;
-            border: 1px solid rgba(0, 210, 160, 0.2);
-        }
-        .player-item .status.crashed {
-            color: #ff6b6b;
-            border: 1px solid rgba(255, 107, 107, 0.2);
-        }
-        .player-item .status.waiting {
-            color: #888;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .player-progress {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0%;
-            border-radius: 12px;
-            opacity: 0.25;
-            transition: width 0.1s linear, background 0.3s;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .player-progress.green {
-            background: #00d2a0;
-        }
-        .player-progress.blue {
-            background: #54a0ff;
-        }
-        .player-progress.red {
-            background: #ff6b6b;
-        }
-        .player-progress.gold {
-            background: #ffd700;
-        }
-        .player-cash-gif {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            backdrop-filter: blur(2px);
-        }
-        .player-cash-gif.show {
-            display: flex;
-        }
-        .player-cash-gif img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            border-radius: 8px;
-            will-change: transform;
-        }
+        @keyframes slideIn { 0% { opacity: 0; transform: translateX(-20px) scale(0.95); } 100% { opacity: 1; transform: translateX(0) scale(1); } }
+        .player-item .player-main { display: flex; align-items: center; gap: 10px; width: 100%; z-index: 2; position: relative; }
+        .player-item .avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
+        .player-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .player-item .avatar .initials { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; font-size: 11px; font-weight: 700; }
+        .player-item .info { flex: 1; }
+        .player-item .info .name { font-size: 13px; font-weight: 600; color: #e0e0e0; }
+        .player-item .info .name .you { color: #ffd700; font-size: 10px; font-weight: 700; margin-left: 4px; }
+        .player-item .info .bet-amount { font-size: 11px; color: #888; display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+        .player-item .info .bet-amount .live-mult { color: #54a0ff; font-weight: 600; }
+        .player-item .status { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; text-align: center; white-space: nowrap; z-index: 2; }
+        .player-item .status.betting { color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
+        .player-item .status.cashed { color: #00d2a0; border: 1px solid rgba(0,210,160,0.2); }
+        .player-item .status.crashed { color: #ff6b6b; border: 1px solid rgba(255,107,107,0.2); }
+        .player-item .status.waiting { color: #888; border: 1px solid rgba(255,255,255,0.06); }
+        .player-progress { position: absolute; left: 0; top: 0; height: 100%; width: 0%; border-radius: 12px; opacity: 0.25; transition: width 0.1s linear, background 0.3s; pointer-events: none; z-index: 1; }
+        .player-progress.green { background: #00d2a0; }
+        .player-progress.blue { background: #54a0ff; }
+        .player-progress.red { background: #ff6b6b; }
+        .player-progress.gold { background: #ffd700; }
+        .player-cash-gif { position: absolute; inset: 0; z-index: 5; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.15); border-radius: 12px; backdrop-filter: blur(2px); }
+        .player-cash-gif.show { display: flex; }
+        .player-cash-gif img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; will-change: transform; }
 
         /* ===== CASH OUT BUTTON WITH NFT INDICATOR ===== */
         .main-action-btn {
@@ -1467,7 +647,7 @@
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
             color: white;
             text-align: center;
             width: 100%;
@@ -1477,64 +657,18 @@
             min-height: 44px;
             line-height: 1.2;
         }
-        .main-action-btn:active {
-            transform: scale(0.94);
-        }
-        .main-action-btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            transform: none;
-        }
-        #mainActionText {
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-        #mainActionSub {
-            font-size: 11px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.2;
-            min-height: 14px;
-        }
-        .main-action-btn.place-bet {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
-        }
-        .main-action-btn.cash-out {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-        }
-        .main-action-btn.waiting {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: not-allowed;
-        }
-        .main-action-btn.confirm-bet {
-            background: linear-gradient(135deg, #f9ca24, #f0932b);
-            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
-        }
-        .main-action-btn.round-in-progress {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .main-action-btn.bet-placed {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .main-action-btn.cashed-out {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .main-action-btn.crashed {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
+        .main-action-btn:active { transform: scale(0.94); }
+        .main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
+        #mainActionText { font-size: 14px; font-weight: 700; line-height: 1.3; }
+        #mainActionSub { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.8); line-height: 1.2; min-height: 14px; }
+        .main-action-btn.place-bet { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
+        .main-action-btn.cash-out { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); }
+        .main-action-btn.waiting { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 20px rgba(0,0,0,0.3); cursor: not-allowed; }
+        .main-action-btn.confirm-bet { background: linear-gradient(135deg, #f9ca24, #f0932b); box-shadow: 0 4px 20px rgba(249,202,36,0.3); }
+        .main-action-btn.round-in-progress { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        .main-action-btn.bet-placed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        .main-action-btn.cashed-out { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
+        .main-action-btn.crashed { background: linear-gradient(135deg, #636e72, #2d3436); cursor: not-allowed; opacity: 0.6; }
         .main-action-btn .nft-indicator {
             position: absolute;
             right: 8px;
@@ -1547,253 +681,48 @@
             opacity: 0;
             transition: opacity 0.5s ease, transform 0.5s ease;
             pointer-events: none;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.08);
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,215,0,0.15);
+            box-shadow: 0 0 20px rgba(255,215,0,0.08);
         }
-        .main-action-btn .nft-indicator.show {
-            opacity: 1;
-            transform: translateY(-50%) scale(1);
-        }
-        .main-action-btn .nft-indicator img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: opacity 0.6s ease, transform 0.6s ease;
-            opacity: 0;
-            transform: scale(0.7);
-        }
-        .main-action-btn .nft-indicator img.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .main-action-btn .nft-indicator img.hidden-img {
-            opacity: 0;
-            transform: scale(0.7);
-        }
+        .main-action-btn .nft-indicator.show { opacity: 1; transform: translateY(-50%) scale(1); }
+        .main-action-btn .nft-indicator img { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: scale(0.7); }
+        .main-action-btn .nft-indicator img.visible { opacity: 1; transform: scale(1); }
+        .main-action-btn .nft-indicator img.hidden-img { opacity: 0; transform: scale(0.7); }
 
         /* ===== MINES ===== */
-        .mines-header {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            padding: 14px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .mines-header .multiplier {
-            font-size: 24px;
-            font-weight: 900;
-            color: #00d2a0;
-            letter-spacing: -0.5px;
-        }
-        .mines-header .multiplier .x {
-            font-size: 16px;
-            font-weight: 400;
-            opacity: 0.5;
-            margin-left: 2px;
-        }
-        .grid-presets {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        .grid-presets button {
-            padding: 3px 10px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            color: #888;
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .grid-presets button.active {
-            background: rgba(108, 92, 231, 0.15);
-            border-color: rgba(108, 92, 231, 0.2);
-            color: #fff;
-        }
-        .grid-presets button.coming-soon {
-            opacity: 0.5;
-            cursor: default;
-        }
-        .mines-grid-wrapper {
-            position: relative;
-            margin: 8px 0 12px 0;
-        }
-        .mines-grid {
-            display: grid;
-            gap: 8px;
-            justify-content: center;
-            margin: 0 auto;
-        }
-        .mines-grid .tile-wrapper {
-            position: relative;
-            aspect-ratio: 1/1;
-            border-radius: 24px;
-            cursor: pointer;
-            perspective: 800px;
-        }
-        .mines-grid .tile-wrapper .shadow {
-            position: absolute;
-            inset: 5px 0 0 5px;
-            border-radius: 24px;
-            background: #060608;
-            opacity: 0.6;
-            z-index: 0;
-            transition: all 0.3s;
-        }
-        .mines-grid .tile-wrapper .tile {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-            background: #141418;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 2px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #fff;
-            opacity: 0;
-            transform: scale(0.7) rotateX(20deg) translateY(10px);
-            pointer-events: none;
-            font-weight: 700;
-            user-select: none;
-        }
-        .mines-grid .tile-wrapper .tile.show {
-            opacity: 1;
-            transform: scale(1) rotateX(0deg) translateY(0);
-            pointer-events: auto;
-        }
-        .mines-grid .tile-wrapper:active .tile {
-            transform: scale(0.94);
-        }
-        .mines-grid .tile-wrapper .tile .symbol {
-            font-size: 28px;
-            line-height: 1;
-            opacity: 0;
-            transform: scale(0.3) rotate(-30deg);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mines-grid .tile-wrapper .tile.revealed .symbol {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
-        .mines-grid .tile-wrapper .tile.revealed {
-            transform: scale(0.97);
-            border-color: transparent;
-        }
-        .mines-grid .tile-wrapper .tile.revealed.safe {
-            background: #0d2018;
-            border-color: rgba(0, 210, 160, 0.12);
-            box-shadow: 0 0 30px rgba(0, 210, 160, 0.06);
-        }
-        .mines-grid .tile-wrapper .tile.revealed.safe .symbol {
-            color: #00d2a0;
-        }
-        .mines-grid .tile-wrapper .tile.revealed.mine {
-            background: #201010;
-            border-color: rgba(255, 80, 80, 0.12);
-            box-shadow: 0 0 30px rgba(255, 80, 80, 0.06);
-        }
-        .mines-grid .tile-wrapper .tile.revealed.mine .symbol {
-            color: #ff6b6b;
-        }
-        .mines-message {
-            text-align: center;
-            padding: 12px;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 500;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 10px;
-            color: #888;
-        }
-        .mines-message.success {
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.1);
-        }
-        .mines-message.danger {
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.1);
-        }
-        .mines-message.gold {
-            color: #ffd700;
-            border-color: rgba(255, 215, 0, 0.1);
-        }
-        .mines-bet-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 4px;
-        }
-        .mines-bet-input-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            padding: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.3s;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            padding: 0 4px;
-            margin: 0;
-        }
-        .mines-bet-input-row.open {
-            max-height: 60px;
-            opacity: 1;
-            padding: 4px;
-            margin: 0;
-        }
-        .mines-bet-input-row input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            padding: 8px 12px;
-            outline: none;
-            min-width: 0;
-        }
-        .mines-bet-input-row input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-        }
-        .mines-bet-input-row .mines-bet-confirm-btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: white;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .mines-bet-input-row .mines-bet-confirm-btn:active {
-            transform: scale(0.92);
-        }
+        .mines-header { background: rgba(255,255,255,0.02); border-radius: 20px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.04); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .mines-header .multiplier { font-size: 24px; font-weight: 900; color: #00d2a0; letter-spacing: -0.5px; }
+        .mines-header .multiplier .x { font-size: 16px; font-weight: 400; opacity: 0.5; margin-left: 2px; }
+        .grid-presets { display: flex; gap: 4px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .grid-presets button { padding: 3px 10px; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; background: rgba(255,255,255,0.02); color: #888; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+        .grid-presets button.active { background: rgba(108,92,231,0.15); border-color: rgba(108,92,231,0.2); color: #fff; }
+        .grid-presets button.coming-soon { opacity: 0.5; cursor: default; }
+        .mines-grid-wrapper { position: relative; margin: 8px 0 12px 0; }
+        .mines-grid { display: grid; gap: 8px; justify-content: center; margin: 0 auto; }
+        .mines-grid .tile-wrapper { position: relative; aspect-ratio: 1/1; border-radius: 24px; cursor: pointer; perspective: 800px; }
+        .mines-grid .tile-wrapper .shadow { position: absolute; inset: 5px 0 0 5px; border-radius: 24px; background: #060608; opacity: 0.6; z-index: 0; transition: all 0.3s; }
+        .mines-grid .tile-wrapper .tile { position: relative; z-index: 1; width: 100%; height: 100%; background: #141418; border-radius: 24px; display: flex; align-items: center; justify-content: center; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 2px 0 rgba(255,255,255,0.04), 0 4px 16px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.04); color: #fff; opacity: 0; transform: scale(0.7) rotateX(20deg) translateY(10px); pointer-events: none; font-weight: 700; user-select: none; }
+        .mines-grid .tile-wrapper .tile.show { opacity: 1; transform: scale(1) rotateX(0deg) translateY(0); pointer-events: auto; }
+        .mines-grid .tile-wrapper:active .tile { transform: scale(0.94); }
+        .mines-grid .tile-wrapper .tile .symbol { font-size: 28px; line-height: 1; opacity: 0; transform: scale(0.3) rotate(-30deg); transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); display: flex; align-items: center; justify-content: center; }
+        .mines-grid .tile-wrapper .tile.revealed .symbol { opacity: 1; transform: scale(1) rotate(0deg); }
+        .mines-grid .tile-wrapper .tile.revealed { transform: scale(0.97); border-color: transparent; }
+        .mines-grid .tile-wrapper .tile.revealed.safe { background: #0d2018; border-color: rgba(0,210,160,0.12); box-shadow: 0 0 30px rgba(0,210,160,0.06); }
+        .mines-grid .tile-wrapper .tile.revealed.safe .symbol { color: #00d2a0; }
+        .mines-grid .tile-wrapper .tile.revealed.mine { background: #201010; border-color: rgba(255,80,80,0.12); box-shadow: 0 0 30px rgba(255,80,80,0.06); }
+        .mines-grid .tile-wrapper .tile.revealed.mine .symbol { color: #ff6b6b; }
+        .mines-message { text-align: center; padding: 12px; border-radius: 16px; font-size: 14px; font-weight: 500; min-height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); margin-bottom: 10px; color: #888; }
+        .mines-message.success { color: #00d2a0; border-color: rgba(0,210,160,0.1); }
+        .mines-message.danger { color: #ff6b6b; border-color: rgba(255,107,107,0.1); }
+        .mines-message.gold { color: #ffd700; border-color: rgba(255,215,0,0.1); }
+        .mines-bet-container { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+        .mines-bet-input-row { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 4px; border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; max-height: 0; overflow: hidden; opacity: 0; padding: 0 4px; margin: 0; }
+        .mines-bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
+        .mines-bet-input-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 700; padding: 8px 12px; outline: none; min-width: 0; }
+        .mines-bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .mines-bet-input-row .mines-bet-confirm-btn { padding: 8px 20px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; transition: all 0.2s; white-space: nowrap; }
+        .mines-bet-input-row .mines-bet-confirm-btn:active { transform: scale(0.92); }
         .mines-main-action-btn {
             display: flex;
             flex-direction: column;
@@ -1807,7 +736,7 @@
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
             color: white;
             text-align: center;
             width: 100%;
@@ -1817,152 +746,34 @@
             min-height: 44px;
             line-height: 1.2;
         }
-        .mines-main-action-btn:active {
-            transform: scale(0.94);
-        }
-        .mines-main-action-btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            transform: none;
-        }
-        .mines-main-action-btn .sub-text {
-            font-size: 11px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.2;
-            min-height: 14px;
-        }
-        .mines-main-action-btn.place-bet {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
-        }
-        .mines-main-action-btn.cash-out {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-        }
-        .mines-main-action-btn.waiting {
-            background: linear-gradient(135deg, #636e72, #2d3436);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: not-allowed;
-        }
-        .mines-main-action-btn.confirm-bet {
-            background: linear-gradient(135deg, #f9ca24, #f0932b);
-            box-shadow: 0 4px 20px rgba(249, 202, 36, 0.3);
-        }
-        .mines-main-action-btn .nft-indicator {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            pointer-events: none;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.08);
-        }
-        .mines-main-action-btn .nft-indicator.show {
-            opacity: 1;
-            transform: translateY(-50%) scale(1);
-        }
-        .mines-main-action-btn .nft-indicator img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: opacity 0.6s ease, transform 0.6s ease;
-            opacity: 0;
-            transform: scale(0.7);
-        }
-        .mines-main-action-btn .nft-indicator img.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .mines-main-action-btn .nft-indicator img.hidden-img {
-            opacity: 0;
-            transform: scale(0.7);
-        }
-        .mines-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 6px;
-            margin-bottom: 4px;
-        }
-        .mines-controls .control-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 4px 10px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .mines-controls .control-group .label {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-right: 4px;
-        }
-        .mines-controls .control-group button {
-            width: 24px;
-            height: 24px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mines-controls .control-group button:active {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(0.92);
-        }
-        .mines-controls .control-group .val {
-            font-size: 15px;
-            font-weight: 700;
-            min-width: 22px;
-            text-align: center;
-            color: #fff;
-        }
-        .mines-history {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 6px;
-        }
-        .mines-history .h-item {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #888;
-        }
-        .mines-history .h-item.win {
-            color: #00d2a0;
-            border-color: rgba(0, 210, 160, 0.15);
-        }
-        .mines-history .h-item.loss {
-            color: #ff6b6b;
-            border-color: rgba(255, 107, 107, 0.15);
-        }
+        .mines-main-action-btn:active { transform: scale(0.94); }
+        .mines-main-action-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
+        .mines-main-action-btn .sub-text { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.8); line-height: 1.2; min-height: 14px; }
+        .mines-main-action-btn.place-bet { background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: 0 4px 20px rgba(108,92,231,0.35); }
+        .mines-main-action-btn.cash-out { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); }
+        .mines-main-action-btn.waiting { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 20px rgba(0,0,0,0.3); cursor: not-allowed; }
+        .mines-main-action-btn.confirm-bet { background: linear-gradient(135deg, #f9ca24, #f0932b); box-shadow: 0 4px 20px rgba(249,202,36,0.3); }
+        .mines-main-action-btn .nft-indicator { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 8px; overflow: hidden; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,215,0,0.15); box-shadow: 0 0 20px rgba(255,215,0,0.08); }
+        .mines-main-action-btn .nft-indicator.show { opacity: 1; transform: translateY(-50%) scale(1); }
+        .mines-main-action-btn .nft-indicator img { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: scale(0.7); }
+        .mines-main-action-btn .nft-indicator img.visible { opacity: 1; transform: scale(1); }
+        .mines-main-action-btn .nft-indicator img.hidden-img { opacity: 0; transform: scale(0.7); }
+        .mines-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 6px; margin-bottom: 4px; }
+        .mines-controls .control-group { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.02); padding: 4px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.04); }
+        .mines-controls .control-group .label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+        .mines-controls .control-group button { width: 24px; height: 24px; border: none; border-radius: 6px; background: rgba(255,255,255,0.04); color: #fff; font-size: 14px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .mines-controls .control-group button:active { background: rgba(255,255,255,0.1); transform: scale(0.92); }
+        .mines-controls .control-group .val { font-size: 15px; font-weight: 700; min-width: 22px; text-align: center; color: #fff; }
+        .mines-history { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+        .mines-history .h-item { padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); color: #888; }
+        .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
+        .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        /* UPGRADE */
+        /* UPGRADE – BIGGER WHEEL */
         .upgrade-wheel-container {
             position: relative;
-            width: 280px;
-            height: 280px;
+            width: 380px;
+            height: 380px;
             margin: 16px auto;
             transition: filter 0.3s;
         }
@@ -1970,107 +781,43 @@
             display: block;
             margin: 0 auto;
             border-radius: 50%;
+            width: 380px;
+            height: 380px;
         }
         .wheel-center-nft {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70px;
-            height: 70px;
+            width: 90px;
+            height: 90px;
             object-fit: contain;
-            border-radius: 12px;
+            border-radius: 16px;
             display: none;
             z-index: 5;
             pointer-events: none;
             will-change: transform;
+            box-shadow: 0 0 30px rgba(255,215,0,0.2);
+            border: 2px solid rgba(255,215,0,0.1);
         }
-        .upgrade-selectors {
-            display: flex;
-            flex-direction: row;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .upgrade-select {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            min-width: 0;
-        }
-        .upgrade-select:active {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        .upgrade-select .nft-square {
-            width: 60px;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .upgrade-select .nft-square img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            will-change: transform;
-        }
-        .upgrade-select .nft-square .placeholder {
-            color: #555;
-            font-size: 10px;
-        }
-        .upgrade-select .info {
-            text-align: center;
-        }
-        .upgrade-select .info .name {
-            font-weight: 600;
-            font-size: 16px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-        .upgrade-select .info .price {
-            color: #ffd700;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-        }
-        .btn-upgrade {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-            margin: 12px auto 0 auto;
-            padding: 18px 40px;
-            font-size: 20px;
-            border-radius: 20px;
-            width: fit-content;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-upgrade:disabled {
-            opacity: 0.5;
-        }
-        .btn-upgrade .arrow-icon {
-            font-size: 22px;
-        }
+        .upgrade-selectors { display: flex; flex-direction: row; gap: 12px; margin-bottom: 16px; }
+        .upgrade-select { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; min-width: 0; }
+        .upgrade-select:active { background: rgba(255,255,255,0.05); }
+        .upgrade-select .nft-square { width: 60px; height: 60px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
+        .upgrade-select .nft-square img { width: 100%; height: 100%; object-fit: contain; will-change: transform; }
+        .upgrade-select .nft-square .placeholder { color: #555; font-size: 10px; }
+        .upgrade-select .info { text-align: center; }
+        .upgrade-select .info .name { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .upgrade-select .info .price { color: #ffd700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 2px; }
+        .btn-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); box-shadow: 0 4px 20px rgba(0,184,148,0.35); margin: 12px auto 0 auto; padding: 18px 40px; font-size: 20px; border-radius: 20px; width: fit-content; display: flex; align-items: center; gap: 8px; }
+        .btn-upgrade:disabled { opacity: 0.5; }
+        .btn-upgrade .arrow-icon { font-size: 22px; }
 
+        /* NFT Selection Overlay - scrollable, sorted, grid */
         .nft-selection-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(10px);
             z-index: 1000;
             display: none;
@@ -2078,56 +825,32 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow: hidden;
         }
-        .nft-selection-overlay.active {
-            display: flex;
-        }
+        .nft-selection-overlay.active { display: flex; }
         .nft-selection-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             max-width: 340px;
             width: 100%;
+            max-height: 65vh;
+            overflow-y: auto;
+            padding: 4px;
         }
-        .nft-selection-item {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .nft-selection-item:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.08);
-        }
-        .nft-selection-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            will-change: transform;
-        }
-        .nft-selection-item .name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .nft-selection-close {
-            margin-top: 20px;
-            color: #888;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 8px 20px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-        }
+        .nft-selection-grid::-webkit-scrollbar { width: 4px; }
+        .nft-selection-grid::-webkit-scrollbar-track { background: transparent; }
+        .nft-selection-grid::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 10px; }
+        .nft-selection-item { background: rgba(255,255,255,0.04); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.06); }
+        .nft-selection-item:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
+        .nft-selection-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; will-change: transform; }
+        .nft-selection-item .name { font-weight: 600; font-size: 14px; }
+        .nft-selection-close { margin-top: 20px; color: #888; font-size: 14px; cursor: pointer; padding: 8px 20px; background: rgba(255,255,255,0.06); border-radius: 20px; }
 
         .win-popup {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(10px);
             z-index: 2000;
             display: none;
@@ -2137,206 +860,95 @@
             padding: 20px;
             text-align: center;
         }
-        .win-popup.active {
+        .win-popup.active { display: flex; }
+        .win-popup .win-card { background: rgba(30,30,30,0.95); border-radius: 24px; padding: 30px 24px; max-width: 320px; width: 100%; border: 1px solid rgba(255,215,0,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+        .win-popup .money-gif { width: 140px; height: 140px; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); will-change: transform; }
+        .win-popup .nft-img { width: 90px; height: 90px; object-fit: contain; border-radius: 16px; margin-bottom: 8px; will-change: transform; }
+        .win-popup .win-title { font-size: 24px; font-weight: 800; color: #ffd700; margin-bottom: 4px; }
+        .win-popup .win-subtitle { font-size: 16px; color: #ccc; }
+        .win-popup button { margin-top: 16px; padding: 12px 32px; border: none; border-radius: 20px; background: linear-gradient(135deg, #00b894, #00d2a0); color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .win-popup button:active { transform: scale(0.94); }
+
+        .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .inventory-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; text-align: center; }
+        .inventory-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; margin-bottom: 8px; will-change: transform; }
+        .inventory-item .name { font-weight: 600; }
+        .inventory-item .actions { display: flex; gap: 6px; margin-top: 8px; }
+        .inventory-item .actions button { flex: 1; padding: 6px 8px; border-radius: 10px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .inventory-item .actions button:active { transform: scale(0.94); }
+        .btn-sell { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+        .btn-inventory-upgrade { background: linear-gradient(135deg, #00b894, #00d2a0); color: white; }
+
+        /* CRASH NFT OVERLAY – center, transparent */
+        #crashNftOverlay {
+            position: absolute;
+            inset: 0;
+            z-index: 9;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #crashNftOverlay.show {
             display: flex;
+            opacity: 0.35;
         }
-        .win-popup .win-card {
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 24px;
-            padding: 30px 24px;
-            max-width: 320px;
-            width: 100%;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-        }
-        .win-popup .money-gif {
-            width: 140px;
-            height: 140px;
+        #crashNftOverlay img {
+            width: 120px;
+            height: 120px;
             object-fit: contain;
-            margin-bottom: 16px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
-            will-change: transform;
-        }
-        .win-popup .nft-img {
-            width: 90px;
-            height: 90px;
-            object-fit: contain;
-            border-radius: 16px;
-            margin-bottom: 8px;
-            will-change: transform;
-        }
-        .win-popup .win-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffd700;
-            margin-bottom: 4px;
-        }
-        .win-popup .win-subtitle {
-            font-size: 16px;
-            color: #ccc;
-        }
-        .win-popup button {
-            margin-top: 16px;
-            padding: 12px 32px;
-            border: none;
             border-radius: 20px;
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
+            filter: drop-shadow(0 0 40px rgba(255,215,0,0.3));
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            opacity: 0;
+            transform: scale(0.7);
         }
-        .win-popup button:active {
-            transform: scale(0.94);
+        #crashNftOverlay img.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        #crashNftOverlay img.hidden-img {
+            opacity: 0;
+            transform: scale(0.7);
         }
 
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .inventory-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 12px;
-            text-align: center;
-        }
-        .inventory-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            will-change: transform;
-        }
-        .inventory-item .name {
-            font-weight: 600;
-        }
-        .inventory-item .actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
-        .inventory-item .actions button {
-            flex: 1;
-            padding: 6px 8px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .inventory-item .actions button:active {
-            transform: scale(0.94);
-        }
-        .btn-sell {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-        }
-        .btn-inventory-upgrade {
-            background: linear-gradient(135deg, #00b894, #00d2a0);
-            color: white;
+        /* Adjust rocket overlay when NFT is shown */
+        .gif-overlay.nft-active {
+            transform: translate(-50%, -50%) rotate(0deg) scale(0.6) translateY(20px) !important;
         }
 
         @media (max-width: 420px) {
-            .mines-grid .tile-wrapper .tile .symbol {
-                font-size: 22px;
-            }
-            .mines-grid {
-                gap: 6px;
-            }
-            .mines-header .multiplier {
-                font-size: 20px;
-            }
-            .grid-presets button {
-                font-size: 9px;
-                padding: 2px 7px;
-            }
-            .mines-grid .tile-wrapper {
-                border-radius: 18px;
-            }
-            .mines-grid .tile-wrapper .tile {
-                border-radius: 18px;
-            }
-            .mines-grid .tile-wrapper .shadow {
-                border-radius: 18px;
-                inset: 4px 0 0 4px;
-            }
-            .balance-icon {
-                width: 30px;
-                height: 30px;
-                margin-top: 5px;
-            }
-            .badge .balance-icon {
-                width: 26px;
-                height: 26px;
-                margin-top: 1px;
-            }
-            .star-icon-sm {
-                width: 16px;
-                height: 16px;
-            }
-            .star-icon-xs {
-                width: 14px;
-                height: 14px;
-            }
-            .main-action-btn {
-                padding-top: 12px;
-                padding-bottom: 10px;
-            }
-            .moon-overlay img {
-                width: 80px;
-                height: 80px;
-            }
-            .quick-grid {
-                gap: 8px;
-            }
-            .quick-card {
-                padding: 12px 14px;
-                gap: 12px;
-            }
-            .quick-card .icon {
-                font-size: 22px;
-                width: 34px;
-            }
-            .quick-card .label {
-                font-size: 14px;
-            }
-            #bounceBallImg {
-                width: 32px;
-                height: 32px;
-            }
-            #loadingScreen .main-gif {
-                max-width: 220px;
-                width: 70%;
-            }
-            #loadingScreen .title {
-                font-size: 30px;
-            }
-            #loadingScreen .spinner-gif {
-                width: 56px;
-                height: 56px;
-            }
-            #bounceNftOverlay img {
-                width: 70px;
-                height: 70px;
-            }
-            .main-action-btn .nft-indicator {
-                width: 28px;
-                height: 28px;
-                right: 4px;
-            }
-            .mines-main-action-btn .nft-indicator {
-                width: 28px;
-                height: 28px;
-                right: 4px;
-            }
-            #settingsModal .settings-card {
-                padding: 20px 16px;
-            }
+            .mines-grid .tile-wrapper .tile .symbol { font-size: 22px; }
+            .mines-grid { gap: 6px; }
+            .mines-header .multiplier { font-size: 20px; }
+            .grid-presets button { font-size: 9px; padding: 2px 7px; }
+            .mines-grid .tile-wrapper { border-radius: 18px; }
+            .mines-grid .tile-wrapper .tile { border-radius: 18px; }
+            .mines-grid .tile-wrapper .shadow { border-radius: 18px; inset: 4px 0 0 4px; }
+            .balance-icon { width: 30px; height: 30px; margin-top: 5px; }
+            .badge .balance-icon { width: 26px; height: 26px; margin-top: 1px; }
+            .star-icon-sm { width: 16px; height: 16px; }
+            .star-icon-xs { width: 14px; height: 14px; }
+            .main-action-btn { padding-top: 12px; padding-bottom: 10px; }
+            .moon-overlay img { width: 80px; height: 80px; }
+            .quick-grid { gap: 8px; }
+            .quick-card { padding: 12px 14px; gap: 12px; }
+            .quick-card .icon { font-size: 22px; width: 34px; }
+            .quick-card .label { font-size: 14px; }
+            #bounceBallImg { width: 32px; height: 32px; }
+            #loadingScreen .main-gif { max-width: 220px; width: 70%; }
+            #loadingScreen .title { font-size: 30px; }
+            #loadingScreen .spinner-gif { width: 56px; height: 56px; }
+            #bounceNftOverlay img { width: 70px; height: 70px; }
+            .main-action-btn .nft-indicator { width: 28px; height: 28px; right: 4px; }
+            .mines-main-action-btn .nft-indicator { width: 28px; height: 28px; right: 4px; }
+            #settingsModal .settings-card { padding: 20px 16px; }
+            .upgrade-wheel-container { width: 300px; height: 300px; }
+            #upgradeWheel { width: 300px; height: 300px; }
+            .wheel-center-nft { width: 70px; height: 70px; }
+            #crashNftOverlay img { width: 80px; height: 80px; }
         }
     </style>
 </head>
@@ -2358,7 +970,7 @@
             <span class="notif-amount" id="notifAmount"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> +0</span>
         </div>
 
-        <!-- Win Popup (for upgrade success) -->
+        <!-- Win Popup -->
         <div class="win-popup" id="winPopup">
             <div class="win-card">
                 <img class="money-gif" id="winMoneyGif" src="" alt="Money">
@@ -2369,7 +981,7 @@
             </div>
         </div>
 
-        <!-- NFT Selection Overlay (global) -->
+        <!-- NFT Selection Overlay -->
         <div class="nft-selection-overlay" id="nftSelectionOverlay">
             <div class="nft-selection-grid" id="nftSelectionGrid"></div>
             <div class="nft-selection-close" onclick="closeNftSelection()">Cancel</div>
@@ -2384,14 +996,6 @@
                     <div class="toggle" id="vibrationToggle" onclick="toggleVibration()">
                         <div class="knob"></div>
                     </div>
-                </div>
-                <div class="setting-row">
-                    <span class="label">Graphics Quality</span>
-                    <select id="graphicsQuality" onchange="updateGraphicsQuality(this.value)">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
                 </div>
                 <div class="close-btn" onclick="closeSettings()">Close</div>
             </div>
@@ -2454,6 +1058,10 @@
                 <div class="wind-lines" id="windLines"></div>
                 <div class="moon-overlay" id="moonOverlay">
                     <img id="moonGif" src="https://images.iimg.live/images/ultimate-collection-3580.webp" alt="Moon" decoding="async">
+                </div>
+                <!-- NFT overlay in center -->
+                <div id="crashNftOverlay">
+                    <img id="crashNftOverlayImg" src="" alt="NFT" decoding="async">
                 </div>
                 <div class="gif-overlay" id="rocketOverlay">
                     <img id="crashGif" src="" alt="Car/Rocket" decoding="async">
@@ -2541,7 +1149,7 @@
                     </div>
                 </div>
                 <div class="upgrade-wheel-container" id="wheelContainer">
-                    <canvas id="upgradeWheel" width="280" height="280"></canvas>
+                    <canvas id="upgradeWheel" width="380" height="380"></canvas>
                     <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
                 </div>
                 <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
@@ -2645,8 +1253,7 @@
         // SETTINGS STATE
         // ============================================================
         const settings = {
-            vibration: true,
-            graphicsQuality: 'medium'
+            vibration: true
         };
 
         function loadSettings() {
@@ -2666,30 +1273,17 @@
 
         function applySettingsUI() {
             const toggle = document.getElementById('vibrationToggle');
-            const select = document.getElementById('graphicsQuality');
             if (settings.vibration) {
                 toggle.classList.add('active');
             } else {
                 toggle.classList.remove('active');
             }
-            select.value = settings.graphicsQuality;
         }
 
         function toggleVibration() {
             settings.vibration = !settings.vibration;
             applySettingsUI();
             saveSettings();
-        }
-
-        function updateGraphicsQuality(value) {
-            settings.graphicsQuality = value;
-            saveSettings();
-            if (document.getElementById('page-bounce').classList.contains('active')) {
-                bounceGame.init();
-            }
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.initWind();
-            }
         }
 
         function openSettings() {
@@ -2711,10 +1305,8 @@
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.decoding = 'async';
-                img.onload = () => { GIF_CACHE[url] = img;
-                    resolve(img); };
-                img.onerror = () => { GIF_CACHE[url] = null;
-                    resolve(null); };
+                img.onload = () => { GIF_CACHE[url] = img; resolve(img); };
+                img.onerror = () => { GIF_CACHE[url] = null; resolve(null); };
                 img.src = url;
             });
         }
@@ -2749,7 +1341,7 @@
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
             'https://images.iimg.live/images/vibrant-scene-3805.webp',
             'https://images.iimg.live/images/glorious-memory-8181.webp',
-            // New NFT GIFs
+            // NEW NFT GIFs
             'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
             'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
             'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
@@ -2840,7 +1432,6 @@
             inventory: []
         };
 
-        // NEW NFTs added here
         const NFT_DB = {
             chill_flame: {
                 id: 'chill_flame',
@@ -2884,7 +1475,7 @@
                 gif: 'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
                 tier: 'legendary'
             },
-            // ---- NEW NFTs ----
+            // NEW NFTs
             homemade_cake: {
                 id: 'homemade_cake',
                 name: 'Homemade Cake',
@@ -3216,8 +1807,7 @@
         function navigateTo(page) {
             Object.keys(pages).forEach(key => { pages[key].classList.toggle('active', key === page); });
             navItems.forEach(item => { item.classList.toggle('active', item.dataset.page === page); });
-            if (page === 'rocket') { crashGame.startGameCycle();
-                renderPlayers(); }
+            if (page === 'rocket') { crashGame.startGameCycle(); renderPlayers(); }
             if (page === 'profile') { updateProfile(); }
             if (page === 'upgrade') {
                 document.getElementById('upgradeBalance').innerHTML =
@@ -3335,8 +1925,7 @@
 
         function triggerCashOutVibration() {
             if (!settings.vibration) return;
-            try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } } catch (
-            e) {}
+            try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); } } catch (e) {}
             try { if (navigator.vibrate) navigator.vibrate(50); } catch (e) {}
         }
 
@@ -3347,8 +1936,7 @@
             const delays = [0, 120, 240, 380];
             for (let i = 0; i < 4; i++) {
                 setTimeout(() => {
-                    try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred(types[
-                            i]); } } catch (e) {}
+                    try { if (window.Telegram?.WebApp) { window.Telegram.WebApp.HapticFeedback.impactOccurred(types[i]); } } catch (e) {}
                     try { if (navigator.vibrate) navigator.vibrate(durations[i]); } catch (e) {}
                 }, delays[i]);
             }
@@ -3414,7 +2002,7 @@
         }
 
         // ============================================================
-        // CRASH GAME
+        // CRASH GAME – with NFT overlay in center and rocket shrink
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -3443,14 +2031,12 @@
             isCarPhase: true,
             transitioning: false,
             moonActive: false,
+            nftActive: false,
 
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
-                let streakCount = 45;
-                if (settings.graphicsQuality === 'low') streakCount = 8;
-                else if (settings.graphicsQuality === 'medium') streakCount = 25;
-
+                const streakCount = 25;
                 for (let i = 0; i < streakCount; i++) {
                     const streak = document.createElement('div');
                     streak.className = 'streak';
@@ -3467,17 +2053,13 @@
             },
 
             updateWindEffect() {
-                if (settings.graphicsQuality === 'low') {
-                    document.getElementById('windLines').classList.remove('active');
-                    document.getElementById('windLines').style.opacity = 0;
-                    return;
-                }
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
-                if (mult > this.windStart && mult < 2.83) { phase = 0; } else if (mult >= 2.83 && mult < 2.9) { phase =
-                    1; } else if (mult >= 2.9 && mult < this.windReappear) { phase = 2; } else if (mult >= this
-                    .windReappear) { phase = 3; }
+                if (mult > this.windStart && mult < 2.83) { phase = 0; }
+                else if (mult >= 2.83 && mult < 2.9) { phase = 1; }
+                else if (mult >= 2.9 && mult < this.windReappear) { phase = 2; }
+                else if (mult >= this.windReappear) { phase = 3; }
                 this.windPhase = phase;
 
                 if (mult > this.windStart && this.isPlaying && phase !== 2) {
@@ -3515,11 +2097,6 @@
             },
 
             updateMoon(mult) {
-                if (settings.graphicsQuality === 'low') {
-                    document.getElementById('moonOverlay').classList.remove('active');
-                    document.getElementById('moonGif').style.display = 'none';
-                    return;
-                }
                 const moonOverlay = document.getElementById('moonOverlay');
                 const moonImg = document.getElementById('moonGif');
 
@@ -3547,6 +2124,35 @@
                     this.moonActive = false;
                     moonOverlay.classList.remove('active');
                     moonImg.style.display = 'none';
+                }
+            },
+
+            // NFT overlay in center
+            updateNftOverlay(winAmount) {
+                const overlay = document.getElementById('crashNftOverlay');
+                const img = document.getElementById('crashNftOverlayImg');
+                if (!overlay || !img) return;
+                const nft = getBestNftForWin(winAmount);
+                if (nft && winAmount > 0 && this.isPlaying && !this.hasCashedOut && !this.gameOver) {
+                    this.nftActive = true;
+                    if (img.src !== nft.gif) {
+                        img.className = 'hidden-img';
+                        setTimeout(() => {
+                            img.src = nft.gif;
+                            void img.offsetHeight;
+                            img.className = 'visible';
+                        }, 300);
+                    } else {
+                        img.className = 'visible';
+                    }
+                    overlay.classList.add('show');
+                    // Shrink rocket and move down
+                    document.getElementById('rocketOverlay').classList.add('nft-active');
+                } else {
+                    this.nftActive = false;
+                    overlay.classList.remove('show');
+                    img.className = 'hidden-img';
+                    document.getElementById('rocketOverlay').classList.remove('nft-active');
                 }
             },
 
@@ -3643,8 +2249,7 @@
             updateRotationAndZoom() {
                 const effectiveMult = Math.min(this.multiplier, 3.0);
                 this.targetAngle = 12 - (effectiveMult - 1) * 24;
-                const stiffness = 8.0,
-                    damping = 4.0;
+                const stiffness = 8.0, damping = 4.0;
                 const springForce = (this.targetAngle - this.currentAngle) * stiffness;
                 const dampingForce = -this.velocity * damping;
                 const acceleration = springForce + dampingForce;
@@ -3658,8 +2263,7 @@
                     const zoomProgress = Math.min(1, (mult - 5.0) / 5.0);
                     this.targetScale = 1.0 - zoomProgress * 0.3;
                 } else { this.targetScale = 1.0; }
-                const scaleStiffness = 6.0,
-                    scaleDamping = 3.5;
+                const scaleStiffness = 6.0, scaleDamping = 3.5;
                 const scaleForce = (this.targetScale - this.currentScale) * scaleStiffness;
                 const scaleDampForce = -this.scaleVelocity * scaleDamping;
                 const scaleAccel = scaleForce + scaleDampForce;
@@ -3667,9 +2271,13 @@
                 this.currentScale += this.scaleVelocity * dt;
                 this.currentScale = Math.max(0.5, Math.min(1.2, this.currentScale));
 
-                const overlay = document.getElementById('rocketOverlay');
-                overlay.style.transform =
-                `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
+                // If NFT is active, we let CSS handle the extra transform via .nft-active class
+                // so we do not override it here.
+                if (!this.nftActive) {
+                    const overlay = document.getElementById('rocketOverlay');
+                    overlay.style.transform =
+                        `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
+                }
             },
 
             updateProgressLine() {
@@ -3709,8 +2317,7 @@
             },
 
             stopContinuousVibration() {
-                if (this.vibrationInterval) { clearInterval(this.vibrationInterval);
-                    this.vibrationInterval = null; }
+                if (this.vibrationInterval) { clearInterval(this.vibrationInterval); this.vibrationInterval = null; }
             },
 
             init() {
@@ -3725,18 +2332,19 @@
                 const moonOverlay = document.getElementById('moonOverlay');
                 moonOverlay.classList.remove('active');
                 document.getElementById('moonGif').style.display = 'none';
+                document.getElementById('crashNftOverlay').classList.remove('show');
+                document.getElementById('crashNftOverlayImg').className = 'hidden-img';
+                document.getElementById('rocketOverlay').classList.remove('nft-active');
             },
 
             createGrid() {
                 const container = document.getElementById('gridSquares');
-                const rows = 6,
-                    cols = 8;
+                const rows = 6, cols = 8;
                 container.innerHTML = '';
                 for (let i = 0; i < rows * cols; i++) {
                     const square = document.createElement('div');
                     square.className = 'grid-square';
-                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) square.classList.add(
-                        'corner');
+                    if (i === 0 || i === cols - 1 || i === (rows - 1) * cols || i === rows * cols - 1) square.classList.add('corner');
                     container.appendChild(square);
                 }
             },
@@ -3767,6 +2375,8 @@
                         document.getElementById('crashNftIndicator'),
                         winAmount
                     );
+                    // Update center NFT overlay
+                    this.updateNftOverlay(winAmount);
                     updateLiveData();
                 } else if (this.gameOver) {
                     this.updateMainButton();
@@ -3778,6 +2388,8 @@
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
                     document.getElementById('crashNftIndicator').classList.remove('show');
+                    document.getElementById('crashNftOverlay').classList.remove('show');
+                    document.getElementById('rocketOverlay').classList.remove('nft-active');
                 }
             },
 
@@ -3960,7 +2572,8 @@
                 this.updateMainButton();
                 updateHomeUI();
                 document.getElementById('crashNftIndicator').classList.remove('show');
-                this.bet = 0; // Reset bet after cash out
+                document.getElementById('crashNftOverlay').classList.remove('show');
+                document.getElementById('rocketOverlay').classList.remove('nft-active');
             },
 
             startCountdown() {
@@ -3974,6 +2587,9 @@
                 moonOverlay.classList.remove('active');
                 document.getElementById('moonGif').style.display = 'none';
                 this.moonActive = false;
+                document.getElementById('crashNftOverlay').classList.remove('show');
+                document.getElementById('crashNftOverlayImg').className = 'hidden-img';
+                document.getElementById('rocketOverlay').classList.remove('nft-active');
 
                 players = players.filter(p => p.isYou);
                 if (players.length > 0) {
@@ -4083,20 +2699,16 @@
                     moonOverlay.classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
+                    document.getElementById('crashNftOverlay').classList.remove('show');
+                    document.getElementById('rocketOverlay').classList.remove('nft-active');
 
-                    if (settings.graphicsQuality !== 'low') {
-                        const explosionOverlay = document.getElementById('explosionOverlay');
-                        explosionOverlay.classList.add('active');
-                        const explosionImg = document.getElementById('explosionGif');
-                        explosionImg.style.animation = 'none';
-                        void explosionImg.offsetHeight;
-                        explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
-                        setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
-                    } else {
-                        const overlay = document.getElementById('explosionOverlay');
-                        overlay.classList.add('active');
-                        setTimeout(() => overlay.classList.remove('active'), 300);
-                    }
+                    const explosionOverlay = document.getElementById('explosionOverlay');
+                    explosionOverlay.classList.add('active');
+                    const explosionImg = document.getElementById('explosionGif');
+                    explosionImg.style.animation = 'none';
+                    void explosionImg.offsetHeight;
+                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
+                    setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
 
                     const user = players.find(p => p.isYou);
                     if (user && user.active && !user.hasCashedOut) {
@@ -4112,12 +2724,10 @@
                     this.updateUI();
                     this.updateMainButton();
                     updateHomeUI();
-                    if (this.animationId) { cancelAnimationFrame(this.animationId);
-                        this.animationId = null; }
+                    if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
                     document.getElementById('crashNftIndicator').classList.remove('show');
-                    this.bet = 0; // Reset bet after crash
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -4158,12 +2768,11 @@
                 }
             },
 
-            addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop();
-                this.renderHistory(); }
+            addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop(); this.renderHistory(); }
         };
 
         // ============================================================
-        // MINES GAME – BIGGER X MULTIPLIER + NFT INDICATOR
+        // MINES GAME – unchanged
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -4253,8 +2862,7 @@
                 const minesToPlace = Math.min(this.minesCount, total - 1);
                 while (placed < minesToPlace) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) { this.board[idx] = 1;
-                        placed++; }
+                    if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
                 }
                 this.safeCount = total - minesToPlace;
                 this.revealedSafe = 0;
@@ -4556,8 +3164,7 @@
                 const mines = Math.min(this.minesCount, total - 1);
                 while (placed < mines) {
                     const idx = Math.floor(Math.random() * total);
-                    if (this.board[idx] === 0) { this.board[idx] = 1;
-                        placed++; }
+                    if (this.board[idx] === 0) { this.board[idx] = 1; placed++; }
                 }
                 this.safeCount = total - mines;
                 this.revealed = new Array(total).fill(false);
@@ -4675,7 +3282,7 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL
+        // UPGRADE SELECTION & WHEEL – ENHANCED SPIN (longer)
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -4752,7 +3359,7 @@
                     return;
                 }
                 const sourcePrice = NFT_DB[upgradeGame.fromNftId].price;
-                eligible = Object.values(NFT_DB).filter(n => n.price > sourcePrice);
+                eligible = Object.values(NFT_DB).filter(n => n.price > sourcePrice).sort((a, b) => a.price - b.price);
             }
             const grid = document.getElementById('nftSelectionGrid');
             const overlay = document.getElementById('nftSelectionOverlay');
@@ -4801,7 +3408,7 @@
             targetChance: 1.0,
             chanceAnimationId: null,
             lastTickAngle: -Math.PI / 2,
-            tickThreshold: 30 * Math.PI / 180,
+            tickThreshold: 25 * Math.PI / 180,
 
             init() {
                 this.ctx = this.canvas.getContext('2d');
@@ -4812,10 +3419,9 @@
                 const ctx = this.ctx;
                 const w = this.canvas.width;
                 const h = this.canvas.height;
-                const cx = w / 2,
-                    cy = h / 2;
-                const outerR = 105;
-                const innerR = 50;
+                const cx = w / 2, cy = h / 2;
+                const outerR = 145; // bigger
+                const innerR = 65;
 
                 ctx.clearRect(0, 0, w, h);
 
@@ -4826,41 +3432,66 @@
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
                 ctx.closePath();
-                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
+                const greenGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
                 greenGrad.addColorStop(0, '#00e676');
+                greenGrad.addColorStop(0.7, '#00c853');
                 greenGrad.addColorStop(1, '#009624');
                 ctx.fillStyle = greenGrad;
+                ctx.shadowColor = 'rgba(0,230,118,0.3)';
+                ctx.shadowBlur = 20;
                 ctx.fill();
+                ctx.shadowBlur = 0;
 
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
                     ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
                     ctx.closePath();
-                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
+                    const redGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
                     redGrad.addColorStop(0, '#ff5252');
+                    redGrad.addColorStop(0.7, '#d32f2f');
                     redGrad.addColorStop(1, '#b71c1c');
                     ctx.fillStyle = redGrad;
+                    ctx.shadowColor = 'rgba(255,82,82,0.3)';
+                    ctx.shadowBlur = 20;
                     ctx.fill();
+                    ctx.shadowBlur = 0;
                 }
 
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                ctx.lineWidth = 0.1;
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
+                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.shadowBlur = 25;
                 ctx.beginPath();
-                ctx.moveTo(outerR - 6, 0);
-                ctx.lineTo(outerR + 8, -8);
-                ctx.lineTo(outerR + 8, 8);
+                ctx.moveTo(outerR - 10, 0);
+                ctx.lineTo(outerR + 22, -16);
+                ctx.lineTo(outerR + 22, 16);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
+                ctx.shadowBlur = 0;
                 ctx.restore();
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, 14, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(255,215,0,0.6)';
+                ctx.shadowBlur = 20;
+                ctx.fill();
+                ctx.shadowBlur = 0;
             },
 
             animateToChance(newChance) {
@@ -4900,11 +3531,28 @@
                 this.spinning = true;
                 document.getElementById('upgradeBtn').disabled = true;
                 const wheelContainer = document.getElementById('wheelContainer');
-                wheelContainer.style.filter = 'drop-shadow(0 0 15px rgba(0,210,160,0.6))';
+                wheelContainer.style.filter = 'drop-shadow(0 0 30px rgba(0,210,160,0.8)) brightness(1.1)';
 
                 this.lastTickAngle = this.arrowAngle;
 
-                const duration = 5000 + Math.random() * 2000;
+                let tensionCount = 0;
+                const tensionMax = 3;
+                let tensionInterval = setInterval(() => {
+                    if (tensionCount >= tensionMax) {
+                        clearInterval(tensionInterval);
+                        this.startSpin();
+                        return;
+                    }
+                    this.arrowAngle += (Math.random() - 0.5) * 0.3;
+                    this.drawWheelAndArrow(this.arrowAngle);
+                    playTick(0.2, 600 + Math.random() * 200);
+                    tensionCount++;
+                }, 120);
+            },
+
+            startSpin() {
+                // Longer spin: 7-9 seconds
+                const duration = 7000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
                 let finalAngleOnWheel;
@@ -4913,26 +3561,28 @@
                 } else {
                     finalAngleOnWheel = this.chance * 2 * Math.PI + Math.random() * (1 - this.chance) * 2 * Math.PI;
                 }
-                const targetArrowAngle = -Math.PI / 2 + finalAngleOnWheel + 2 * Math.PI * (6 + Math.floor(Math.random() *
-                4));
+                const targetArrowAngle = -Math.PI / 2 + finalAngleOnWheel + 2 * Math.PI * (6 + Math.floor(Math.random() * 4));
 
                 const startTime = performance.now();
                 const animateSpin = (now) => {
                     const elapsed = now - startTime;
                     const t = Math.min(elapsed / duration, 1);
-                    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                    const eased = t < 0.7 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                     this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
                     this.drawWheelAndArrow(this.arrowAngle);
 
                     const angleDiff = Math.abs(this.arrowAngle - this.lastTickAngle);
                     if (angleDiff >= this.tickThreshold) {
-                        const speed = Math.abs(targetArrowAngle - startAngle) * (eased < 0.5 ? 12 * t * t : 6 * (1 - t) *
-                            (1 - t)) / duration;
-                        const freq = 400 + speed * 100;
-                        const vol = Math.min(0.4, 0.1 + speed * 0.005);
+                        const speed = Math.abs(targetArrowAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 - t)) / duration;
+                        const freq = 400 + speed * 150;
+                        const vol = Math.min(0.4, 0.15 + speed * 0.008);
                         playTick(vol, freq);
                         this.lastTickAngle = this.arrowAngle;
                     }
+
+                    const glowIntensity = 0.3 + 0.7 * (1 - Math.abs(0.5 - t) * 2);
+                    document.getElementById('wheelContainer').style.filter =
+                        `drop-shadow(0 0 ${20 + glowIntensity * 30}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.15})`;
 
                     if (t < 1) {
                         requestAnimationFrame(animateSpin);
@@ -4943,16 +3593,16 @@
                         const isGreen = relativeAngle < this.chance * 2 * Math.PI;
                         this.resolveSpin(isGreen);
 
-                        wheelContainer.style.transition = 'filter 0.2s';
+                        const container = document.getElementById('wheelContainer');
                         if (isGreen) {
-                            wheelContainer.style.filter = 'drop-shadow(0 0 25px rgba(0,210,160,1)) brightness(1.2)';
-                            setTimeout(() => { wheelContainer.style.filter = 'none'; }, 300);
+                            container.style.filter = 'drop-shadow(0 0 50px rgba(0,210,160,1)) brightness(1.4)';
+                            setTimeout(() => { container.style.filter = 'none'; }, 500);
                         } else {
-                            wheelContainer.style.filter = 'drop-shadow(0 0 25px rgba(255,80,80,1)) brightness(0.9)';
-                            setTimeout(() => { wheelContainer.style.filter = 'none'; }, 300);
+                            container.style.filter = 'drop-shadow(0 0 50px rgba(255,80,80,1)) brightness(0.8)';
+                            setTimeout(() => { container.style.filter = 'none'; }, 500);
                         }
 
-                        const returnDuration = 800;
+                        const returnDuration = 1000;
                         const returnStartAngle = this.arrowAngle;
                         const returnStartTime = performance.now();
                         const animateReturn = (now2) => {
@@ -4962,7 +3612,7 @@
                             let bounce = 0;
                             if (t2 > 0.8) {
                                 const b = (t2 - 0.8) / 0.2;
-                                bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.08;
+                                bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.1;
                             }
                             this.arrowAngle = returnStartAngle - deltaAngle * eased2 + bounce;
                             this.drawWheelAndArrow(this.arrowAngle);
@@ -5048,8 +3698,7 @@
 
             const fromOwned = state.inventory.some(n => n.id === upgradeGame.fromNftId);
             const validFrom = upgradeGame.fromNftId && NFT_DB[upgradeGame.fromNftId];
-            const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId] && NFT_DB[upgradeGame.toNftId].price > (
-                validFrom ? NFT_DB[upgradeGame.fromNftId].price : 0);
+            const validTo = upgradeGame.toNftId && NFT_DB[upgradeGame.toNftId] && NFT_DB[upgradeGame.toNftId].price > (validFrom ? NFT_DB[upgradeGame.fromNftId].price : 0);
 
             if (validFrom && validTo) {
                 const multiplier = NFT_DB[upgradeGame.toNftId].price / NFT_DB[upgradeGame.fromNftId].price;
@@ -5071,7 +3720,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP + QUALITY
+        // BOUNCE GAME – FASTER BALL
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5109,8 +3758,7 @@
 
             playHitSound() { playBeep(600, 0.06, 0.2); },
             playBreakSound() { playBeep(1000, 0.1, 0.35); },
-            playWinSound() { playBeep(800, 0.15, 0.3);
-                playBeep(1000, 0.15, 0.3); },
+            playWinSound() { playBeep(800, 0.15, 0.3); playBeep(1000, 0.15, 0.3); },
             playLoseSound() { playBeep(400, 0.2, 0.3); },
 
             updateNftOverlay() {
@@ -5145,14 +3793,7 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
-
-                if (settings.graphicsQuality === 'low') {
-                    this.segmentCount = 10;
-                } else if (settings.graphicsQuality === 'medium') {
-                    this.segmentCount = 16;
-                } else {
-                    this.segmentCount = 20;
-                }
+                this.segmentCount = 16;
 
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
@@ -5219,19 +3860,13 @@
                     if (sec.type === 'line') {
                         for (let j = 0; j <= steps; j++) {
                             const t = j / steps;
-                            pts.push({
-                                x: sec.x1 + t * (sec.x2 - sec.x1),
-                                y: sec.y1 + t * (sec.y2 - sec.y1)
-                            });
+                            pts.push({ x: sec.x1 + t * (sec.x2 - sec.x1), y: sec.y1 + t * (sec.y2 - sec.y1) });
                         }
                     } else {
                         for (let j = 0; j <= steps; j++) {
                             const t = j / steps;
                             const angle = sec.start + t * (sec.end - sec.start);
-                            pts.push({
-                                x: sec.cx + r * Math.cos(angle),
-                                y: sec.cy + r * Math.sin(angle)
-                            });
+                            pts.push({ x: sec.cx + r * Math.cos(angle), y: sec.cy + r * Math.sin(angle) });
                         }
                     }
                 }
@@ -5336,7 +3971,8 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                const speed = 200 + Math.random() * 80;
+                // FASTER BALL
+                const speed = 250 + Math.random() * 100;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
                 document.getElementById('bounceStartBtn').textContent = 'Playing...';
@@ -5524,14 +4160,7 @@
                 const cy = (seg.y1 + seg.y2) / 2;
                 const mult = seg.multiplier;
                 const sign = mult >= 0 ? '+' : '';
-                this.floatingTexts.push({
-                    x: cx,
-                    y: cy,
-                    text: `${sign}${mult.toFixed(2)}x`,
-                    life: 1.2,
-                    maxLife: 1.2,
-                    scale: 1.0
-                });
+                this.floatingTexts.push({ x: cx, y: cy, text: `${sign}${mult.toFixed(2)}x`, life: 1.2, maxLife: 1.2, scale: 1.0 });
             },
 
             distToSegment(px, py, x1, y1, x2, y2) {
@@ -5576,8 +4205,7 @@
                     clearTimeout(this.launchTimeout);
                     this.launchTimeout = null;
                 }
-                if (this.animId) { cancelAnimationFrame(this.animId);
-                    this.animId = null; }
+                if (this.animId) { cancelAnimationFrame(this.animId); this.animId = null; }
                 document.getElementById('bounceStartBtn').textContent = 'Start';
                 document.getElementById('bounceStartBtn').disabled = false;
 
@@ -5623,12 +4251,10 @@
 
             draw() {
                 const ctx = this.ctx;
-                const w = this.width,
-                    h = this.height;
+                const w = this.width, h = this.height;
                 ctx.clearRect(0, 0, w, h);
 
-                const cx = w / 2,
-                    cy = h / 2;
+                const cx = w / 2, cy = h / 2;
                 const halfW = (w - 20) / 2 - this.borderWidth;
                 const halfH = (h - 20) / 2 - this.borderWidth;
                 const r = Math.max(0, this.cornerRadius - this.borderWidth);
@@ -5787,21 +4413,19 @@
             } else {
                 if (crashGame.isPlaying) crashGame.startContinuousVibration();
                 if (document.getElementById('page-rocket').classList.contains('active')) {
-                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame
-                        .startGameCycle();
+                    if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame.startGameCycle();
                 }
             }
         });
 
         // ============================================================
-        // INIT – WITH TIMEOUT FOR LOADING SCREEN
+        // INIT – LOADING SCREEN ENABLED
         // ============================================================
         async function init() {
             const loadingScreen = document.getElementById('loadingScreen');
-            const startTime = performance.now();
+            loadingScreen.classList.remove('hidden');
 
             try {
-                // Preload with a 5-second timeout
                 const preloadPromise = preloadAllGifs();
                 const timeoutPromise = new Promise(resolve => setTimeout(resolve, 5000));
                 await Promise.race([preloadPromise, timeoutPromise]);
@@ -5810,45 +4434,33 @@
                 console.warn('Preload error, continuing anyway', e);
             }
 
-            // Ensure minimum display time (2.5s)
-            const elapsed = performance.now() - startTime;
             const minDisplay = 2500;
+            const startTime = performance.now();
+            const elapsed = performance.now() - startTime;
             const remaining = Math.max(0, minDisplay - elapsed);
             await new Promise(resolve => setTimeout(resolve, remaining));
 
-            // Hide loading screen
             loadingScreen.classList.add('hidden');
-            console.log('Loading screen hidden');
 
-            // Initialize app
-            try {
-                getTelegramUser();
-                loadSettings();
-                updateHomeUI();
-                updateProfile();
-                crashGame.init();
-                minesGame.init();
-                minesGame.setGridSize(3, 1);
-                upgradeGame.init();
-                renderInventory();
-                updateUpgradeSelectors();
+            getTelegramUser();
+            loadSettings();
+            updateHomeUI();
+            updateProfile();
+            crashGame.init();
+            minesGame.init();
+            minesGame.setGridSize(3, 1);
+            upgradeGame.init();
+            renderInventory();
+            updateUpgradeSelectors();
 
-                if (document.getElementById('page-rocket').classList.contains('active')) {
-                    crashGame.startGameCycle();
-                }
-
-                console.log('✅ Casino loaded with new NFTs, quality optimizations, and loading fix.');
-                console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
-            } catch (e) {
-                console.error('Init error:', e);
-                // still hide loading screen if not already
-                loadingScreen.classList.add('hidden');
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.startGameCycle();
             }
+
+            console.log('✅ Casino loaded: bigger wheel, longer spin, faster bounce, crash NFT overlay + rocket shrink.');
+            console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
-        // ============================================================
-        // STARTUP – ensure init is called
-        // ============================================================
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(init, 100);
         } else {
