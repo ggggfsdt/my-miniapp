@@ -769,7 +769,7 @@
         .mines-history .h-item.win { color: #00d2a0; border-color: rgba(0,210,160,0.15); }
         .mines-history .h-item.loss { color: #ff6b6b; border-color: rgba(255,107,107,0.15); }
 
-        /* UPGRADE – same as original (340px, original gradient, arrow) */
+        /* ===== UPGRADE – original look (340px) ===== */
         .upgrade-wheel-container {
             position: relative;
             width: 340px;
@@ -784,6 +784,7 @@
             width: 340px;
             height: 340px;
         }
+        /* Center NFT – no background, just GIF */
         .wheel-center-nft {
             position: absolute;
             top: 50%;
@@ -792,13 +793,14 @@
             width: 80px;
             height: 80px;
             object-fit: contain;
-            border-radius: 16px;
+            border-radius: 0;
             display: none;
             z-index: 5;
             pointer-events: none;
             will-change: transform;
-            box-shadow: 0 0 30px rgba(255,215,0,0.2);
-            border: 2px solid rgba(255,215,0,0.1);
+            filter: drop-shadow(0 0 30px rgba(255,215,0,0.2));
+            background: transparent;
+            border: none;
         }
         .upgrade-selectors { display: flex; flex-direction: row; gap: 12px; margin-bottom: 16px; }
         .upgrade-select { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; min-width: 0; }
@@ -893,10 +895,10 @@
         }
         #crashNftOverlay.show {
             display: flex;
-            opacity: 0.5; /* less transparent */
+            opacity: 0.5;
         }
         #crashNftOverlay img {
-            width: 160px; /* bigger */
+            width: 160px;
             height: 160px;
             object-fit: contain;
             border-radius: 20px;
@@ -919,7 +921,7 @@
             transform: translate(-50%, -20%) rotate(0deg) scale(0.55) !important;
         }
 
-        /* Upgrade win animation – flying NFT to inventory tab */
+        /* Flying NFT – slide to inventory */
         .flying-nft {
             position: fixed;
             z-index: 9999;
@@ -1540,17 +1542,35 @@
         }
 
         // ============================================================
-        // WIN POPUP
+        // WIN POPUP – with onClose callback support
         // ============================================================
-        function showWinPopup(nft) {
+        let winPopupOnClose = null;
+
+        function showWinPopup(nft, onClose) {
             const popup = document.getElementById('winPopup');
             document.getElementById('winMoneyGif').src = getRandomMoneyGif();
             document.getElementById('winNftImg').src = nft.gif;
             document.getElementById('winSubtitle').textContent = nft.name;
+            winPopupOnClose = onClose || null;
             popup.classList.add('active');
-            setTimeout(() => popup.classList.remove('active'), 4000);
+            // Auto-close after 4 seconds
+            clearTimeout(popup._autoClose);
+            popup._autoClose = setTimeout(() => {
+                closeWinPopup();
+            }, 4000);
         }
-        function closeWinPopup() { document.getElementById('winPopup').classList.remove('active'); }
+
+        function closeWinPopup() {
+            const popup = document.getElementById('winPopup');
+            popup.classList.remove('active');
+            clearTimeout(popup._autoClose);
+            // Call the onClose callback if it exists
+            if (typeof winPopupOnClose === 'function') {
+                const cb = winPopupOnClose;
+                winPopupOnClose = null;
+                cb();
+            }
+        }
 
         // ============================================================
         // RENDER PLAYERS (Crash)
@@ -1892,7 +1912,7 @@
         }
 
         // ============================================================
-        // FLYING NFT ANIMATION (upgrade win)
+        // FLYING NFT ANIMATION (upgrade win – after popup closes)
         // ============================================================
         function flyNftToInventory(nft) {
             const wheelCenter = document.getElementById('wheelCenterNft');
@@ -1902,7 +1922,6 @@
             if (!inventoryTab) return;
             const invRect = inventoryTab.getBoundingClientRect();
 
-            // Create flying element
             const flying = document.createElement('img');
             flying.className = 'flying-nft';
             flying.src = nft.gif;
@@ -1913,7 +1932,6 @@
             flying.style.height = '80px';
             document.body.appendChild(flying);
 
-            // Trigger reflow then animate
             void flying.offsetHeight;
             flying.style.left = invRect.left + invRect.width / 2 - 20 + 'px';
             flying.style.top = invRect.top + invRect.height / 2 - 20 + 'px';
@@ -1922,7 +1940,6 @@
             flying.style.opacity = '0';
             flying.style.transform = 'scale(0.3)';
 
-            // Remove after animation
             setTimeout(() => {
                 if (flying.parentNode) flying.remove();
             }, 1500);
@@ -3166,7 +3183,7 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL – original look, longer spin
+        // UPGRADE – EXACTLY THE ORIGINAL WORKING VERSION (only spin duration increased to 8-10s)
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -3278,6 +3295,7 @@
             activeSelectionType = null;
         }
 
+        // ===== ORIGINAL UPGRADE GAME – copied from your working script =====
         const upgradeGame = {
             fromNftId: null,
             toNftId: null,
@@ -3309,7 +3327,6 @@
                 const greenAngle = this.chance * 2 * Math.PI;
                 const startAngle = -Math.PI / 2;
 
-                // Green segment
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
@@ -3320,7 +3337,6 @@
                 ctx.fillStyle = greenGrad;
                 ctx.fill();
 
-                // Red segment
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
@@ -3333,14 +3349,12 @@
                     ctx.fill();
                 }
 
-                // Outer border
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.05)';
                 ctx.lineWidth = 0.1;
                 ctx.stroke();
 
-                // Arrow
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
@@ -3395,7 +3409,6 @@
 
                 this.lastTickAngle = this.arrowAngle;
 
-                // Tension build-up
                 let tensionCount = 0;
                 const tensionMax = 3;
                 let tensionInterval = setInterval(() => {
@@ -3404,7 +3417,7 @@
                         this.startSpin();
                         return;
                     }
-                    this.arrowAngle += (Math.random() - 0.5) * 0.3;
+                    this.arrowAngle += (Math.random() - 0.5) * 0.2;
                     this.drawWheelAndArrow(this.arrowAngle);
                     playTick(0.2, 600 + Math.random() * 200);
                     tensionCount++;
@@ -3412,7 +3425,7 @@
             },
 
             startSpin() {
-                // Longer spin: 8-10 seconds
+                // Longer spin: 8-10 seconds (original was 5-7s)
                 const duration = 8000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
@@ -3428,7 +3441,7 @@
                 const animateSpin = (now) => {
                     const elapsed = now - startTime;
                     const t = Math.min(elapsed / duration, 1);
-                    const eased = t < 0.7 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                     this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
                     this.drawWheelAndArrow(this.arrowAngle);
 
@@ -3508,9 +3521,10 @@
                     state.inventory.push({ ...toNft });
                     showNotification(toNft.price, toNft.price);
                     triggerVibration(80, 'heavy');
-                    showWinPopup(toNft);
-                    // Trigger flying animation
-                    flyNftToInventory(toNft);
+                    // Show popup, and when it closes, trigger flying animation
+                    showWinPopup(toNft, () => {
+                        flyNftToInventory(toNft);
+                    });
                 } else {
                     playLoseSound();
                     state.inventory.splice(fromIdx, 1);
@@ -3534,7 +3548,6 @@
             const upgradeBtn = document.getElementById('upgradeBtn');
             const upgradeBtnText = document.getElementById('upgradeBtnText');
 
-            // Update from NFT display
             if (upgradeGame.fromNftId) {
                 const nft = NFT_DB[upgradeGame.fromNftId];
                 fromImg.src = nft.gif;
@@ -3549,7 +3562,6 @@
                 fromPrice.innerHTML = `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
             }
 
-            // Update to NFT display
             if (upgradeGame.toNftId) {
                 const nft = NFT_DB[upgradeGame.toNftId];
                 toImg.src = nft.gif;
@@ -4293,7 +4305,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – wheel original (340px), longer spin, crash NFT bigger+less transparent, flying animation, price displayed.');
+            console.log('✅ Casino loaded – original wheel (340px) with longer spin (8-10s), center NFT clean, flying after popup.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
