@@ -859,6 +859,21 @@
         #settingsModal .settings-card .setting-row .toggle.active .knob {
             transform: translateX(20px);
         }
+        #settingsModal .settings-card .setting-row select {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            min-width: 80px;
+        }
+        #settingsModal .settings-card .setting-row select option {
+            background: #1a1a1e;
+            color: #fff;
+        }
         #settingsModal .settings-card .close-btn {
             margin-top: 20px;
             padding: 10px;
@@ -1946,8 +1961,8 @@
         /* UPGRADE */
         .upgrade-wheel-container {
             position: relative;
-            width: 340px;
-            height: 340px;
+            width: 280px;
+            height: 280px;
             margin: 16px auto;
             transition: filter 0.3s;
         }
@@ -1955,24 +1970,20 @@
             display: block;
             margin: 0 auto;
             border-radius: 50%;
-            width: 340px;
-            height: 340px;
         }
         .wheel-center-nft {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             object-fit: contain;
-            border-radius: 16px;
+            border-radius: 12px;
             display: none;
             z-index: 5;
             pointer-events: none;
             will-change: transform;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
-            border: 2px solid rgba(255, 215, 0, 0.1);
         }
         .upgrade-selectors {
             display: flex;
@@ -2056,7 +2067,6 @@
             font-size: 22px;
         }
 
-        /* NFT Selection Overlay - scrollable, sorted, grid */
         .nft-selection-overlay {
             position: fixed;
             inset: 0;
@@ -2068,7 +2078,6 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: hidden;
         }
         .nft-selection-overlay.active {
             display: flex;
@@ -2079,19 +2088,6 @@
             gap: 12px;
             max-width: 340px;
             width: 100%;
-            max-height: 65vh;
-            overflow-y: auto;
-            padding: 4px;
-        }
-        .nft-selection-grid::-webkit-scrollbar {
-            width: 4px;
-        }
-        .nft-selection-grid::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .nft-selection-grid::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 10px;
         }
         .nft-selection-item {
             background: rgba(255, 255, 255, 0.04);
@@ -2341,18 +2337,6 @@
             #settingsModal .settings-card {
                 padding: 20px 16px;
             }
-            .upgrade-wheel-container {
-                width: 280px;
-                height: 280px;
-            }
-            #upgradeWheel {
-                width: 280px;
-                height: 280px;
-            }
-            .wheel-center-nft {
-                width: 60px;
-                height: 60px;
-            }
         }
     </style>
 </head>
@@ -2400,6 +2384,14 @@
                     <div class="toggle" id="vibrationToggle" onclick="toggleVibration()">
                         <div class="knob"></div>
                     </div>
+                </div>
+                <div class="setting-row">
+                    <span class="label">Graphics Quality</span>
+                    <select id="graphicsQuality" onchange="updateGraphicsQuality(this.value)">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
                 </div>
                 <div class="close-btn" onclick="closeSettings()">Close</div>
             </div>
@@ -2549,7 +2541,7 @@
                     </div>
                 </div>
                 <div class="upgrade-wheel-container" id="wheelContainer">
-                    <canvas id="upgradeWheel" width="340" height="340"></canvas>
+                    <canvas id="upgradeWheel" width="280" height="280"></canvas>
                     <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
                 </div>
                 <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
@@ -2653,7 +2645,8 @@
         // SETTINGS STATE
         // ============================================================
         const settings = {
-            vibration: true
+            vibration: true,
+            graphicsQuality: 'medium'
         };
 
         function loadSettings() {
@@ -2673,17 +2666,30 @@
 
         function applySettingsUI() {
             const toggle = document.getElementById('vibrationToggle');
+            const select = document.getElementById('graphicsQuality');
             if (settings.vibration) {
                 toggle.classList.add('active');
             } else {
                 toggle.classList.remove('active');
             }
+            select.value = settings.graphicsQuality;
         }
 
         function toggleVibration() {
             settings.vibration = !settings.vibration;
             applySettingsUI();
             saveSettings();
+        }
+
+        function updateGraphicsQuality(value) {
+            settings.graphicsQuality = value;
+            saveSettings();
+            if (document.getElementById('page-bounce').classList.contains('active')) {
+                bounceGame.init();
+            }
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.initWind();
+            }
         }
 
         function openSettings() {
@@ -2743,7 +2749,7 @@
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
             'https://images.iimg.live/images/vibrant-scene-3805.webp',
             'https://images.iimg.live/images/glorious-memory-8181.webp',
-            // NEW NFT GIFs
+            // New NFT GIFs
             'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
             'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
             'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
@@ -2834,6 +2840,7 @@
             inventory: []
         };
 
+        // NEW NFTs added here
         const NFT_DB = {
             chill_flame: {
                 id: 'chill_flame',
@@ -2877,7 +2884,7 @@
                 gif: 'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
                 tier: 'legendary'
             },
-            // NEW NFTs
+            // ---- NEW NFTs ----
             homemade_cake: {
                 id: 'homemade_cake',
                 name: 'Homemade Cake',
@@ -3440,7 +3447,10 @@
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
-                const streakCount = 25;
+                let streakCount = 45;
+                if (settings.graphicsQuality === 'low') streakCount = 8;
+                else if (settings.graphicsQuality === 'medium') streakCount = 25;
+
                 for (let i = 0; i < streakCount; i++) {
                     const streak = document.createElement('div');
                     streak.className = 'streak';
@@ -3457,6 +3467,11 @@
             },
 
             updateWindEffect() {
+                if (settings.graphicsQuality === 'low') {
+                    document.getElementById('windLines').classList.remove('active');
+                    document.getElementById('windLines').style.opacity = 0;
+                    return;
+                }
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
@@ -3500,6 +3515,11 @@
             },
 
             updateMoon(mult) {
+                if (settings.graphicsQuality === 'low') {
+                    document.getElementById('moonOverlay').classList.remove('active');
+                    document.getElementById('moonGif').style.display = 'none';
+                    return;
+                }
                 const moonOverlay = document.getElementById('moonOverlay');
                 const moonImg = document.getElementById('moonGif');
 
@@ -3940,6 +3960,7 @@
                 this.updateMainButton();
                 updateHomeUI();
                 document.getElementById('crashNftIndicator').classList.remove('show');
+                this.bet = 0; // Reset bet after cash out
             },
 
             startCountdown() {
@@ -4063,13 +4084,19 @@
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
 
-                    const explosionOverlay = document.getElementById('explosionOverlay');
-                    explosionOverlay.classList.add('active');
-                    const explosionImg = document.getElementById('explosionGif');
-                    explosionImg.style.animation = 'none';
-                    void explosionImg.offsetHeight;
-                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
-                    setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
+                    if (settings.graphicsQuality !== 'low') {
+                        const explosionOverlay = document.getElementById('explosionOverlay');
+                        explosionOverlay.classList.add('active');
+                        const explosionImg = document.getElementById('explosionGif');
+                        explosionImg.style.animation = 'none';
+                        void explosionImg.offsetHeight;
+                        explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
+                        setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
+                    } else {
+                        const overlay = document.getElementById('explosionOverlay');
+                        overlay.classList.add('active');
+                        setTimeout(() => overlay.classList.remove('active'), 300);
+                    }
 
                     const user = players.find(p => p.isYou);
                     if (user && user.active && !user.hasCashedOut) {
@@ -4090,6 +4117,7 @@
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
                     document.getElementById('crashNftIndicator').classList.remove('show');
+                    this.bet = 0; // Reset bet after crash
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -4647,7 +4675,7 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL – ENHANCED SPIN
+        // UPGRADE SELECTION & WHEEL
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -4724,8 +4752,7 @@
                     return;
                 }
                 const sourcePrice = NFT_DB[upgradeGame.fromNftId].price;
-                // Sort by price low to high
-                eligible = Object.values(NFT_DB).filter(n => n.price > sourcePrice).sort((a, b) => a.price - b.price);
+                eligible = Object.values(NFT_DB).filter(n => n.price > sourcePrice);
             }
             const grid = document.getElementById('nftSelectionGrid');
             const overlay = document.getElementById('nftSelectionOverlay');
@@ -4774,7 +4801,7 @@
             targetChance: 1.0,
             chanceAnimationId: null,
             lastTickAngle: -Math.PI / 2,
-            tickThreshold: 25 * Math.PI / 180, // more sensitive
+            tickThreshold: 30 * Math.PI / 180,
 
             init() {
                 this.ctx = this.canvas.getContext('2d');
@@ -4787,84 +4814,53 @@
                 const h = this.canvas.height;
                 const cx = w / 2,
                     cy = h / 2;
-                const outerR = 130; // bigger
-                const innerR = 60;
+                const outerR = 105;
+                const innerR = 50;
 
                 ctx.clearRect(0, 0, w, h);
 
                 const greenAngle = this.chance * 2 * Math.PI;
                 const startAngle = -Math.PI / 2;
 
-                // Draw green segment (success)
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
                 ctx.closePath();
-                const greenGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                 greenGrad.addColorStop(0, '#00e676');
-                greenGrad.addColorStop(0.7, '#00c853');
                 greenGrad.addColorStop(1, '#009624');
                 ctx.fillStyle = greenGrad;
-                ctx.shadowColor = 'rgba(0,230,118,0.3)';
-                ctx.shadowBlur = 20;
                 ctx.fill();
-                ctx.shadowBlur = 0;
 
-                // Red segment (failure)
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
                     ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
                     ctx.closePath();
-                    const redGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                     redGrad.addColorStop(0, '#ff5252');
-                    redGrad.addColorStop(0.7, '#d32f2f');
                     redGrad.addColorStop(1, '#b71c1c');
                     ctx.fillStyle = redGrad;
-                    ctx.shadowColor = 'rgba(255,82,82,0.3)';
-                    ctx.shadowBlur = 20;
                     ctx.fill();
-                    ctx.shadowBlur = 0;
                 }
 
-                // Outer ring glow
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.lineWidth = 0.1;
                 ctx.stroke();
 
-                // Inner ring
-                ctx.beginPath();
-                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Arrow (bigger, with shadow)
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
-                ctx.shadowColor = 'rgba(255,255,255,0.5)';
-                ctx.shadowBlur = 25;
                 ctx.beginPath();
-                ctx.moveTo(outerR - 10, 0);
-                ctx.lineTo(outerR + 20, -14);
-                ctx.lineTo(outerR + 20, 14);
+                ctx.moveTo(outerR - 6, 0);
+                ctx.lineTo(outerR + 8, -8);
+                ctx.lineTo(outerR + 8, 8);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
-                ctx.shadowBlur = 0;
                 ctx.restore();
-
-                // Center dot
-                ctx.beginPath();
-                ctx.arc(cx, cy, 12, 0, 2 * Math.PI);
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(255,215,0,0.6)';
-                ctx.shadowBlur = 20;
-                ctx.fill();
-                ctx.shadowBlur = 0;
             },
 
             animateToChance(newChance) {
@@ -4904,28 +4900,11 @@
                 this.spinning = true;
                 document.getElementById('upgradeBtn').disabled = true;
                 const wheelContainer = document.getElementById('wheelContainer');
-                wheelContainer.style.filter = 'drop-shadow(0 0 30px rgba(0,210,160,0.8)) brightness(1.1)';
+                wheelContainer.style.filter = 'drop-shadow(0 0 15px rgba(0,210,160,0.6))';
 
                 this.lastTickAngle = this.arrowAngle;
 
-                // Build tension before spin (quick back-and-forth)
-                let tensionCount = 0;
-                const tensionMax = 3;
-                let tensionInterval = setInterval(() => {
-                    if (tensionCount >= tensionMax) {
-                        clearInterval(tensionInterval);
-                        this.startSpin();
-                        return;
-                    }
-                    this.arrowAngle += (Math.random() - 0.5) * 0.3;
-                    this.drawWheelAndArrow(this.arrowAngle);
-                    playTick(0.2, 600 + Math.random() * 200);
-                    tensionCount++;
-                }, 120);
-            },
-
-            startSpin() {
-                const duration = 6000 + Math.random() * 2000;
+                const duration = 5000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
                 let finalAngleOnWheel;
@@ -4941,26 +4920,19 @@
                 const animateSpin = (now) => {
                     const elapsed = now - startTime;
                     const t = Math.min(elapsed / duration, 1);
-                    // Easing: fast then slow
-                    const eased = t < 0.7 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                     this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
                     this.drawWheelAndArrow(this.arrowAngle);
 
-                    // Ticks with increasing frequency then decreasing
                     const angleDiff = Math.abs(this.arrowAngle - this.lastTickAngle);
                     if (angleDiff >= this.tickThreshold) {
-                        const speed = Math.abs(targetArrowAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 -
-                            t)) / duration;
-                        const freq = 400 + speed * 150;
-                        const vol = Math.min(0.4, 0.15 + speed * 0.008);
+                        const speed = Math.abs(targetArrowAngle - startAngle) * (eased < 0.5 ? 12 * t * t : 6 * (1 - t) *
+                            (1 - t)) / duration;
+                        const freq = 400 + speed * 100;
+                        const vol = Math.min(0.4, 0.1 + speed * 0.005);
                         playTick(vol, freq);
                         this.lastTickAngle = this.arrowAngle;
                     }
-
-                    // Glow pulse during spin
-                    const glowIntensity = 0.3 + 0.7 * (1 - Math.abs(0.5 - t) * 2);
-                    document.getElementById('wheelContainer').style.filter =
-                        `drop-shadow(0 0 ${20 + glowIntensity * 30}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.15})`;
 
                     if (t < 1) {
                         requestAnimationFrame(animateSpin);
@@ -4971,18 +4943,16 @@
                         const isGreen = relativeAngle < this.chance * 2 * Math.PI;
                         this.resolveSpin(isGreen);
 
-                        // Final flash
-                        const container = document.getElementById('wheelContainer');
+                        wheelContainer.style.transition = 'filter 0.2s';
                         if (isGreen) {
-                            container.style.filter = 'drop-shadow(0 0 50px rgba(0,210,160,1)) brightness(1.4)';
-                            setTimeout(() => { container.style.filter = 'none'; }, 500);
+                            wheelContainer.style.filter = 'drop-shadow(0 0 25px rgba(0,210,160,1)) brightness(1.2)';
+                            setTimeout(() => { wheelContainer.style.filter = 'none'; }, 300);
                         } else {
-                            container.style.filter = 'drop-shadow(0 0 50px rgba(255,80,80,1)) brightness(0.8)';
-                            setTimeout(() => { container.style.filter = 'none'; }, 500);
+                            wheelContainer.style.filter = 'drop-shadow(0 0 25px rgba(255,80,80,1)) brightness(0.9)';
+                            setTimeout(() => { wheelContainer.style.filter = 'none'; }, 300);
                         }
 
-                        // Return arrow to top with bounce
-                        const returnDuration = 1000;
+                        const returnDuration = 800;
                         const returnStartAngle = this.arrowAngle;
                         const returnStartTime = performance.now();
                         const animateReturn = (now2) => {
@@ -4992,7 +4962,7 @@
                             let bounce = 0;
                             if (t2 > 0.8) {
                                 const b = (t2 - 0.8) / 0.2;
-                                bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.1;
+                                bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.08;
                             }
                             this.arrowAngle = returnStartAngle - deltaAngle * eased2 + bounce;
                             this.drawWheelAndArrow(this.arrowAngle);
@@ -5101,7 +5071,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP
+        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP + QUALITY
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5175,7 +5145,14 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
-                this.segmentCount = 16;
+
+                if (settings.graphicsQuality === 'low') {
+                    this.segmentCount = 10;
+                } else if (settings.graphicsQuality === 'medium') {
+                    this.segmentCount = 16;
+                } else {
+                    this.segmentCount = 20;
+                }
 
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
@@ -5817,15 +5794,14 @@
         });
 
         // ============================================================
-        // INIT – LOADING SCREEN ENABLED
+        // INIT – WITH TIMEOUT FOR LOADING SCREEN
         // ============================================================
         async function init() {
             const loadingScreen = document.getElementById('loadingScreen');
-            // Show loading screen (already visible)
-            loadingScreen.classList.remove('hidden');
+            const startTime = performance.now();
 
             try {
-                // Preload all GIFs with a timeout to avoid infinite hang
+                // Preload with a 5-second timeout
                 const preloadPromise = preloadAllGifs();
                 const timeoutPromise = new Promise(resolve => setTimeout(resolve, 5000));
                 await Promise.race([preloadPromise, timeoutPromise]);
@@ -5834,36 +5810,45 @@
                 console.warn('Preload error, continuing anyway', e);
             }
 
-            // Minimum display time (2.5s)
-            const minDisplay = 2500;
-            const startTime = performance.now();
+            // Ensure minimum display time (2.5s)
             const elapsed = performance.now() - startTime;
+            const minDisplay = 2500;
             const remaining = Math.max(0, minDisplay - elapsed);
             await new Promise(resolve => setTimeout(resolve, remaining));
 
             // Hide loading screen
             loadingScreen.classList.add('hidden');
+            console.log('Loading screen hidden');
 
-            // Initialize everything
-            getTelegramUser();
-            loadSettings();
-            updateHomeUI();
-            updateProfile();
-            crashGame.init();
-            minesGame.init();
-            minesGame.setGridSize(3, 1);
-            upgradeGame.init();
-            renderInventory();
-            updateUpgradeSelectors();
+            // Initialize app
+            try {
+                getTelegramUser();
+                loadSettings();
+                updateHomeUI();
+                updateProfile();
+                crashGame.init();
+                minesGame.init();
+                minesGame.setGridSize(3, 1);
+                upgradeGame.init();
+                renderInventory();
+                updateUpgradeSelectors();
 
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.startGameCycle();
+                if (document.getElementById('page-rocket').classList.contains('active')) {
+                    crashGame.startGameCycle();
+                }
+
+                console.log('✅ Casino loaded with new NFTs, quality optimizations, and loading fix.');
+                console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
+            } catch (e) {
+                console.error('Init error:', e);
+                // still hide loading screen if not already
+                loadingScreen.classList.add('hidden');
             }
-
-            console.log('✅ Casino loaded with loading screen enabled, scrollable NFT selection, larger wheel, and epic spin.');
-            console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
+        // ============================================================
+        // STARTUP – ensure init is called
+        // ============================================================
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(init, 100);
         } else {
