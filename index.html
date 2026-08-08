@@ -561,67 +561,106 @@
         .progress-wrap.active { opacity: 1; }
         .progress-fill { height: 100%; width: 0%; border-radius: 2px; background: #00d2a0; transition: none; box-shadow: 0 0 16px rgba(0,210,160,0.2); }
         .bet-container { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 0 0; }
-        .bet-input-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            padding: 4px;
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: all 0.3s;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            padding: 0 4px;
-            margin: 0;
-        }
-        .bet-input-row.open { max-height: 60px; opacity: 1; padding: 4px; margin: 0; }
-        .bet-input-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 700; padding: 8px 12px; outline: none; min-width: 0; }
-        .bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .bet-input-row .bet-confirm-btn { padding: 8px 20px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; transition: all 0.2s; white-space: nowrap; }
-        .bet-input-row .bet-confirm-btn:active { transform: scale(0.92); }
-        .bet-input-row .bet-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ===== BET TYPE TOGGLE ===== */
-        .bet-type-selector {
+        /* ===== BET TOGGLE – single button with slide animation ===== */
+        .bet-toggle-wrapper {
             display: flex;
-            gap: 8px;
             align-items: center;
-            margin-bottom: 4px;
+            justify-content: center;
+            margin-bottom: 6px;
         }
-        .bet-type-selector .label {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .bet-type-btn {
-            padding: 4px 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            background: rgba(255,255,255,0.03);
-            color: #888;
-            font-size: 11px;
-            font-weight: 600;
+        .bet-toggle-btn {
+            position: relative;
+            width: 180px;
+            height: 40px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 30px;
             cursor: pointer;
-            transition: all 0.2s;
+            outline: none;
+            padding: 0;
+            transition: background 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        .bet-type-btn.active {
-            background: rgba(108,92,231,0.2);
-            border-color: rgba(108,92,231,0.3);
+        .bet-toggle-btn:active { transform: scale(0.96); }
+        .bet-toggle-btn .toggle-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 2;
+        }
+        .bet-toggle-btn .toggle-track .option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            transition: color 0.3s ease;
+            z-index: 2;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .bet-toggle-btn .toggle-track .option.active {
             color: #fff;
         }
-        .bet-type-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        .bet-toggle-btn .toggle-track .option i {
+            font-size: 14px;
         }
+        .bet-toggle-btn .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: calc(50% - 6px);
+            height: calc(100% - 6px);
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border-radius: 30px;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 12px rgba(108,92,231,0.3);
+            z-index: 1;
+        }
+        .bet-toggle-btn.nft-mode .toggle-slider {
+            transform: translateX(calc(100% + 6px));
+        }
+        .bet-toggle-btn.nft-mode {
+            border-color: rgba(255,215,0,0.2);
+        }
+        .bet-toggle-btn.nft-mode .toggle-track .option.nft-opt {
+            color: #fff;
+        }
+        .bet-toggle-btn.nft-mode .toggle-track .option.stars-opt {
+            color: #666;
+        }
+        .bet-toggle-btn .toggle-track .option.stars-opt.active {
+            color: #fff;
+        }
+        .bet-toggle-btn .toggle-track .option.nft-opt.active {
+            color: #fff;
+        }
+
         .nft-bet-selector {
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
             padding: 8px;
             margin-bottom: 4px;
             display: none;
+            animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .nft-bet-selector.open {
+            display: block;
+        }
+        @keyframes slideDown {
+            0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .nft-bet-selector select {
             width: 100%;
@@ -654,6 +693,54 @@
         }
         .nft-bet-preview .name { font-size: 14px; }
         .nft-bet-preview .price { font-size: 12px; color: #ffd700; }
+
+        .bet-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 4px;
+            margin: 0;
+        }
+        .bet-input-row.open {
+            max-height: 60px;
+            opacity: 1;
+            padding: 4px;
+            margin: 0;
+        }
+        .bet-input-row input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 0;
+        }
+        .bet-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .bet-input-row .bet-confirm-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .bet-input-row .bet-confirm-btn:active { transform: scale(0.92); }
+        .bet-input-row .bet-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .players-list {
             background: rgba(255,255,255,0.02);
@@ -1057,8 +1144,8 @@
             .wheel-center-nft { width: 60px; height: 60px; }
             #crashNftOverlay img { width: 120px; height: 120px; }
             .flying-nft { width: 60px; height: 60px; }
-            .bet-type-btn { font-size: 10px; padding: 3px 8px; }
-            .nft-bet-preview img { width: 30px; height: 30px; }
+            .bet-toggle-btn { width: 150px; height: 36px; }
+            .bet-toggle-btn .toggle-track .option { font-size: 11px; }
         }
     </style>
 </head>
@@ -1191,12 +1278,21 @@
                 </div>
             </div>
             <div class="bet-container">
-                <!-- Bet Type Selector -->
-                <div class="bet-type-selector">
-                    <span class="label">Bet with:</span>
-                    <button class="bet-type-btn active" data-type="stars" onclick="crashGame.setBetType('stars')">⭐ Stars</button>
-                    <button class="bet-type-btn" data-type="nft" onclick="crashGame.setBetType('nft')">🎁 NFT</button>
+                <!-- BET TOGGLE – single button with slide animation -->
+                <div class="bet-toggle-wrapper">
+                    <button class="bet-toggle-btn" id="betToggleBtn" onclick="crashGame.toggleBetType()">
+                        <div class="toggle-slider" id="betToggleSlider"></div>
+                        <div class="toggle-track">
+                            <span class="option stars-opt active" id="starsOption">
+                                <i class="fas fa-star"></i> Stars
+                            </span>
+                            <span class="option nft-opt" id="nftOption">
+                                <i class="fas fa-gift"></i> NFT
+                            </span>
+                        </div>
+                    </button>
                 </div>
+
                 <!-- NFT Bet Selector -->
                 <div class="nft-bet-selector" id="nftBetSelector">
                     <select id="nftBetSelect">
@@ -1208,11 +1304,13 @@
                         <span class="price" id="nftBetPreviewPrice"></span>
                     </div>
                 </div>
+
                 <!-- Stars Bet Input -->
-                <div class="bet-input-row" id="betInputRow">
+                <div class="bet-input-row open" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
                     <button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
                 </div>
+
                 <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
                     <span id="mainActionText">Place Bet</span>
                     <span id="mainActionSub"></span>
@@ -1469,7 +1567,7 @@
             'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif',
             'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
             'https://i.postimg.cc/02SjbFc2/brick.gif',
-            'https://i.postimg.cc/RZdBnc8Z/ezgif-86ccd2fd265e1e18.gif' // Chabips Papaha
+            'https://i.postimg.cc/RZdBnc8Z/ezgif-86ccd2fd265e1e18.gif'
         ];
 
         async function preloadAllGifs() {
@@ -1734,7 +1832,7 @@
                     `<div class="initials" style="background:${p.color || '#6c5ce7'}">${name.charAt(0).toUpperCase()}</div>`;
                 const playerId = 'p_' + i;
                 // Show NFT icon if bet type is NFT
-                const nftTag = p.betNftData ? `<span style="font-size:8px; background:rgba(255,215,0,0.15); padding:1px 6px; border-radius:8px; margin-left:4px;">🎁 ${p.betNftData.name}</span>` : '';
+                const nftTag = p.betNftData ? `<span style="font-size:8px; background:rgba(255,215,0,0.15); padding:1px 6px; border-radius:8px; margin-left:4px;"><i class="fas fa-gift" style="margin-right:3px;"></i>${p.betNftData.name}</span>` : '';
                 html += `
                 <div class="player-item" data-player-id="${playerId}" style="--anim-delay: ${(i * 0.06).toFixed(2)}s;">
                     <div class="player-progress ${progressColor}" style="width: ${progressWidth}%;"></div>
@@ -1852,7 +1950,7 @@
                 document.getElementById('inventoryBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 renderInventory();
-                crashGame.populateNftSelect(); // Refresh NFT select when inventory changes
+                crashGame.populateNftSelect();
             }
             if (page === 'bounce') setTimeout(() => bounceGame.init(), 50);
         }
@@ -2064,7 +2162,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – with NFT betting
+        // CRASH GAME – with NFT betting and toggle
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -2116,15 +2214,37 @@
                 }
             },
 
+            toggleBetType() {
+                if (this.isPlaying || this.isCountingDown) return;
+                if (this.betType === 'stars') {
+                    this.setBetType('nft');
+                } else {
+                    this.setBetType('stars');
+                }
+            },
+
             setBetType(type) {
                 if (this.isPlaying || this.isCountingDown) return;
                 this.betType = type;
-                document.querySelectorAll('.bet-type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
-                document.getElementById('nftBetSelector').style.display = type === 'nft' ? 'block' : 'none';
-                document.getElementById('betInputRow').style.display = type === 'stars' ? 'flex' : 'none';
+                const btn = document.getElementById('betToggleBtn');
+                const starsOpt = document.getElementById('starsOption');
+                const nftOpt = document.getElementById('nftOption');
+                const selector = document.getElementById('nftBetSelector');
+                const inputRow = document.getElementById('betInputRow');
+
                 if (type === 'nft') {
+                    btn.classList.add('nft-mode');
+                    starsOpt.classList.remove('active');
+                    nftOpt.classList.add('active');
+                    selector.classList.add('open');
+                    inputRow.classList.remove('open');
                     this.populateNftSelect();
                 } else {
+                    btn.classList.remove('nft-mode');
+                    starsOpt.classList.add('active');
+                    nftOpt.classList.remove('active');
+                    selector.classList.remove('open');
+                    inputRow.classList.add('open');
                     this.betNftId = null;
                     this.betNftData = null;
                     document.getElementById('nftBetPreviewImg').style.display = 'none';
@@ -2422,8 +2542,10 @@
                 document.getElementById('crashNftOverlay').classList.remove('show');
                 document.getElementById('crashNftOverlayImg').className = 'hidden-img';
                 document.getElementById('rocketOverlay').classList.remove('nft-active');
-                // Init bet type
+                // Init bet type to stars
                 this.setBetType('stars');
+                // Populate NFT select
+                this.populateNftSelect();
             },
 
             createGrid() {
@@ -2512,7 +2634,8 @@
                         btn.disabled = true;
                         inputRow.classList.remove('open');
                         confirmBtn.disabled = true;
-                        document.querySelectorAll('.bet-type-btn').forEach(b => b.disabled = true);
+                        document.getElementById('betToggleBtn').style.opacity = '0.4';
+                        document.getElementById('betToggleBtn').style.pointerEvents = 'none';
                     } else {
                         const isOpen = inputRow.classList.contains('open');
                         if (isOpen) {
@@ -2526,13 +2649,15 @@
                             btn.disabled = false;
                             confirmBtn.disabled = true;
                         }
-                        document.querySelectorAll('.bet-type-btn').forEach(b => b.disabled = false);
+                        document.getElementById('betToggleBtn').style.opacity = '1';
+                        document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
                     }
                     return;
                 }
 
                 if (this.isPlaying) {
-                    document.querySelectorAll('.bet-type-btn').forEach(b => b.disabled = true);
+                    document.getElementById('betToggleBtn').style.opacity = '0.4';
+                    document.getElementById('betToggleBtn').style.pointerEvents = 'none';
                     if (this.bet > 0 && !this.hasCashedOut) {
                         mainText.textContent = 'Cash Out';
                         const winAmount = Math.floor(this.bet * this.multiplier);
@@ -2554,7 +2679,8 @@
                     return;
                 }
 
-                document.querySelectorAll('.bet-type-btn').forEach(b => b.disabled = false);
+                document.getElementById('betToggleBtn').style.opacity = '1';
+                document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
 
                 if (isCrashed) {
                     mainText.textContent = 'Crashed';
@@ -2622,7 +2748,6 @@
                         document.getElementById('betInputRocket').focus();
                         this.updateMainButton();
                     } else {
-                        // NFT bet - try to confirm directly or show selection
                         this.confirmBet();
                     }
                 }
@@ -2740,7 +2865,6 @@
                     state.inventory.push({ ...this.betNftData });
                     renderInventory();
                     state.balance += win;
-                    // Reset betNftData to avoid re-adding on next cashout
                     this.betNftData = null;
                     this.betNftId = null;
                 } else {
@@ -2770,12 +2894,13 @@
                 document.getElementById('crashNftIndicator').classList.remove('show');
                 document.getElementById('crashNftOverlay').classList.remove('show');
                 document.getElementById('rocketOverlay').classList.remove('nft-active');
-                // Reset bet after cash out
                 this.bet = 0;
                 this.betNftId = null;
                 this.betNftData = null;
-                // Re-enable bet type toggles
-                document.querySelectorAll('.bet-type-btn').forEach(b => b.disabled = false);
+                document.getElementById('betToggleBtn').style.opacity = '1';
+                document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
+                // Refresh NFT select
+                this.populateNftSelect();
             },
 
             startCountdown() {
@@ -2792,7 +2917,6 @@
                 document.getElementById('crashNftOverlayImg').className = 'hidden-img';
                 document.getElementById('rocketOverlay').classList.remove('nft-active');
 
-                // Keep only "You" in players list for the next round
                 players = players.filter(p => p.isYou);
                 if (players.length > 0) {
                     const user = players[0];
@@ -2836,10 +2960,7 @@
             },
 
             startRound() {
-                // Check if NFT bet is valid for this round
                 if (this.betNftData) {
-                    // NFT already deducted in confirmBet
-                    // Ensure user exists in players
                     const user = players.find(p => p.isYou);
                     if (user) {
                         user.active = true;
@@ -2935,10 +3056,7 @@
                     if (user && user.active && !user.hasCashedOut) {
                         user.crashed = true;
                         user.active = false;
-                        // If NFT bet, the NFT is already deducted from inventory (in confirmBet)
-                        // so we don't need to do anything else.
                         if (this.betNftData) {
-                            // NFT is already lost, just log it
                             console.log(`Lost NFT: ${this.betNftData.name}`);
                             this.betNftData = null;
                             this.betNftId = null;
@@ -2957,12 +3075,12 @@
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
                     document.getElementById('crashNftIndicator').classList.remove('show');
-                    // Reset bet
                     this.bet = 0;
                     this.betNftId = null;
                     this.betNftData = null;
-                    // Re-enable bet type toggles
-                    document.querySelectorAll('.bet-type-btn').forEach(b => b.disabled = false);
+                    document.getElementById('betToggleBtn').style.opacity = '1';
+                    document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
+                    this.populateNftSelect();
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -3506,15 +3624,13 @@
                 </div>
             </div>
         `).join('');
-            // Refresh NFT select in crash game
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.populateNftSelect();
             }
         }
 
         // ============================================================
-        // UPGRADE – EXACTLY THE ORIGINAL WORKING VERSION (only spin duration increased to 8-10s)
-        // plus locking the selectors during spin
+        // UPGRADE – EXACTLY THE ORIGINAL WORKING VERSION
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -3578,7 +3694,6 @@
             } catch (e) {}
         }
 
-        // Lock/unlock selectors
         function setUpgradeLocked(locked) {
             const fromSelector = document.getElementById('upgradeFromSelector');
             const toSelector = document.getElementById('upgradeToSelector');
@@ -3592,7 +3707,6 @@
         }
 
         function openNftSelection(type) {
-            // If upgrade is locked (spinning), ignore click
             if (upgradeGame.locked) return;
             activeSelectionType = type;
             let eligible;
@@ -3641,12 +3755,11 @@
             activeSelectionType = null;
         }
 
-        // ===== ORIGINAL UPGRADE GAME – copied from your working script =====
         const upgradeGame = {
             fromNftId: null,
             toNftId: null,
             spinning: false,
-            locked: false, // added to lock selectors
+            locked: false,
             arrowAngle: -Math.PI / 2,
             canvas: document.getElementById('upgradeWheel'),
             ctx: null,
@@ -3774,7 +3887,6 @@
             },
 
             startSpin() {
-                // Longer spin: 8-10 seconds
                 const duration = 8000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
                 const rand = Math.random();
@@ -3872,7 +3984,6 @@
                     state.inventory.push({ ...toNft });
                     showNotification(toNft.price, toNft.price);
                     triggerVibration(80, 'heavy');
-                    // Show popup, and when it closes, trigger flying animation
                     showWinPopup(toNft, () => {
                         flyNftToInventory(toNft);
                     });
@@ -4201,7 +4312,6 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // FASTER BALL
                 const speed = 250 + Math.random() * 100;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -4656,7 +4766,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – NFT betting added, Chabips Papaha added, original wheel, everything works.');
+            console.log('✅ Casino loaded – NFT betting toggle working, icons only, smooth animation.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
