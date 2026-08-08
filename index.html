@@ -2646,7 +2646,7 @@
         // ============================================================
         const settings = {
             vibration: true,
-            graphicsQuality: 'medium' // 'low', 'medium', 'high'
+            graphicsQuality: 'medium'
         };
 
         function loadSettings() {
@@ -2679,19 +2679,33 @@
             settings.vibration = !settings.vibration;
             applySettingsUI();
             saveSettings();
-            // Apply vibration setting to all game loops
-            // The triggerVibration function checks this setting
         }
 
         function updateGraphicsQuality(value) {
             settings.graphicsQuality = value;
             saveSettings();
-            // Adjust game performance: segment count in bounce, particle count, etc.
-            // We can re-init bounce game with new settings if active
+
+            // Apply to Crash Game (wind effects)
+            if (crashGame) {
+                // Force re-init of wind
+                crashGame.initWind();
+                // If playing, the update loop will pick it up
+            }
+
+            // Apply to Bounce Game
             if (document.getElementById('page-bounce').classList.contains('active')) {
                 bounceGame.init();
             }
-            // Also adjust upgrade wheel resolution? Not needed.
+
+            // Apply to Upgrade Wheel
+            if (document.getElementById('page-upgrade').classList.contains('active')) {
+                upgradeGame.init();
+            }
+
+            // Force UI update for wind visibility
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.updateUI();
+            }
         }
 
         function openSettings() {
@@ -2721,6 +2735,7 @@
             });
         }
 
+        // All GIFs used in the app – including new NFTs
         const ALL_GIF_URLS = [
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
             'https://images.iimg.live/images/excellent-art-9247.webp',
@@ -2747,6 +2762,17 @@
             'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
             'https://images.iimg.live/images/majestic-memory-3550.webp',
             'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
+            // New NFTs
+            'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
+            'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
+            'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
+            'https://i.postimg.cc/Gt1pLNc9/ezgif-5795a209619b1a80.gif',
+            'https://i.postimg.cc/nc2Lx0Nb/ezgif-56ec96aa9d12b9ac.gif',
+            'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif',
+            'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif',
+            'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif',
+            'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
+            // Misc
             'https://images.iimg.live/images/excellent-photo-9680.webp',
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
             'https://images.iimg.live/images/vibrant-scene-3805.webp',
@@ -2817,7 +2843,7 @@
         }
 
         // ============================================================
-        // STATE & NFT DATA
+        // STATE & NFT DATA – ADDED 9 NEW NFTS
         // ============================================================
         const state = {
             balance: 1000,
@@ -2854,11 +2880,47 @@
                 gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp',
                 tier: 'medium'
             },
+            // New NFTs
+            swag_bag: {
+                id: 'swag_bag',
+                name: 'Swag Bag',
+                price: 560,
+                gif: 'https://i.postimg.cc/nc2Lx0Nb/ezgif-56ec96aa9d12b9ac.gif',
+                tier: 'medium'
+            },
+            homemade_cake: {
+                id: 'homemade_cake',
+                name: 'Homemade Cake',
+                price: 640,
+                gif: 'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
+                tier: 'medium'
+            },
+            jolly_chimp: {
+                id: 'jolly_chimp',
+                name: 'Jolly Chimp',
+                price: 630,
+                gif: 'https://i.postimg.cc/Gt1pLNc9/ezgif-5795a209619b1a80.gif',
+                tier: 'medium'
+            },
+            snoop_dog: {
+                id: 'snoop_dog',
+                name: 'Snoop Dog',
+                price: 630,
+                gif: 'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif',
+                tier: 'medium'
+            },
             snoop_cigar: {
                 id: 'snoop_cigar',
                 name: 'Snoop Cigar',
                 price: 1500,
                 gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp',
+                tier: 'high'
+            },
+            bling_blinky: {
+                id: 'bling_blinky',
+                name: 'Bling Blinky',
+                price: 2200,
+                gif: 'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif',
                 tier: 'high'
             },
             rare_bird: {
@@ -2867,6 +2929,34 @@
                 price: 2190,
                 gif: 'https://images.iimg.live/images/majestic-memory-3550.webp',
                 tier: 'epic'
+            },
+            voodo_doll: {
+                id: 'voodo_doll',
+                name: 'Voodo Doll',
+                price: 3200,
+                gif: 'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
+                tier: 'epic'
+            },
+            toy_bear: {
+                id: 'toy_bear',
+                name: 'Toy Bear',
+                price: 3365,
+                gif: 'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
+                tier: 'epic'
+            },
+            kissed_frog: {
+                id: 'kissed_frog',
+                name: 'Kissed Frog',
+                price: 4000,
+                gif: 'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
+                tier: 'epic'
+            },
+            precious_peach: {
+                id: 'precious_peach',
+                name: 'Precious Peach',
+                price: 26400,
+                gif: 'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif',
+                tier: 'legendary'
             },
             plush_pepe: {
                 id: 'plush_pepe',
@@ -2877,6 +2967,7 @@
             }
         };
 
+        // Sort NFTs by price for the reward system
         const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
 
         // -------- DOM refs ----------
@@ -3082,7 +3173,7 @@
                     progressWidth = Math.min(100, ((p.cashOutMultiplier || 1.0) - 1) / (maxMult - 1) * 100);
                     liveMultiplied = p.cashOutAmount || betAmount;
                 } else if (p.crashed) {
-                    statusClass = 'cashed';
+                    statusClass = 'crashed';
                     statusText = 'Crashed';
                     progressColor = 'red';
                     progressWidth = Math.min(100, ((crashGame.multiplier || 1.0) - 1) / (maxMult - 1) * 100);
@@ -3341,7 +3432,7 @@
         }
 
         // ============================================================
-        // CRASH GAME
+        // CRASH GAME – WITH GRAPHICS QUALITY INTEGRATION
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -3374,6 +3465,15 @@
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
+
+                // Low quality: disable wind completely
+                if (settings.graphicsQuality === 'low') {
+                    container.style.display = 'none';
+                    return;
+                }
+                container.style.display = 'block';
+
+                // Medium/High quality: show wind
                 for (let i = 0; i < 45; i++) {
                     const streak = document.createElement('div');
                     streak.className = 'streak';
@@ -3390,6 +3490,14 @@
             },
 
             updateWindEffect() {
+                // Skip if low quality
+                if (settings.graphicsQuality === 'low') {
+                    const windContainer = document.getElementById('windLines');
+                    windContainer.classList.remove('active');
+                    windContainer.style.opacity = 0;
+                    return;
+                }
+
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
@@ -4580,7 +4688,7 @@
         }
 
         // ============================================================
-        // UPGRADE SELECTION & WHEEL
+        // UPGRADE SELECTION & WHEEL – DYNAMIC SEGMENTS
         // ============================================================
         let activeSelectionType = null;
         let audioCtx2 = null;
@@ -4724,48 +4832,89 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                const greenAngle = this.chance * 2 * Math.PI;
-                const startAngle = -Math.PI / 2;
+                // Dynamic segments based on quality
+                let totalSegments = 24;
+                if (settings.graphicsQuality === 'low') totalSegments = 12;
+                else if (settings.graphicsQuality === 'medium') totalSegments = 18;
+                else totalSegments = 24;
 
-                ctx.beginPath();
-                ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
-                ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
-                ctx.closePath();
-                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
-                greenGrad.addColorStop(0, '#00e676');
-                greenGrad.addColorStop(1, '#009624');
-                ctx.fillStyle = greenGrad;
-                ctx.fill();
+                const segmentAngle = (2 * Math.PI) / totalSegments;
+                const greenSegments = Math.round(this.chance * totalSegments);
 
-                if (greenAngle < 2 * Math.PI) {
+                for (let i = 0; i < totalSegments; i++) {
+                    const startAngle = i * segmentAngle - Math.PI / 2;
+                    const endAngle = startAngle + segmentAngle;
+                    const isGreen = i < greenSegments;
+
                     ctx.beginPath();
-                    ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
-                    ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
+                    ctx.arc(cx, cy, outerR, startAngle, endAngle);
+                    ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
                     ctx.closePath();
-                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
-                    redGrad.addColorStop(0, '#ff5252');
-                    redGrad.addColorStop(1, '#b71c1c');
-                    ctx.fillStyle = redGrad;
+
+                    if (isGreen) {
+                        const grad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
+                        grad.addColorStop(0, '#00e676');
+                        grad.addColorStop(1, '#009624');
+                        ctx.fillStyle = grad;
+                    } else {
+                        const grad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
+                        grad.addColorStop(0, '#ff5252');
+                        grad.addColorStop(1, '#b71c1c');
+                        ctx.fillStyle = grad;
+                    }
+                    // Reduce shadow/glow on low quality
+                    if (settings.graphicsQuality !== 'low') {
+                        ctx.shadowColor = isGreen ? 'rgba(0,255,136,0.2)' : 'rgba(255,0,0,0.2)';
+                        ctx.shadowBlur = 8;
+                    }
                     ctx.fill();
+                    ctx.shadowBlur = 0;
                 }
 
+                // Inner ring
                 ctx.beginPath();
-                ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
+                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fill();
                 ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                ctx.lineWidth = 0.1;
+                ctx.lineWidth = 1;
                 ctx.stroke();
 
+                // Outer ring glow - skip on low quality
+                if (settings.graphicsQuality !== 'low') {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
+                    ctx.shadowColor = 'rgba(255,215,0,0.08)';
+                    ctx.shadowBlur = 30;
+                    ctx.strokeStyle = 'rgba(255,215,0,0.08)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+
+                // Arrow
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
+                if (settings.graphicsQuality !== 'low') {
+                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                    ctx.shadowBlur = 12;
+                }
                 ctx.beginPath();
-                ctx.moveTo(outerR - 6, 0);
-                ctx.lineTo(outerR + 8, -8);
-                ctx.lineTo(outerR + 8, 8);
+                ctx.moveTo(outerR - 4, 0);
+                ctx.lineTo(outerR + 10, -8);
+                ctx.lineTo(outerR + 10, 8);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 0;
                 ctx.fill();
                 ctx.restore();
+
+                // Center dot
+                ctx.beginPath();
+                ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fill();
             },
 
             animateToChance(newChance) {
@@ -4976,7 +5125,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP
+        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP + QUALITY SETTINGS
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5008,9 +5157,9 @@
             launchTimeout: null,
             ballElement: document.getElementById('bounceBallImg'),
             isLossBall: false,
-            // Fixed timestep accumulator
             accumulator: 0,
             fixedStep: 1 / 60,
+            lastFrameTime: 0,
 
             playHitSound() { playBeep(600, 0.06, 0.2); },
             playBreakSound() { playBeep(1000, 0.1, 0.35); },
@@ -5051,13 +5200,13 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
 
-                // Adjust segment count based on graphics quality
+                // Set segment count based on quality
                 if (settings.graphicsQuality === 'low') {
-                    this.segmentCount = 12;
+                    this.segmentCount = 10;
                 } else if (settings.graphicsQuality === 'medium') {
-                    this.segmentCount = 16;
-                } else { // high
-                    this.segmentCount = 20;
+                    this.segmentCount = 14;
+                } else {
+                    this.segmentCount = 18;
                 }
 
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
@@ -5083,6 +5232,7 @@
                 this.isLaunched = false;
                 this.isSpinning = false;
                 this.accumulator = 0;
+                this.lastFrameTime = 0;
                 if (this.launchTimeout) {
                     clearTimeout(this.launchTimeout);
                     this.launchTimeout = null;
@@ -5219,6 +5369,7 @@
                 this.spinStartTime = performance.now();
                 this.arrowAngle = Math.random() * 2 * Math.PI;
                 this.accumulator = 0;
+                this.lastFrameTime = 0;
                 if (this.launchTimeout) clearTimeout(this.launchTimeout);
                 this.launchTimeout = setTimeout(() => {
                     if (this.isSpinning && !this.isLaunched) {
@@ -5240,7 +5391,6 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                // Faster ball: 200-280
                 const speed = 200 + Math.random() * 80;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
@@ -5303,7 +5453,7 @@
             },
 
             update() {
-                const dt = 1 / 60; // fixed timestep for physics
+                const dt = 1 / 60;
 
                 if (this.isSpinning) {
                     const now = performance.now();
@@ -5319,7 +5469,6 @@
 
                 if (!this.isPlaying) return;
 
-                // Accumulate time for fixed step
                 const now = performance.now();
                 const delta = this.lastFrameTime ? (now - this.lastFrameTime) / 1000 : 0;
                 this.lastFrameTime = now;
@@ -5330,10 +5479,8 @@
                     this.accumulator -= this.fixedStep;
                 }
 
-                // Update NFT overlay during play
                 this.updateNftOverlay();
 
-                // Update floating texts
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
                     ft.y -= 60 * this.fixedStep;
@@ -5344,7 +5491,6 @@
                     }
                 }
 
-                // Check if circle is outside the arena
                 if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
                     this.isLossBall = true;
                     if (this.ballElement) {
@@ -5703,51 +5849,58 @@
         });
 
         // ============================================================
-        // INIT
+        // INIT – WITH FALLBACK TO HIDE LOADING SCREEN
         // ============================================================
         async function init() {
             const loadingScreen = document.getElementById('loadingScreen');
             loadingScreen.classList.remove('hidden');
 
-            await preloadAllGifs();
+            try {
+                await preloadAllGifs();
 
-            const minDisplayTime = 2500;
-            const startTime = performance.now();
-            const elapsed = performance.now() - startTime;
-            const remaining = Math.max(0, minDisplayTime - elapsed);
-            await new Promise(resolve => setTimeout(resolve, remaining));
+                const minDisplayTime = 2500;
+                const startTime = performance.now();
+                const elapsed = performance.now() - startTime;
+                const remaining = Math.max(0, minDisplayTime - elapsed);
+                await new Promise(resolve => setTimeout(resolve, remaining));
 
-            loadingScreen.classList.add('hidden');
+                loadingScreen.classList.add('hidden');
 
-            getTelegramUser();
-            loadSettings(); // load settings from localStorage
-            updateHomeUI();
-            updateProfile();
-            crashGame.init();
-            minesGame.init();
-            minesGame.setGridSize(3, 1);
-            upgradeGame.init();
-            renderInventory();
-            updateUpgradeSelectors();
+                getTelegramUser();
+                loadSettings();
+                updateHomeUI();
+                updateProfile();
+                crashGame.init();
+                minesGame.init();
+                minesGame.setGridSize(3, 1);
+                upgradeGame.init();
+                renderInventory();
+                updateUpgradeSelectors();
 
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.startGameCycle();
+                if (document.getElementById('page-rocket').classList.contains('active')) {
+                    crashGame.startGameCycle();
+                }
+
+                console.log('✅ Casino loaded with 9 new NFTs, dynamic graphics quality, and performance tweaks!');
+                console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
+
+            } catch (err) {
+                console.error('Init error:', err);
+                loadingScreen.classList.add('hidden');
             }
-
-            console.log('✅ Casino loaded with settings, faster bounce, fixed timestep, NFT indicators.');
-            console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('page-rocket').classList.contains('active')) crashGame.startGameCycle();
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
+        // ============================================================
+        // STARTUP – ensure init is called
+        // ============================================================
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(init, 100);
-        });
-        if (document.readyState === 'complete') {
-            setTimeout(init, 100);
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(init, 100);
+            });
         }
+        setTimeout(init, 500);
     </script>
 </body>
 </html>
