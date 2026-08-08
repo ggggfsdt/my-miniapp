@@ -22,6 +22,8 @@
             opacity: 1;
             visibility: visible;
             padding: 20px;
+            /* DISABLE LOADING SCREEN FOR NOW */
+            display: none;
         }
         #loadingScreen.hidden {
             opacity: 0;
@@ -858,21 +860,6 @@
         }
         #settingsModal .settings-card .setting-row .toggle.active .knob {
             transform: translateX(20px);
-        }
-        #settingsModal .settings-card .setting-row select {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 6px 12px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            cursor: pointer;
-            min-width: 80px;
-        }
-        #settingsModal .settings-card .setting-row select option {
-            background: #1a1a1e;
-            color: #fff;
         }
         #settingsModal .settings-card .close-btn {
             margin-top: 20px;
@@ -2385,14 +2372,7 @@
                         <div class="knob"></div>
                     </div>
                 </div>
-                <div class="setting-row">
-                    <span class="label">Graphics Quality</span>
-                    <select id="graphicsQuality" onchange="updateGraphicsQuality(this.value)">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
+                <!-- Graphics Quality removed as requested -->
                 <div class="close-btn" onclick="closeSettings()">Close</div>
             </div>
         </div>
@@ -2645,8 +2625,8 @@
         // SETTINGS STATE
         // ============================================================
         const settings = {
-            vibration: true,
-            graphicsQuality: 'medium'
+            vibration: true
+            // graphicsQuality removed
         };
 
         function loadSettings() {
@@ -2666,30 +2646,17 @@
 
         function applySettingsUI() {
             const toggle = document.getElementById('vibrationToggle');
-            const select = document.getElementById('graphicsQuality');
             if (settings.vibration) {
                 toggle.classList.add('active');
             } else {
                 toggle.classList.remove('active');
             }
-            select.value = settings.graphicsQuality;
         }
 
         function toggleVibration() {
             settings.vibration = !settings.vibration;
             applySettingsUI();
             saveSettings();
-        }
-
-        function updateGraphicsQuality(value) {
-            settings.graphicsQuality = value;
-            saveSettings();
-            if (document.getElementById('page-bounce').classList.contains('active')) {
-                bounceGame.init();
-            }
-            if (document.getElementById('page-rocket').classList.contains('active')) {
-                crashGame.initWind();
-            }
         }
 
         function openSettings() {
@@ -2749,7 +2716,7 @@
             'https://images.iimg.live/images/vibrant-memory-9307.webp',
             'https://images.iimg.live/images/vibrant-scene-3805.webp',
             'https://images.iimg.live/images/glorious-memory-8181.webp',
-            // New NFT GIFs
+            // NEW NFT GIFs
             'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif',
             'https://i.postimg.cc/JnpXGM2b/ezgif-5ce311053406b6e6.gif',
             'https://i.postimg.cc/nLPjJ0jT/ezgif-51377086e31c6216.gif',
@@ -2840,7 +2807,6 @@
             inventory: []
         };
 
-        // NEW NFTs added here
         const NFT_DB = {
             chill_flame: {
                 id: 'chill_flame',
@@ -2884,7 +2850,7 @@
                 gif: 'https://i.postimg.cc/436TK8Nx/ezgif-817d70fd08e26549.gif',
                 tier: 'legendary'
             },
-            // ---- NEW NFTs ----
+            // NEW NFTs
             homemade_cake: {
                 id: 'homemade_cake',
                 name: 'Homemade Cake',
@@ -3447,10 +3413,8 @@
             initWind() {
                 const container = document.getElementById('windLines');
                 container.innerHTML = '';
-                let streakCount = 45;
-                if (settings.graphicsQuality === 'low') streakCount = 8;
-                else if (settings.graphicsQuality === 'medium') streakCount = 25;
-
+                // Fixed streak count (medium quality)
+                const streakCount = 25;
                 for (let i = 0; i < streakCount; i++) {
                     const streak = document.createElement('div');
                     streak.className = 'streak';
@@ -3467,11 +3431,6 @@
             },
 
             updateWindEffect() {
-                if (settings.graphicsQuality === 'low') {
-                    document.getElementById('windLines').classList.remove('active');
-                    document.getElementById('windLines').style.opacity = 0;
-                    return;
-                }
                 const windContainer = document.getElementById('windLines');
                 const mult = this.multiplier;
                 let phase = 0;
@@ -3515,11 +3474,6 @@
             },
 
             updateMoon(mult) {
-                if (settings.graphicsQuality === 'low') {
-                    document.getElementById('moonOverlay').classList.remove('active');
-                    document.getElementById('moonGif').style.display = 'none';
-                    return;
-                }
                 const moonOverlay = document.getElementById('moonOverlay');
                 const moonImg = document.getElementById('moonGif');
 
@@ -3960,7 +3914,6 @@
                 this.updateMainButton();
                 updateHomeUI();
                 document.getElementById('crashNftIndicator').classList.remove('show');
-                this.bet = 0; // Reset bet after cash out
             },
 
             startCountdown() {
@@ -4084,19 +4037,13 @@
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
 
-                    if (settings.graphicsQuality !== 'low') {
-                        const explosionOverlay = document.getElementById('explosionOverlay');
-                        explosionOverlay.classList.add('active');
-                        const explosionImg = document.getElementById('explosionGif');
-                        explosionImg.style.animation = 'none';
-                        void explosionImg.offsetHeight;
-                        explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
-                        setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
-                    } else {
-                        const overlay = document.getElementById('explosionOverlay');
-                        overlay.classList.add('active');
-                        setTimeout(() => overlay.classList.remove('active'), 300);
-                    }
+                    const explosionOverlay = document.getElementById('explosionOverlay');
+                    explosionOverlay.classList.add('active');
+                    const explosionImg = document.getElementById('explosionGif');
+                    explosionImg.style.animation = 'none';
+                    void explosionImg.offsetHeight;
+                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
+                    setTimeout(() => { explosionOverlay.classList.remove('active'); }, 1200);
 
                     const user = players.find(p => p.isYou);
                     if (user && user.active && !user.hasCashedOut) {
@@ -4117,7 +4064,6 @@
                     document.getElementById('windLines').classList.remove('active');
                     document.getElementById('windLines').style.opacity = 0;
                     document.getElementById('crashNftIndicator').classList.remove('show');
-                    this.bet = 0; // Reset bet after crash
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -5071,7 +5017,7 @@
         }
 
         // ============================================================
-        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP + QUALITY
+        // BOUNCE GAME – FASTER BALL + FIXED TIMESTEP
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5089,7 +5035,7 @@
             animId: null,
             friction: 0.998,
             speedThreshold: 0.05,
-            segmentCount: 16,
+            segmentCount: 16, // fixed medium quality
             constantSpeedDuration: 4000,
             startTime: 0,
             floatingTexts: [],
@@ -5146,13 +5092,8 @@
                 this.width = this.canvas.width;
                 this.height = this.canvas.height;
 
-                if (settings.graphicsQuality === 'low') {
-                    this.segmentCount = 10;
-                } else if (settings.graphicsQuality === 'medium') {
-                    this.segmentCount = 16;
-                } else {
-                    this.segmentCount = 20;
-                }
+                // Fixed segment count (medium)
+                this.segmentCount = 16;
 
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.display = 'block';
@@ -5794,56 +5735,35 @@
         });
 
         // ============================================================
-        // INIT – WITH TIMEOUT FOR LOADING SCREEN
+        // INIT – LOADING SCREEN IS DISABLED (hidden by CSS)
         // ============================================================
         async function init() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const startTime = performance.now();
-
+            // Loading screen is already hidden via CSS (display:none)
+            // We still preload GIFs in the background for smoother experience
             try {
-                // Preload with a 5-second timeout
-                const preloadPromise = preloadAllGifs();
-                const timeoutPromise = new Promise(resolve => setTimeout(resolve, 5000));
-                await Promise.race([preloadPromise, timeoutPromise]);
-                console.log('Preload done or timed out');
+                await preloadAllGifs();
             } catch (e) {
                 console.warn('Preload error, continuing anyway', e);
             }
 
-            // Ensure minimum display time (2.5s)
-            const elapsed = performance.now() - startTime;
-            const minDisplay = 2500;
-            const remaining = Math.max(0, minDisplay - elapsed);
-            await new Promise(resolve => setTimeout(resolve, remaining));
+            // Initialize everything
+            getTelegramUser();
+            loadSettings();
+            updateHomeUI();
+            updateProfile();
+            crashGame.init();
+            minesGame.init();
+            minesGame.setGridSize(3, 1);
+            upgradeGame.init();
+            renderInventory();
+            updateUpgradeSelectors();
 
-            // Hide loading screen
-            loadingScreen.classList.add('hidden');
-            console.log('Loading screen hidden');
-
-            // Initialize app
-            try {
-                getTelegramUser();
-                loadSettings();
-                updateHomeUI();
-                updateProfile();
-                crashGame.init();
-                minesGame.init();
-                minesGame.setGridSize(3, 1);
-                upgradeGame.init();
-                renderInventory();
-                updateUpgradeSelectors();
-
-                if (document.getElementById('page-rocket').classList.contains('active')) {
-                    crashGame.startGameCycle();
-                }
-
-                console.log('✅ Casino loaded with new NFTs, quality optimizations, and loading fix.');
-                console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
-            } catch (e) {
-                console.error('Init error:', e);
-                // still hide loading screen if not already
-                loadingScreen.classList.add('hidden');
+            if (document.getElementById('page-rocket').classList.contains('active')) {
+                crashGame.startGameCycle();
             }
+
+            console.log('✅ Casino loaded with new NFTs, quality removed, loading disabled.');
+            console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
         // ============================================================
