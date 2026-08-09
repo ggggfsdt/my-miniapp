@@ -2133,8 +2133,8 @@
         }
 
         /* ============================================================
-                   UPGRADE – FULL SCREEN, SEGMENTED WHEEL, ARROW SPINS
-                   ============================================================ */
+           UPGRADE – FULL SCREEN, SEGMENTED WHEEL, ORIGINAL ARROW & LOGIC
+           ============================================================ */
         #page-upgrade {
             padding: 0;
             overflow: hidden;
@@ -3087,7 +3087,7 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- ===== UPGRADE – FULL SCREEN, SEGMENTED WHEEL, ARROW SPINS ===== -->
+        <!-- ===== UPGRADE – FULL SCREEN, SEGMENTED WHEEL, ORIGINAL ARROW ===== -->
         <div id="page-upgrade" class="page">
             <div class="upgrade-full">
                 <!-- Header -->
@@ -6216,7 +6216,7 @@
             }
         }
 
-        // ===== UPGRADE GAME – segmented wheel, arrow spins =====
+        // ===== UPGRADE GAME – segmented wheel, original arrow =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -6350,7 +6350,7 @@
             toNftId: null,
             spinning: false,
             locked: false,
-            arrowAngle: -Math.PI / 2, // arrow rotates, wheel stays fixed
+            arrowAngle: -Math.PI / 2, // arrow rotates
             canvas: document.getElementById('upgradeWheel'),
             ctx: null,
             chance: 1.0,
@@ -6382,12 +6382,11 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // ---- Draw the segmented wheel (wheel is static) ----
+                // ---- Draw the segmented wheel (static) ----
                 const numSegments = 24;
                 const segAngle = (2 * Math.PI) / numSegments;
                 const greenSegments = Math.floor(this.chance * numSegments);
 
-                // Draw each segment
                 for (let i = 0; i < numSegments; i++) {
                     const startA = -Math.PI / 2 + i * segAngle;
                     const endA = startA + segAngle;
@@ -6397,6 +6396,7 @@
                     ctx.arc(cx, cy, innerR, endA, startA, true);
                     ctx.closePath();
                     if (isGreen) {
+                        // Use the same green gradient colors as original, but solid
                         ctx.fillStyle = '#00c853';
                     } else {
                         ctx.fillStyle = '#d32f2f';
@@ -6408,49 +6408,38 @@
                     ctx.stroke();
                 }
 
-                // Inner ring border
+                // Inner ring border (like original)
                 ctx.beginPath();
                 ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // Outer ring border
+                // Outer ring border (like original)
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // ---- Draw the arrow (it rotates) ----
+                // ---- Draw the arrow EXACTLY as in the original script ----
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
-                // Arrow shaft (pointing outward)
-                const arrowLen = outerR - 2;
+                // Arrow shaft and head (copied from original)
                 ctx.beginPath();
-                ctx.moveTo(0, -innerR - 4);
-                ctx.lineTo(0, -arrowLen);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.shadowColor = 'rgba(255,255,255,0.3)';
-                ctx.shadowBlur = 12;
-                ctx.stroke();
-                // Arrow head at the outer end
-                const headSize = 10;
-                ctx.beginPath();
-                ctx.moveTo(0, -arrowLen);
-                ctx.lineTo(-headSize, -arrowLen + headSize);
-                ctx.lineTo(headSize, -arrowLen + headSize);
+                ctx.moveTo(outerR - 6, 0);
+                ctx.lineTo(outerR + 8, -8);
+                ctx.lineTo(outerR + 8, 8);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(255,255,255,0.4)';
-                ctx.shadowBlur = 16;
+                ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                ctx.shadowBlur = 12;
                 ctx.fill();
-                ctx.shadowBlur = 0;
+                // Also draw a small center dot (optional, original had none but we keep it clean)
                 ctx.restore();
 
-                // ---- Center percentage ----
+                // ---- Center percentage (same as original) ----
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -6511,7 +6500,7 @@
 
                 this.lastTickAngle = this.arrowAngle;
 
-                // Pre-spin tension ticks
+                // Pre‑spin tension (same as original)
                 let tensionCount = 0;
                 const tensionMax = 3;
                 let tensionInterval = setInterval(() => {
@@ -6530,17 +6519,14 @@
             startSpin() {
                 const duration = 8000 + Math.random() * 2000;
                 const startAngle = this.arrowAngle;
-                // Determine final angle based on chance
                 const rand = Math.random();
                 let finalAngleOnWheel;
                 if (rand < this.chance) {
-                    // win: land in green area
                     finalAngleOnWheel = Math.random() * this.chance * 2 * Math.PI;
                 } else {
-                    // lose: land in red area
                     finalAngleOnWheel = this.chance * 2 * Math.PI + Math.random() * (1 - this.chance) * 2 * Math.PI;
                 }
-                // Add extra full rotations for drama
+                // Extra full rotations (same as original)
                 const extraRotations = 6 + Math.floor(Math.random() * 4);
                 const targetArrowAngle = -Math.PI / 2 + finalAngleOnWheel + extraRotations * 2 * Math.PI;
 
@@ -6552,13 +6538,13 @@
                     this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
                     this.drawWheelAndArrow(this.arrowAngle);
 
-                    // sound tick
+                    // Sound ticks (same logic as original)
                     const speed = Math.abs(targetArrowAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 - t)) / duration;
                     const freq = 400 + speed * 100;
                     const vol = Math.min(0.4, 0.1 + speed * 0.005);
                     playTick(vol, freq);
 
-                    // glow effect
+                    // Glow effect (same as original)
                     const glowIntensity = 0.3 + 0.7 * (1 - Math.abs(0.5 - t) * 2);
                     document.getElementById('wheelContainer').style.filter =
                         `drop-shadow(0 0 ${20 + glowIntensity * 40}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.12})`;
@@ -6570,11 +6556,7 @@
                         this.locked = false;
                         setUpgradeLocked(false);
                         // Determine result: check if the arrow points to green
-                        // Arrow angle is relative to -PI/2. The wheel is fixed, so the green region starts at -PI/2.
                         const normalized = ((this.arrowAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-                        // Since arrow starts at -PI/2, we need to shift: the arrow's "0" is at -PI/2.
-                        // The arrow angle is absolute, so we can check if the arrow is within the green angle.
-                        // Actually, we can check if the angle from -PI/2 to arrowAngle is less than chance*2PI.
                         const relAngle = ((this.arrowAngle + Math.PI / 2) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
                         const isGreen = relAngle < this.chance * 2 * Math.PI;
                         this.resolveSpin(isGreen);
@@ -6588,7 +6570,7 @@
                             setTimeout(() => container.style.filter = 'none', 500);
                         }
 
-                        // Reset arrow angle slowly (bounce effect)
+                        // Reset arrow angle (bounce effect, same as original)
                         const returnDuration = 800;
                         const returnStartAngle = this.arrowAngle;
                         const returnStartTime = performance.now();
@@ -6808,7 +6790,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Upgrade: segmented wheel, arrow spins, full‑screen.');
+            console.log('✅ Casino loaded – Upgrade: segmented wheel, original arrow & logic, full‑screen.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
