@@ -94,6 +94,7 @@
             justify-content: center;
             align-items: center;
             padding: 10px;
+            overflow: hidden;
         }
         #app {
             max-width: 420px;
@@ -104,6 +105,7 @@
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.06);
             min-height: 760px;
+            max-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -349,7 +351,6 @@
             flex-shrink: 0;
             border: 2px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 16px rgba(108, 92, 231, 0.2);
-            cursor: pointer;
         }
         .home-avatar img {
             width: 100%;
@@ -1160,6 +1161,33 @@
             box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
             position: relative;
             z-index: 1;
+        }
+
+        /* ===== NFT MILESTONE – just an image, no circles, with pop animation ===== */
+        .nft-milestone {
+            position: absolute;
+            top: -22px;
+            transform: translateX(-50%) scale(0.6);
+            z-index: 12;
+            width: 30px;
+            height: 30px;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.5;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+        .nft-milestone img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+        }
+        .nft-milestone.reached {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.5);
+            z-index: 13;
+            filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.6));
         }
 
         /* ===== BET TOGGLE, INPUT, ETC ===== */
@@ -2106,97 +2134,191 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
-        /* ===== UPGRADE ===== */
+        /* ============================================================
+                   UPGRADE – FULL SCREEN REDESIGN
+                   ============================================================ */
+        #page-upgrade {
+            padding: 0;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            background: radial-gradient(ellipse at 50% 30%, #16161e, #08080a);
+            position: relative;
+            min-height: 100vh;
+            max-height: 100vh;
+        }
+        #page-upgrade.active {
+            display: flex;
+        }
+        .upgrade-full {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 12px 16px 20px 16px;
+            height: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0 4px 0;
+            flex-shrink: 0;
+        }
+        .upgrade-header .back-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px 6px 0;
+            transition: color 0.2s;
+        }
+        .upgrade-header .back-btn:hover {
+            color: #fff;
+        }
+        .upgrade-header .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upgrade-header .title i {
+            color: #00d2a0;
+        }
+        .upgrade-header .badge {
+            font-size: 13px;
+            padding: 4px 12px;
+        }
+
+        /* Wheel container – takes most of the space */
+        .upgrade-wheel-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            padding: 4px 0;
+            position: relative;
+        }
         .upgrade-wheel-container {
             position: relative;
-            width: 340px;
-            height: 340px;
-            margin: 16px auto;
-            transition: filter 0.3s;
+            width: min(82vw, 340px);
+            aspect-ratio: 1/1;
+            max-height: 82vh;
+            margin: 0 auto;
+            transition: filter 0.3s ease;
+            touch-action: none;
         }
         #upgradeWheel {
             display: block;
-            margin: 0 auto;
+            width: 100% !important;
+            height: 100% !important;
             border-radius: 50%;
-            width: 340px;
-            height: 340px;
+            box-shadow: 0 0 60px rgba(0, 210, 160, 0.08), inset 0 0 60px rgba(0, 0, 0, 0.3);
+            will-change: transform;
         }
         .wheel-center-nft {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
+            width: 18%;
+            height: 18%;
             object-fit: contain;
-            border-radius: 0;
+            border-radius: 12px;
             display: none;
             z-index: 5;
             pointer-events: none;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.3));
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+            padding: 4px;
             will-change: transform;
-            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
-            background: transparent;
-            border: none;
         }
+
+        /* NFT selectors – bigger squares, horizontal layout */
         .upgrade-selectors {
             display: flex;
             flex-direction: row;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 14px;
+            margin: 6px 0 10px 0;
+            flex-shrink: 0;
+            justify-content: center;
+            width: 100%;
         }
         .upgrade-select {
             flex: 1;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 14px;
+            max-width: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            padding: 12px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
-            transition: background 0.2s, opacity 0.3s, cursor 0.3s;
+            transition: background 0.25s, border-color 0.25s, transform 0.2s, opacity 0.3s;
             min-width: 0;
-        }
-        .upgrade-select.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
+            backdrop-filter: blur(4px);
         }
         .upgrade-select:active {
-            background: rgba(255, 255, 255, 0.05);
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .upgrade-select.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(0.6);
         }
         .upgrade-select .nft-square {
-            width: 60px;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.06);
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
         }
         .upgrade-select .nft-square img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             will-change: transform;
+            transition: transform 0.3s;
         }
         .upgrade-select .nft-square .placeholder {
             color: #555;
-            font-size: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+            padding: 4px;
         }
         .upgrade-select .info {
             text-align: center;
+            width: 100%;
+            min-width: 0;
         }
         .upgrade-select .info .name {
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 15px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            color: #e0e0e0;
+            display: block;
         }
         .upgrade-select .info .price {
             color: #ffd700;
@@ -2204,32 +2326,105 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 3px;
+            font-weight: 600;
+        }
+        .upgrade-select .info .price img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        .upgrade-select .select-badge {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #666;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-top: 2px;
+            font-weight: 600;
+        }
+        .upgrade-select.has-value .select-badge {
+            color: #54a0ff;
+            border-color: rgba(54, 160, 255, 0.15);
+            background: rgba(54, 160, 255, 0.06);
+        }
+        .upgrade-select.to-select .nft-square {
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+        .upgrade-select.to-select.has-value .nft-square {
+            border-color: #ffd700;
+            box-shadow: 0 0 24px rgba(255, 215, 0, 0.08);
+        }
+        .upgrade-select.from-select .nft-square {
+            border-color: rgba(108, 92, 231, 0.15);
+        }
+        .upgrade-select.from-select.has-value .nft-square {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 24px rgba(108, 92, 231, 0.08);
+        }
+
+        /* Upgrade button – prominent */
+        .upgrade-btn-wrap {
+            flex-shrink: 0;
+            padding: 2px 0 6px 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
         .btn-upgrade {
             background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-            margin: 12px auto 0 auto;
-            padding: 18px 40px;
-            font-size: 20px;
+            box-shadow: 0 4px 28px rgba(0, 184, 148, 0.4);
+            padding: 14px 32px;
+            font-size: 18px;
+            font-weight: 800;
             border-radius: 20px;
-            width: fit-content;
+            width: 100%;
+            max-width: 320px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-upgrade:active {
+            transform: scale(0.95);
         }
         .btn-upgrade:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .btn-upgrade .arrow-icon {
-            font-size: 22px;
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        .btn-upgrade:not(:disabled):hover .arrow-icon {
+            transform: translateX(4px);
+        }
+        .btn-upgrade .upgrade-pct {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
         }
 
+        /* NFT Selection Overlay (upgrade) */
         .nft-selection-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(16px);
             z-index: 1000;
             display: none;
             flex-direction: column;
@@ -2241,15 +2436,22 @@
         .nft-selection-overlay.active {
             display: flex;
         }
+        .nft-selection-overlay .overlay-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            text-align: center;
+        }
         .nft-selection-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            max-width: 340px;
+            gap: 14px;
+            max-width: 380px;
             width: 100%;
-            max-height: 65vh;
+            max-height: 60vh;
             overflow-y: auto;
-            padding: 4px;
+            padding: 6px;
         }
         .nft-selection-grid::-webkit-scrollbar {
             width: 4px;
@@ -2263,15 +2465,15 @@
         }
         .nft-selection-item {
             background: rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 12px;
+            border-radius: 18px;
+            padding: 14px 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
         .nft-selection-item:active {
-            transform: scale(0.96);
+            transform: scale(0.94);
             background: rgba(255, 255, 255, 0.08);
         }
         .nft-selection-item img {
@@ -2279,28 +2481,47 @@
             height: 80px;
             object-fit: contain;
             border-radius: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
             will-change: transform;
         }
         .nft-selection-item .name {
             font-weight: 600;
             font-size: 14px;
+            color: #e0e0e0;
+        }
+        .nft-selection-item .price {
+            font-size: 12px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
         .nft-selection-close {
-            margin-top: 20px;
+            margin-top: 18px;
             color: #888;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            padding: 8px 20px;
+            padding: 10px 28px;
             background: rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+        }
+        .nft-selection-close:active {
+            background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Win Popup */
         .win-popup {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(16px);
             z-index: 2000;
             display: none;
             flex-direction: column;
@@ -2313,20 +2534,20 @@
             display: flex;
         }
         .win-popup .win-card {
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 24px;
-            padding: 30px 24px;
-            max-width: 320px;
+            background: rgba(30, 30, 35, 0.96);
+            border-radius: 28px;
+            padding: 32px 24px;
+            max-width: 340px;
             width: 100%;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
         }
         .win-popup .money-gif {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             object-fit: contain;
-            margin-bottom: 16px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
             will-change: transform;
         }
         .win-popup .nft-img {
@@ -2334,27 +2555,29 @@
             height: 90px;
             object-fit: contain;
             border-radius: 16px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             will-change: transform;
+            border: 2px solid rgba(255, 215, 0, 0.1);
         }
         .win-popup .win-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             color: #ffd700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .win-popup .win-subtitle {
             font-size: 16px;
             color: #ccc;
+            font-weight: 500;
         }
         .win-popup button {
             margin-top: 16px;
-            padding: 12px 32px;
+            padding: 12px 36px;
             border: none;
-            border-radius: 20px;
+            border-radius: 24px;
             background: linear-gradient(135deg, #00b894, #00d2a0);
             color: white;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -2465,7 +2688,37 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
         }
 
+        /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width: 420px) {
+            .upgrade-select .nft-square {
+                width: 64px;
+                height: 64px;
+                border-radius: 12px;
+            }
+            .upgrade-select .info .name {
+                font-size: 13px;
+            }
+            .upgrade-select .info .price {
+                font-size: 12px;
+            }
+            .upgrade-select {
+                padding: 10px 8px;
+                gap: 4px;
+            }
+            .upgrade-selectors {
+                gap: 10px;
+                margin: 4px 0 6px 0;
+            }
+            .btn-upgrade {
+                font-size: 16px;
+                padding: 12px 24px;
+            }
+            .upgrade-wheel-container {
+                width: min(78vw, 290px);
+            }
+            .upgrade-header .title {
+                font-size: 16px;
+            }
             .mines-grid .tile-wrapper .tile .symbol {
                 font-size: 22px;
             }
@@ -2566,18 +2819,6 @@
             #settingsModal .settings-card {
                 padding: 20px 16px;
             }
-            .upgrade-wheel-container {
-                width: 280px;
-                height: 280px;
-            }
-            #upgradeWheel {
-                width: 280px;
-                height: 280px;
-            }
-            .wheel-center-nft {
-                width: 60px;
-                height: 60px;
-            }
             #crashNftOverlay img {
                 width: 120px;
                 height: 120px;
@@ -2608,6 +2849,45 @@
             }
             .nft-grid-select .nft-option .nft-price {
                 font-size: 7px;
+            }
+            .nft-milestone {
+                width: 26px;
+                height: 26px;
+                top: -18px;
+            }
+            .nft-selection-item img {
+                width: 64px;
+                height: 64px;
+            }
+            .nft-selection-grid {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .upgrade-select .nft-square {
+                width: 54px;
+                height: 54px;
+                border-radius: 10px;
+            }
+            .upgrade-select .info .name {
+                font-size: 12px;
+            }
+            .upgrade-select .info .price {
+                font-size: 11px;
+            }
+            .upgrade-select {
+                padding: 8px 6px;
+            }
+            .upgrade-selectors {
+                gap: 8px;
+            }
+            .btn-upgrade {
+                font-size: 14px;
+                padding: 10px 18px;
+            }
+            .upgrade-wheel-container {
+                width: min(72vw, 240px);
             }
         }
     </style>
@@ -2643,6 +2923,7 @@
 
         <!-- NFT Selection Overlay (for upgrade) -->
         <div class="nft-selection-overlay" id="nftSelectionOverlay">
+            <div class="overlay-title" id="nftOverlayTitle">Select NFT</div>
             <div class="nft-selection-grid" id="nftSelectionGrid"></div>
             <div class="nft-selection-close" onclick="closeNftSelection()">Cancel</div>
         </div>
@@ -2664,7 +2945,7 @@
         <!-- HOME -->
         <div id="page-home" class="page active">
             <div class="home-header">
-                <div class="home-avatar" onclick="navigateTo('profile')"><img id="homeAvatarImg" src="" alt="Avatar"></div>
+                <div class="home-avatar"><img id="homeAvatarImg" src="" alt="Avatar"></div>
                 <div class="home-user">
                     <div class="greeting">Welcome back</div>
                     <div class="username" id="homeUsername">xDll_Lud</div>
@@ -2738,14 +3019,12 @@
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
                 </div>
-                <!-- The existing progress line inside grid (no arrow) -->
                 <div class="progress-wrap" id="progressWrap">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
             </div>
 
             <div class="bet-container">
-                <!-- BET TOGGLE – smaller + left aligned -->
                 <div class="bet-toggle-wrapper">
                     <button class="bet-toggle-btn" id="betToggleBtn" onclick="crashGame.toggleBetType()">
                         <div class="toggle-slider" id="betToggleSlider"></div>
@@ -2759,8 +3038,6 @@
                         </div>
                     </button>
                 </div>
-
-                <!-- NFT Bet Selector – grid of inventory NFTs -->
                 <div class="nft-bet-selector" id="nftBetSelector">
                     <div class="nft-grid-select" id="nftGridSelect"></div>
                     <div class="nft-bet-preview" style="display:none;" id="nftBetPreview">
@@ -2769,13 +3046,10 @@
                         <span class="price" id="nftBetPreviewPrice"></span>
                     </div>
                 </div>
-
-                <!-- Stars Bet Input -->
                 <div class="bet-input-row open" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
                     <button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
                 </div>
-
                 <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
                     <span id="mainActionText">Place Bet</span>
                     <span id="mainActionSub"></span>
@@ -2812,44 +3086,58 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- UPGRADE -->
+        <!-- ===== UPGRADE – FULL SCREEN REDESIGN ===== -->
         <div id="page-upgrade" class="page">
-            <div class="flex-between mb-8">
-                <span class="badge badge-blue"><i class="fas fa-arrow-up" style="margin-right:6px;"></i>Upgrade<span class="online-dot"></span></span>
-                <span class="badge" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
-            </div>
-            <div class="card" style="padding: 20px;">
-                <div class="card-title" style="margin-bottom: 12px; font-size: 14px;">Select NFTs to Upgrade</div>
+            <div class="upgrade-full">
+                <!-- Header -->
+                <div class="upgrade-header">
+                    <button class="back-btn" onclick="navigateTo('home')"><i class="fas fa-arrow-left"></i></button>
+                    <span class="title"><i class="fas fa-arrow-up"></i> Upgrade</span>
+                    <span class="badge" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
+                </div>
+
+                <!-- Wheel -->
+                <div class="upgrade-wheel-wrap">
+                    <div class="upgrade-wheel-container" id="wheelContainer">
+                        <canvas id="upgradeWheel" width="400" height="400"></canvas>
+                        <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
+                    </div>
+                </div>
+
+                <!-- NFT Selectors – bigger squares -->
                 <div class="upgrade-selectors">
-                    <div class="upgrade-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
+                    <div class="upgrade-select from-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
                         <div class="nft-square" id="fromNftSquare">
                             <img id="fromNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="fromPlaceholder">Choose</span>
                         </div>
                         <div class="info">
-                            <div class="name" id="fromNftName">Your NFT</div>
-                            <div class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                            <span class="name" id="fromNftName">Your NFT</span>
+                            <span class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
                         </div>
+                        <span class="select-badge" id="fromBadge">⬇ Your NFT</span>
                     </div>
-                    <div class="upgrade-select" id="upgradeToSelector" onclick="openNftSelection('to')">
+                    <div class="upgrade-select to-select" id="upgradeToSelector" onclick="openNftSelection('to')">
                         <div class="nft-square" id="toNftSquare">
                             <img id="toNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="toPlaceholder">Choose</span>
                         </div>
                         <div class="info">
-                            <div class="name" id="toNftName">Desired NFT</div>
-                            <div class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                            <span class="name" id="toNftName">Desired NFT</span>
+                            <span class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
                         </div>
+                        <span class="select-badge" id="toBadge">⬆ Desired</span>
                     </div>
                 </div>
-                <div class="upgrade-wheel-container" id="wheelContainer">
-                    <canvas id="upgradeWheel" width="340" height="340"></canvas>
-                    <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
+
+                <!-- Upgrade Button -->
+                <div class="upgrade-btn-wrap">
+                    <button class="btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
+                        <span id="upgradeBtnText">Upgrade</span>
+                        <span class="upgrade-pct" id="upgradePct">—</span>
+                        <i class="fas fa-arrow-up arrow-icon"></i>
+                    </button>
                 </div>
-                <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
-                    <span id="upgradeBtnText">Upgrade</span>
-                    <i class="fas fa-arrow-up arrow-icon"></i>
-                </button>
             </div>
         </div>
 
@@ -2973,6 +3261,7 @@
         }
 
         function openSettings() { document.getElementById('settingsModal').classList.add('active'); }
+
         function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
 
         // ============================================================
@@ -3032,7 +3321,6 @@
             'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
             'https://i.postimg.cc/02SjbFc2/brick.gif',
             'https://i.postimg.cc/RZdBnc8Z/ezgif-86ccd2fd265e1e18.gif',
-            // new rocket gifs
             'https://i.postimg.cc/sDQHk9K1/ezgif-8b61599f5def4979.gif',
             'https://i.postimg.cc/xd0R1KGR/ezgif-69a8adec4a1d8304.gif'
         ];
@@ -3059,6 +3347,7 @@
         ];
 
         function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
+
         function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
         // ============================================================
@@ -3433,6 +3722,8 @@
                 document.getElementById('upgradeBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 updateUpgradeSelectors();
+                // Re-draw wheel after layout
+                setTimeout(() => { upgradeGame.init(); }, 100);
             }
             if (page === 'inventory') {
                 document.getElementById('inventoryBalance').innerHTML =
@@ -3657,7 +3948,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – with enhanced rocket struggle (no arrow)
+        // CRASH GAME – NFT milestones on the existing progress line
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -3688,16 +3979,9 @@
             moonActive: false,
             nftActive: false,
             maxMultiplierForLine: 10.0,
-
-            // Enhanced struggle parameters
             struggleTime: 0,
-            struggleAmplitude: 0.35, // increased
-            struggleSpeed: 18, // faster
-            // additional shake
-            shakeX: 0,
-            shakeY: 0,
-
-            smoothFill: 0,
+            struggleAmplitude: 0.25,
+            struggleSpeed: 14,
 
             toggleBetType() {
                 if (this.isPlaying) return;
@@ -3748,7 +4032,7 @@
                     document.getElementById('crashNftIndicator'),
                     null
                 );
-                this.smoothFill = 0;
+                this.updateNftMilestones(0);
             },
 
             populateNftGrid() {
@@ -3799,6 +4083,89 @@
                         }
                     });
                     grid.appendChild(div);
+                });
+            },
+
+            updateNftMilestones(bet) {
+                const progressWrap = document.getElementById('progressWrap');
+                const oldMarkers = progressWrap.querySelectorAll('.nft-milestone');
+                oldMarkers.forEach(el => el.remove());
+
+                if (!bet || bet <= 0) {
+                    return;
+                }
+
+                const maxMult = this.maxMultiplierForLine;
+                const minMult = 1.0;
+
+                let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
+                if (this.betType === 'nft' && this.betNftData) {
+                    betImage = this.betNftData.gif;
+                }
+
+                const firstMarker = document.createElement('div');
+                firstMarker.className = 'nft-milestone';
+                firstMarker.dataset.mult = 1.0;
+                firstMarker.style.left = '0%';
+                const img = document.createElement('img');
+                img.src = betImage;
+                img.alt = 'bet';
+                firstMarker.appendChild(img);
+                progressWrap.appendChild(firstMarker);
+
+                const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
+                if (reachable.length === 0) return;
+
+                let selected = [];
+                if (reachable.length <= 4) {
+                    selected = reachable;
+                } else {
+                    const first = reachable[0];
+                    const last = reachable[reachable.length - 1];
+                    const mid1 = reachable[Math.floor(reachable.length / 3)];
+                    const mid2 = reachable[Math.floor(2 * reachable.length / 3)];
+                    const set = new Set([first.id, mid1.id, mid2.id, last.id]);
+                    selected = reachable.filter(n => set.has(n.id));
+                    selected.sort((a, b) => a.price - b.price);
+                }
+
+                selected.forEach((nft) => {
+                    const requiredMult = nft.price / bet;
+                    if (requiredMult <= minMult) return;
+                    const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
+                    const marker = document.createElement('div');
+                    marker.className = 'nft-milestone';
+                    marker.dataset.mult = requiredMult;
+                    marker.style.left = pct + '%';
+                    const img2 = document.createElement('img');
+                    img2.src = nft.gif;
+                    img2.alt = nft.name;
+                    marker.appendChild(img2);
+                    progressWrap.appendChild(marker);
+                });
+
+                const fill = document.getElementById('progressFill');
+                if (fill) fill.style.zIndex = 1;
+            },
+
+            updateMilestoneStates(mult) {
+                const progressWrap = document.getElementById('progressWrap');
+                const markers = progressWrap.querySelectorAll('.nft-milestone');
+                let highest = null;
+                let highestMult = 1.0;
+                markers.forEach(marker => {
+                    const mMult = parseFloat(marker.dataset.mult);
+                    if (mMult <= mult && mMult >= highestMult) {
+                        highestMult = mMult;
+                        highest = marker;
+                    }
+                });
+                markers.forEach(marker => {
+                    if (marker === highest) {
+                        marker.classList.add('reached');
+                    } else {
+                        marker.classList.remove('reached');
+                    }
                 });
             },
 
@@ -3876,7 +4243,6 @@
                 img.src = '';
             },
 
-            // Enhanced rocket struggle with shake and strong pulsing
             updateRotationAndZoom() {
                 const effectiveMult = Math.min(this.multiplier, 3.0);
                 this.targetAngle = 12 - (effectiveMult - 1) * 24;
@@ -3897,22 +4263,14 @@
                     baseScale = 1.0 - zoomProgress * 0.3;
                 }
 
-                // Enhanced struggle: strong pulsing + shake
                 let struggle = 0;
-                let shakeX = 0,
-                    shakeY = 0;
                 if (this.isPlaying && mult < 5.0) {
                     this.struggleTime += dt * this.struggleSpeed;
                     const amp = this.struggleAmplitude * (1 - mult / 5.0);
                     struggle = amp * Math.sin(this.struggleTime);
-                    // Shake: quick random offsets
-                    shakeX = (Math.sin(this.struggleTime * 2.3) * 0.03) * (1 - mult / 5.0);
-                    shakeY = (Math.cos(this.struggleTime * 1.7) * 0.03) * (1 - mult / 5.0);
                 } else {
                     this.struggleTime += dt * this.struggleSpeed;
                     struggle = 0;
-                    shakeX = 0;
-                    shakeY = 0;
                 }
 
                 let totalScale = baseScale + struggle;
@@ -3929,11 +4287,8 @@
 
                 if (!this.nftActive) {
                     const overlay = document.getElementById('rocketOverlay');
-                    // Apply shake as translate offset
-                    const translateX = shakeX * 100;
-                    const translateY = shakeY * 100;
                     overlay.style.transform =
-                        `translate(calc(-50% + ${translateX}px), calc(-50% + ${translateY}px)) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
+                        `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
                 }
             },
 
@@ -3941,26 +4296,22 @@
                 const wrap = document.getElementById('progressWrap');
                 const fill = document.getElementById('progressFill');
                 const mult = this.multiplier;
-                const targetWidth = (mult > 1.0 && this.isPlaying && !this.hasCashedOut) ?
-                    Math.min(100, ((mult - 1.0) / (this.maxMultiplierForLine - 1.0)) * 100) :
-                    (this.gameOver && this.multiplier > 0) ?
-                    Math.min(100, ((this.multiplier - 1.0) / (this.maxMultiplierForLine - 1.0)) * 100) :
-                    0;
-
-                const speed = 0.15;
-                this.smoothFill += (targetWidth - this.smoothFill) * speed;
-                const currentWidth = this.smoothFill;
-
-                if (targetWidth > 0 || this.gameOver) {
+                if (mult > 1.0 && this.isPlaying && !this.hasCashedOut) {
                     wrap.classList.add('active');
-                    fill.style.width = currentWidth + '%';
+                    const progress = (mult - 1.0) / (this.maxMultiplierForLine - 1.0);
+                    fill.style.width = Math.min(100, progress * 100) + '%';
                     let color;
                     if (mult < 2.0) color = '#00d2a0';
                     else if (mult < 3.0) color = '#54a0ff';
                     else color = '#a29bfe';
-                    if (this.gameOver) color = '#ff6b6b';
                     fill.style.background = color;
                     fill.style.boxShadow = `0 0 16px ${color}50`;
+                } else if (this.gameOver && this.multiplier > 0) {
+                    wrap.classList.add('active');
+                    const progress = (this.multiplier - 1.0) / (this.maxMultiplierForLine - 1.0);
+                    fill.style.width = Math.min(100, progress * 100) + '%';
+                    fill.style.background = '#ff6b6b';
+                    fill.style.boxShadow = '0 0 24px rgba(255,107,107,0.5)';
                 } else {
                     wrap.classList.remove('active');
                     fill.style.width = '0%';
@@ -3997,8 +4348,8 @@
                 document.getElementById('rocketOverlay').classList.remove('nft-active');
                 this.setBetType('stars');
                 this.populateNftGrid();
+                this.updateNftMilestones(0);
                 this.struggleTime = 0;
-                this.smoothFill = 0;
             },
 
             createGrid() {
@@ -4031,23 +4382,22 @@
                     this.updateProgressLine();
                     this.updateRotationAndZoom();
                     this.updateMoon(m);
+                    this.updateMilestoneStates(m);
                     const winAmount = Math.floor(this.bet * this.multiplier);
                     this.updateNftOverlay(winAmount);
                     updateLiveData();
                 } else if (this.gameOver) {
                     this.updateMainButton();
                     this.updateProgressLine();
+                    this.updateMilestoneStates(this.multiplier);
                     updateLiveData();
                     document.getElementById('moonOverlay').classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
                     document.getElementById('crashNftOverlay').classList.remove('show');
                     document.getElementById('rocketOverlay').classList.remove('nft-active');
-                    // Reset rocket transform
-                    const overlay = document.getElementById('rocketOverlay');
-                    overlay.style.transform = `translate(-50%, -50%) rotate(0deg) scale(1)`;
                 } else {
-                    this.updateProgressLine();
+                    this.updateMilestoneStates(1.0);
                 }
             },
 
@@ -4273,6 +4623,7 @@
                     renderPlayers();
                     this.updateMainButton();
                     document.getElementById('betInputRow').classList.remove('open');
+                    this.updateNftMilestones(this.bet);
                     return;
                 }
 
@@ -4316,6 +4667,7 @@
                     document.getElementById('crashNftIndicator'),
                     null
                 );
+                this.updateNftMilestones(bet);
             },
 
             initiateCashOut() {
@@ -4380,6 +4732,7 @@
                     document.getElementById('crashNftIndicator'),
                     null
                 );
+                this.updateNftMilestones(0);
             },
 
             startCountdown() {
@@ -4563,6 +4916,7 @@
                         document.getElementById('crashNftIndicator'),
                         null
                     );
+                    this.updateNftMilestones(0);
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -4608,7 +4962,7 @@
         };
 
         // ============================================================
-        // MINES GAME (unchanged)
+        // MINES GAME
         // ============================================================
         const minesGame = {
             gridSize: 3,
@@ -5067,7 +5421,7 @@
         };
 
         // ============================================================
-        // BOUNCE GAME – NO BOMBS, NO PROGRESS LINE
+        // BOUNCE GAME
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5102,12 +5456,45 @@
             accumulator: 0,
             fixedStep: 1 / 60,
             lastFrameTime: 0,
+            tnts: [],
+            tntRadius: 12,
+            tntExplosionRadius: 60,
 
             playHitSound() { playBeep(600, 0.06, 0.2); },
             playBreakSound() { playBeep(1000, 0.1, 0.35); },
             playWinSound() { playBeep(800, 0.15, 0.3);
                 playBeep(1000, 0.15, 0.3); },
             playLoseSound() { playBeep(400, 0.2, 0.3); },
+
+            generateTnts() {
+                this.tnts = [];
+                const count = Math.floor(Math.random() * 4);
+                if (count === 0) return;
+                const w = this.width - 20 - this.borderWidth * 2 - 20;
+                const h = this.height - 20 - this.borderWidth * 2 - 20;
+                const cx = this.width / 2;
+                const cy = this.height / 2;
+                for (let i = 0; i < count; i++) {
+                    let attempts = 0;
+                    let pos;
+                    let ok;
+                    do {
+                        const x = cx - w / 2 + 20 + Math.random() * (w - 40);
+                        const y = cy - h / 2 + 20 + Math.random() * (h - 40);
+                        pos = { x, y };
+                        ok = true;
+                        const distFromCenter = Math.hypot(x - cx, y - cy);
+                        if (distFromCenter < 60) ok = false;
+                        for (const t of this.tnts) {
+                            if (Math.hypot(x - t.x, y - t.y) < this.tntRadius * 3) ok = false;
+                        }
+                        attempts++;
+                    } while (!ok && attempts < 50);
+                    if (ok) {
+                        this.tnts.push({ x: pos.x, y: pos.y, exploded: false });
+                    }
+                }
+            },
 
             updateNftOverlay() {
                 if (!this.isPlaying || this.gameOver) {
@@ -5153,6 +5540,7 @@
                 this.isLossBall = false;
 
                 this.generateSegments();
+                this.generateTnts();
                 this.resetCircle();
                 this.draw();
                 document.getElementById('bounceBalance').innerHTML =
@@ -5315,7 +5703,7 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                const speed = 260 + Math.random() * 80;
+                const speed = 250 + Math.random() * 100;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
                 document.getElementById('bounceStartBtn').textContent = 'Playing...';
@@ -5353,6 +5741,7 @@
                 document.getElementById('bounceNftImg').className = 'hidden-img';
 
                 this.generateSegments();
+                this.generateTnts();
                 this.resetCircle();
                 this.draw();
                 updateHomeUI();
@@ -5443,7 +5832,35 @@
                     this.ballElement.style.top = percentY + '%';
                 }
 
-                // Segment collisions
+                for (let i = this.tnts.length - 1; i >= 0; i--) {
+                    const tnt = this.tnts[i];
+                    if (tnt.exploded) continue;
+                    const dist = Math.hypot(this.circle.x - tnt.x, this.circle.y - tnt.y);
+                    if (dist < this.circle.radius + this.tntRadius) {
+                        tnt.exploded = true;
+                        const speed = Math.hypot(this.circle.vx, this.circle.vy);
+                        const newSpeed = speed * 1.6 + 100;
+                        const angle = Math.atan2(this.circle.vy, this.circle.vx);
+                        this.circle.vx = Math.cos(angle) * newSpeed;
+                        this.circle.vy = Math.sin(angle) * newSpeed;
+                        const explosionRadius = this.tntExplosionRadius;
+                        for (const seg of this.segments) {
+                            if (seg.broken) continue;
+                            const midX = (seg.x1 + seg.x2) / 2;
+                            const midY = (seg.y1 + seg.y2) / 2;
+                            if (Math.hypot(midX - tnt.x, midY - tnt.y) < explosionRadius) {
+                                seg.broken = true;
+                                this.totalMultiplier += seg.multiplier * 0.5;
+                                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+                                this.createFloatingTextFromPoint(seg, tnt.x, tnt.y);
+                            }
+                        }
+                        triggerVibration(100, 'heavy');
+                        playBeep(150, 0.3, 0.5);
+                        this.tnts.splice(i, 1);
+                    }
+                }
+
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const dist = this.distToSegment(this.circle.x, this.circle.y, seg.x1, seg.y1, seg.x2, seg.y2);
@@ -5485,6 +5902,13 @@
                     this.endGame(true);
                     return;
                 }
+            },
+
+            createFloatingTextFromPoint(seg, x, y) {
+                const mult = seg.multiplier;
+                const sign = mult >= 0 ? '+' : '';
+                this.floatingTexts.push({ x: x, y: y, text: `${sign}${mult.toFixed(2)}x`, life: 1.2, maxLife: 1.2,
+                    scale: 1.0 });
             },
 
             createFloatingText(seg) {
@@ -5657,6 +6081,38 @@
                     ctx.stroke();
                 }
 
+                for (const tnt of this.tnts) {
+                    if (tnt.exploded) continue;
+                    ctx.beginPath();
+                    ctx.arc(tnt.x, tnt.y, this.tntRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#cc0000';
+                    ctx.shadowColor = 'rgba(255,0,0,0.3)';
+                    ctx.shadowBlur = 10;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.beginPath();
+                    ctx.moveTo(tnt.x + this.tntRadius * 0.6, tnt.y - this.tntRadius * 0.6);
+                    ctx.lineTo(tnt.x + this.tntRadius * 0.9, tnt.y - this.tntRadius * 1.2);
+                    ctx.strokeStyle = '#ffaa00';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(tnt.x + this.tntRadius * 0.9, tnt.y - this.tntRadius * 1.2, 3, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ff8800';
+                    ctx.shadowColor = 'rgba(255,136,0,0.5)';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.beginPath();
+                    ctx.moveTo(tnt.x - 4, tnt.y);
+                    ctx.lineTo(tnt.x + 4, tnt.y);
+                    ctx.moveTo(tnt.x, tnt.y - 4);
+                    ctx.lineTo(tnt.x, tnt.y + 4);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
                 for (let ft of this.floatingTexts) {
                     const alpha = Math.min(1, ft.life / 0.3);
                     const scale = ft.scale;
@@ -5710,7 +6166,7 @@
         };
 
         // ============================================================
-        // INVENTORY, UPGRADE (unchanged)
+        // INVENTORY, UPGRADE
         // ============================================================
         function sellNFT(index) {
             const nft = state.inventory[index];
@@ -5729,7 +6185,10 @@
             upgradeGame.fromNftId = nftId;
             upgradeGame.toNftId = null;
             navigateTo('upgrade');
-            updateUpgradeSelectors();
+            setTimeout(() => {
+                updateUpgradeSelectors();
+                upgradeGame.init();
+            }, 100);
         }
 
         function renderInventory() {
@@ -5757,7 +6216,7 @@
             }
         }
 
-        // ===== UPGRADE GAME =====
+        // ===== UPGRADE GAME – with pattern on wheel =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -5836,9 +6295,12 @@
             if (upgradeGame.locked) return;
             activeSelectionType = type;
             let eligible;
+            const overlayTitle = document.getElementById('nftOverlayTitle');
             if (type === 'from') {
+                overlayTitle.textContent = 'Select Your NFT';
                 eligible = state.inventory.slice();
             } else {
+                overlayTitle.textContent = 'Select Desired NFT';
                 if (!upgradeGame.fromNftId) {
                     alert('Select your NFT first.');
                     return;
@@ -5849,13 +6311,14 @@
             const grid = document.getElementById('nftSelectionGrid');
             const overlay = document.getElementById('nftSelectionOverlay');
             if (eligible.length === 0) {
-                alert('No eligible NFTs.');
+                alert(type === 'from' ? 'No NFTs in inventory.' : 'No higher-value NFTs available.');
                 return;
             }
             grid.innerHTML = eligible.map(nft => `
             <div class="nft-selection-item" onclick="selectNft('${nft.id}', '${type}')">
                 <img src="${nft.gif}" alt="${nft.name}" decoding="async">
                 <div class="name">${nft.name}</div>
+                <div class="price">${starImg('star-icon-xs')} ${nft.price}</div>
             </div>
         `).join('');
             overlay.classList.add('active');
@@ -5874,6 +6337,8 @@
             }
             closeNftSelection();
             updateUpgradeSelectors();
+            // Re-draw wheel after selection
+            setTimeout(() => { upgradeGame.init(); }, 50);
         }
 
         function closeNftSelection() {
@@ -5897,33 +6362,58 @@
 
             init() {
                 this.ctx = this.canvas.getContext('2d');
+                // Ensure canvas size matches CSS
+                const rect = this.canvas.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    this.canvas.width = rect.width * (window.devicePixelRatio || 1);
+                    this.canvas.height = rect.height * (window.devicePixelRatio || 1);
+                    // Scale the context
+                    this.ctx.scale(this.canvas.width / 400, this.canvas.height / 400);
+                } else {
+                    this.canvas.width = 400;
+                    this.canvas.height = 400;
+                }
                 this.drawWheelAndArrow(this.arrowAngle);
             },
 
             drawWheelAndArrow(arrowAngle) {
                 const ctx = this.ctx;
-                const w = this.canvas.width;
-                const h = this.canvas.height;
+                const w = 400,
+                    h = 400;
                 const cx = w / 2,
                     cy = h / 2;
-                const outerR = 120;
-                const innerR = 52;
+                const outerR = 170;
+                const innerR = 70;
+                const centerR = 34;
 
                 ctx.clearRect(0, 0, w, h);
 
+                // --- Background glow ---
+                const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, outerR + 20);
+                grad.addColorStop(0, 'rgba(0,210,160,0.02)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, outerR + 20, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // --- Main pie chart (green/red) ---
                 const greenAngle = this.chance * 2 * Math.PI;
                 const startAngle = -Math.PI / 2;
 
+                // Green section
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
                 ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
                 ctx.closePath();
                 const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                 greenGrad.addColorStop(0, '#00e676');
+                greenGrad.addColorStop(0.5, '#00c853');
                 greenGrad.addColorStop(1, '#009624');
                 ctx.fillStyle = greenGrad;
                 ctx.fill();
 
+                // Red section
                 if (greenAngle < 2 * Math.PI) {
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
@@ -5931,27 +6421,147 @@
                     ctx.closePath();
                     const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
                     redGrad.addColorStop(0, '#ff5252');
+                    redGrad.addColorStop(0.5, '#d32f2f');
                     redGrad.addColorStop(1, '#b71c1c');
                     ctx.fillStyle = redGrad;
                     ctx.fill();
                 }
 
+                // --- PATTERN: segmented ring with alternating colors (dartboard style) ---
+                const numSegments = 24;
+                const segAngle = (2 * Math.PI) / numSegments;
+                const ringOuter = outerR - 4;
+                const ringInner = innerR + 4;
+                const ringWidth = ringOuter - ringInner;
+
+                for (let i = 0; i < numSegments; i++) {
+                    const a1 = -Math.PI / 2 + i * segAngle;
+                    const a2 = a1 + segAngle;
+                    // Alternate colors: dark and light
+                    const isDark = i % 2 === 0;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, ringOuter, a1, a2);
+                    ctx.arc(cx, cy, ringInner, a2, a1, true);
+                    ctx.closePath();
+                    ctx.fillStyle = isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.06)';
+                    ctx.fill();
+                    // Add subtle border
+                    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+
+                // --- Inner ring pattern: dotted circle ---
+                const dotCount = 36;
+                const dotRadius = 3;
+                const dotDist = innerR + 6;
+                for (let i = 0; i < dotCount; i++) {
+                    const angle = -Math.PI / 2 + (i / dotCount) * 2 * Math.PI;
+                    const dx = cx + dotDist * Math.cos(angle);
+                    const dy = cy + dotDist * Math.sin(angle);
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, dotRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = i % 2 === 0 ? 'rgba(255,215,0,0.2)' : 'rgba(255,255,255,0.08)';
+                    ctx.fill();
+                }
+
+                // --- Outer decorative dots ---
+                const outerDotCount = 48;
+                const outerDotDist = outerR - 4;
+                for (let i = 0; i < outerDotCount; i++) {
+                    const angle = -Math.PI / 2 + (i / outerDotCount) * 2 * Math.PI;
+                    const dx = cx + outerDotDist * Math.cos(angle);
+                    const dy = cy + outerDotDist * Math.sin(angle);
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, 2, 0, 2 * Math.PI);
+                    ctx.fillStyle = i % 3 === 0 ? 'rgba(255,215,0,0.12)' : 'rgba(255,255,255,0.04)';
+                    ctx.fill();
+                }
+
+                // --- Inner glow ring ---
+                const innerGlow = ctx.createRadialGradient(cx, cy, innerR - 8, cx, cy, innerR + 4);
+                innerGlow.addColorStop(0, 'rgba(0,0,0,0)');
+                innerGlow.addColorStop(0.5, 'rgba(255,215,0,0.02)');
+                innerGlow.addColorStop(1, 'rgba(255,215,0,0.06)');
+                ctx.beginPath();
+                ctx.arc(cx, cy, innerR + 4, 0, 2 * Math.PI);
+                ctx.fillStyle = innerGlow;
+                ctx.fill();
+
+                // --- Outer ring border ---
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                ctx.lineWidth = 0.1;
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
+                ctx.beginPath();
+                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // --- Center circle with shine ---
+                const centerGrad = ctx.createRadialGradient(cx - 6, cy - 6, 2, cx, cy, centerR);
+                centerGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
+                centerGrad.addColorStop(0.5, 'rgba(0,210,160,0.08)');
+                centerGrad.addColorStop(1, 'rgba(0,0,0,0.2)');
+                ctx.beginPath();
+                ctx.arc(cx, cy, centerR, 0, 2 * Math.PI);
+                ctx.fillStyle = centerGrad;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // --- Arrow ---
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
+                // Arrow shaft
                 ctx.beginPath();
-                ctx.moveTo(outerR - 6, 0);
-                ctx.lineTo(outerR + 8, -8);
-                ctx.lineTo(outerR + 8, 8);
+                ctx.moveTo(innerR + 6, 0);
+                ctx.lineTo(outerR - 2, 0);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                ctx.shadowBlur = 12;
+                ctx.stroke();
+                // Arrow head
+                ctx.beginPath();
+                ctx.moveTo(outerR - 2, 0);
+                ctx.lineTo(outerR - 14, -10);
+                ctx.lineTo(outerR - 14, 10);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(255,255,255,0.4)';
+                ctx.shadowBlur = 16;
                 ctx.fill();
+                // Glow dot at base
+                ctx.beginPath();
+                ctx.arc(innerR + 4, 0, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255,215,0,0.3)';
+                ctx.shadowColor = 'rgba(255,215,0,0.3)';
+                ctx.shadowBlur = 20;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.restore();
+
+                // --- Percentage label in center ---
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const pct = Math.round(this.chance * 100);
+                ctx.font = 'bold 26px -apple-system, sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = 10;
+                ctx.fillText(pct + '%', cx, cy - 4);
+                ctx.font = '10px -apple-system, sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.shadowBlur = 4;
+                ctx.fillText('CHANCE', cx, cy + 22);
+                ctx.shadowBlur = 0;
                 ctx.restore();
             },
 
@@ -5994,7 +6604,7 @@
                 setUpgradeLocked(true);
                 document.getElementById('upgradeBtn').disabled = true;
                 const wheelContainer = document.getElementById('wheelContainer');
-                wheelContainer.style.filter = 'drop-shadow(0 0 15px rgba(0,210,160,0.6))';
+                wheelContainer.style.filter = 'drop-shadow(0 0 20px rgba(0,210,160,0.5))';
 
                 this.lastTickAngle = this.arrowAngle;
 
@@ -6006,7 +6616,7 @@
                         this.startSpin();
                         return;
                     }
-                    this.arrowAngle += (Math.random() - 0.5) * 0.2;
+                    this.arrowAngle += (Math.random() - 0.5) * 0.25;
                     this.drawWheelAndArrow(this.arrowAngle);
                     playTick(0.2, 600 + Math.random() * 200);
                     tensionCount++;
@@ -6046,7 +6656,7 @@
 
                     const glowIntensity = 0.3 + 0.7 * (1 - Math.abs(0.5 - t) * 2);
                     document.getElementById('wheelContainer').style.filter =
-                        `drop-shadow(0 0 ${20 + glowIntensity * 30}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.15})`;
+                        `drop-shadow(0 0 ${20 + glowIntensity * 40}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.12})`;
 
                     if (t < 1) {
                         requestAnimationFrame(animateSpin);
@@ -6061,10 +6671,10 @@
 
                         const container = document.getElementById('wheelContainer');
                         if (isGreen) {
-                            container.style.filter = 'drop-shadow(0 0 50px rgba(0,210,160,1)) brightness(1.4)';
+                            container.style.filter = 'drop-shadow(0 0 60px rgba(0,210,160,1)) brightness(1.5)';
                             setTimeout(() => container.style.filter = 'none', 500);
                         } else {
-                            container.style.filter = 'drop-shadow(0 0 50px rgba(255,80,80,1)) brightness(0.8)';
+                            container.style.filter = 'drop-shadow(0 0 60px rgba(255,80,80,1)) brightness(0.7)';
                             setTimeout(() => container.style.filter = 'none', 500);
                         }
 
@@ -6136,8 +6746,14 @@
             const toName = document.getElementById('toNftName');
             const fromPrice = document.getElementById('fromPriceDisplay');
             const toPrice = document.getElementById('toPriceDisplay');
+            const fromBadge = document.getElementById('fromBadge');
+            const toBadge = document.getElementById('toBadge');
             const upgradeBtn = document.getElementById('upgradeBtn');
             const upgradeBtnText = document.getElementById('upgradeBtnText');
+            const upgradePct = document.getElementById('upgradePct');
+
+            const fromSelector = document.getElementById('upgradeFromSelector');
+            const toSelector = document.getElementById('upgradeToSelector');
 
             if (upgradeGame.fromNftId) {
                 const nft = NFT_DB[upgradeGame.fromNftId];
@@ -6147,12 +6763,16 @@
                 fromName.textContent = nft.name;
                 fromPrice.innerHTML =
                 `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
+                fromBadge.textContent = '⬇ ' + nft.name;
+                fromSelector.classList.add('has-value');
             } else {
                 fromImg.style.display = 'none';
                 fromPlaceholder.style.display = 'block';
                 fromName.textContent = 'Your NFT';
                 fromPrice.innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
+                fromBadge.textContent = '⬇ Your NFT';
+                fromSelector.classList.remove('has-value');
             }
 
             if (upgradeGame.toNftId) {
@@ -6163,6 +6783,8 @@
                 toName.textContent = nft.name;
                 toPrice.innerHTML =
                 `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
+                toBadge.textContent = '⬆ ' + nft.name;
+                toSelector.classList.add('has-value');
                 document.getElementById('wheelCenterNft').src = nft.gif;
                 document.getElementById('wheelCenterNft').style.display = 'block';
             } else {
@@ -6171,6 +6793,8 @@
                 toName.textContent = 'Desired NFT';
                 toPrice.innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
+                toBadge.textContent = '⬆ Desired';
+                toSelector.classList.remove('has-value');
                 document.getElementById('wheelCenterNft').style.display = 'none';
             }
 
@@ -6183,14 +6807,20 @@
                 const multiplier = NFT_DB[upgradeGame.toNftId].price / NFT_DB[upgradeGame.fromNftId].price;
                 let newChance = 1 / multiplier;
                 newChance = Math.min(0.95, Math.max(0.05, newChance));
-                upgradeBtnText.textContent = `Upgrade (${Math.round(newChance * 100)}%)`;
+                upgradeBtnText.textContent = 'Upgrade';
+                upgradePct.textContent = Math.round(newChance * 100) + '%';
                 upgradeGame.animateToChance(newChance);
+                upgradeBtn.disabled = false;
             } else {
                 upgradeGame.animateToChance(1.0);
-                upgradeBtnText.textContent = 'Upgrade';
+                upgradeBtnText.textContent = validFrom && !validTo ? 'Select Desired' : 'Upgrade';
+                upgradePct.textContent = '—';
+                upgradeBtn.disabled = true;
             }
 
-            upgradeBtn.disabled = !(validFrom && validTo && fromOwned && !upgradeGame.spinning);
+            if (upgradeGame.spinning) {
+                upgradeBtn.disabled = true;
+            }
         }
 
         function spinUpgrade() {
@@ -6227,7 +6857,24 @@
                     if (!crashGame.isPlaying && !crashGame.isCountingDown && !crashGame.gameOver) crashGame
                         .startGameCycle();
                 }
+                // Re-draw upgrade wheel on visibility change
+                if (document.getElementById('page-upgrade').classList.contains('active')) {
+                    setTimeout(() => upgradeGame.init(), 50);
+                }
             }
+        });
+
+        // ============================================================
+        // WINDOW RESIZE – re-draw upgrade wheel
+        // ============================================================
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (document.getElementById('page-upgrade').classList.contains('active')) {
+                    upgradeGame.init();
+                }
+            }, 200);
         });
 
         // ============================================================
@@ -6257,15 +6904,18 @@
             crashGame.init();
             minesGame.init();
             minesGame.setGridSize(3, 1);
-            upgradeGame.init();
             renderInventory();
-            updateUpgradeSelectors();
+            // Init upgrade after a small delay to ensure layout
+            setTimeout(() => {
+                upgradeGame.init();
+                updateUpgradeSelectors();
+            }, 100);
 
             if (document.getElementById('page-rocket').classList.contains('active')) {
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – crash rocket enhanced, bounce clean, no bombs, no arrow.');
+            console.log('✅ Casino loaded – Upgrade full-screen with pattern, bigger squares.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
