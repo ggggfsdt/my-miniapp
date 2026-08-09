@@ -672,6 +672,82 @@
             display: block;
         }
 
+        /* ===== BOUNCE PROGRESS LINE (under grid) ===== */
+        #bounceProgressLine {
+            position: relative;
+            width: 100%;
+            height: 32px;
+            margin: 6px 0 4px 0;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            overflow: visible;
+            display: none;
+            align-items: center;
+        }
+        #bounceProgressLine.active {
+            display: flex;
+        }
+        #bounceProgressLine .line-track {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: visible;
+            margin: 0 8px;
+        }
+        #bounceProgressLine .line-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            background: #00d2a0;
+            transition: none;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
+        }
+        .bounce-nft-milestone {
+            position: absolute;
+            top: -18px;
+            transform: translateX(-50%) scale(0.6);
+            z-index: 12;
+            width: 28px;
+            height: 28px;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.5;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+        .bounce-nft-milestone img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+        }
+        .bounce-nft-milestone.reached {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.4);
+            z-index: 13;
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+        }
+        .bounce-arrow {
+            position: absolute;
+            top: -26px;
+            transform: translateX(-50%);
+            z-index: 14;
+            font-size: 18px;
+            color: #ffffff;
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+            pointer-events: none;
+            transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-shadow: 0 0 8px rgba(255,255,255,0.2);
+        }
+        .bounce-arrow i {
+            display: block;
+        }
+
         /* ===== PROFILE & SETTINGS ===== */
         .profile-header {
             text-align: center;
@@ -1189,7 +1265,7 @@
             filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.6));
         }
 
-        /* ===== ARROW POINTER FOR NEXT NFT ===== */
+        /* ===== ARROW POINTER FOR NEXT NFT (crash) ===== */
         .nft-arrow {
             position: absolute;
             top: -30px;
@@ -2662,6 +2738,18 @@
                 top: -28px;
                 font-size: 16px;
             }
+            #bounceProgressLine {
+                height: 28px;
+            }
+            .bounce-nft-milestone {
+                width: 24px;
+                height: 24px;
+                top: -16px;
+            }
+            .bounce-arrow {
+                top: -22px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -2967,6 +3055,13 @@
             <div class="bounce-info">
                 <span>Multiplier: <span class="multiplier" id="bounceMultiplier">0.20</span>x</span>
                 <span>Bet: <span id="bounceBetDisplay">10</span>⭐</span>
+            </div>
+            <!-- BOUNCE PROGRESS LINE -->
+            <div id="bounceProgressLine">
+                <div class="line-track" id="bounceLineTrack">
+                    <div class="line-fill" id="bounceLineFill"></div>
+                    <div class="bounce-arrow" id="bounceArrow"><i class="fas fa-arrow-down"></i></div>
+                </div>
             </div>
             <div class="bounce-controls">
                 <input type="number" id="bounceBetInput" value="10" min="1" step="1">
@@ -5223,7 +5318,7 @@
         };
 
         // ============================================================
-        // BOUNCE GAME – with TNTs, temporary speed boost, particles
+        // BOUNCE GAME – with TNTs (gentle knock) and progress line with arrow
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5263,6 +5358,7 @@
             tntRadius: 12,
             tntExplosionRadius: 60,
             particles: [],
+            // speed boost timer for gentle knock
             speedBoostTimer: 0,
             speedBoostMultiplier: 1.0,
 
@@ -5300,6 +5396,120 @@
                         this.tnts.push({x: pos.x, y: pos.y, exploded: false});
                     }
                 }
+            },
+
+            updateBounceProgressLine() {
+                // Update the progress line under the grid
+                const container = document.getElementById('bounceProgressLine');
+                const fill = document.getElementById('bounceLineFill');
+                const track = document.getElementById('bounceLineTrack');
+                const arrow = document.getElementById('bounceArrow');
+
+                // Remove old markers
+                const oldMarkers = track.querySelectorAll('.bounce-nft-milestone');
+                oldMarkers.forEach(el => el.remove());
+
+                if (!this.isPlaying || this.bet <= 0) {
+                    container.classList.remove('active');
+                    return;
+                }
+
+                const currentWin = this.bet * this.totalMultiplier;
+                const maxMult = 10.0; // max multiplier for display
+                const minMult = 1.0;
+
+                // Determine bet image
+                let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
+                // In bounce, we don't have betType, we just show star always? But we can use the same logic: if state has inventory? We'll just use star for simplicity.
+                // But we can check if we have a bet NFT? Not applicable in bounce. So we use star.
+
+                // First marker at 1x (start)
+                const firstMarker = document.createElement('div');
+                firstMarker.className = 'bounce-nft-milestone';
+                firstMarker.dataset.mult = 1.0;
+                firstMarker.style.left = '0%';
+                const img = document.createElement('img');
+                img.src = betImage;
+                img.alt = 'bet';
+                firstMarker.appendChild(img);
+                track.appendChild(firstMarker);
+
+                // Reachable NFTs based on maxMult and currentWin
+                const reachable = SORTED_NFTS.filter(nft => (nft.price / this.bet) <= maxMult);
+                if (reachable.length === 0) {
+                    container.classList.remove('active');
+                    return;
+                }
+
+                // Select up to 4 additional milestones
+                let selected = [];
+                if (reachable.length <= 4) {
+                    selected = reachable;
+                } else {
+                    const first = reachable[0];
+                    const last = reachable[reachable.length - 1];
+                    const mid1 = reachable[Math.floor(reachable.length / 3)];
+                    const mid2 = reachable[Math.floor(2 * reachable.length / 3)];
+                    const set = new Set([first.id, mid1.id, mid2.id, last.id]);
+                    selected = reachable.filter(n => set.has(n.id));
+                    selected.sort((a, b) => a.price - b.price);
+                }
+
+                selected.forEach((nft) => {
+                    const requiredMult = nft.price / this.bet;
+                    if (requiredMult <= minMult) return;
+                    const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
+                    const marker = document.createElement('div');
+                    marker.className = 'bounce-nft-milestone';
+                    marker.dataset.mult = requiredMult;
+                    marker.style.left = pct + '%';
+                    const img2 = document.createElement('img');
+                    img2.src = nft.gif;
+                    img2.alt = nft.name;
+                    marker.appendChild(img2);
+                    track.appendChild(marker);
+                });
+
+                // Update fill and arrow
+                const targetWidth = Math.min(100, ((this.totalMultiplier - minMult) / (maxMult - minMult)) * 100);
+                fill.style.width = targetWidth + '%';
+                // Color based on multiplier
+                let color = '#00d2a0';
+                if (this.totalMultiplier >= 3.0) color = '#54a0ff';
+                if (this.totalMultiplier >= 5.0) color = '#a29bfe';
+                if (this.totalMultiplier >= 8.0) color = '#ffd700';
+                fill.style.background = color;
+
+                // Find next milestone (the one just above current multiplier)
+                let next = null;
+                let nextMult = Infinity;
+                const markers = track.querySelectorAll('.bounce-nft-milestone');
+                markers.forEach(marker => {
+                    const mMult = parseFloat(marker.dataset.mult);
+                    if (mMult > this.totalMultiplier && mMult < nextMult) {
+                        nextMult = mMult;
+                        next = marker;
+                    }
+                });
+                if (next) {
+                    const leftPct = parseFloat(next.style.left) || 0;
+                    arrow.style.left = leftPct + '%';
+                    arrow.style.display = 'block';
+                } else {
+                    arrow.style.display = 'none';
+                }
+
+                container.classList.add('active');
+
+                // Update reached state for markers
+                markers.forEach(marker => {
+                    const mMult = parseFloat(marker.dataset.mult);
+                    if (mMult <= this.totalMultiplier) {
+                        marker.classList.add('reached');
+                    } else {
+                        marker.classList.remove('reached');
+                    }
+                });
             },
 
             updateNftOverlay() {
@@ -5369,6 +5579,8 @@
                     this.launchTimeout = null;
                 }
                 document.getElementById('bounceNftOverlay').classList.remove('show');
+                // Hide progress line
+                document.getElementById('bounceProgressLine').classList.remove('active');
             },
 
             getRoundedRectPoints(cx, cy, w, h, r, n) {
@@ -5603,6 +5815,7 @@
                 }
 
                 this.updateNftOverlay();
+                this.updateBounceProgressLine();
 
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
@@ -5668,21 +5881,25 @@
                     this.ballElement.style.top = percentY + '%';
                 }
 
+                // TNT collision – gentle knock
                 for (let i = this.tnts.length - 1; i >= 0; i--) {
                     const tnt = this.tnts[i];
                     if (tnt.exploded) continue;
                     const dist = Math.hypot(this.circle.x - tnt.x, this.circle.y - tnt.y);
                     if (dist < this.circle.radius + this.tntRadius) {
                         tnt.exploded = true;
-                        // Speed boost for 0.5 seconds, moderate
-                        this.speedBoostTimer = 0.5;
-                        this.speedBoostMultiplier = 1.3;
-                        // Slight kick
+                        // Gentle knock: increase speed by a small amount + random direction change
                         const speed = Math.hypot(this.circle.vx, this.circle.vy);
-                        const newSpeed = Math.min(speed + 80, 600);
-                        const angle = Math.atan2(this.circle.vy, this.circle.vx);
+                        // add a small impulse (20-30)
+                        const newSpeed = speed + 20 + Math.random() * 20;
+                        // slightly randomize angle
+                        const angle = Math.atan2(this.circle.vy, this.circle.vx) + (Math.random() - 0.5) * 0.4;
                         this.circle.vx = Math.cos(angle) * newSpeed;
                         this.circle.vy = Math.sin(angle) * newSpeed;
+
+                        // Short speed boost multiplier (1.1x for 0.3s)
+                        this.speedBoostTimer = 0.3;
+                        this.speedBoostMultiplier = 1.1;
 
                         // Particles
                         const numParticles = 20;
@@ -5701,6 +5918,7 @@
                             });
                         }
 
+                        // Remove nearby segments (same as before)
                         const explosionRadius = this.tntExplosionRadius;
                         for (const seg of this.segments) {
                             if (seg.broken) continue;
@@ -5719,6 +5937,7 @@
                     }
                 }
 
+                // Segment collisions
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const dist = this.distToSegment(this.circle.x, this.circle.y, seg.x1, seg.y1, seg.x2, seg.y2);
@@ -5826,6 +6045,7 @@
                 document.getElementById('bounceStartBtn').disabled = false;
 
                 document.getElementById('bounceNftOverlay').classList.remove('show');
+                document.getElementById('bounceProgressLine').classList.remove('active');
 
                 const resultEl = document.getElementById('bounceResult');
                 resultEl.style.display = 'block';
@@ -6592,7 +6812,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – crash restored, bounce TNT fixed, arrow visible.');
+            console.log('✅ Casino loaded – crash restored, bounce TNT gentle knock, bounce arrow added.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
