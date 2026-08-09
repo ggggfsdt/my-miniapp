@@ -672,82 +672,6 @@
             display: block;
         }
 
-        /* ===== BOUNCE PROGRESS LINE (under grid) ===== */
-        #bounceProgressLine {
-            position: relative;
-            width: 100%;
-            height: 32px;
-            margin: 6px 0 4px 0;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            overflow: visible;
-            display: none;
-            align-items: center;
-        }
-        #bounceProgressLine.active {
-            display: flex;
-        }
-        #bounceProgressLine .line-track {
-            position: relative;
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
-            background: rgba(255, 255, 255, 0.08);
-            overflow: visible;
-            margin: 0 8px;
-        }
-        #bounceProgressLine .line-fill {
-            height: 100%;
-            width: 0%;
-            border-radius: 2px;
-            background: #00d2a0;
-            transition: none;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
-        }
-        .bounce-nft-milestone {
-            position: absolute;
-            top: -18px;
-            transform: translateX(-50%) scale(0.6);
-            z-index: 12;
-            width: 28px;
-            height: 28px;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0.5;
-            pointer-events: none;
-            will-change: transform, opacity;
-        }
-        .bounce-nft-milestone img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
-        }
-        .bounce-nft-milestone.reached {
-            opacity: 1;
-            transform: translateX(-50%) scale(1.4);
-            z-index: 13;
-            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
-        }
-        .bounce-arrow {
-            position: absolute;
-            top: -26px;
-            transform: translateX(-50%);
-            z-index: 14;
-            font-size: 18px;
-            color: #ffffff;
-            filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
-            pointer-events: none;
-            transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-shadow: 0 0 8px rgba(255,255,255,0.2);
-        }
-        .bounce-arrow i {
-            display: block;
-        }
-
         /* ===== PROFILE & SETTINGS ===== */
         .profile-header {
             text-align: center;
@@ -1236,50 +1160,6 @@
             box-shadow: 0 0 16px rgba(0, 210, 160, 0.2);
             position: relative;
             z-index: 1;
-        }
-
-        /* ===== NFT MILESTONE – just an image, no circles, with pop animation ===== */
-        .nft-milestone {
-            position: absolute;
-            top: -22px;
-            transform: translateX(-50%) scale(0.6);
-            z-index: 12;
-            width: 30px;
-            height: 30px;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0.5;
-            pointer-events: none;
-            will-change: transform, opacity;
-        }
-        .nft-milestone img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
-        }
-        .nft-milestone.reached {
-            opacity: 1;
-            transform: translateX(-50%) scale(1.5);
-            z-index: 13;
-            filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.6));
-        }
-
-        /* ===== ARROW POINTER FOR NEXT NFT (crash) ===== */
-        .nft-arrow {
-            position: absolute;
-            top: -30px;
-            transform: translateX(-50%);
-            z-index: 14;
-            font-size: 20px;
-            color: #ffd700;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
-            pointer-events: none;
-            transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-        .nft-arrow i {
-            display: block;
         }
 
         /* ===== BET TOGGLE, INPUT, ETC ===== */
@@ -2729,27 +2609,6 @@
             .nft-grid-select .nft-option .nft-price {
                 font-size: 7px;
             }
-            .nft-milestone {
-                width: 26px;
-                height: 26px;
-                top: -18px;
-            }
-            .nft-arrow {
-                top: -28px;
-                font-size: 16px;
-            }
-            #bounceProgressLine {
-                height: 28px;
-            }
-            .bounce-nft-milestone {
-                width: 24px;
-                height: 24px;
-                top: -16px;
-            }
-            .bounce-arrow {
-                top: -22px;
-                font-size: 14px;
-            }
         }
     </style>
 </head>
@@ -2879,11 +2738,9 @@
                     <div class="history-current" id="historyCurrent">1.00<span class="x">x</span></div>
                     <div class="history-past" id="historyPast"></div>
                 </div>
-                <!-- The existing progress line inside grid -->
+                <!-- The existing progress line inside grid (no arrow) -->
                 <div class="progress-wrap" id="progressWrap">
                     <div class="progress-fill" id="progressFill"></div>
-                    <!-- Arrow pointer for next NFT -->
-                    <div class="nft-arrow" id="nftArrow"><i class="fas fa-arrow-down"></i></div>
                 </div>
             </div>
 
@@ -3055,13 +2912,6 @@
             <div class="bounce-info">
                 <span>Multiplier: <span class="multiplier" id="bounceMultiplier">0.20</span>x</span>
                 <span>Bet: <span id="bounceBetDisplay">10</span>⭐</span>
-            </div>
-            <!-- BOUNCE PROGRESS LINE -->
-            <div id="bounceProgressLine">
-                <div class="line-track" id="bounceLineTrack">
-                    <div class="line-fill" id="bounceLineFill"></div>
-                    <div class="bounce-arrow" id="bounceArrow"><i class="fas fa-arrow-down"></i></div>
-                </div>
             </div>
             <div class="bounce-controls">
                 <input type="number" id="bounceBetInput" value="10" min="1" step="1">
@@ -3807,7 +3657,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – FULLY RESTORED
+        // CRASH GAME – with enhanced rocket struggle (no arrow)
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -3839,9 +3689,13 @@
             nftActive: false,
             maxMultiplierForLine: 10.0,
 
+            // Enhanced struggle parameters
             struggleTime: 0,
-            struggleAmplitude: 0.25,
-            struggleSpeed: 14,
+            struggleAmplitude: 0.35, // increased
+            struggleSpeed: 18, // faster
+            // additional shake
+            shakeX: 0,
+            shakeY: 0,
 
             smoothFill: 0,
 
@@ -3894,8 +3748,6 @@
                     document.getElementById('crashNftIndicator'),
                     null
                 );
-                this.updateNftMilestones(0);
-                this.updateArrow(0);
                 this.smoothFill = 0;
             },
 
@@ -3949,116 +3801,6 @@
                     grid.appendChild(div);
                 });
             },
-
-            // ----- NFT Milestones with arrow -----
-            updateNftMilestones(bet) {
-                const progressWrap = document.getElementById('progressWrap');
-                const oldMarkers = progressWrap.querySelectorAll('.nft-milestone');
-                oldMarkers.forEach(el => el.remove());
-
-                if (!bet || bet <= 0) {
-                    return;
-                }
-
-                const maxMult = this.maxMultiplierForLine;
-                const minMult = 1.0;
-
-                let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
-                if (this.betType === 'nft' && this.betNftData) {
-                    betImage = this.betNftData.gif;
-                }
-
-                const firstMarker = document.createElement('div');
-                firstMarker.className = 'nft-milestone';
-                firstMarker.dataset.mult = 1.0;
-                firstMarker.style.left = '0%';
-                const img = document.createElement('img');
-                img.src = betImage;
-                img.alt = 'bet';
-                firstMarker.appendChild(img);
-                progressWrap.appendChild(firstMarker);
-
-                const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
-                if (reachable.length === 0) return;
-
-                let selected = [];
-                if (reachable.length <= 4) {
-                    selected = reachable;
-                } else {
-                    const first = reachable[0];
-                    const last = reachable[reachable.length - 1];
-                    const mid1 = reachable[Math.floor(reachable.length / 3)];
-                    const mid2 = reachable[Math.floor(2 * reachable.length / 3)];
-                    const set = new Set([first.id, mid1.id, mid2.id, last.id]);
-                    selected = reachable.filter(n => set.has(n.id));
-                    selected.sort((a, b) => a.price - b.price);
-                }
-
-                selected.forEach((nft) => {
-                    const requiredMult = nft.price / bet;
-                    if (requiredMult <= minMult) return;
-                    const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
-                    const marker = document.createElement('div');
-                    marker.className = 'nft-milestone';
-                    marker.dataset.mult = requiredMult;
-                    marker.style.left = pct + '%';
-                    const img2 = document.createElement('img');
-                    img2.src = nft.gif;
-                    img2.alt = nft.name;
-                    marker.appendChild(img2);
-                    progressWrap.appendChild(marker);
-                });
-
-                const fill = document.getElementById('progressFill');
-                if (fill) fill.style.zIndex = 1;
-            },
-
-            updateArrow(mult) {
-                const arrow = document.getElementById('nftArrow');
-                if (!arrow) return;
-                const progressWrap = document.getElementById('progressWrap');
-                const markers = progressWrap.querySelectorAll('.nft-milestone');
-                let next = null;
-                let nextMult = Infinity;
-                markers.forEach(marker => {
-                    const mMult = parseFloat(marker.dataset.mult);
-                    if (mMult > mult && mMult < nextMult) {
-                        nextMult = mMult;
-                        next = marker;
-                    }
-                });
-                if (next) {
-                    const leftPct = parseFloat(next.style.left) || 0;
-                    arrow.style.left = leftPct + '%';
-                    arrow.style.display = 'block';
-                } else {
-                    arrow.style.display = 'none';
-                }
-            },
-
-            updateMilestoneStates(mult) {
-                const progressWrap = document.getElementById('progressWrap');
-                const markers = progressWrap.querySelectorAll('.nft-milestone');
-                let highest = null;
-                let highestMult = 1.0;
-                markers.forEach(marker => {
-                    const mMult = parseFloat(marker.dataset.mult);
-                    if (mMult <= mult && mMult >= highestMult) {
-                        highestMult = mMult;
-                        highest = marker;
-                    }
-                });
-                markers.forEach(marker => {
-                    if (marker === highest) {
-                        marker.classList.add('reached');
-                    } else {
-                        marker.classList.remove('reached');
-                    }
-                });
-                this.updateArrow(mult);
-            },
-
-            // ----- end milestone -----
 
             updateMoon(mult) {
                 const moonOverlay = document.getElementById('moonOverlay');
@@ -4134,6 +3876,7 @@
                 img.src = '';
             },
 
+            // Enhanced rocket struggle with shake and strong pulsing
             updateRotationAndZoom() {
                 const effectiveMult = Math.min(this.multiplier, 3.0);
                 this.targetAngle = 12 - (effectiveMult - 1) * 24;
@@ -4154,14 +3897,22 @@
                     baseScale = 1.0 - zoomProgress * 0.3;
                 }
 
+                // Enhanced struggle: strong pulsing + shake
                 let struggle = 0;
+                let shakeX = 0,
+                    shakeY = 0;
                 if (this.isPlaying && mult < 5.0) {
                     this.struggleTime += dt * this.struggleSpeed;
                     const amp = this.struggleAmplitude * (1 - mult / 5.0);
                     struggle = amp * Math.sin(this.struggleTime);
+                    // Shake: quick random offsets
+                    shakeX = (Math.sin(this.struggleTime * 2.3) * 0.03) * (1 - mult / 5.0);
+                    shakeY = (Math.cos(this.struggleTime * 1.7) * 0.03) * (1 - mult / 5.0);
                 } else {
                     this.struggleTime += dt * this.struggleSpeed;
                     struggle = 0;
+                    shakeX = 0;
+                    shakeY = 0;
                 }
 
                 let totalScale = baseScale + struggle;
@@ -4178,8 +3929,11 @@
 
                 if (!this.nftActive) {
                     const overlay = document.getElementById('rocketOverlay');
+                    // Apply shake as translate offset
+                    const translateX = shakeX * 100;
+                    const translateY = shakeY * 100;
                     overlay.style.transform =
-                        `translate(-50%, -50%) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
+                        `translate(calc(-50% + ${translateX}px), calc(-50% + ${translateY}px)) rotate(${this.currentAngle}deg) scale(${this.currentScale})`;
                 }
             },
 
@@ -4243,7 +3997,6 @@
                 document.getElementById('rocketOverlay').classList.remove('nft-active');
                 this.setBetType('stars');
                 this.populateNftGrid();
-                this.updateNftMilestones(0);
                 this.struggleTime = 0;
                 this.smoothFill = 0;
             },
@@ -4278,22 +4031,22 @@
                     this.updateProgressLine();
                     this.updateRotationAndZoom();
                     this.updateMoon(m);
-                    this.updateMilestoneStates(m);
                     const winAmount = Math.floor(this.bet * this.multiplier);
                     this.updateNftOverlay(winAmount);
                     updateLiveData();
                 } else if (this.gameOver) {
                     this.updateMainButton();
                     this.updateProgressLine();
-                    this.updateMilestoneStates(this.multiplier);
                     updateLiveData();
                     document.getElementById('moonOverlay').classList.remove('active');
                     document.getElementById('moonGif').style.display = 'none';
                     this.moonActive = false;
                     document.getElementById('crashNftOverlay').classList.remove('show');
                     document.getElementById('rocketOverlay').classList.remove('nft-active');
+                    // Reset rocket transform
+                    const overlay = document.getElementById('rocketOverlay');
+                    overlay.style.transform = `translate(-50%, -50%) rotate(0deg) scale(1)`;
                 } else {
-                    this.updateMilestoneStates(1.0);
                     this.updateProgressLine();
                 }
             },
@@ -4520,7 +4273,6 @@
                     renderPlayers();
                     this.updateMainButton();
                     document.getElementById('betInputRow').classList.remove('open');
-                    this.updateNftMilestones(this.bet);
                     return;
                 }
 
@@ -4564,7 +4316,6 @@
                     document.getElementById('crashNftIndicator'),
                     null
                 );
-                this.updateNftMilestones(bet);
             },
 
             initiateCashOut() {
@@ -4629,7 +4380,6 @@
                     document.getElementById('crashNftIndicator'),
                     null
                 );
-                this.updateNftMilestones(0);
             },
 
             startCountdown() {
@@ -4813,7 +4563,6 @@
                         document.getElementById('crashNftIndicator'),
                         null
                     );
-                    this.updateNftMilestones(0);
                     setTimeout(() => {
                         if (!this.isPlaying && this.gameOver) {
                             this.bet = 0;
@@ -5318,7 +5067,7 @@
         };
 
         // ============================================================
-        // BOUNCE GAME – with TNTs (gentle knock) and progress line with arrow
+        // BOUNCE GAME – NO BOMBS, NO PROGRESS LINE
         // ============================================================
         const bounceGame = {
             canvas: null,
@@ -5354,163 +5103,11 @@
             fixedStep: 1 / 60,
             lastFrameTime: 0,
 
-            tnts: [],
-            tntRadius: 12,
-            tntExplosionRadius: 60,
-            particles: [],
-            // speed boost timer for gentle knock
-            speedBoostTimer: 0,
-            speedBoostMultiplier: 1.0,
-
             playHitSound() { playBeep(600, 0.06, 0.2); },
             playBreakSound() { playBeep(1000, 0.1, 0.35); },
             playWinSound() { playBeep(800, 0.15, 0.3);
                 playBeep(1000, 0.15, 0.3); },
             playLoseSound() { playBeep(400, 0.2, 0.3); },
-
-            generateTnts() {
-                this.tnts = [];
-                const count = Math.floor(Math.random() * 4);
-                if (count === 0) return;
-                const w = this.width - 20 - this.borderWidth * 2 - 20;
-                const h = this.height - 20 - this.borderWidth * 2 - 20;
-                const cx = this.width / 2;
-                const cy = this.height / 2;
-                for (let i = 0; i < count; i++) {
-                    let attempts = 0;
-                    let pos;
-                    let ok;
-                    do {
-                        const x = cx - w/2 + 20 + Math.random() * (w - 40);
-                        const y = cy - h/2 + 20 + Math.random() * (h - 40);
-                        pos = {x, y};
-                        ok = true;
-                        const distFromCenter = Math.hypot(x - cx, y - cy);
-                        if (distFromCenter < 60) ok = false;
-                        for (const t of this.tnts) {
-                            if (Math.hypot(x - t.x, y - t.y) < this.tntRadius * 3) ok = false;
-                        }
-                        attempts++;
-                    } while (!ok && attempts < 50);
-                    if (ok) {
-                        this.tnts.push({x: pos.x, y: pos.y, exploded: false});
-                    }
-                }
-            },
-
-            updateBounceProgressLine() {
-                // Update the progress line under the grid
-                const container = document.getElementById('bounceProgressLine');
-                const fill = document.getElementById('bounceLineFill');
-                const track = document.getElementById('bounceLineTrack');
-                const arrow = document.getElementById('bounceArrow');
-
-                // Remove old markers
-                const oldMarkers = track.querySelectorAll('.bounce-nft-milestone');
-                oldMarkers.forEach(el => el.remove());
-
-                if (!this.isPlaying || this.bet <= 0) {
-                    container.classList.remove('active');
-                    return;
-                }
-
-                const currentWin = this.bet * this.totalMultiplier;
-                const maxMult = 10.0; // max multiplier for display
-                const minMult = 1.0;
-
-                // Determine bet image
-                let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
-                // In bounce, we don't have betType, we just show star always? But we can use the same logic: if state has inventory? We'll just use star for simplicity.
-                // But we can check if we have a bet NFT? Not applicable in bounce. So we use star.
-
-                // First marker at 1x (start)
-                const firstMarker = document.createElement('div');
-                firstMarker.className = 'bounce-nft-milestone';
-                firstMarker.dataset.mult = 1.0;
-                firstMarker.style.left = '0%';
-                const img = document.createElement('img');
-                img.src = betImage;
-                img.alt = 'bet';
-                firstMarker.appendChild(img);
-                track.appendChild(firstMarker);
-
-                // Reachable NFTs based on maxMult and currentWin
-                const reachable = SORTED_NFTS.filter(nft => (nft.price / this.bet) <= maxMult);
-                if (reachable.length === 0) {
-                    container.classList.remove('active');
-                    return;
-                }
-
-                // Select up to 4 additional milestones
-                let selected = [];
-                if (reachable.length <= 4) {
-                    selected = reachable;
-                } else {
-                    const first = reachable[0];
-                    const last = reachable[reachable.length - 1];
-                    const mid1 = reachable[Math.floor(reachable.length / 3)];
-                    const mid2 = reachable[Math.floor(2 * reachable.length / 3)];
-                    const set = new Set([first.id, mid1.id, mid2.id, last.id]);
-                    selected = reachable.filter(n => set.has(n.id));
-                    selected.sort((a, b) => a.price - b.price);
-                }
-
-                selected.forEach((nft) => {
-                    const requiredMult = nft.price / this.bet;
-                    if (requiredMult <= minMult) return;
-                    const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
-                    const marker = document.createElement('div');
-                    marker.className = 'bounce-nft-milestone';
-                    marker.dataset.mult = requiredMult;
-                    marker.style.left = pct + '%';
-                    const img2 = document.createElement('img');
-                    img2.src = nft.gif;
-                    img2.alt = nft.name;
-                    marker.appendChild(img2);
-                    track.appendChild(marker);
-                });
-
-                // Update fill and arrow
-                const targetWidth = Math.min(100, ((this.totalMultiplier - minMult) / (maxMult - minMult)) * 100);
-                fill.style.width = targetWidth + '%';
-                // Color based on multiplier
-                let color = '#00d2a0';
-                if (this.totalMultiplier >= 3.0) color = '#54a0ff';
-                if (this.totalMultiplier >= 5.0) color = '#a29bfe';
-                if (this.totalMultiplier >= 8.0) color = '#ffd700';
-                fill.style.background = color;
-
-                // Find next milestone (the one just above current multiplier)
-                let next = null;
-                let nextMult = Infinity;
-                const markers = track.querySelectorAll('.bounce-nft-milestone');
-                markers.forEach(marker => {
-                    const mMult = parseFloat(marker.dataset.mult);
-                    if (mMult > this.totalMultiplier && mMult < nextMult) {
-                        nextMult = mMult;
-                        next = marker;
-                    }
-                });
-                if (next) {
-                    const leftPct = parseFloat(next.style.left) || 0;
-                    arrow.style.left = leftPct + '%';
-                    arrow.style.display = 'block';
-                } else {
-                    arrow.style.display = 'none';
-                }
-
-                container.classList.add('active');
-
-                // Update reached state for markers
-                markers.forEach(marker => {
-                    const mMult = parseFloat(marker.dataset.mult);
-                    if (mMult <= this.totalMultiplier) {
-                        marker.classList.add('reached');
-                    } else {
-                        marker.classList.remove('reached');
-                    }
-                });
-            },
 
             updateNftOverlay() {
                 if (!this.isPlaying || this.gameOver) {
@@ -5556,10 +5153,6 @@
                 this.isLossBall = false;
 
                 this.generateSegments();
-                this.generateTnts();
-                this.particles = [];
-                this.speedBoostTimer = 0;
-                this.speedBoostMultiplier = 1.0;
                 this.resetCircle();
                 this.draw();
                 document.getElementById('bounceBalance').innerHTML =
@@ -5579,8 +5172,6 @@
                     this.launchTimeout = null;
                 }
                 document.getElementById('bounceNftOverlay').classList.remove('show');
-                // Hide progress line
-                document.getElementById('bounceProgressLine').classList.remove('active');
             },
 
             getRoundedRectPoints(cx, cy, w, h, r, n) {
@@ -5748,9 +5339,6 @@
                 this.gameOver = false;
                 this.floatingTexts = [];
                 this.isLossBall = false;
-                this.particles = [];
-                this.speedBoostTimer = 0;
-                this.speedBoostMultiplier = 1.0;
                 this.ballElement.style.display = 'block';
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.ballElement.style.left = '50%';
@@ -5765,7 +5353,6 @@
                 document.getElementById('bounceNftImg').className = 'hidden-img';
 
                 this.generateSegments();
-                this.generateTnts();
                 this.resetCircle();
                 this.draw();
                 updateHomeUI();
@@ -5815,7 +5402,6 @@
                 }
 
                 this.updateNftOverlay();
-                this.updateBounceProgressLine();
 
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
@@ -5823,25 +5409,6 @@
                     ft.life -= this.fixedStep;
                     ft.scale = 1 - (1 - ft.life / ft.maxLife) * 0.8;
                     if (ft.life <= 0) this.floatingTexts.splice(i, 1);
-                }
-
-                for (let i = this.particles.length - 1; i >= 0; i--) {
-                    const p = this.particles[i];
-                    p.x += p.vx * this.fixedStep;
-                    p.y += p.vy * this.fixedStep;
-                    p.life -= this.fixedStep;
-                    p.radius *= 0.98;
-                    if (p.life <= 0 || p.radius < 0.5) {
-                        this.particles.splice(i, 1);
-                    }
-                }
-
-                if (this.speedBoostTimer > 0) {
-                    this.speedBoostTimer -= this.fixedStep;
-                    if (this.speedBoostTimer <= 0) {
-                        this.speedBoostTimer = 0;
-                        this.speedBoostMultiplier = 1.0;
-                    }
                 }
 
                 if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
@@ -5866,11 +5433,6 @@
                     this.circle.vy *= currentFriction;
                 }
 
-                if (this.speedBoostMultiplier > 1.0) {
-                    this.circle.vx *= this.speedBoostMultiplier;
-                    this.circle.vy *= this.speedBoostMultiplier;
-                }
-
                 this.circle.x += this.circle.vx * dt;
                 this.circle.y += this.circle.vy * dt;
 
@@ -5879,62 +5441,6 @@
                     const percentY = (this.circle.y / this.height) * 100;
                     this.ballElement.style.left = percentX + '%';
                     this.ballElement.style.top = percentY + '%';
-                }
-
-                // TNT collision – gentle knock
-                for (let i = this.tnts.length - 1; i >= 0; i--) {
-                    const tnt = this.tnts[i];
-                    if (tnt.exploded) continue;
-                    const dist = Math.hypot(this.circle.x - tnt.x, this.circle.y - tnt.y);
-                    if (dist < this.circle.radius + this.tntRadius) {
-                        tnt.exploded = true;
-                        // Gentle knock: increase speed by a small amount + random direction change
-                        const speed = Math.hypot(this.circle.vx, this.circle.vy);
-                        // add a small impulse (20-30)
-                        const newSpeed = speed + 20 + Math.random() * 20;
-                        // slightly randomize angle
-                        const angle = Math.atan2(this.circle.vy, this.circle.vx) + (Math.random() - 0.5) * 0.4;
-                        this.circle.vx = Math.cos(angle) * newSpeed;
-                        this.circle.vy = Math.sin(angle) * newSpeed;
-
-                        // Short speed boost multiplier (1.1x for 0.3s)
-                        this.speedBoostTimer = 0.3;
-                        this.speedBoostMultiplier = 1.1;
-
-                        // Particles
-                        const numParticles = 20;
-                        for (let j = 0; j < numParticles; j++) {
-                            const angle2 = Math.random() * 2 * Math.PI;
-                            const speed2 = 50 + Math.random() * 150;
-                            this.particles.push({
-                                x: tnt.x,
-                                y: tnt.y,
-                                vx: Math.cos(angle2) * speed2,
-                                vy: Math.sin(angle2) * speed2,
-                                radius: 3 + Math.random() * 6,
-                                life: 0.8 + Math.random() * 0.6,
-                                maxLife: 1.4,
-                                color: `hsl(${20 + Math.random() * 30}, 100%, ${50 + Math.random() * 30}%)`
-                            });
-                        }
-
-                        // Remove nearby segments (same as before)
-                        const explosionRadius = this.tntExplosionRadius;
-                        for (const seg of this.segments) {
-                            if (seg.broken) continue;
-                            const midX = (seg.x1 + seg.x2) / 2;
-                            const midY = (seg.y1 + seg.y2) / 2;
-                            if (Math.hypot(midX - tnt.x, midY - tnt.y) < explosionRadius) {
-                                seg.broken = true;
-                                this.totalMultiplier += seg.multiplier * 0.5;
-                                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
-                                this.createFloatingTextFromPoint(seg, tnt.x, tnt.y);
-                            }
-                        }
-                        triggerVibration(100, 'heavy');
-                        playBeep(150, 0.3, 0.5);
-                        this.tnts.splice(i, 1);
-                    }
                 }
 
                 // Segment collisions
@@ -5979,13 +5485,6 @@
                     this.endGame(true);
                     return;
                 }
-            },
-
-            createFloatingTextFromPoint(seg, x, y) {
-                const mult = seg.multiplier;
-                const sign = mult >= 0 ? '+' : '';
-                this.floatingTexts.push({ x: x, y: y, text: `${sign}${mult.toFixed(2)}x`, life: 1.2, maxLife: 1.2,
-                    scale: 1.0 });
             },
 
             createFloatingText(seg) {
@@ -6045,7 +5544,6 @@
                 document.getElementById('bounceStartBtn').disabled = false;
 
                 document.getElementById('bounceNftOverlay').classList.remove('show');
-                document.getElementById('bounceProgressLine').classList.remove('active');
 
                 const resultEl = document.getElementById('bounceResult');
                 resultEl.style.display = 'block';
@@ -6158,51 +5656,6 @@
                     ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
-
-                for (const tnt of this.tnts) {
-                    if (tnt.exploded) continue;
-                    ctx.beginPath();
-                    ctx.arc(tnt.x, tnt.y, this.tntRadius, 0, 2 * Math.PI);
-                    ctx.fillStyle = '#cc0000';
-                    ctx.shadowColor = 'rgba(255,0,0,0.3)';
-                    ctx.shadowBlur = 10;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.beginPath();
-                    ctx.moveTo(tnt.x + this.tntRadius * 0.6, tnt.y - this.tntRadius * 0.6);
-                    ctx.lineTo(tnt.x + this.tntRadius * 0.9, tnt.y - this.tntRadius * 1.2);
-                    ctx.strokeStyle = '#ffaa00';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.arc(tnt.x + this.tntRadius * 0.9, tnt.y - this.tntRadius * 1.2, 3, 0, 2 * Math.PI);
-                    ctx.fillStyle = '#ff8800';
-                    ctx.shadowColor = 'rgba(255,136,0,0.5)';
-                    ctx.shadowBlur = 8;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.beginPath();
-                    ctx.moveTo(tnt.x - 4, tnt.y);
-                    ctx.lineTo(tnt.x + 4, tnt.y);
-                    ctx.moveTo(tnt.x, tnt.y - 4);
-                    ctx.lineTo(tnt.x, tnt.y + 4);
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                }
-
-                for (const p of this.particles) {
-                    const alpha = p.life / p.maxLife;
-                    ctx.globalAlpha = alpha;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
-                    ctx.fillStyle = p.color || '#ff8800';
-                    ctx.shadowColor = 'rgba(255,136,0,0.5)';
-                    ctx.shadowBlur = 10;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-                ctx.globalAlpha = 1;
 
                 for (let ft of this.floatingTexts) {
                     const alpha = Math.min(1, ft.life / 0.3);
@@ -6812,7 +6265,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – crash restored, bounce TNT gentle knock, bounce arrow added.');
+            console.log('✅ Casino loaded – crash rocket enhanced, bounce clean, no bombs, no arrow.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
