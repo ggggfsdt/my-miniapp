@@ -1164,7 +1164,7 @@
         /* ===== NFT MILESTONE – just an image, no circles, with pop animation ===== */
         .nft-milestone {
             position: absolute;
-            top: -22px; /* moved higher */
+            top: -22px;
             transform: translateX(-50%) scale(0.6);
             z-index: 12;
             width: 30px;
@@ -3035,7 +3035,6 @@
             'https://images.iimg.live/images/stellar-collection-3896.webp',
             'https://images.iimg.live/images/cool-gallery-5268.webp',
             'https://images.iimg.live/images/fantastic-image-2034.webp',
-            // removed the three old rocket gifs
             'https://images.iimg.live/images/ultimate-photography-1463.webp',
             'https://images.iimg.live/images/radiant-masterpiece-3049.webp',
             'https://images.iimg.live/images/ultimate-collection-3580.webp',
@@ -3076,7 +3075,7 @@
         }
 
         // ============================================================
-        // ROCKET GIFS (only rockets, no cars) – updated list
+        // ROCKET GIFS
         // ============================================================
         const ROCKET_GIFS = [
             'https://i.postimg.cc/sDQHk9K1/ezgif-8b61599f5def4979.gif',
@@ -3721,9 +3720,8 @@
             transitioning: false,
             moonActive: false,
             nftActive: false,
-            maxMultiplierForLine: 10.0, // 10x max
+            maxMultiplierForLine: 10.0,
 
-            // Rocket struggle – increased amplitude & speed
             struggleTime: 0,
             struggleAmplitude: 0.25,
             struggleSpeed: 14,
@@ -3831,7 +3829,7 @@
                 });
             },
 
-            // ----- NFT Milestones on the progress line -----
+            // ----- NFT Milestones – limited to at most 5 (including bet) -----
             updateNftMilestones(bet) {
                 const progressWrap = document.getElementById('progressWrap');
                 const oldMarkers = progressWrap.querySelectorAll('.nft-milestone');
@@ -3844,13 +3842,13 @@
                 const maxMult = this.maxMultiplierForLine;
                 const minMult = 1.0;
 
-                // Bet image (star or NFT)
+                // Bet image
                 let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
                 if (this.betType === 'nft' && this.betNftData) {
                     betImage = this.betNftData.gif;
                 }
 
-                // First marker at 1x (start of line)
+                // First marker at 1x
                 const firstMarker = document.createElement('div');
                 firstMarker.className = 'nft-milestone';
                 firstMarker.dataset.mult = 1.0;
@@ -3861,10 +3859,28 @@
                 firstMarker.appendChild(img);
                 progressWrap.appendChild(firstMarker);
 
-                // Then NFT milestones – show all NFTs that are within maxMult
+                // Collect reachable NFTs
                 const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
-                // Show up to 6, but we can show all – let's show all to demonstrate
-                reachable.forEach((nft) => {
+                if (reachable.length === 0) return;
+
+                // We want at most 4 additional milestones, but always include the most expensive reachable
+                let selected = [];
+                if (reachable.length <= 4) {
+                    selected = reachable;
+                } else {
+                    // take the first (cheapest) and the most expensive, plus two in between
+                    const first = reachable[0];
+                    const last = reachable[reachable.length - 1];
+                    const mid1 = reachable[Math.floor(reachable.length / 3)];
+                    const mid2 = reachable[Math.floor(2 * reachable.length / 3)];
+                    // Avoid duplicates
+                    const set = new Set([first.id, mid1.id, mid2.id, last.id]);
+                    selected = reachable.filter(n => set.has(n.id));
+                    // Ensure order by price
+                    selected.sort((a, b) => a.price - b.price);
+                }
+
+                selected.forEach((nft) => {
                     const requiredMult = nft.price / bet;
                     if (requiredMult <= minMult) return;
                     const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
@@ -3993,7 +4009,6 @@
                 this.currentAngle += this.velocity * dt;
                 this.currentAngle = Math.max(-45, Math.min(45, this.currentAngle));
 
-                // Base scale from zoom (if any)
                 const mult = this.multiplier;
                 let baseScale = 1.0;
                 if (mult >= 5.0) {
@@ -4001,25 +4016,19 @@
                     baseScale = 1.0 - zoomProgress * 0.3;
                 }
 
-                // Struggle effect: oscillate scale when multiplier < 5
                 let struggle = 0;
                 if (this.isPlaying && mult < 5.0) {
-                    // Increase struggle time
                     this.struggleTime += dt * this.struggleSpeed;
-                    // Amplitude decreases as multiplier approaches 5
                     const amp = this.struggleAmplitude * (1 - mult / 5.0);
                     struggle = amp * Math.sin(this.struggleTime);
                 } else {
-                    // Keep time moving but no oscillation
                     this.struggleTime += dt * this.struggleSpeed;
                     struggle = 0;
                 }
 
-                // Apply struggle to scale
                 let totalScale = baseScale + struggle;
                 totalScale = Math.max(0.4, Math.min(1.6, totalScale));
 
-                // Smoothly interpolate currentScale towards target
                 const scaleStiffness = 6.0,
                     scaleDamping = 3.5;
                 const scaleForce = (totalScale - this.currentScale) * scaleStiffness;
@@ -4042,8 +4051,8 @@
                 const mult = this.multiplier;
                 if (mult > 1.0 && this.isPlaying && !this.hasCashedOut) {
                     wrap.classList.add('active');
-                    const progress = Math.min(1, (mult - 1.0) / 4.0);
-                    fill.style.width = (progress * 100) + '%';
+                    const progress = (mult - 1.0) / (this.maxMultiplierForLine - 1.0);
+                    fill.style.width = Math.min(100, progress * 100) + '%';
                     let color;
                     if (mult < 2.0) color = '#00d2a0';
                     else if (mult < 3.0) color = '#54a0ff';
@@ -4052,8 +4061,8 @@
                     fill.style.boxShadow = `0 0 16px ${color}50`;
                 } else if (this.gameOver && this.multiplier > 0) {
                     wrap.classList.add('active');
-                    const progress = Math.min(1, (this.multiplier - 1.0) / 4.0);
-                    fill.style.width = (progress * 100) + '%';
+                    const progress = (this.multiplier - 1.0) / (this.maxMultiplierForLine - 1.0);
+                    fill.style.width = Math.min(100, progress * 100) + '%';
                     fill.style.background = '#ff6b6b';
                     fill.style.boxShadow = '0 0 24px rgba(255,107,107,0.5)';
                 } else {
@@ -5165,7 +5174,783 @@
         };
 
         // ============================================================
-        // INVENTORY, UPGRADE, BOUNCE (unchanged – included for completeness)
+        // BOUNCE GAME – WITH TNTs
+        // ============================================================
+        const bounceGame = {
+            canvas: null,
+            ctx: null,
+            width: 400,
+            height: 400,
+            cornerRadius: 50,
+            borderWidth: 20,
+            segments: [],
+            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 18 },
+            bet: 10,
+            totalMultiplier: 0.2,
+            isPlaying: false,
+            gameOver: false,
+            animId: null,
+            friction: 0.998,
+            speedThreshold: 0.05,
+            segmentCount: 16,
+            constantSpeedDuration: 4000,
+            startTime: 0,
+            floatingTexts: [],
+            arrowAngle: 0,
+            isSpinning: false,
+            spinSpeed: 0,
+            spinStartTime: 0,
+            spinDuration: 5.0,
+            maxSpinSpeed: 8,
+            isLaunched: false,
+            launchTimeout: null,
+            ballElement: document.getElementById('bounceBallImg'),
+            isLossBall: false,
+            accumulator: 0,
+            fixedStep: 1 / 60,
+            lastFrameTime: 0,
+
+            // TNT stuff
+            tnts: [],
+            tntRadius: 12,
+            tntExplosionRadius: 60,
+
+            playHitSound() { playBeep(600, 0.06, 0.2); },
+            playBreakSound() { playBeep(1000, 0.1, 0.35); },
+            playWinSound() { playBeep(800, 0.15, 0.3);
+                playBeep(1000, 0.15, 0.3); },
+            playLoseSound() { playBeep(400, 0.2, 0.3); },
+
+            // generate TNTs
+            generateTnts() {
+                this.tnts = [];
+                const count = Math.floor(Math.random() * 4); // 0-3
+                if (count === 0) return;
+                const w = this.width - 20 - this.borderWidth * 2 - 20;
+                const h = this.height - 20 - this.borderWidth * 2 - 20;
+                const cx = this.width / 2;
+                const cy = this.height / 2;
+                for (let i = 0; i < count; i++) {
+                    let attempts = 0;
+                    let pos;
+                    let ok;
+                    do {
+                        const x = cx - w/2 + 20 + Math.random() * (w - 40);
+                        const y = cy - h/2 + 20 + Math.random() * (h - 40);
+                        pos = {x, y};
+                        ok = true;
+                        // avoid center where ball starts
+                        const distFromCenter = Math.hypot(x - cx, y - cy);
+                        if (distFromCenter < 60) ok = false;
+                        // avoid overlapping other TNTs
+                        for (const t of this.tnts) {
+                            if (Math.hypot(x - t.x, y - t.y) < this.tntRadius * 3) ok = false;
+                        }
+                        // avoid being too close to walls? not necessary.
+                        attempts++;
+                    } while (!ok && attempts < 50);
+                    if (ok) {
+                        this.tnts.push({x: pos.x, y: pos.y, exploded: false});
+                    }
+                }
+            },
+
+            updateNftOverlay() {
+                if (!this.isPlaying || this.gameOver) {
+                    document.getElementById('bounceNftOverlay').classList.remove('show');
+                    return;
+                }
+                const winAmount = Math.floor(this.bet * this.totalMultiplier);
+                const nft = getBestNftForWin(winAmount);
+                const overlay = document.getElementById('bounceNftOverlay');
+                const img = document.getElementById('bounceNftImg');
+                if (nft && winAmount > 0) {
+                    if (img.src !== nft.gif) {
+                        img.className = 'hidden-img';
+                        setTimeout(() => {
+                            img.src = nft.gif;
+                            void img.offsetHeight;
+                            img.className = 'visible';
+                        }, 300);
+                    } else {
+                        img.className = 'visible';
+                    }
+                    overlay.classList.add('show');
+                } else {
+                    overlay.classList.remove('show');
+                    img.className = 'hidden-img';
+                }
+            },
+
+            init() {
+                this.canvas = document.getElementById('bounceCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.width = this.canvas.width;
+                this.height = this.canvas.height;
+                this.segmentCount = 16;
+
+                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                this.ballElement.style.display = 'block';
+                this.ballElement.style.left = '50%';
+                this.ballElement.style.top = '50%';
+                this.ballElement.style.transform = 'translate(-50%, -50%)';
+                this.ballElement.style.width = '36px';
+                this.ballElement.style.height = '36px';
+                this.isLossBall = false;
+
+                this.generateSegments();
+                this.generateTnts();
+                this.resetCircle();
+                this.draw();
+                document.getElementById('bounceBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('bounceBetDisplay').textContent = this.bet;
+                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+                document.getElementById('bounceResult').className = 'bounce-result';
+                document.getElementById('bounceResult').style.display = 'none';
+                document.getElementById('bounceStartBtn').textContent = 'Start';
+                document.getElementById('bounceStartBtn').disabled = false;
+                this.isLaunched = false;
+                this.isSpinning = false;
+                this.accumulator = 0;
+                this.lastFrameTime = 0;
+                if (this.launchTimeout) {
+                    clearTimeout(this.launchTimeout);
+                    this.launchTimeout = null;
+                }
+                document.getElementById('bounceNftOverlay').classList.remove('show');
+            },
+
+            getRoundedRectPoints(cx, cy, w, h, r, n) {
+                const pts = [];
+                const halfW = w / 2;
+                const halfH = h / 2;
+                const sections = [
+                    { type: 'line', x1: cx - halfW + r, y1: cy - halfH, x2: cx + halfW - r, y2: cy - halfH },
+                    { type: 'arc', cx: cx + halfW - r, cy: cy - halfH + r, start: -Math.PI / 2, end: 0 },
+                    { type: 'line', x1: cx + halfW, y1: cy - halfH + r, x2: cx + halfW, y2: cy + halfH - r },
+                    { type: 'arc', cx: cx + halfW - r, cy: cy + halfH - r, start: 0, end: Math.PI / 2 },
+                    { type: 'line', x1: cx + halfW - r, y1: cy + halfH, x2: cx - halfW + r, y2: cy + halfH },
+                    { type: 'arc', cx: cx - halfW + r, cy: cy + halfH - r, start: Math.PI / 2, end: Math.PI },
+                    { type: 'line', x1: cx - halfW, y1: cy + halfH - r, x2: cx - halfW, y2: cy - halfH + r },
+                    { type: 'arc', cx: cx - halfW + r, cy: cy - halfH + r, start: Math.PI, end: 3 * Math.PI / 2 }
+                ];
+                let totalLen = 0;
+                const lengths = [];
+                for (let sec of sections) {
+                    if (sec.type === 'line') {
+                        const len = Math.sqrt((sec.x2 - sec.x1) ** 2 + (sec.y2 - sec.y1) ** 2);
+                        lengths.push(len);
+                        totalLen += len;
+                    } else {
+                        const len = r * Math.abs(sec.end - sec.start);
+                        lengths.push(len);
+                        totalLen += len;
+                    }
+                }
+                for (let i = 0; i < sections.length; i++) {
+                    const sec = sections[i];
+                    const len = lengths[i];
+                    const steps = Math.round(n * (len / totalLen));
+                    if (sec.type === 'line') {
+                        for (let j = 0; j <= steps; j++) {
+                            const t = j / steps;
+                            pts.push({ x: sec.x1 + t * (sec.x2 - sec.x1), y: sec.y1 + t * (sec.y2 - sec.y1) });
+                        }
+                    } else {
+                        for (let j = 0; j <= steps; j++) {
+                            const t = j / steps;
+                            const angle = sec.start + t * (sec.end - sec.start);
+                            pts.push({ x: sec.cx + r * Math.cos(angle), y: sec.cy + r * Math.sin(angle) });
+                        }
+                    }
+                }
+                if (pts.length > 1 && pts[0].x === pts[pts.length - 1].x && pts[0].y === pts[pts.length - 1].y) pts.pop();
+                return pts;
+            },
+
+            generateSegments() {
+                this.segments = [];
+                const w = this.width - 20;
+                const h = this.height - 20;
+                const cx = this.width / 2;
+                const cy = this.height / 2;
+                const r = this.cornerRadius;
+                const outerPts = this.getRoundedRectPoints(cx, cy, w, h, r, 400);
+                const innerW = w - this.borderWidth * 2;
+                const innerH = h - this.borderWidth * 2;
+                const innerR = Math.max(0, r - this.borderWidth);
+                const innerPts = this.getRoundedRectPoints(cx, cy, innerW, innerH, innerR, 400);
+
+                const totalPts = outerPts.length;
+                const ptsPerSeg = Math.floor(totalPts / this.segmentCount);
+
+                const multiplierPool = [
+                    { value: 3.0, weight: 1 },
+                    { value: 2.0, weight: 2 },
+                    { value: 1.0, weight: 5 },
+                    { value: 0.5, weight: 15 },
+                    { value: 0.2, weight: 25 },
+                    { value: 0.1, weight: 52 }
+                ];
+                let weighted = [];
+                for (let item of multiplierPool) {
+                    for (let i = 0; i < item.weight; i++) weighted.push(item.value);
+                }
+
+                for (let i = 0; i < this.segmentCount; i++) {
+                    const startIdx = i * ptsPerSeg;
+                    const endIdx = (i === this.segmentCount - 1) ? totalPts - 1 : (i + 1) * ptsPerSeg;
+                    const outerSeg = [];
+                    const innerSeg = [];
+                    for (let j = startIdx; j <= endIdx; j++) {
+                        outerSeg.push(outerPts[j]);
+                        innerSeg.push(innerPts[j]);
+                    }
+                    const p1 = innerSeg[0];
+                    const p2 = innerSeg[innerSeg.length - 1];
+                    const durability = 1 + Math.floor(Math.random() * 2);
+                    const multiplier = weighted[Math.floor(Math.random() * weighted.length)];
+                    this.segments.push({
+                        outer: outerSeg,
+                        inner: innerSeg,
+                        x1: p1.x,
+                        y1: p1.y,
+                        x2: p2.x,
+                        y2: p2.y,
+                        durability: durability,
+                        maxDurability: durability,
+                        multiplier: multiplier,
+                        broken: false
+                    });
+                }
+            },
+
+            resetCircle() {
+                this.circle.x = this.width / 2;
+                this.circle.y = this.height / 2;
+                this.circle.vx = 0;
+                this.circle.vy = 0;
+                this.isSpinning = true;
+                this.isLaunched = false;
+                this.isPlaying = false;
+                this.isLossBall = false;
+                this.ballElement.style.display = 'block';
+                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                this.ballElement.style.left = '50%';
+                this.ballElement.style.top = '50%';
+                this.spinStartTime = performance.now();
+                this.arrowAngle = Math.random() * 2 * Math.PI;
+                this.accumulator = 0;
+                this.lastFrameTime = 0;
+                if (this.launchTimeout) clearTimeout(this.launchTimeout);
+                this.launchTimeout = setTimeout(() => {
+                    if (this.isSpinning && !this.isLaunched) this.launchBall();
+                    this.launchTimeout = null;
+                }, (this.spinDuration + 0.5) * 1000);
+            },
+
+            launchBall() {
+                if (this.isLaunched) return;
+                if (this.launchTimeout) {
+                    clearTimeout(this.launchTimeout);
+                    this.launchTimeout = null;
+                }
+                this.isSpinning = false;
+                this.isLaunched = true;
+                this.isPlaying = true;
+                this.isLossBall = false;
+                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                this.startTime = performance.now();
+                const speed = 250 + Math.random() * 100;
+                this.circle.vx = Math.cos(this.arrowAngle) * speed;
+                this.circle.vy = Math.sin(this.arrowAngle) * speed;
+                document.getElementById('bounceStartBtn').textContent = 'Playing...';
+                document.getElementById('bounceStartBtn').disabled = true;
+                if (this.animId) cancelAnimationFrame(this.animId);
+                this.gameLoop();
+            },
+
+            handleStart() {
+                if (!this.isPlaying && !this.isSpinning) this.startRound();
+            },
+
+            startRound() {
+                const input = document.getElementById('bounceBetInput');
+                let bet = parseInt(input.value) || 0;
+                if (bet < 1) { triggerVibration(60, 'heavy'); return; }
+                if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
+                this.bet = bet;
+                state.balance -= this.bet;
+                this.totalMultiplier = 0.2;
+                this.gameOver = false;
+                this.floatingTexts = [];
+                this.isLossBall = false;
+                this.ballElement.style.display = 'block';
+                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                this.ballElement.style.left = '50%';
+                this.ballElement.style.top = '50%';
+                document.getElementById('bounceResult').style.display = 'none';
+                document.getElementById('bounceStartBtn').textContent = 'Start';
+                document.getElementById('bounceStartBtn').disabled = false;
+                document.getElementById('bounceBetDisplay').textContent = this.bet;
+                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+
+                document.getElementById('bounceNftOverlay').classList.remove('show');
+                document.getElementById('bounceNftImg').className = 'hidden-img';
+
+                this.generateSegments();
+                this.generateTnts();
+                this.resetCircle();
+                this.draw();
+                updateHomeUI();
+                document.getElementById('bounceBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+
+                if (this.animId) cancelAnimationFrame(this.animId);
+                this.gameLoop();
+            },
+
+            gameLoop() {
+                if (!this.isPlaying && !this.isSpinning) {
+                    this.draw();
+                    this.animId = requestAnimationFrame(() => this.gameLoop());
+                    return;
+                }
+                this.update();
+                this.draw();
+                this.animId = requestAnimationFrame(() => this.gameLoop());
+            },
+
+            update() {
+                const dt = 1 / 60;
+
+                if (this.isSpinning) {
+                    const now = performance.now();
+                    const elapsed = (now - this.spinStartTime) / 1000;
+                    if (elapsed >= this.spinDuration) {
+                        this.launchBall();
+                    } else {
+                        const progress = elapsed / this.spinDuration;
+                        this.spinSpeed = this.maxSpinSpeed * Math.sin(progress * Math.PI);
+                        this.arrowAngle += this.spinSpeed * dt;
+                    }
+                }
+
+                if (!this.isPlaying) return;
+
+                const now = performance.now();
+                const delta = this.lastFrameTime ? (now - this.lastFrameTime) / 1000 : 0;
+                this.lastFrameTime = now;
+                this.accumulator += delta;
+
+                while (this.accumulator >= this.fixedStep) {
+                    this.physicsStep(this.fixedStep);
+                    this.accumulator -= this.fixedStep;
+                }
+
+                this.updateNftOverlay();
+
+                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+                    const ft = this.floatingTexts[i];
+                    ft.y -= 60 * this.fixedStep;
+                    ft.life -= this.fixedStep;
+                    ft.scale = 1 - (1 - ft.life / ft.maxLife) * 0.8;
+                    if (ft.life <= 0) this.floatingTexts.splice(i, 1);
+                }
+
+                if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
+                    this.isLossBall = true;
+                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
+                    this.endGame(false);
+                    return;
+                }
+            },
+
+            physicsStep(dt) {
+                const now = performance.now();
+                const elapsed = now - this.startTime;
+
+                let currentFriction = 1.0;
+                if (elapsed > 2500 && elapsed <= 6000) currentFriction = 0.998;
+                else if (elapsed > 6000) currentFriction = 0.993;
+                else currentFriction = 1.0;
+
+                if (elapsed > 2500) {
+                    this.circle.vx *= currentFriction;
+                    this.circle.vy *= currentFriction;
+                }
+
+                // check TNT collision before moving?
+                // We'll check after move, but we'll also check during move.
+                // Simpler: after move, check and handle.
+
+                this.circle.x += this.circle.vx * dt;
+                this.circle.y += this.circle.vy * dt;
+
+                // Ball image position
+                if (this.ballElement) {
+                    const percentX = (this.circle.x / this.width) * 100;
+                    const percentY = (this.circle.y / this.height) * 100;
+                    this.ballElement.style.left = percentX + '%';
+                    this.ballElement.style.top = percentY + '%';
+                }
+
+                // Check TNT collision
+                for (let i = this.tnts.length - 1; i >= 0; i--) {
+                    const tnt = this.tnts[i];
+                    if (tnt.exploded) continue;
+                    const dist = Math.hypot(this.circle.x - tnt.x, this.circle.y - tnt.y);
+                    if (dist < this.circle.radius + this.tntRadius) {
+                        // Explode!
+                        tnt.exploded = true;
+                        // Increase speed
+                        const speed = Math.hypot(this.circle.vx, this.circle.vy);
+                        const newSpeed = speed * 1.6 + 100;
+                        const angle = Math.atan2(this.circle.vy, this.circle.vx);
+                        this.circle.vx = Math.cos(angle) * newSpeed;
+                        this.circle.vy = Math.sin(angle) * newSpeed;
+                        // Remove nearby segments
+                        const explosionRadius = this.tntExplosionRadius;
+                        for (const seg of this.segments) {
+                            if (seg.broken) continue;
+                            // Check if any point of seg is within radius
+                            const midX = (seg.x1 + seg.x2) / 2;
+                            const midY = (seg.y1 + seg.y2) / 2;
+                            if (Math.hypot(midX - tnt.x, midY - tnt.y) < explosionRadius) {
+                                seg.broken = true;
+                                // add multiplier from broken segment? we can add a small bonus.
+                                this.totalMultiplier += seg.multiplier * 0.5;
+                                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+                                // show floating text
+                                this.createFloatingTextFromPoint(seg, tnt.x, tnt.y);
+                            }
+                        }
+                        // Vibration
+                        triggerVibration(100, 'heavy');
+                        // Play explosion sound (we have a beep)
+                        playBeep(150, 0.3, 0.5);
+                        // Maybe add a visual effect – we'll draw it later
+                        // Remove tnt
+                        this.tnts.splice(i, 1);
+                    }
+                }
+
+                // Then segment collisions as before
+                for (let seg of this.segments) {
+                    if (seg.broken) continue;
+                    const dist = this.distToSegment(this.circle.x, this.circle.y, seg.x1, seg.y1, seg.x2, seg.y2);
+                    if (dist < this.circle.radius) {
+                        let nx = -(seg.y2 - seg.y1);
+                        let ny = (seg.x2 - seg.x1);
+                        const len = Math.sqrt(nx * nx + ny * ny);
+                        if (len === 0) continue;
+                        let normX = nx / len;
+                        let normY = ny / len;
+                        const cx = this.circle.x - seg.x1;
+                        const cy = this.circle.y - seg.y1;
+                        if (cx * normX + cy * normY < 0) { normX = -normX;
+                            normY = -normY; }
+                        const vDot = this.circle.vx * normX + this.circle.vy * normY;
+                        if (vDot < 0) {
+                            this.circle.vx -= 2 * vDot * normX;
+                            this.circle.vy -= 2 * vDot * normY;
+                            const overlap = this.circle.radius - dist + 1;
+                            this.circle.x += normX * overlap;
+                            this.circle.y += normY * overlap;
+                            seg.durability--;
+                            this.playHitSound();
+                            triggerVibration(15, 'light');
+                            if (seg.durability <= 0) {
+                                seg.broken = true;
+                                this.totalMultiplier += seg.multiplier;
+                                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+                                this.createFloatingText(seg);
+                                this.playBreakSound();
+                                triggerVibration(30, 'medium');
+                            }
+                        }
+                    }
+                }
+
+                const speed = Math.sqrt(this.circle.vx * this.circle.vx + this.circle.vy * this.circle.vy);
+                if (speed < this.speedThreshold && elapsed > 2500) {
+                    this.endGame(true);
+                    return;
+                }
+            },
+
+            createFloatingTextFromPoint(seg, x, y) {
+                const mult = seg.multiplier;
+                const sign = mult >= 0 ? '+' : '';
+                this.floatingTexts.push({ x: x, y: y, text: `${sign}${mult.toFixed(2)}x`, life: 1.2, maxLife: 1.2,
+                    scale: 1.0 });
+            },
+
+            createFloatingText(seg) {
+                const cx = (seg.x1 + seg.x2) / 2;
+                const cy = (seg.y1 + seg.y2) / 2;
+                const mult = seg.multiplier;
+                const sign = mult >= 0 ? '+' : '';
+                this.floatingTexts.push({ x: cx, y: cy, text: `${sign}${mult.toFixed(2)}x`, life: 1.2, maxLife: 1.2,
+                    scale: 1.0 });
+            },
+
+            distToSegment(px, py, x1, y1, x2, y2) {
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const lenSq = dx * dx + dy * dy;
+                if (lenSq === 0) return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
+                let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+                t = Math.max(0, Math.min(1, t));
+                const projX = x1 + t * dx;
+                const projY = y1 + t * dy;
+                return Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
+            },
+
+            isInsideRoundedRect(x, y) {
+                const w = this.width - 20 - this.borderWidth * 2;
+                const h = this.height - 20 - this.borderWidth * 2;
+                const cx = this.width / 2;
+                const cy = this.height / 2;
+                const r = Math.max(0, this.cornerRadius - this.borderWidth);
+                const halfW = w / 2;
+                const halfH = h / 2;
+                if (x < cx - halfW || x > cx + halfW || y < cy - halfH || y > cy + halfH) return false;
+                const corners = [
+                    { x: cx - halfW + r, y: cy - halfH + r },
+                    { x: cx + halfW - r, y: cy - halfH + r },
+                    { x: cx + halfW - r, y: cy + halfH - r },
+                    { x: cx - halfW + r, y: cy + halfH - r }
+                ];
+                for (let c of corners) {
+                    if (Math.sqrt((x - c.x) * (x - c.x) + (y - c.y) * (y - c.y)) < r) return true;
+                }
+                return true;
+            },
+
+            endGame(win) {
+                if (this.gameOver) return;
+                this.isPlaying = false;
+                this.isSpinning = false;
+                this.gameOver = true;
+                if (this.launchTimeout) {
+                    clearTimeout(this.launchTimeout);
+                    this.launchTimeout = null;
+                }
+                if (this.animId) { cancelAnimationFrame(this.animId);
+                    this.animId = null; }
+                document.getElementById('bounceStartBtn').textContent = 'Start';
+                document.getElementById('bounceStartBtn').disabled = false;
+
+                document.getElementById('bounceNftOverlay').classList.remove('show');
+
+                const resultEl = document.getElementById('bounceResult');
+                resultEl.style.display = 'block';
+                if (win) {
+                    const winAmount = Math.floor(this.bet * this.totalMultiplier);
+                    state.balance += winAmount;
+                    state.wins++;
+                    state.totalGames++;
+                    if (this.totalMultiplier > state.bestMultiplier) state.bestMultiplier = this.totalMultiplier;
+                    state.recentWinners.unshift({ name: 'You (Bounce)', amount: winAmount });
+                    if (state.recentWinners.length > 10) state.recentWinners.pop();
+                    resultEl.className = 'bounce-result win';
+                    resultEl.textContent = `Won ${winAmount}⭐ (${this.totalMultiplier.toFixed(2)}x)`;
+                    this.playWinSound();
+                    triggerVibration(50, 'medium');
+                    showNotification(winAmount, winAmount);
+                    processGameWin(winAmount);
+                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
+                } else {
+                    state.losses++;
+                    state.totalGames++;
+                    resultEl.className = 'bounce-result lose';
+                    resultEl.textContent = `Lost ${this.bet}⭐`;
+                    this.playLoseSound();
+                    triggerVibration(80, 'heavy');
+                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
+                }
+                updateHomeUI();
+                updateProfile();
+                document.getElementById('bounceBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
+                this.draw();
+            },
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.width,
+                    h = this.height;
+                ctx.clearRect(0, 0, w, h);
+
+                const cx = w / 2,
+                    cy = h / 2;
+                const halfW = (w - 20) / 2 - this.borderWidth;
+                const halfH = (h - 20) / 2 - this.borderWidth;
+                const r = Math.max(0, this.cornerRadius - this.borderWidth);
+
+                ctx.beginPath();
+                ctx.moveTo(cx - halfW + r, cy - halfH);
+                ctx.lineTo(cx + halfW - r, cy - halfH);
+                ctx.quadraticCurveTo(cx + halfW, cy - halfH, cx + halfW, cy - halfH + r);
+                ctx.lineTo(cx + halfW, cy + halfH - r);
+                ctx.quadraticCurveTo(cx + halfW, cy + halfH, cx + halfW - r, cy + halfH);
+                ctx.lineTo(cx - halfW + r, cy + halfH);
+                ctx.quadraticCurveTo(cx - halfW, cy + halfH, cx - halfW, cy + halfH - r);
+                ctx.lineTo(cx - halfW, cy - halfH + r);
+                ctx.quadraticCurveTo(cx - halfW, cy - halfH, cx - halfW + r, cy - halfH);
+                ctx.closePath();
+                ctx.fillStyle = '#060608';
+                ctx.fill();
+
+                const outerR = this.cornerRadius;
+                const outerW = w - 20;
+                const outerH = h - 20;
+                const innerR = Math.max(0, outerR - this.borderWidth);
+                const innerW = outerW - this.borderWidth * 2;
+                const innerH = outerH - this.borderWidth * 2;
+
+                ctx.beginPath();
+                ctx.moveTo(cx - outerW / 2 + outerR, cy - outerH / 2);
+                ctx.lineTo(cx + outerW / 2 - outerR, cy - outerH / 2);
+                ctx.quadraticCurveTo(cx + outerW / 2, cy - outerH / 2, cx + outerW / 2, cy - outerH / 2 + outerR);
+                ctx.lineTo(cx + outerW / 2, cy + outerH / 2 - outerR);
+                ctx.quadraticCurveTo(cx + outerW / 2, cy + outerH / 2, cx + outerW / 2 - outerR, cy + outerH / 2);
+                ctx.lineTo(cx - outerW / 2 + outerR, cy + outerH / 2);
+                ctx.quadraticCurveTo(cx - outerW / 2, cy + outerH / 2, cx - outerW / 2, cy + outerH / 2 - outerR);
+                ctx.lineTo(cx - outerW / 2, cy - outerH / 2 + outerR);
+                ctx.quadraticCurveTo(cx - outerW / 2, cy - outerH / 2, cx - outerW / 2 + outerR, cy - outerH / 2);
+                ctx.closePath();
+                ctx.moveTo(cx - innerW / 2 + innerR, cy - innerH / 2);
+                ctx.lineTo(cx + innerW / 2 - innerR, cy - innerH / 2);
+                ctx.quadraticCurveTo(cx + innerW / 2, cy - innerH / 2, cx + innerW / 2, cy - innerH / 2 + innerR);
+                ctx.lineTo(cx + innerW / 2, cy + innerH / 2 - innerR);
+                ctx.quadraticCurveTo(cx + innerW / 2, cy + innerH / 2, cx + innerW / 2 - innerR, cy + innerH / 2);
+                ctx.lineTo(cx - innerW / 2 + innerR, cy + innerH / 2);
+                ctx.quadraticCurveTo(cx - innerW / 2, cy + innerH / 2, cx - innerW / 2, cy + innerH / 2 - innerR);
+                ctx.lineTo(cx - innerW / 2, cy - innerH / 2 + innerR);
+                ctx.quadraticCurveTo(cx - innerW / 2, cy - innerH / 2, cx - innerW / 2 + innerR, cy - innerH / 2);
+                ctx.closePath();
+                ctx.fillStyle = '#111115';
+                ctx.fill();
+
+                // Draw segments
+                for (let seg of this.segments) {
+                    if (seg.broken) continue;
+                    const ratio = seg.durability / seg.maxDurability;
+                    let color = ratio > 0.5 ? '#1a1a20' : '#282830';
+                    ctx.beginPath();
+                    const outer = seg.outer;
+                    ctx.moveTo(outer[0].x, outer[0].y);
+                    for (let i = 1; i < outer.length; i++) ctx.lineTo(outer[i].x, outer[i].y);
+                    const inner = seg.inner;
+                    for (let i = inner.length - 1; i >= 0; i--) ctx.lineTo(inner[i].x, inner[i].y);
+                    ctx.closePath();
+                    ctx.fillStyle = color;
+                    ctx.shadowColor = 'rgba(255,255,255,0.02)';
+                    ctx.shadowBlur = 4;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+
+                // Draw TNTs
+                for (const tnt of this.tnts) {
+                    if (tnt.exploded) continue;
+                    // draw a small red circle with a fuse
+                    ctx.beginPath();
+                    ctx.arc(tnt.x, tnt.y, this.tntRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#cc0000';
+                    ctx.shadowColor = 'rgba(255,0,0,0.3)';
+                    ctx.shadowBlur = 10;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    // fuse
+                    ctx.beginPath();
+                    ctx.moveTo(tnt.x + this.tntRadius * 0.6, tnt.y - this.tntRadius * 0.6);
+                    ctx.lineTo(tnt.x + this.tntRadius * 0.9, tnt.y - this.tntRadius * 1.2);
+                    ctx.strokeStyle = '#ffaa00';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // small spark
+                    ctx.beginPath();
+                    ctx.arc(tnt.x + this.tntRadius * 0.9, tnt.y - this.tntRadius * 1.2, 3, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ff8800';
+                    ctx.shadowColor = 'rgba(255,136,0,0.5)';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    // cross
+                    ctx.beginPath();
+                    ctx.moveTo(tnt.x - 4, tnt.y);
+                    ctx.lineTo(tnt.x + 4, tnt.y);
+                    ctx.moveTo(tnt.x, tnt.y - 4);
+                    ctx.lineTo(tnt.x, tnt.y + 4);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                // Floating texts
+                for (let ft of this.floatingTexts) {
+                    const alpha = Math.min(1, ft.life / 0.3);
+                    const scale = ft.scale;
+                    ctx.globalAlpha = alpha;
+                    ctx.save();
+                    ctx.translate(ft.x, ft.y);
+                    ctx.scale(scale, scale);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 28px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(255,215,0,0.5)';
+                    ctx.shadowBlur = 20;
+                    ctx.fillText(ft.text, 0, 0);
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                }
+                ctx.globalAlpha = 1;
+
+                // Arrow
+                if (this.isSpinning || !this.isLaunched) {
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(this.arrowAngle);
+                    ctx.beginPath();
+                    ctx.moveTo(30, 0);
+                    ctx.lineTo(65, 0);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 4;
+                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                    ctx.shadowBlur = 15;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(65, 0);
+                    ctx.lineTo(55, -10);
+                    ctx.lineTo(55, 10);
+                    ctx.closePath();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                    ctx.shadowBlur = 20;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                    ctx.shadowBlur = 25;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                }
+            }
+        };
+
+        // ============================================================
+        // INVENTORY, UPGRADE – unchanged (omitted for brevity, but we keep them)
         // ============================================================
         function sellNFT(index) {
             const nft = state.inventory[index];
@@ -5653,646 +6438,6 @@
             upgradeGame.spin();
         }
 
-        // ===== BOUNCE GAME =====
-        const bounceGame = {
-            canvas: null,
-            ctx: null,
-            width: 400,
-            height: 400,
-            cornerRadius: 50,
-            borderWidth: 20,
-            segments: [],
-            circle: { x: 0, y: 0, vx: 0, vy: 0, radius: 18 },
-            bet: 10,
-            totalMultiplier: 0.2,
-            isPlaying: false,
-            gameOver: false,
-            animId: null,
-            friction: 0.998,
-            speedThreshold: 0.05,
-            segmentCount: 16,
-            constantSpeedDuration: 4000,
-            startTime: 0,
-            floatingTexts: [],
-            arrowAngle: 0,
-            isSpinning: false,
-            spinSpeed: 0,
-            spinStartTime: 0,
-            spinDuration: 5.0,
-            maxSpinSpeed: 8,
-            isLaunched: false,
-            launchTimeout: null,
-            ballElement: document.getElementById('bounceBallImg'),
-            isLossBall: false,
-            accumulator: 0,
-            fixedStep: 1 / 60,
-            lastFrameTime: 0,
-
-            playHitSound() { playBeep(600, 0.06, 0.2); },
-            playBreakSound() { playBeep(1000, 0.1, 0.35); },
-            playWinSound() { playBeep(800, 0.15, 0.3);
-                playBeep(1000, 0.15, 0.3); },
-            playLoseSound() { playBeep(400, 0.2, 0.3); },
-
-            updateNftOverlay() {
-                if (!this.isPlaying || this.gameOver) {
-                    document.getElementById('bounceNftOverlay').classList.remove('show');
-                    return;
-                }
-                const winAmount = Math.floor(this.bet * this.totalMultiplier);
-                const nft = getBestNftForWin(winAmount);
-                const overlay = document.getElementById('bounceNftOverlay');
-                const img = document.getElementById('bounceNftImg');
-                if (nft && winAmount > 0) {
-                    if (img.src !== nft.gif) {
-                        img.className = 'hidden-img';
-                        setTimeout(() => {
-                            img.src = nft.gif;
-                            void img.offsetHeight;
-                            img.className = 'visible';
-                        }, 300);
-                    } else {
-                        img.className = 'visible';
-                    }
-                    overlay.classList.add('show');
-                } else {
-                    overlay.classList.remove('show');
-                    img.className = 'hidden-img';
-                }
-            },
-
-            init() {
-                this.canvas = document.getElementById('bounceCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.width = this.canvas.width;
-                this.height = this.canvas.height;
-                this.segmentCount = 16;
-
-                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                this.ballElement.style.display = 'block';
-                this.ballElement.style.left = '50%';
-                this.ballElement.style.top = '50%';
-                this.ballElement.style.transform = 'translate(-50%, -50%)';
-                this.ballElement.style.width = '36px';
-                this.ballElement.style.height = '36px';
-                this.isLossBall = false;
-
-                this.generateSegments();
-                this.resetCircle();
-                this.draw();
-                document.getElementById('bounceBalance').innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-                document.getElementById('bounceBetDisplay').textContent = this.bet;
-                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
-                document.getElementById('bounceResult').className = 'bounce-result';
-                document.getElementById('bounceResult').style.display = 'none';
-                document.getElementById('bounceStartBtn').textContent = 'Start';
-                document.getElementById('bounceStartBtn').disabled = false;
-                this.isLaunched = false;
-                this.isSpinning = false;
-                this.accumulator = 0;
-                this.lastFrameTime = 0;
-                if (this.launchTimeout) {
-                    clearTimeout(this.launchTimeout);
-                    this.launchTimeout = null;
-                }
-                document.getElementById('bounceNftOverlay').classList.remove('show');
-            },
-
-            getRoundedRectPoints(cx, cy, w, h, r, n) {
-                const pts = [];
-                const halfW = w / 2;
-                const halfH = h / 2;
-                const sections = [
-                    { type: 'line', x1: cx - halfW + r, y1: cy - halfH, x2: cx + halfW - r, y2: cy - halfH },
-                    { type: 'arc', cx: cx + halfW - r, cy: cy - halfH + r, start: -Math.PI / 2, end: 0 },
-                    { type: 'line', x1: cx + halfW, y1: cy - halfH + r, x2: cx + halfW, y2: cy + halfH - r },
-                    { type: 'arc', cx: cx + halfW - r, cy: cy + halfH - r, start: 0, end: Math.PI / 2 },
-                    { type: 'line', x1: cx + halfW - r, y1: cy + halfH, x2: cx - halfW + r, y2: cy + halfH },
-                    { type: 'arc', cx: cx - halfW + r, cy: cy + halfH - r, start: Math.PI / 2, end: Math.PI },
-                    { type: 'line', x1: cx - halfW, y1: cy + halfH - r, x2: cx - halfW, y2: cy - halfH + r },
-                    { type: 'arc', cx: cx - halfW + r, cy: cy - halfH + r, start: Math.PI, end: 3 * Math.PI / 2 }
-                ];
-                let totalLen = 0;
-                const lengths = [];
-                for (let sec of sections) {
-                    if (sec.type === 'line') {
-                        const len = Math.sqrt((sec.x2 - sec.x1) ** 2 + (sec.y2 - sec.y1) ** 2);
-                        lengths.push(len);
-                        totalLen += len;
-                    } else {
-                        const len = r * Math.abs(sec.end - sec.start);
-                        lengths.push(len);
-                        totalLen += len;
-                    }
-                }
-                for (let i = 0; i < sections.length; i++) {
-                    const sec = sections[i];
-                    const len = lengths[i];
-                    const steps = Math.round(n * (len / totalLen));
-                    if (sec.type === 'line') {
-                        for (let j = 0; j <= steps; j++) {
-                            const t = j / steps;
-                            pts.push({ x: sec.x1 + t * (sec.x2 - sec.x1), y: sec.y1 + t * (sec.y2 - sec.y1) });
-                        }
-                    } else {
-                        for (let j = 0; j <= steps; j++) {
-                            const t = j / steps;
-                            const angle = sec.start + t * (sec.end - sec.start);
-                            pts.push({ x: sec.cx + r * Math.cos(angle), y: sec.cy + r * Math.sin(angle) });
-                        }
-                    }
-                }
-                if (pts.length > 1 && pts[0].x === pts[pts.length - 1].x && pts[0].y === pts[pts.length - 1].y) pts.pop();
-                return pts;
-            },
-
-            generateSegments() {
-                this.segments = [];
-                const w = this.width - 20;
-                const h = this.height - 20;
-                const cx = this.width / 2;
-                const cy = this.height / 2;
-                const r = this.cornerRadius;
-                const outerPts = this.getRoundedRectPoints(cx, cy, w, h, r, 400);
-                const innerW = w - this.borderWidth * 2;
-                const innerH = h - this.borderWidth * 2;
-                const innerR = Math.max(0, r - this.borderWidth);
-                const innerPts = this.getRoundedRectPoints(cx, cy, innerW, innerH, innerR, 400);
-
-                const totalPts = outerPts.length;
-                const ptsPerSeg = Math.floor(totalPts / this.segmentCount);
-
-                const multiplierPool = [
-                    { value: 3.0, weight: 1 },
-                    { value: 2.0, weight: 2 },
-                    { value: 1.0, weight: 5 },
-                    { value: 0.5, weight: 15 },
-                    { value: 0.2, weight: 25 },
-                    { value: 0.1, weight: 52 }
-                ];
-                let weighted = [];
-                for (let item of multiplierPool) {
-                    for (let i = 0; i < item.weight; i++) weighted.push(item.value);
-                }
-
-                for (let i = 0; i < this.segmentCount; i++) {
-                    const startIdx = i * ptsPerSeg;
-                    const endIdx = (i === this.segmentCount - 1) ? totalPts - 1 : (i + 1) * ptsPerSeg;
-                    const outerSeg = [];
-                    const innerSeg = [];
-                    for (let j = startIdx; j <= endIdx; j++) {
-                        outerSeg.push(outerPts[j]);
-                        innerSeg.push(innerPts[j]);
-                    }
-                    const p1 = innerSeg[0];
-                    const p2 = innerSeg[innerSeg.length - 1];
-                    const durability = 1 + Math.floor(Math.random() * 2);
-                    const multiplier = weighted[Math.floor(Math.random() * weighted.length)];
-                    this.segments.push({
-                        outer: outerSeg,
-                        inner: innerSeg,
-                        x1: p1.x,
-                        y1: p1.y,
-                        x2: p2.x,
-                        y2: p2.y,
-                        durability: durability,
-                        maxDurability: durability,
-                        multiplier: multiplier,
-                        broken: false
-                    });
-                }
-            },
-
-            resetCircle() {
-                this.circle.x = this.width / 2;
-                this.circle.y = this.height / 2;
-                this.circle.vx = 0;
-                this.circle.vy = 0;
-                this.isSpinning = true;
-                this.isLaunched = false;
-                this.isPlaying = false;
-                this.isLossBall = false;
-                this.ballElement.style.display = 'block';
-                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                this.ballElement.style.left = '50%';
-                this.ballElement.style.top = '50%';
-                this.spinStartTime = performance.now();
-                this.arrowAngle = Math.random() * 2 * Math.PI;
-                this.accumulator = 0;
-                this.lastFrameTime = 0;
-                if (this.launchTimeout) clearTimeout(this.launchTimeout);
-                this.launchTimeout = setTimeout(() => {
-                    if (this.isSpinning && !this.isLaunched) this.launchBall();
-                    this.launchTimeout = null;
-                }, (this.spinDuration + 0.5) * 1000);
-            },
-
-            launchBall() {
-                if (this.isLaunched) return;
-                if (this.launchTimeout) {
-                    clearTimeout(this.launchTimeout);
-                    this.launchTimeout = null;
-                }
-                this.isSpinning = false;
-                this.isLaunched = true;
-                this.isPlaying = true;
-                this.isLossBall = false;
-                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                this.startTime = performance.now();
-                const speed = 250 + Math.random() * 100;
-                this.circle.vx = Math.cos(this.arrowAngle) * speed;
-                this.circle.vy = Math.sin(this.arrowAngle) * speed;
-                document.getElementById('bounceStartBtn').textContent = 'Playing...';
-                document.getElementById('bounceStartBtn').disabled = true;
-                if (this.animId) cancelAnimationFrame(this.animId);
-                this.gameLoop();
-            },
-
-            handleStart() {
-                if (!this.isPlaying && !this.isSpinning) this.startRound();
-            },
-
-            startRound() {
-                const input = document.getElementById('bounceBetInput');
-                let bet = parseInt(input.value) || 0;
-                if (bet < 1) { triggerVibration(60, 'heavy'); return; }
-                if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
-                this.bet = bet;
-                state.balance -= this.bet;
-                this.totalMultiplier = 0.2;
-                this.gameOver = false;
-                this.floatingTexts = [];
-                this.isLossBall = false;
-                this.ballElement.style.display = 'block';
-                this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                this.ballElement.style.left = '50%';
-                this.ballElement.style.top = '50%';
-                document.getElementById('bounceResult').style.display = 'none';
-                document.getElementById('bounceStartBtn').textContent = 'Start';
-                document.getElementById('bounceStartBtn').disabled = false;
-                document.getElementById('bounceBetDisplay').textContent = this.bet;
-                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
-
-                document.getElementById('bounceNftOverlay').classList.remove('show');
-                document.getElementById('bounceNftImg').className = 'hidden-img';
-
-                this.generateSegments();
-                this.resetCircle();
-                this.draw();
-                updateHomeUI();
-                document.getElementById('bounceBalance').innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-
-                if (this.animId) cancelAnimationFrame(this.animId);
-                this.gameLoop();
-            },
-
-            gameLoop() {
-                if (!this.isPlaying && !this.isSpinning) {
-                    this.draw();
-                    this.animId = requestAnimationFrame(() => this.gameLoop());
-                    return;
-                }
-                this.update();
-                this.draw();
-                this.animId = requestAnimationFrame(() => this.gameLoop());
-            },
-
-            update() {
-                const dt = 1 / 60;
-
-                if (this.isSpinning) {
-                    const now = performance.now();
-                    const elapsed = (now - this.spinStartTime) / 1000;
-                    if (elapsed >= this.spinDuration) {
-                        this.launchBall();
-                    } else {
-                        const progress = elapsed / this.spinDuration;
-                        this.spinSpeed = this.maxSpinSpeed * Math.sin(progress * Math.PI);
-                        this.arrowAngle += this.spinSpeed * dt;
-                    }
-                }
-
-                if (!this.isPlaying) return;
-
-                const now = performance.now();
-                const delta = this.lastFrameTime ? (now - this.lastFrameTime) / 1000 : 0;
-                this.lastFrameTime = now;
-                this.accumulator += delta;
-
-                while (this.accumulator >= this.fixedStep) {
-                    this.physicsStep(this.fixedStep);
-                    this.accumulator -= this.fixedStep;
-                }
-
-                this.updateNftOverlay();
-
-                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
-                    const ft = this.floatingTexts[i];
-                    ft.y -= 60 * this.fixedStep;
-                    ft.life -= this.fixedStep;
-                    ft.scale = 1 - (1 - ft.life / ft.maxLife) * 0.8;
-                    if (ft.life <= 0) this.floatingTexts.splice(i, 1);
-                }
-
-                if (!this.isInsideRoundedRect(this.circle.x, this.circle.y)) {
-                    this.isLossBall = true;
-                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
-                    this.endGame(false);
-                    return;
-                }
-            },
-
-            physicsStep(dt) {
-                const now = performance.now();
-                const elapsed = now - this.startTime;
-
-                let currentFriction = 1.0;
-                if (elapsed > 2500 && elapsed <= 6000) currentFriction = 0.998;
-                else if (elapsed > 6000) currentFriction = 0.993;
-                else currentFriction = 1.0;
-
-                if (elapsed > 2500) {
-                    this.circle.vx *= currentFriction;
-                    this.circle.vy *= currentFriction;
-                }
-
-                this.circle.x += this.circle.vx * dt;
-                this.circle.y += this.circle.vy * dt;
-
-                if (this.ballElement) {
-                    const percentX = (this.circle.x / this.width) * 100;
-                    const percentY = (this.circle.y / this.height) * 100;
-                    this.ballElement.style.left = percentX + '%';
-                    this.ballElement.style.top = percentY + '%';
-                }
-
-                const speed = Math.sqrt(this.circle.vx * this.circle.vx + this.circle.vy * this.circle.vy);
-                if (speed < this.speedThreshold && elapsed > 2500) {
-                    this.endGame(true);
-                    return;
-                }
-
-                for (let seg of this.segments) {
-                    if (seg.broken) continue;
-                    const dist = this.distToSegment(this.circle.x, this.circle.y, seg.x1, seg.y1, seg.x2, seg.y2);
-                    if (dist < this.circle.radius) {
-                        let nx = -(seg.y2 - seg.y1);
-                        let ny = (seg.x2 - seg.x1);
-                        const len = Math.sqrt(nx * nx + ny * ny);
-                        if (len === 0) continue;
-                        let normX = nx / len;
-                        let normY = ny / len;
-                        const cx = this.circle.x - seg.x1;
-                        const cy = this.circle.y - seg.y1;
-                        if (cx * normX + cy * normY < 0) { normX = -normX;
-                            normY = -normY; }
-                        const vDot = this.circle.vx * normX + this.circle.vy * normY;
-                        if (vDot < 0) {
-                            this.circle.vx -= 2 * vDot * normX;
-                            this.circle.vy -= 2 * vDot * normY;
-                            const overlap = this.circle.radius - dist + 1;
-                            this.circle.x += normX * overlap;
-                            this.circle.y += normY * overlap;
-                            seg.durability--;
-                            this.playHitSound();
-                            triggerVibration(15, 'light');
-                            if (seg.durability <= 0) {
-                                seg.broken = true;
-                                this.totalMultiplier += seg.multiplier;
-                                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
-                                this.createFloatingText(seg);
-                                this.playBreakSound();
-                                triggerVibration(30, 'medium');
-                            }
-                        }
-                    }
-                }
-            },
-
-            createFloatingText(seg) {
-                const cx = (seg.x1 + seg.x2) / 2;
-                const cy = (seg.y1 + seg.y2) / 2;
-                const mult = seg.multiplier;
-                const sign = mult >= 0 ? '+' : '';
-                this.floatingTexts.push({ x: cx, y: cy, text: `${sign}${mult.toFixed(2)}x`, life: 1.2, maxLife: 1.2,
-                    scale: 1.0 });
-            },
-
-            distToSegment(px, py, x1, y1, x2, y2) {
-                const dx = x2 - x1;
-                const dy = y2 - y1;
-                const lenSq = dx * dx + dy * dy;
-                if (lenSq === 0) return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
-                let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
-                t = Math.max(0, Math.min(1, t));
-                const projX = x1 + t * dx;
-                const projY = y1 + t * dy;
-                return Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
-            },
-
-            isInsideRoundedRect(x, y) {
-                const w = this.width - 20 - this.borderWidth * 2;
-                const h = this.height - 20 - this.borderWidth * 2;
-                const cx = this.width / 2;
-                const cy = this.height / 2;
-                const r = Math.max(0, this.cornerRadius - this.borderWidth);
-                const halfW = w / 2;
-                const halfH = h / 2;
-                if (x < cx - halfW || x > cx + halfW || y < cy - halfH || y > cy + halfH) return false;
-                const corners = [
-                    { x: cx - halfW + r, y: cy - halfH + r },
-                    { x: cx + halfW - r, y: cy - halfH + r },
-                    { x: cx + halfW - r, y: cy + halfH - r },
-                    { x: cx - halfW + r, y: cy + halfH - r }
-                ];
-                for (let c of corners) {
-                    if (Math.sqrt((x - c.x) * (x - c.x) + (y - c.y) * (y - c.y)) < r) return true;
-                }
-                return true;
-            },
-
-            endGame(win) {
-                if (this.gameOver) return;
-                this.isPlaying = false;
-                this.isSpinning = false;
-                this.gameOver = true;
-                if (this.launchTimeout) {
-                    clearTimeout(this.launchTimeout);
-                    this.launchTimeout = null;
-                }
-                if (this.animId) { cancelAnimationFrame(this.animId);
-                    this.animId = null; }
-                document.getElementById('bounceStartBtn').textContent = 'Start';
-                document.getElementById('bounceStartBtn').disabled = false;
-
-                document.getElementById('bounceNftOverlay').classList.remove('show');
-
-                const resultEl = document.getElementById('bounceResult');
-                resultEl.style.display = 'block';
-                if (win) {
-                    const winAmount = Math.floor(this.bet * this.totalMultiplier);
-                    state.balance += winAmount;
-                    state.wins++;
-                    state.totalGames++;
-                    if (this.totalMultiplier > state.bestMultiplier) state.bestMultiplier = this.totalMultiplier;
-                    state.recentWinners.unshift({ name: 'You (Bounce)', amount: winAmount });
-                    if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    resultEl.className = 'bounce-result win';
-                    resultEl.textContent = `Won ${winAmount}⭐ (${this.totalMultiplier.toFixed(2)}x)`;
-                    this.playWinSound();
-                    triggerVibration(50, 'medium');
-                    showNotification(winAmount, winAmount);
-                    processGameWin(winAmount);
-                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
-                } else {
-                    state.losses++;
-                    state.totalGames++;
-                    resultEl.className = 'bounce-result lose';
-                    resultEl.textContent = `Lost ${this.bet}⭐`;
-                    this.playLoseSound();
-                    triggerVibration(80, 'heavy');
-                    if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
-                }
-                updateHomeUI();
-                updateProfile();
-                document.getElementById('bounceBalance').innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-                document.getElementById('bounceMultiplier').textContent = this.totalMultiplier.toFixed(2);
-                this.draw();
-            },
-
-            draw() {
-                const ctx = this.ctx;
-                const w = this.width,
-                    h = this.height;
-                ctx.clearRect(0, 0, w, h);
-
-                const cx = w / 2,
-                    cy = h / 2;
-                const halfW = (w - 20) / 2 - this.borderWidth;
-                const halfH = (h - 20) / 2 - this.borderWidth;
-                const r = Math.max(0, this.cornerRadius - this.borderWidth);
-
-                ctx.beginPath();
-                ctx.moveTo(cx - halfW + r, cy - halfH);
-                ctx.lineTo(cx + halfW - r, cy - halfH);
-                ctx.quadraticCurveTo(cx + halfW, cy - halfH, cx + halfW, cy - halfH + r);
-                ctx.lineTo(cx + halfW, cy + halfH - r);
-                ctx.quadraticCurveTo(cx + halfW, cy + halfH, cx + halfW - r, cy + halfH);
-                ctx.lineTo(cx - halfW + r, cy + halfH);
-                ctx.quadraticCurveTo(cx - halfW, cy + halfH, cx - halfW, cy + halfH - r);
-                ctx.lineTo(cx - halfW, cy - halfH + r);
-                ctx.quadraticCurveTo(cx - halfW, cy - halfH, cx - halfW + r, cy - halfH);
-                ctx.closePath();
-                ctx.fillStyle = '#060608';
-                ctx.fill();
-
-                const outerR = this.cornerRadius;
-                const outerW = w - 20;
-                const outerH = h - 20;
-                const innerR = Math.max(0, outerR - this.borderWidth);
-                const innerW = outerW - this.borderWidth * 2;
-                const innerH = outerH - this.borderWidth * 2;
-
-                ctx.beginPath();
-                ctx.moveTo(cx - outerW / 2 + outerR, cy - outerH / 2);
-                ctx.lineTo(cx + outerW / 2 - outerR, cy - outerH / 2);
-                ctx.quadraticCurveTo(cx + outerW / 2, cy - outerH / 2, cx + outerW / 2, cy - outerH / 2 + outerR);
-                ctx.lineTo(cx + outerW / 2, cy + outerH / 2 - outerR);
-                ctx.quadraticCurveTo(cx + outerW / 2, cy + outerH / 2, cx + outerW / 2 - outerR, cy + outerH / 2);
-                ctx.lineTo(cx - outerW / 2 + outerR, cy + outerH / 2);
-                ctx.quadraticCurveTo(cx - outerW / 2, cy + outerH / 2, cx - outerW / 2, cy + outerH / 2 - outerR);
-                ctx.lineTo(cx - outerW / 2, cy - outerH / 2 + outerR);
-                ctx.quadraticCurveTo(cx - outerW / 2, cy - outerH / 2, cx - outerW / 2 + outerR, cy - outerH / 2);
-                ctx.closePath();
-                ctx.moveTo(cx - innerW / 2 + innerR, cy - innerH / 2);
-                ctx.lineTo(cx + innerW / 2 - innerR, cy - innerH / 2);
-                ctx.quadraticCurveTo(cx + innerW / 2, cy - innerH / 2, cx + innerW / 2, cy - innerH / 2 + innerR);
-                ctx.lineTo(cx + innerW / 2, cy + innerH / 2 - innerR);
-                ctx.quadraticCurveTo(cx + innerW / 2, cy + innerH / 2, cx + innerW / 2 - innerR, cy + innerH / 2);
-                ctx.lineTo(cx - innerW / 2 + innerR, cy + innerH / 2);
-                ctx.quadraticCurveTo(cx - innerW / 2, cy + innerH / 2, cx - innerW / 2, cy + innerH / 2 - innerR);
-                ctx.lineTo(cx - innerW / 2, cy - innerH / 2 + innerR);
-                ctx.quadraticCurveTo(cx - innerW / 2, cy - innerH / 2, cx - innerW / 2 + innerR, cy - innerH / 2);
-                ctx.closePath();
-                ctx.fillStyle = '#111115';
-                ctx.fill();
-
-                for (let seg of this.segments) {
-                    if (seg.broken) continue;
-                    const ratio = seg.durability / seg.maxDurability;
-                    let color = ratio > 0.5 ? '#1a1a20' : '#282830';
-                    ctx.beginPath();
-                    const outer = seg.outer;
-                    ctx.moveTo(outer[0].x, outer[0].y);
-                    for (let i = 1; i < outer.length; i++) ctx.lineTo(outer[i].x, outer[i].y);
-                    const inner = seg.inner;
-                    for (let i = inner.length - 1; i >= 0; i--) ctx.lineTo(inner[i].x, inner[i].y);
-                    ctx.closePath();
-                    ctx.fillStyle = color;
-                    ctx.shadowColor = 'rgba(255,255,255,0.02)';
-                    ctx.shadowBlur = 4;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
-                }
-
-                for (let ft of this.floatingTexts) {
-                    const alpha = Math.min(1, ft.life / 0.3);
-                    const scale = ft.scale;
-                    ctx.globalAlpha = alpha;
-                    ctx.save();
-                    ctx.translate(ft.x, ft.y);
-                    ctx.scale(scale, scale);
-                    ctx.fillStyle = '#ffd700';
-                    ctx.font = 'bold 28px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.shadowColor = 'rgba(255,215,0,0.5)';
-                    ctx.shadowBlur = 20;
-                    ctx.fillText(ft.text, 0, 0);
-                    ctx.shadowBlur = 0;
-                    ctx.restore();
-                }
-                ctx.globalAlpha = 1;
-
-                if (this.isSpinning || !this.isLaunched) {
-                    ctx.save();
-                    ctx.translate(cx, cy);
-                    ctx.rotate(this.arrowAngle);
-                    ctx.beginPath();
-                    ctx.moveTo(30, 0);
-                    ctx.lineTo(65, 0);
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 4;
-                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
-                    ctx.shadowBlur = 15;
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(65, 0);
-                    ctx.lineTo(55, -10);
-                    ctx.lineTo(55, 10);
-                    ctx.closePath();
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
-                    ctx.shadowBlur = 20;
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 6, 0, 2 * Math.PI);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = 'rgba(255,255,255,0.3)';
-                    ctx.shadowBlur = 25;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.restore();
-                }
-            }
-        };
-
         // ============================================================
         // PRESET BUTTON HANDLERS
         // ============================================================
@@ -6360,7 +6505,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – rocket struggle active, all NFT milestones shown.');
+            console.log('✅ Casino loaded – milestones optimized, bounce TNTs added.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
