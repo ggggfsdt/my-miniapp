@@ -913,8 +913,6 @@
             border-color: rgba(108, 92, 231, 0.06);
         }
 
-        /* removed wind-lines */
-
         .gif-overlay {
             position: absolute;
             top: 45%;
@@ -1166,7 +1164,7 @@
         /* ===== NFT MILESTONE – just an image, no circles, with pop animation ===== */
         .nft-milestone {
             position: absolute;
-            top: -14px; /* moved higher above the line */
+            top: -22px; /* moved higher */
             transform: translateX(-50%) scale(0.6);
             z-index: 12;
             width: 30px;
@@ -2640,7 +2638,7 @@
             .nft-milestone {
                 width: 26px;
                 height: 26px;
-                top: -12px;
+                top: -18px;
             }
         }
     </style>
@@ -3037,9 +3035,7 @@
             'https://images.iimg.live/images/stellar-collection-3896.webp',
             'https://images.iimg.live/images/cool-gallery-5268.webp',
             'https://images.iimg.live/images/fantastic-image-2034.webp',
-            'https://images.iimg.live/images/radiant-picture-4066.webp',
-            'https://images.iimg.live/images/glorious-portfolio-1947.webp',
-            'https://images.iimg.live/images/wonderful-work-4770.webp',
+            // removed the three old rocket gifs
             'https://images.iimg.live/images/ultimate-photography-1463.webp',
             'https://images.iimg.live/images/radiant-masterpiece-3049.webp',
             'https://images.iimg.live/images/ultimate-collection-3580.webp',
@@ -3069,7 +3065,10 @@
             'https://i.postimg.cc/wjzbXkBN/ezgif-8e6e7217c24feec6.gif',
             'https://i.postimg.cc/XNy2tPGZ/ezgif-8d85e2a6a121dfa8.gif',
             'https://i.postimg.cc/02SjbFc2/brick.gif',
-            'https://i.postimg.cc/RZdBnc8Z/ezgif-86ccd2fd265e1e18.gif'
+            'https://i.postimg.cc/RZdBnc8Z/ezgif-86ccd2fd265e1e18.gif',
+            // new rocket gifs
+            'https://i.postimg.cc/sDQHk9K1/ezgif-8b61599f5def4979.gif',
+            'https://i.postimg.cc/xd0R1KGR/ezgif-69a8adec4a1d8304.gif'
         ];
 
         async function preloadAllGifs() {
@@ -3077,12 +3076,11 @@
         }
 
         // ============================================================
-        // ROCKET GIFS (only rockets, no cars)
+        // ROCKET GIFS (only rockets, no cars) – updated list
         // ============================================================
         const ROCKET_GIFS = [
-            'https://images.iimg.live/images/radiant-picture-4066.webp',
-            'https://images.iimg.live/images/glorious-portfolio-1947.webp',
-            'https://images.iimg.live/images/wonderful-work-4770.webp',
+            'https://i.postimg.cc/sDQHk9K1/ezgif-8b61599f5def4979.gif',
+            'https://i.postimg.cc/xd0R1KGR/ezgif-69a8adec4a1d8304.gif',
             'https://images.iimg.live/images/ultimate-photography-1463.webp',
             'https://images.iimg.live/images/radiant-masterpiece-3049.webp'
         ];
@@ -3713,7 +3711,6 @@
             isCashingOut: false,
             vibrationInterval: null,
             roundId: 0,
-            // removed wind related
             currentAngle: 0,
             velocity: 0,
             targetAngle: 0,
@@ -3724,12 +3721,12 @@
             transitioning: false,
             moonActive: false,
             nftActive: false,
-            maxMultiplierForLine: 5.0, // line fills from 1x to 5x
+            maxMultiplierForLine: 10.0, // 10x max
 
-            // Rocket struggle parameters – increased amplitude
+            // Rocket struggle – increased amplitude & speed
             struggleTime: 0,
-            struggleAmplitude: 0.15,
-            struggleSpeed: 10,
+            struggleAmplitude: 0.25,
+            struggleSpeed: 14,
 
             toggleBetType() {
                 if (this.isPlaying) return;
@@ -3864,10 +3861,10 @@
                 firstMarker.appendChild(img);
                 progressWrap.appendChild(firstMarker);
 
-                // Then NFT milestones
+                // Then NFT milestones – show all NFTs that are within maxMult
                 const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
-                const displayNfts = reachable.slice(0, 5);
-                displayNfts.forEach((nft) => {
+                // Show up to 6, but we can show all – let's show all to demonstrate
+                reachable.forEach((nft) => {
                     const requiredMult = nft.price / bet;
                     if (requiredMult <= minMult) return;
                     const pct = ((requiredMult - minMult) / (maxMult - minMult)) * 100;
@@ -4020,7 +4017,7 @@
 
                 // Apply struggle to scale
                 let totalScale = baseScale + struggle;
-                totalScale = Math.max(0.5, Math.min(1.4, totalScale));
+                totalScale = Math.max(0.4, Math.min(1.6, totalScale));
 
                 // Smoothly interpolate currentScale towards target
                 const scaleStiffness = 6.0,
@@ -4030,7 +4027,7 @@
                 const scaleAccel = scaleForce + scaleDampForce;
                 this.scaleVelocity += scaleAccel * dt;
                 this.currentScale += this.scaleVelocity * dt;
-                this.currentScale = Math.max(0.5, Math.min(1.4, this.currentScale));
+                this.currentScale = Math.max(0.4, Math.min(1.6, this.currentScale));
 
                 if (!this.nftActive) {
                     const overlay = document.getElementById('rocketOverlay');
@@ -6363,7 +6360,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – rocket struggle active, NFT milestones shown.');
+            console.log('✅ Casino loaded – rocket struggle active, all NFT milestones shown.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
