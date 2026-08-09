@@ -3712,7 +3712,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – NFT milestones with arrow pointer
+        // CRASH GAME – FULLY RESTORED
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -3748,7 +3748,6 @@
             struggleAmplitude: 0.25,
             struggleSpeed: 14,
 
-            // For smoothing fill
             smoothFill: 0,
 
             toggleBetType() {
@@ -3802,6 +3801,7 @@
                 );
                 this.updateNftMilestones(0);
                 this.updateArrow(0);
+                this.smoothFill = 0;
             },
 
             populateNftGrid() {
@@ -3868,13 +3868,11 @@
                 const maxMult = this.maxMultiplierForLine;
                 const minMult = 1.0;
 
-                // Bet image
                 let betImage = 'https://images.iimg.live/images/radiant-capture-7834.webp';
                 if (this.betType === 'nft' && this.betNftData) {
                     betImage = this.betNftData.gif;
                 }
 
-                // First marker at 1x
                 const firstMarker = document.createElement('div');
                 firstMarker.className = 'nft-milestone';
                 firstMarker.dataset.mult = 1.0;
@@ -3885,11 +3883,9 @@
                 firstMarker.appendChild(img);
                 progressWrap.appendChild(firstMarker);
 
-                // Collect reachable NFTs
                 const reachable = SORTED_NFTS.filter(nft => (nft.price / bet) <= maxMult);
                 if (reachable.length === 0) return;
 
-                // We want at most 4 additional milestones, but always include the most expensive reachable
                 let selected = [];
                 if (reachable.length <= 4) {
                     selected = reachable;
@@ -3922,7 +3918,6 @@
                 if (fill) fill.style.zIndex = 1;
             },
 
-            // Arrow pointer – shows next milestone (the one just above current multiplier)
             updateArrow(mult) {
                 const arrow = document.getElementById('nftArrow');
                 if (!arrow) return;
@@ -3938,9 +3933,7 @@
                     }
                 });
                 if (next) {
-                    const rect = next.getBoundingClientRect();
-                    const wrapRect = progressWrap.getBoundingClientRect();
-                    const leftPct = ((parseFloat(next.style.left) || 0) / 100) * 100;
+                    const leftPct = parseFloat(next.style.left) || 0;
                     arrow.style.left = leftPct + '%';
                     arrow.style.display = 'block';
                 } else {
@@ -3967,7 +3960,6 @@
                         marker.classList.remove('reached');
                     }
                 });
-                // Update arrow
                 this.updateArrow(mult);
             },
 
@@ -4096,7 +4088,6 @@
                 }
             },
 
-            // Smooth progress line with lerp
             updateProgressLine() {
                 const wrap = document.getElementById('progressWrap');
                 const fill = document.getElementById('progressFill');
@@ -4107,7 +4098,6 @@
                     Math.min(100, ((this.multiplier - 1.0) / (this.maxMultiplierForLine - 1.0)) * 100) :
                     0;
 
-                // Smooth interpolation
                 const speed = 0.15;
                 this.smoothFill += (targetWidth - this.smoothFill) * speed;
                 const currentWidth = this.smoothFill;
@@ -4209,27 +4199,568 @@
                     document.getElementById('rocketOverlay').classList.remove('nft-active');
                 } else {
                     this.updateMilestoneStates(1.0);
-                    this.updateProgressLine(); // will set to 0
+                    this.updateProgressLine();
                 }
             },
 
             updateMainButton() {
-                // ... (unchanged, long)
-                // Keep as is from previous version, omitted for brevity
-                // We'll include the full function in the final code.
-                // For brevity in this response, we assume it's unchanged.
+                const btn = document.getElementById('mainActionBtn');
+                const mainText = document.getElementById('mainActionText');
+                const subText = document.getElementById('mainActionSub');
+                const confirmBtn = document.getElementById('betConfirmBtn');
+                const inputRow = document.getElementById('betInputRow');
+                subText.textContent = '';
+                const isCrashed = this.gameOver && !this.isPlaying && !this.isCountingDown;
+
+                let nftValid = false;
+                if (this.betType === 'nft') {
+                    if (this.betNftId) {
+                        const exists = state.inventory.some(n => n.id === this.betNftId);
+                        if (exists) nftValid = true;
+                        else {
+                            this.betNftId = null;
+                            this.betNftData = null;
+                            document.getElementById('nftBetPreview').style.display = 'none';
+                            this.populateNftGrid();
+                            updateBetNftIndicator(
+                                document.getElementById('crashNftImg'),
+                                document.getElementById('crashNftIndicator'),
+                                null
+                            );
+                        }
+                    }
+                }
+
+                if (this.isCountingDown) {
+                    if (this.bet > 0 || (this.betType === 'nft' && this.betNftId && this.bet > 0)) {
+                        mainText.textContent = 'Waiting for round';
+                        btn.className = 'main-action-btn bet-placed';
+                        btn.disabled = true;
+                        inputRow.classList.remove('open');
+                        confirmBtn.disabled = true;
+                        document.getElementById('betToggleBtn').style.opacity = '0.4';
+                        document.getElementById('betToggleBtn').style.pointerEvents = 'none';
+                    } else {
+                        const isOpen = inputRow.classList.contains('open');
+                        if (this.betType === 'nft') {
+                            if (nftValid) {
+                                mainText.textContent = 'Bet NFT';
+                                btn.className = 'main-action-btn bet-nft';
+                                btn.disabled = false;
+                            } else {
+                                mainText.textContent = 'Select an NFT';
+                                btn.className = 'main-action-btn waiting';
+                                btn.disabled = true;
+                            }
+                            inputRow.classList.remove('open');
+                            confirmBtn.disabled = true;
+                        } else {
+                            if (isOpen) {
+                                mainText.textContent = 'Confirm Bet';
+                                btn.className = 'main-action-btn confirm-bet';
+                                btn.disabled = false;
+                                confirmBtn.disabled = false;
+                            } else {
+                                mainText.textContent = 'Place Bet';
+                                btn.className = 'main-action-btn place-bet';
+                                btn.disabled = false;
+                                confirmBtn.disabled = true;
+                            }
+                        }
+                        document.getElementById('betToggleBtn').style.opacity = '1';
+                        document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
+                    }
+                    return;
+                }
+
+                if (this.isPlaying) {
+                    document.getElementById('betToggleBtn').style.opacity = '0.4';
+                    document.getElementById('betToggleBtn').style.pointerEvents = 'none';
+                    if (this.bet > 0 && !this.hasCashedOut) {
+                        mainText.textContent = 'Cash Out';
+                        const winAmount = Math.floor(this.bet * this.multiplier);
+                        subText.textContent = winAmount.toFixed(0);
+                        btn.className = 'main-action-btn cash-out';
+                        btn.disabled = false;
+                    } else if (this.bet > 0 && this.hasCashedOut) {
+                        mainText.textContent = 'Cashed Out';
+                        subText.textContent = (this.bet * this.multiplier).toFixed(1);
+                        btn.className = 'main-action-btn cashed-out';
+                        btn.disabled = true;
+                    } else {
+                        mainText.textContent = 'Round in progress';
+                        btn.className = 'main-action-btn round-in-progress';
+                        btn.disabled = true;
+                    }
+                    inputRow.classList.remove('open');
+                    confirmBtn.disabled = true;
+                    return;
+                }
+
+                document.getElementById('betToggleBtn').style.opacity = '1';
+                document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
+
+                if (isCrashed) {
+                    mainText.textContent = 'Crashed';
+                    btn.className = 'main-action-btn crashed';
+                    btn.disabled = true;
+                    inputRow.classList.remove('open');
+                    confirmBtn.disabled = true;
+                    return;
+                }
+
+                if (this.betType === 'nft') {
+                    if (nftValid) {
+                        mainText.textContent = 'Bet NFT';
+                        btn.className = 'main-action-btn bet-nft';
+                        btn.disabled = false;
+                    } else {
+                        mainText.textContent = 'Select an NFT';
+                        btn.className = 'main-action-btn waiting';
+                        btn.disabled = true;
+                    }
+                    inputRow.classList.remove('open');
+                    confirmBtn.disabled = true;
+                    return;
+                }
+
+                mainText.textContent = 'Place Bet';
+                btn.className = 'main-action-btn place-bet';
+                btn.disabled = false;
+                confirmBtn.disabled = true;
             },
 
-            mainAction() { /* unchanged */ },
-            confirmBet() { /* unchanged */ },
-            initiateCashOut() { /* unchanged */ },
-            executeCashOut() { /* unchanged */ },
-            startCountdown() { /* unchanged */ },
-            startRound() { /* unchanged */ },
-            gameLoop() { /* unchanged */ },
-            generateCrashPoint() { /* unchanged */ },
-            renderHistory() { /* unchanged */ },
-            addHistory() { /* unchanged */ }
+            mainAction() {
+                if (this.gameOver && !this.isPlaying && !this.isCountingDown) return;
+                if (this.isPlaying) {
+                    if (this.bet > 0 && !this.hasCashedOut && !this.isCashingOut && !this.cashOutPending) {
+                        this.initiateCashOut();
+                    }
+                    return;
+                }
+                if (this.isCountingDown) {
+                    const row = document.getElementById('betInputRow');
+                    const isOpen = row.classList.contains('open');
+                    if (this.betType === 'nft') {
+                        this.confirmBet();
+                        return;
+                    }
+                    if (isOpen) { this.confirmBet(); } else {
+                        if (this.bet === 0) {
+                            row.classList.add('open');
+                            document.getElementById('betInputRocket').focus();
+                            this.updateMainButton();
+                        }
+                    }
+                    return;
+                }
+                if (this.gameOver && !this.isPlaying && !this.isCountingDown) {
+                    this.gameOver = false;
+                    this.hasCashedOut = false;
+                    this.bet = 0;
+                    document.getElementById('explosionOverlay').classList.remove('active');
+                    document.getElementById('betInputRocket').value = 10;
+                    this.startCountdown();
+                    return;
+                }
+                if (this.bet === 0 && !this.isPlaying && !this.isCountingDown) {
+                    if (this.betType === 'stars') {
+                        const row = document.getElementById('betInputRow');
+                        row.classList.add('open');
+                        document.getElementById('betInputRocket').focus();
+                        this.updateMainButton();
+                    } else {
+                        this.confirmBet();
+                    }
+                }
+            },
+
+            confirmBet() {
+                if (this.betType === 'nft') {
+                    const id = this.betNftId;
+                    if (!id) { triggerVibration(60, 'heavy'); return; }
+                    const nft = state.inventory.find(n => n.id === id);
+                    if (!nft) { triggerVibration(60, 'heavy'); return; }
+                    const idx = state.inventory.findIndex(n => n.id === id);
+                    if (idx === -1) { triggerVibration(60, 'heavy'); return; }
+                    state.inventory.splice(idx, 1);
+                    this.bet = nft.price;
+                    this.betNftId = nft.id;
+                    this.betNftData = nft;
+                    renderInventory();
+                    updateHomeUI();
+                    this.populateNftGrid();
+                    const isBig = nft.price >= 1000;
+                    updateBetNftIndicator(
+                        document.getElementById('crashNftImg'),
+                        document.getElementById('crashNftIndicator'),
+                        nft,
+                        isBig
+                    );
+                    const existing = players.find(p => p.isYou);
+                    if (existing) {
+                        existing.bet = this.bet;
+                        existing.active = true;
+                        existing.hasCashedOut = false;
+                        existing.crashed = false;
+                        existing.cashOutMultiplier = undefined;
+                        existing.cashOutAmount = undefined;
+                        existing._gifPlayed = false;
+                        existing.betNftData = this.betNftData;
+                    } else {
+                        players.push({
+                            name: state.displayName,
+                            color: '#ffd700',
+                            bet: this.bet,
+                            hasCashedOut: false,
+                            crashed: false,
+                            active: true,
+                            isYou: true,
+                            cashOutMultiplier: undefined,
+                            cashOutAmount: undefined,
+                            _gifPlayed: false,
+                            betNftData: this.betNftData
+                        });
+                    }
+                    renderPlayers();
+                    this.updateMainButton();
+                    document.getElementById('betInputRow').classList.remove('open');
+                    this.updateNftMilestones(this.bet);
+                    return;
+                }
+
+                const input = document.getElementById('betInputRocket');
+                let bet = parseInt(input.value) || 0;
+                if (bet < 1) { triggerVibration(60, 'heavy'); return; }
+                if (bet > state.balance) { triggerVibration(60, 'heavy'); return; }
+                this.bet = bet;
+                this.betNftId = null;
+                this.betNftData = null;
+                document.getElementById('betInputRow').classList.remove('open');
+                const existing = players.find(p => p.isYou);
+                if (existing) {
+                    existing.bet = bet;
+                    existing.active = true;
+                    existing.hasCashedOut = false;
+                    existing.crashed = false;
+                    existing.cashOutMultiplier = undefined;
+                    existing.cashOutAmount = undefined;
+                    existing._gifPlayed = false;
+                    existing.betNftData = null;
+                } else {
+                    players.push({
+                        name: state.displayName,
+                        color: '#ffd700',
+                        bet: bet,
+                        hasCashedOut: false,
+                        crashed: false,
+                        active: true,
+                        isYou: true,
+                        cashOutMultiplier: undefined,
+                        cashOutAmount: undefined,
+                        _gifPlayed: false,
+                        betNftData: null
+                    });
+                }
+                renderPlayers();
+                this.updateMainButton();
+                updateBetNftIndicator(
+                    document.getElementById('crashNftImg'),
+                    document.getElementById('crashNftIndicator'),
+                    null
+                );
+                this.updateNftMilestones(bet);
+            },
+
+            initiateCashOut() {
+                if (this.isCashingOut || this.cashOutPending) return;
+                this.cashOutPending = true;
+                triggerCashOutVibration();
+                const btn = document.getElementById('mainActionBtn');
+                btn.disabled = true;
+                setTimeout(() => {
+                    this.cashOutPending = false;
+                    if (this.isPlaying && this.bet > 0 && !this.hasCashedOut) this.executeCashOut();
+                    btn.disabled = false;
+                }, 300);
+            },
+
+            executeCashOut() {
+                if (!this.isPlaying || this.bet === 0 || this.hasCashedOut) return;
+                this.hasCashedOut = true;
+                const win = Math.floor(this.bet * this.multiplier);
+
+                if (this.betNftData) {
+                    state.inventory.push({ ...this.betNftData });
+                    renderInventory();
+                    state.balance += win;
+                    this.betNftData = null;
+                    this.betNftId = null;
+                } else {
+                    state.balance += win;
+                }
+
+                state.wins++;
+                state.totalGames++;
+                if (this.multiplier > state.bestMultiplier) state.bestMultiplier = this.multiplier;
+                state.recentWinners.unshift({ name: 'You', amount: win });
+                if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                processGameWin(win);
+
+                const user = players.find(p => p.isYou);
+                if (user) {
+                    user.hasCashedOut = true;
+                    user.active = false;
+                    user.cashOutMultiplier = this.multiplier;
+                    user.cashOutAmount = win;
+                    user._gifPlayed = false;
+                }
+                renderPlayers();
+                this.updateUI();
+                this.updateMainButton();
+                updateHomeUI();
+                document.getElementById('crashNftIndicator').classList.remove('show');
+                document.getElementById('crashNftOverlay').classList.remove('show');
+                document.getElementById('rocketOverlay').classList.remove('nft-active');
+                this.bet = 0;
+                this.betNftId = null;
+                this.betNftData = null;
+                document.getElementById('betToggleBtn').style.opacity = '1';
+                document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
+                this.populateNftGrid();
+                updateBetNftIndicator(
+                    document.getElementById('crashNftImg'),
+                    document.getElementById('crashNftIndicator'),
+                    null
+                );
+                this.updateNftMilestones(0);
+            },
+
+            startCountdown() {
+                if (this.isCountingDown || this.isPlaying) return;
+                this.isCountingDown = true;
+                this.gameOver = false;
+                this.hasCashedOut = false;
+                this.roundId++;
+                this.hideImage();
+                document.getElementById('moonOverlay').classList.remove('active');
+                document.getElementById('moonGif').style.display = 'none';
+                this.moonActive = false;
+                document.getElementById('crashNftOverlay').classList.remove('show');
+                document.getElementById('crashNftOverlayImg').className = 'hidden-img';
+                document.getElementById('rocketOverlay').classList.remove('nft-active');
+
+                players = players.filter(p => p.isYou);
+                if (players.length > 0) {
+                    const user = players[0];
+                    user.active = false;
+                    user.hasCashedOut = false;
+                    user.crashed = false;
+                    user.bet = 0;
+                    user.cashOutMultiplier = undefined;
+                    user.cashOutAmount = undefined;
+                    user._gifPlayed = false;
+                    user.betNftData = null;
+                }
+                renderPlayers();
+
+                const overlay = document.getElementById('countdownOverlay');
+                const numberEl = document.getElementById('countdownNumber');
+                overlay.classList.add('active');
+                let count = 3;
+                const showNumber = (num) => {
+                    numberEl.textContent = num;
+                    numberEl.style.animation = 'none';
+                    void numberEl.offsetHeight;
+                    numberEl.style.animation = 'countdownPulse 1s ease-out forwards';
+                    if (num === 2 || num === 1) triggerVibration(35, 'light');
+                };
+                showNumber(3);
+                const intervalTime = 1200;
+                this.countdownId = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(this.countdownId);
+                        this.countdownId = null;
+                        overlay.classList.remove('active');
+                        this.isCountingDown = false;
+                        this.startRound();
+                        return;
+                    }
+                    showNumber(count);
+                }, intervalTime);
+                this.updateMainButton();
+            },
+
+            startRound() {
+                if (this.betNftData) {
+                    const user = players.find(p => p.isYou);
+                    if (user) {
+                        user.active = true;
+                        user.bet = this.bet;
+                        user.hasCashedOut = false;
+                        user.crashed = false;
+                        user.cashOutMultiplier = undefined;
+                        user.cashOutAmount = undefined;
+                        user._gifPlayed = false;
+                        user.betNftData = this.betNftData;
+                    }
+                } else if (this.bet > 0 && this.bet <= state.balance) {
+                    state.balance -= this.bet;
+                    const user = players.find(p => p.isYou);
+                    if (user) {
+                        user.active = true;
+                        user.bet = this.bet;
+                        user.hasCashedOut = false;
+                        user.crashed = false;
+                        user.cashOutMultiplier = undefined;
+                        user.cashOutAmount = undefined;
+                        user._gifPlayed = false;
+                        user.betNftData = null;
+                    }
+                } else {
+                    this.bet = 0;
+                    this.betNftId = null;
+                    this.betNftData = null;
+                    const user = players.find(p => p.isYou);
+                    if (user) { user.active = false;
+                        user.betNftData = null; }
+                    renderPlayers();
+                }
+                this.hasCashedOut = false;
+                this.multiplier = 1.00;
+                this.crashPoint = this.generateCrashPoint();
+                this.isPlaying = true;
+                this.gameOver = false;
+                this.lastTime = 0;
+                document.getElementById('explosionOverlay').classList.remove('active');
+                this.setRocketImage();
+                document.getElementById('progressWrap').classList.remove('active');
+                document.getElementById('progressFill').style.width = '0%';
+                this.currentAngle = 0;
+                this.velocity = 0;
+                this.currentScale = 1;
+                this.targetScale = 1;
+                this.scaleVelocity = 0;
+                this.struggleTime = 0;
+                this.updateUI();
+                this.updateMainButton();
+                this.startContinuousVibration();
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+            },
+
+            gameLoop(timestamp) {
+                if (!this.isPlaying) return;
+                const delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
+                this.lastTime = timestamp;
+                const mult = this.multiplier;
+                const speedFactor = 0.04 + 0.12 * mult;
+                const inc = delta * speedFactor * 1.2;
+                this.multiplier = parseFloat((this.multiplier + inc).toFixed(3));
+
+                this.updateRotationAndZoom();
+                this.updateUI();
+
+                if (this.multiplier >= this.crashPoint) {
+                    this.multiplier = parseFloat(this.crashPoint.toFixed(2));
+                    this.isPlaying = false;
+                    this.gameOver = true;
+                    this.stopContinuousVibration();
+                    triggerExplosionVibration();
+
+                    this.hideImage();
+                    document.getElementById('moonOverlay').classList.remove('active');
+                    document.getElementById('moonGif').style.display = 'none';
+                    this.moonActive = false;
+                    document.getElementById('crashNftOverlay').classList.remove('show');
+                    document.getElementById('rocketOverlay').classList.remove('nft-active');
+
+                    const explosionOverlay = document.getElementById('explosionOverlay');
+                    explosionOverlay.classList.add('active');
+                    const explosionImg = document.getElementById('explosionGif');
+                    explosionImg.style.animation = 'none';
+                    void explosionImg.offsetHeight;
+                    explosionImg.style.animation = 'explosionAnim 0.8s ease-out forwards';
+                    setTimeout(() => explosionOverlay.classList.remove('active'), 1200);
+
+                    const user = players.find(p => p.isYou);
+                    if (user && user.active && !user.hasCashedOut) {
+                        user.crashed = true;
+                        user.active = false;
+                        if (this.betNftData) {
+                            console.log(`Lost NFT: ${this.betNftData.name}`);
+                            this.betNftData = null;
+                            this.betNftId = null;
+                        }
+                    }
+                    renderPlayers();
+                    if (this.bet > 0 && !this.hasCashedOut) {
+                        state.losses++;
+                        state.totalGames++;
+                    }
+                    this.addHistory(this.multiplier);
+                    this.updateUI();
+                    this.updateMainButton();
+                    updateHomeUI();
+                    if (this.animationId) { cancelAnimationFrame(this.animationId);
+                        this.animationId = null; }
+                    document.getElementById('crashNftIndicator').classList.remove('show');
+                    this.bet = 0;
+                    this.betNftId = null;
+                    this.betNftData = null;
+                    document.getElementById('betToggleBtn').style.opacity = '1';
+                    document.getElementById('betToggleBtn').style.pointerEvents = 'auto';
+                    this.populateNftGrid();
+                    updateBetNftIndicator(
+                        document.getElementById('crashNftImg'),
+                        document.getElementById('crashNftIndicator'),
+                        null
+                    );
+                    this.updateNftMilestones(0);
+                    setTimeout(() => {
+                        if (!this.isPlaying && this.gameOver) {
+                            this.bet = 0;
+                            this.hasCashedOut = false;
+                            document.getElementById('betInputRocket').value = 10;
+                            this.gameOver = false;
+                            if (document.getElementById('page-rocket').classList.contains('active')) {
+                                this.startCountdown();
+                            }
+                        }
+                    }, 1500);
+                    return;
+                }
+                this.animationId = requestAnimationFrame((t) => this.gameLoop(t));
+            },
+
+            generateCrashPoint() {
+                const r = Math.random();
+                if (r < 0.30) return 1.00 + Math.random() * 0.5;
+                if (r < 0.60) return 1.50 + Math.random() * 1.0;
+                if (r < 0.80) return 2.50 + Math.random() * 2.0;
+                return 4.50 + Math.random() * 6.55;
+            },
+
+            renderHistory() {
+                const container = document.getElementById('historyPast');
+                container.innerHTML = '';
+                const items = this.history.slice(0, 8);
+                for (const mult of items) {
+                    const el = document.createElement('span');
+                    el.className = 'history-item';
+                    if (mult >= 3.0) el.classList.add('purple');
+                    else if (mult >= 2.0) el.classList.add('blue');
+                    else if (mult >= 1.4) el.classList.add('green');
+                    else el.classList.add('crashed');
+                    el.textContent = `${mult.toFixed(2)}x`;
+                    container.appendChild(el);
+                }
+            },
+
+            addHistory(mult) { this.history.unshift(mult); if (this.history.length > 12) this.history.pop(); this
+                    .renderHistory(); }
         };
 
         // ============================================================
@@ -4728,13 +5259,10 @@
             fixedStep: 1 / 60,
             lastFrameTime: 0,
 
-            // TNT
             tnts: [],
             tntRadius: 12,
             tntExplosionRadius: 60,
-            // particles
             particles: [],
-            // speed boost timer
             speedBoostTimer: 0,
             speedBoostMultiplier: 1.0,
 
@@ -4984,7 +5512,7 @@
                 this.isLossBall = false;
                 this.ballElement.src = 'https://images.iimg.live/images/stellar-work-2795.webp';
                 this.startTime = performance.now();
-                const speed = 260 + Math.random() * 80; // slightly more speed
+                const speed = 260 + Math.random() * 80;
                 this.circle.vx = Math.cos(this.arrowAngle) * speed;
                 this.circle.vy = Math.sin(this.arrowAngle) * speed;
                 document.getElementById('bounceStartBtn').textContent = 'Playing...';
@@ -5076,7 +5604,6 @@
 
                 this.updateNftOverlay();
 
-                // Update floating texts
                 for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
                     const ft = this.floatingTexts[i];
                     ft.y -= 60 * this.fixedStep;
@@ -5085,7 +5612,6 @@
                     if (ft.life <= 0) this.floatingTexts.splice(i, 1);
                 }
 
-                // Update particles
                 for (let i = this.particles.length - 1; i >= 0; i--) {
                     const p = this.particles[i];
                     p.x += p.vx * this.fixedStep;
@@ -5097,7 +5623,6 @@
                     }
                 }
 
-                // Speed boost timer
                 if (this.speedBoostTimer > 0) {
                     this.speedBoostTimer -= this.fixedStep;
                     if (this.speedBoostTimer <= 0) {
@@ -5128,7 +5653,6 @@
                     this.circle.vy *= currentFriction;
                 }
 
-                // Apply speed boost multiplier
                 if (this.speedBoostMultiplier > 1.0) {
                     this.circle.vx *= this.speedBoostMultiplier;
                     this.circle.vy *= this.speedBoostMultiplier;
@@ -5137,7 +5661,6 @@
                 this.circle.x += this.circle.vx * dt;
                 this.circle.y += this.circle.vy * dt;
 
-                // Ball image position
                 if (this.ballElement) {
                     const percentX = (this.circle.x / this.width) * 100;
                     const percentY = (this.circle.y / this.height) * 100;
@@ -5145,20 +5668,18 @@
                     this.ballElement.style.top = percentY + '%';
                 }
 
-                // Check TNT collision
                 for (let i = this.tnts.length - 1; i >= 0; i--) {
                     const tnt = this.tnts[i];
                     if (tnt.exploded) continue;
                     const dist = Math.hypot(this.circle.x - tnt.x, this.circle.y - tnt.y);
                     if (dist < this.circle.radius + this.tntRadius) {
-                        // Explode!
                         tnt.exploded = true;
                         // Speed boost for 0.5 seconds, moderate
                         this.speedBoostTimer = 0.5;
                         this.speedBoostMultiplier = 1.3;
-                        // Increase speed a bit
+                        // Slight kick
                         const speed = Math.hypot(this.circle.vx, this.circle.vy);
-                        const newSpeed = speed * 1.2 + 50;
+                        const newSpeed = Math.min(speed + 80, 600);
                         const angle = Math.atan2(this.circle.vy, this.circle.vx);
                         this.circle.vx = Math.cos(angle) * newSpeed;
                         this.circle.vy = Math.sin(angle) * newSpeed;
@@ -5180,7 +5701,6 @@
                             });
                         }
 
-                        // Remove nearby segments
                         const explosionRadius = this.tntExplosionRadius;
                         for (const seg of this.segments) {
                             if (seg.broken) continue;
@@ -5199,7 +5719,6 @@
                     }
                 }
 
-                // Segment collisions
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const dist = this.distToSegment(this.circle.x, this.circle.y, seg.x1, seg.y1, seg.x2, seg.y2);
@@ -5354,7 +5873,6 @@
                 const halfH = (h - 20) / 2 - this.borderWidth;
                 const r = Math.max(0, this.cornerRadius - this.borderWidth);
 
-                // Background
                 ctx.beginPath();
                 ctx.moveTo(cx - halfW + r, cy - halfH);
                 ctx.lineTo(cx + halfW - r, cy - halfH);
@@ -5369,7 +5887,6 @@
                 ctx.fillStyle = '#060608';
                 ctx.fill();
 
-                // Border
                 const outerR = this.cornerRadius;
                 const outerW = w - 20;
                 const outerH = h - 20;
@@ -5401,7 +5918,6 @@
                 ctx.fillStyle = '#111115';
                 ctx.fill();
 
-                // Draw segments
                 for (let seg of this.segments) {
                     if (seg.broken) continue;
                     const ratio = seg.durability / seg.maxDurability;
@@ -5423,7 +5939,6 @@
                     ctx.stroke();
                 }
 
-                // Draw TNTs
                 for (const tnt of this.tnts) {
                     if (tnt.exploded) continue;
                     ctx.beginPath();
@@ -5456,7 +5971,6 @@
                     ctx.stroke();
                 }
 
-                // Draw particles
                 for (const p of this.particles) {
                     const alpha = p.life / p.maxLife;
                     ctx.globalAlpha = alpha;
@@ -5470,7 +5984,6 @@
                 }
                 ctx.globalAlpha = 1;
 
-                // Floating texts
                 for (let ft of this.floatingTexts) {
                     const alpha = Math.min(1, ft.life / 0.3);
                     const scale = ft.scale;
@@ -5490,7 +6003,6 @@
                 }
                 ctx.globalAlpha = 1;
 
-                // Arrow
                 if (this.isSpinning || !this.isLaunched) {
                     ctx.save();
                     ctx.translate(cx, cy);
@@ -5525,7 +6037,7 @@
         };
 
         // ============================================================
-        // INVENTORY, UPGRADE (unchanged – omitted for brevity, but kept)
+        // INVENTORY, UPGRADE (unchanged)
         // ============================================================
         function sellNFT(index) {
             const nft = state.inventory[index];
@@ -6080,7 +6592,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – profile clickable, smooth line, bounce TNT with particles & arrow.');
+            console.log('✅ Casino loaded – crash restored, bounce TNT fixed, arrow visible.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
