@@ -2133,7 +2133,7 @@
         }
 
         /* ============================================================
-           UPGRADE – FULL SCREEN, SMALLER SELECTOR SQUARES, ICON ARROWS
+           UPGRADE – FULL SCREEN, EXCITING WHEEL, SMALL SQUARES, ICON ARROWS
            ============================================================ */
         #page-upgrade {
             padding: 0;
@@ -2241,7 +2241,6 @@
                 transform: translate(-50%, -50%) scale(1);
             }
         }
-        /* small selector squares */
         .upgrade-selectors {
             display: flex;
             flex-direction: row;
@@ -3099,10 +3098,10 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- ===== UPGRADE – POLISHED ===== -->
+        <!-- ===== UPGRADE – POLISHED & EXCITING ===== -->
         <div id="page-upgrade" class="page">
             <div class="upgrade-full">
-                <!-- Header like other tabs -->
+                <!-- Header -->
                 <div class="upgrade-header">
                     <div class="left-badge">
                         <span class="badge badge-green"><i class="fas fa-arrow-up" style="margin-right:4px;"></i>Upgrade<span class="online-dot"></span></span>
@@ -3118,7 +3117,7 @@
                     </div>
                 </div>
 
-                <!-- NFT Selectors – smaller squares, icon arrows -->
+                <!-- NFT Selectors -->
                 <div class="upgrade-selectors">
                     <div class="upgrade-select from-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
                         <div class="nft-square" id="fromNftSquare">
@@ -6233,7 +6232,7 @@
             }
         }
 
-        // ===== UPGRADE GAME – smaller squares, icon arrows, pop-in center NFT =====
+        // ===== UPGRADE GAME – EXCITING WHEEL WITH SEGMENTS & ROULELLE STYLE =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -6350,7 +6349,6 @@
                 upgradeGame.toNftId = nftId;
                 const centerImg = document.getElementById('wheelCenterNft');
                 centerImg.src = NFT_DB[nftId].gif;
-                // Re-trigger pop-in animation
                 centerImg.className = 'wheel-center-nft';
                 void centerImg.offsetHeight;
                 centerImg.className = 'wheel-center-nft pop-in';
@@ -6399,10 +6397,29 @@
                     cy = h / 2;
                 const outerR = Math.min(w, h) * 0.44;
                 const innerR = outerR * 0.4;
+                const midR = innerR + (outerR - innerR) * 0.3;
 
                 ctx.clearRect(0, 0, w, h);
 
-                // Segmented wheel
+                // --- Background glow ---
+                const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, outerR * 1.1);
+                bgGrad.addColorStop(0, 'rgba(0,210,160,0.02)');
+                bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = bgGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, outerR * 1.1, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // --- Outer rim glow ---
+                ctx.beginPath();
+                ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // --- Segments (vibrant, high contrast) ---
                 const numSegments = 24;
                 const segAngle = (2 * Math.PI) / numSegments;
                 const greenSegments = Math.floor(this.chance * numSegments);
@@ -6412,28 +6429,73 @@
                     const endA = startA + segAngle;
                     const isGreen = i < greenSegments;
                     ctx.beginPath();
-                    ctx.arc(cx, cy, outerR, startA, endA);
-                    ctx.arc(cx, cy, innerR, endA, startA, true);
+                    ctx.arc(cx, cy, outerR - 2, startA, endA);
+                    ctx.arc(cx, cy, innerR + 2, endA, startA, true);
                     ctx.closePath();
-                    ctx.fillStyle = isGreen ? '#00c853' : '#d32f2f';
+
+                    // Bright, clear colors
+                    if (isGreen) {
+                        ctx.fillStyle = '#4caf50';
+                    } else {
+                        ctx.fillStyle = '#e53935';
+                    }
                     ctx.fill();
-                    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                    ctx.lineWidth = 0.8;
+
+                    // Thick, bright borders for clear visibility
+                    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+                    ctx.lineWidth = 1.8;
                     ctx.stroke();
                 }
 
+                // --- Inner decorative ring (alternating stripes) ---
+                const ringSegments = 12;
+                const ringAngle = (2 * Math.PI) / ringSegments;
+                const ringOuter = midR;
+                const ringInner = innerR + 4;
+                for (let i = 0; i < ringSegments; i++) {
+                    const a1 = -Math.PI / 2 + i * ringAngle;
+                    const a2 = a1 + ringAngle;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, ringOuter, a1, a2);
+                    ctx.arc(cx, cy, ringInner, a2, a1, true);
+                    ctx.closePath();
+                    ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.15)';
+                    ctx.fill();
+                }
+
+                // --- Outer "pocket" dots (roulette style) ---
+                const dotRadius = outerR * 0.045;
+                const dotDist = outerR - 4;
+                for (let i = 0; i < numSegments; i++) {
+                    const angle = -Math.PI / 2 + (i + 0.5) * segAngle;
+                    const dx = cx + dotDist * Math.cos(angle);
+                    const dy = cy + dotDist * Math.sin(angle);
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, dotRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = i < greenSegments ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.4)';
+                    ctx.shadowColor = 'rgba(255,255,255,0.2)';
+                    ctx.shadowBlur = 6;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
+                // --- Inner ring border ---
                 ctx.beginPath();
                 ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // Arrow
+                // --- Center glow (for depth) ---
+                const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, innerR * 0.8);
+                centerGrad.addColorStop(0, 'rgba(0,0,0,0)');
+                centerGrad.addColorStop(1, 'rgba(0,0,0,0.2)');
+                ctx.beginPath();
+                ctx.arc(cx, cy, innerR * 0.8, 0, 2 * Math.PI);
+                ctx.fillStyle = centerGrad;
+                ctx.fill();
+
+                // --- Arrow (same as original) ---
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
@@ -6443,10 +6505,13 @@
                 ctx.lineTo(outerR + 8, 8);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                ctx.shadowBlur = 12;
                 ctx.fill();
+                ctx.shadowBlur = 0;
                 ctx.restore();
 
-                // Percentage – hide when desired NFT selected
+                // --- Percentage (hide when desired NFT selected) ---
                 if (!upgradeGame.toNftId) {
                     ctx.save();
                     ctx.textAlign = 'center';
@@ -6454,12 +6519,12 @@
                     const pct = Math.round(this.chance * 100);
                     ctx.font = 'bold 28px -apple-system, sans-serif';
                     ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 14;
                     ctx.fillText(pct + '%', cx, cy - 2);
                     ctx.font = '11px -apple-system, sans-serif';
-                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                    ctx.shadowBlur = 4;
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.shadowBlur = 6;
                     ctx.fillText('CHANCE', cx, cy + 24);
                     ctx.shadowBlur = 0;
                     ctx.restore();
@@ -6505,7 +6570,7 @@
                 setUpgradeLocked(true);
                 document.getElementById('upgradeBtn').disabled = true;
                 const wheelContainer = document.getElementById('wheelContainer');
-                wheelContainer.style.filter = 'drop-shadow(0 0 15px rgba(0,210,160,0.6))';
+                wheelContainer.style.filter = 'drop-shadow(0 0 20px rgba(0,210,160,0.7))';
 
                 this.lastTickAngle = this.arrowAngle;
 
@@ -6557,7 +6622,7 @@
 
                     const glowIntensity = 0.3 + 0.7 * (1 - Math.abs(0.5 - t) * 2);
                     document.getElementById('wheelContainer').style.filter =
-                        `drop-shadow(0 0 ${20 + glowIntensity * 30}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.15})`;
+                        `drop-shadow(0 0 ${20 + glowIntensity * 40}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.15})`;
 
                     if (t < 1) {
                         requestAnimationFrame(animateSpin);
@@ -6572,10 +6637,10 @@
 
                         const container = document.getElementById('wheelContainer');
                         if (isGreen) {
-                            container.style.filter = 'drop-shadow(0 0 50px rgba(0,210,160,1)) brightness(1.4)';
+                            container.style.filter = 'drop-shadow(0 0 60px rgba(0,210,160,1)) brightness(1.5)';
                             setTimeout(() => container.style.filter = 'none', 500);
                         } else {
-                            container.style.filter = 'drop-shadow(0 0 50px rgba(255,80,80,1)) brightness(0.8)';
+                            container.style.filter = 'drop-shadow(0 0 60px rgba(255,80,80,1)) brightness(0.7)';
                             setTimeout(() => container.style.filter = 'none', 500);
                         }
 
@@ -6651,7 +6716,6 @@
             const upgradeBtnText = document.getElementById('upgradeBtnText');
             const upgradePct = document.getElementById('upgradePct');
 
-            // From
             if (upgradeGame.fromNftId) {
                 const nft = NFT_DB[upgradeGame.fromNftId];
                 fromImg.src = nft.gif;
@@ -6669,7 +6733,6 @@
                 fromPrice.style.display = 'none';
             }
 
-            // To
             if (upgradeGame.toNftId) {
                 const nft = NFT_DB[upgradeGame.toNftId];
                 toImg.src = nft.gif;
@@ -6679,7 +6742,6 @@
                 toPrice.innerHTML =
                 `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
                 toPrice.style.display = 'inline-flex';
-                // Center NFT already set with pop-in
             } else {
                 toImg.style.display = 'none';
                 toPlaceholder.style.display = 'block';
@@ -6801,7 +6863,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Upgrade polished: smaller squares, icon arrows, pop-in center NFT.');
+            console.log('✅ Casino loaded – Upgrade wheel is now exciting, clear, and visible on all screens!');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
