@@ -2133,7 +2133,7 @@
         }
 
         /* ============================================================
-           UPGRADE – FULL SCREEN, WHEEL BIGGER, IMPROVED UI
+           UPGRADE – FULL SCREEN, SEGMENTED WHEEL, CLEAN SELECTORS
            ============================================================ */
         #page-upgrade {
             padding: 0;
@@ -2225,12 +2225,12 @@
             width: 18%;
             height: 18%;
             object-fit: contain;
-            border-radius: 0; /* no border */
+            border-radius: 0;
             display: none;
             z-index: 5;
             pointer-events: none;
             filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.3));
-            background: transparent; /* transparent */
+            background: transparent;
             border: none;
             padding: 0;
             will-change: transform;
@@ -2271,7 +2271,7 @@
             filter: grayscale(0.6);
         }
         .upgrade-select .nft-square {
-            width: 100px; /* bigger image */
+            width: 100px;
             height: 100px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 12px;
@@ -3089,7 +3089,7 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- ===== UPGRADE – FULL SCREEN, WHEEL BIGGER, POLISHED UI ===== -->
+        <!-- ===== UPGRADE – FULL SCREEN, SEGMENTED WHEEL, CLEAN UI ===== -->
         <div id="page-upgrade" class="page">
             <div class="upgrade-full">
                 <!-- Header -->
@@ -3117,7 +3117,7 @@
                         <div class="info">
                             <div class="name-price-wrap">
                                 <span class="name" id="fromNftName">Your NFT</span>
-                                <span class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
+                                <span class="price" id="fromPriceDisplay"></span>
                             </div>
                         </div>
                         <span class="select-badge" id="fromBadge">⬇ Your NFT</span>
@@ -3130,7 +3130,7 @@
                         <div class="info">
                             <div class="name-price-wrap">
                                 <span class="name" id="toNftName">Desired NFT</span>
-                                <span class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
+                                <span class="price" id="toPriceDisplay"></span>
                             </div>
                         </div>
                         <span class="select-badge" id="toBadge">⬆ Desired</span>
@@ -6222,7 +6222,7 @@
             }
         }
 
-        // ===== UPGRADE GAME – with polished UI =====
+        // ===== UPGRADE GAME – segmented wheel, clean UI =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -6388,40 +6388,51 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // Green/Red sections (same as original)
-                const greenAngle = this.chance * 2 * Math.PI;
-                const startAngle = -Math.PI / 2;
+                // ---- Segmented wheel ----
+                const numSegments = 24;
+                const segAngle = (2 * Math.PI) / numSegments;
+                const greenSegments = Math.floor(this.chance * numSegments);
 
-                ctx.beginPath();
-                ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
-                ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
-                ctx.closePath();
-                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
-                greenGrad.addColorStop(0, '#00e676');
-                greenGrad.addColorStop(1, '#009624');
-                ctx.fillStyle = greenGrad;
-                ctx.fill();
-
-                if (greenAngle < 2 * Math.PI) {
+                for (let i = 0; i < numSegments; i++) {
+                    const startA = -Math.PI / 2 + i * segAngle;
+                    const endA = startA + segAngle;
+                    const isGreen = i < greenSegments;
                     ctx.beginPath();
-                    ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
-                    ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
+                    ctx.arc(cx, cy, outerR, startA, endA);
+                    ctx.arc(cx, cy, innerR, endA, startA, true);
                     ctx.closePath();
-                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
-                    redGrad.addColorStop(0, '#ff5252');
-                    redGrad.addColorStop(1, '#b71c1c');
-                    ctx.fillStyle = redGrad;
+                    if (isGreen) {
+                        // Use green gradient per segment for a nicer look
+                        const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+                        grad.addColorStop(0, '#00e676');
+                        grad.addColorStop(1, '#009624');
+                        ctx.fillStyle = grad;
+                    } else {
+                        const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+                        grad.addColorStop(0, '#ff5252');
+                        grad.addColorStop(1, '#b71c1c');
+                        ctx.fillStyle = grad;
+                    }
                     ctx.fill();
+                    // subtle border
+                    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
                 }
 
-                // Outer border
+                // Inner and outer borders
+                ctx.beginPath();
+                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                ctx.lineWidth = 0.1;
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // Arrow (exactly as original: triangle pointing outward)
+                // Arrow (exactly as original)
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
@@ -6434,7 +6445,7 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Center percentage – hide when a desired NFT is selected (toNftId != null)
+                // Percentage – hide when a desired NFT is selected
                 if (!upgradeGame.toNftId) {
                     ctx.save();
                     ctx.textAlign = 'center';
@@ -6639,6 +6650,7 @@
             const upgradeBtnText = document.getElementById('upgradeBtnText');
             const upgradePct = document.getElementById('upgradePct');
 
+            // From
             if (upgradeGame.fromNftId) {
                 const nft = NFT_DB[upgradeGame.fromNftId];
                 fromImg.src = nft.gif;
@@ -6647,14 +6659,16 @@
                 fromName.textContent = nft.name;
                 fromPrice.innerHTML =
                 `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
+                fromPrice.style.display = 'inline-flex';
             } else {
                 fromImg.style.display = 'none';
                 fromPlaceholder.style.display = 'block';
                 fromName.textContent = 'Your NFT';
-                fromPrice.innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
+                fromPrice.innerHTML = '';
+                fromPrice.style.display = 'none';
             }
 
+            // To
             if (upgradeGame.toNftId) {
                 const nft = NFT_DB[upgradeGame.toNftId];
                 toImg.src = nft.gif;
@@ -6663,14 +6677,15 @@
                 toName.textContent = nft.name;
                 toPrice.innerHTML =
                 `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> ${nft.price}`;
+                toPrice.style.display = 'inline-flex';
                 document.getElementById('wheelCenterNft').src = nft.gif;
                 document.getElementById('wheelCenterNft').style.display = 'block';
             } else {
                 toImg.style.display = 'none';
                 toPlaceholder.style.display = 'block';
                 toName.textContent = 'Desired NFT';
-                toPrice.innerHTML =
-                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -`;
+                toPrice.innerHTML = '';
+                toPrice.style.display = 'none';
                 document.getElementById('wheelCenterNft').style.display = 'none';
             }
 
@@ -6786,7 +6801,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Upgrade polished: full‑screen, bigger wheel, clean UI.');
+            console.log('✅ Casino loaded – Upgrade: segmented wheel, price only when selected.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
