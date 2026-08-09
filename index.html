@@ -301,10 +301,10 @@
             border-color: rgba(255, 215, 0, 0.15);
             color: #ffd700;
         }
-        .badge-blue {
-            background: rgba(54, 160, 255, 0.1);
-            border-color: rgba(54, 160, 255, 0.15);
-            color: #54a0ff;
+        .badge-green {
+            background: rgba(0, 210, 160, 0.1);
+            border-color: rgba(0, 210, 160, 0.15);
+            color: #00d2a0;
         }
         .online-dot {
             display: inline-block;
@@ -2133,7 +2133,7 @@
         }
 
         /* ============================================================
-           UPGRADE – FULL SCREEN, SEGMENTED WHEEL, CLEAN SELECTORS
+           UPGRADE – FULL SCREEN, MATCHES OTHER TABS, SEGMENTED WHEEL
            ============================================================ */
         #page-upgrade {
             padding: 0;
@@ -2157,40 +2157,31 @@
             max-height: 100vh;
             overflow: hidden;
         }
+        /* Header – like other tabs */
         .upgrade-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 0 4px 0;
+            padding: 4px 0 8px 0;
             flex-shrink: 0;
         }
-        .upgrade-header .back-btn {
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 6px 10px 6px 0;
-            transition: color 0.2s;
-        }
-        .upgrade-header .back-btn:hover {
-            color: #fff;
-        }
-        .upgrade-header .title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
+        .upgrade-header .left-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-        .upgrade-header .title i {
-            color: #00d2a0;
-        }
-        .upgrade-header .badge {
+        .upgrade-header .left-badge .badge {
             font-size: 13px;
             padding: 4px 12px;
         }
+        .upgrade-header .left-badge .badge i {
+            margin-right: 4px;
+        }
+        .upgrade-balance {
+            font-size: 13px;
+            padding: 4px 12px;
+        }
+
         .upgrade-wheel-wrap {
             flex: 1;
             display: flex;
@@ -2202,7 +2193,7 @@
         }
         .upgrade-wheel-container {
             position: relative;
-            width: min(82vw, 400px);
+            width: min(82vw, 340px);
             aspect-ratio: 1/1;
             max-height: 82vh;
             margin: 0 auto;
@@ -2493,14 +2484,7 @@
             font-size: 14px;
             color: #e0e0e0;
         }
-        .nft-selection-item .price {
-            font-size: 12px;
-            color: #ffd700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
+        /* No price in selection overlay */
         .nft-selection-close {
             margin-top: 18px;
             color: #888;
@@ -2716,8 +2700,13 @@
             .upgrade-wheel-container {
                 width: min(78vw, 320px);
             }
-            .upgrade-header .title {
-                font-size: 16px;
+            .upgrade-header .left-badge .badge {
+                font-size: 12px;
+                padding: 3px 10px;
+            }
+            .upgrade-balance {
+                font-size: 12px;
+                padding: 3px 10px;
             }
             .mines-grid .tile-wrapper .tile .symbol {
                 font-size: 22px;
@@ -3089,14 +3078,15 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- ===== UPGRADE – FULL SCREEN, SEGMENTED WHEEL, CLEAN UI ===== -->
+        <!-- ===== UPGRADE – CONSISTENT HEADER, BIGGER WHEEL, SEGMENTS ===== -->
         <div id="page-upgrade" class="page">
             <div class="upgrade-full">
-                <!-- Header -->
+                <!-- Header like other tabs -->
                 <div class="upgrade-header">
-                    <button class="back-btn" onclick="navigateTo('home')"><i class="fas fa-arrow-left"></i></button>
-                    <span class="title"><i class="fas fa-arrow-up"></i> Upgrade</span>
-                    <span class="badge badge-blue" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
+                    <div class="left-badge">
+                        <span class="badge badge-green"><i class="fas fa-arrow-up" style="margin-right:4px;"></i>Upgrade<span class="online-dot"></span></span>
+                    </div>
+                    <span class="badge upgrade-balance" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
                 </div>
 
                 <!-- Wheel -->
@@ -6222,7 +6212,7 @@
             }
         }
 
-        // ===== UPGRADE GAME – segmented wheel, clean UI =====
+        // ===== UPGRADE GAME – segmented wheel, smooth transitions =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -6324,7 +6314,6 @@
             <div class="nft-selection-item" onclick="selectNft('${nft.id}', '${type}')">
                 <img src="${nft.gif}" alt="${nft.name}" decoding="async">
                 <div class="name">${nft.name}</div>
-                <div class="price">${starImg('star-icon-xs')} ${nft.price}</div>
             </div>
         `).join('');
             overlay.classList.add('active');
@@ -6343,6 +6332,7 @@
             }
             closeNftSelection();
             updateUpgradeSelectors();
+            // Smooth transition: animate chance to the new value
             setTimeout(() => { upgradeGame.init(); }, 50);
         }
 
@@ -6401,22 +6391,11 @@
                     ctx.arc(cx, cy, outerR, startA, endA);
                     ctx.arc(cx, cy, innerR, endA, startA, true);
                     ctx.closePath();
-                    if (isGreen) {
-                        // Use green gradient per segment for a nicer look
-                        const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
-                        grad.addColorStop(0, '#00e676');
-                        grad.addColorStop(1, '#009624');
-                        ctx.fillStyle = grad;
-                    } else {
-                        const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
-                        grad.addColorStop(0, '#ff5252');
-                        grad.addColorStop(1, '#b71c1c');
-                        ctx.fillStyle = grad;
-                    }
+                    ctx.fillStyle = isGreen ? '#00c853' : '#d32f2f';
                     ctx.fill();
-                    // subtle border
-                    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                    ctx.lineWidth = 0.5;
+                    // border between segments for clarity
+                    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                    ctx.lineWidth = 0.8;
                     ctx.stroke();
                 }
 
@@ -6432,7 +6411,7 @@
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // Arrow (exactly as original)
+                // Arrow (original)
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(arrowAngle);
@@ -6445,7 +6424,7 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Percentage – hide when a desired NFT is selected
+                // Percentage – hide when desired NFT selected
                 if (!upgradeGame.toNftId) {
                     ctx.save();
                     ctx.textAlign = 'center';
@@ -6478,7 +6457,7 @@
                     this.drawWheelAndArrow(this.arrowAngle);
                     return;
                 }
-                const duration = 400;
+                const duration = 400; // smooth transition
                 const startTime = performance.now();
                 const animate = (now) => {
                     const elapsed = now - startTime;
@@ -6700,6 +6679,7 @@
                 newChance = Math.min(0.95, Math.max(0.05, newChance));
                 upgradeBtnText.textContent = 'Upgrade';
                 upgradePct.textContent = Math.round(newChance * 100) + '%';
+                // Smoothly animate the chance
                 upgradeGame.animateToChance(newChance);
                 upgradeBtn.disabled = false;
             } else {
@@ -6801,7 +6781,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Upgrade: segmented wheel, price only when selected.');
+            console.log('✅ Casino loaded – Upgrade fixed: consistent header, segmented wheel, smooth transitions.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
