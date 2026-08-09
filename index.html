@@ -301,10 +301,10 @@
             border-color: rgba(255, 215, 0, 0.15);
             color: #ffd700;
         }
-        .badge-blue {
-            background: rgba(54, 160, 255, 0.1);
-            border-color: rgba(54, 160, 255, 0.15);
-            color: #54a0ff;
+        .badge-green {
+            background: rgba(0, 210, 160, 0.1);
+            border-color: rgba(0, 210, 160, 0.15);
+            color: #00d2a0;
         }
         .online-dot {
             display: inline-block;
@@ -884,7 +884,7 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* ===== CRASH, MINES, UPGRADE, INVENTORY ===== */
+        /* ===== CRASH, MINES, INVENTORY ===== */
         .grid-container {
             position: relative;
             height: 280px;
@@ -2132,20 +2132,92 @@
             border-color: rgba(255, 107, 107, 0.15);
         }
 
-        /* ===== UPGRADE – keep original layout, only wheel bigger and pattern added ===== */
+        /* ============================================================
+                   UPGRADE – FULL SCREEN, SEGMENTED WHEEL, FIXED ARROW
+                   ============================================================ */
+        #page-upgrade {
+            padding: 0;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            background: radial-gradient(ellipse at 50% 30%, #16161e, #08080a);
+            position: relative;
+            min-height: 100vh;
+            max-height: 100vh;
+        }
+        #page-upgrade.active {
+            display: flex;
+        }
+        .upgrade-full {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 12px 16px 20px 16px;
+            height: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0 4px 0;
+            flex-shrink: 0;
+        }
+        .upgrade-header .back-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px 6px 0;
+            transition: color 0.2s;
+        }
+        .upgrade-header .back-btn:hover {
+            color: #fff;
+        }
+        .upgrade-header .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upgrade-header .title i {
+            color: #00d2a0;
+        }
+        .upgrade-header .badge {
+            font-size: 13px;
+            padding: 4px 12px;
+        }
+
+        /* Wheel container – takes most of the space */
+        .upgrade-wheel-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            padding: 4px 0;
+            position: relative;
+        }
         .upgrade-wheel-container {
             position: relative;
-            width: 100%;
-            max-width: 400px;
+            width: min(82vw, 340px);
             aspect-ratio: 1/1;
-            margin: 12px auto;
-            transition: filter 0.3s;
+            max-height: 82vh;
+            margin: 0 auto;
+            transition: filter 0.3s ease;
+            touch-action: none;
         }
         #upgradeWheel {
             display: block;
             width: 100% !important;
             height: 100% !important;
             border-radius: 50%;
+            box-shadow: 0 0 60px rgba(0, 210, 160, 0.08), inset 0 0 60px rgba(0, 0, 0, 0.3);
+            will-change: transform;
         }
         .wheel-center-nft {
             position: absolute;
@@ -2155,74 +2227,96 @@
             width: 18%;
             height: 18%;
             object-fit: contain;
-            border-radius: 0;
+            border-radius: 12px;
             display: none;
             z-index: 5;
             pointer-events: none;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.3));
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+            padding: 4px;
             will-change: transform;
-            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
-            background: transparent;
-            border: none;
         }
+
+        /* NFT selectors – bigger squares, horizontal layout */
         .upgrade-selectors {
             display: flex;
             flex-direction: row;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 14px;
+            margin: 6px 0 10px 0;
+            flex-shrink: 0;
+            justify-content: center;
+            width: 100%;
         }
         .upgrade-select {
             flex: 1;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 14px;
+            max-width: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            padding: 12px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
-            transition: background 0.2s, opacity 0.3s, cursor 0.3s;
+            transition: background 0.25s, border-color 0.25s, transform 0.2s, opacity 0.3s;
             min-width: 0;
-        }
-        .upgrade-select.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
+            backdrop-filter: blur(4px);
         }
         .upgrade-select:active {
-            background: rgba(255, 255, 255, 0.05);
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .upgrade-select.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(0.6);
         }
         .upgrade-select .nft-square {
-            width: 60px;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.06);
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
         }
         .upgrade-select .nft-square img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             will-change: transform;
+            transition: transform 0.3s;
         }
         .upgrade-select .nft-square .placeholder {
             color: #555;
-            font-size: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+            padding: 4px;
         }
         .upgrade-select .info {
             text-align: center;
+            width: 100%;
+            min-width: 0;
         }
         .upgrade-select .info .name {
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 15px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            color: #e0e0e0;
+            display: block;
         }
         .upgrade-select .info .price {
             color: #ffd700;
@@ -2230,32 +2324,105 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 3px;
+            font-weight: 600;
+        }
+        .upgrade-select .info .price img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        .upgrade-select .select-badge {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #666;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-top: 2px;
+            font-weight: 600;
+        }
+        .upgrade-select.has-value .select-badge {
+            color: #54a0ff;
+            border-color: rgba(54, 160, 255, 0.15);
+            background: rgba(54, 160, 255, 0.06);
+        }
+        .upgrade-select.to-select .nft-square {
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+        .upgrade-select.to-select.has-value .nft-square {
+            border-color: #ffd700;
+            box-shadow: 0 0 24px rgba(255, 215, 0, 0.08);
+        }
+        .upgrade-select.from-select .nft-square {
+            border-color: rgba(108, 92, 231, 0.15);
+        }
+        .upgrade-select.from-select.has-value .nft-square {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 24px rgba(108, 92, 231, 0.08);
+        }
+
+        /* Upgrade button – prominent */
+        .upgrade-btn-wrap {
+            flex-shrink: 0;
+            padding: 2px 0 6px 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
         .btn-upgrade {
             background: linear-gradient(135deg, #00b894, #00d2a0);
-            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
-            margin: 12px auto 0 auto;
-            padding: 18px 40px;
-            font-size: 20px;
+            box-shadow: 0 4px 28px rgba(0, 184, 148, 0.4);
+            padding: 14px 32px;
+            font-size: 18px;
+            font-weight: 800;
             border-radius: 20px;
-            width: fit-content;
+            width: 100%;
+            max-width: 320px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-upgrade:active {
+            transform: scale(0.95);
         }
         .btn-upgrade:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .btn-upgrade .arrow-icon {
-            font-size: 22px;
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        .btn-upgrade:not(:disabled):hover .arrow-icon {
+            transform: translateX(4px);
+        }
+        .btn-upgrade .upgrade-pct {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
         }
 
+        /* NFT Selection Overlay (upgrade) */
         .nft-selection-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(16px);
             z-index: 1000;
             display: none;
             flex-direction: column;
@@ -2267,15 +2434,22 @@
         .nft-selection-overlay.active {
             display: flex;
         }
+        .nft-selection-overlay .overlay-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            text-align: center;
+        }
         .nft-selection-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            max-width: 340px;
+            gap: 14px;
+            max-width: 380px;
             width: 100%;
-            max-height: 65vh;
+            max-height: 60vh;
             overflow-y: auto;
-            padding: 4px;
+            padding: 6px;
         }
         .nft-selection-grid::-webkit-scrollbar {
             width: 4px;
@@ -2289,15 +2463,15 @@
         }
         .nft-selection-item {
             background: rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 12px;
+            border-radius: 18px;
+            padding: 14px 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
         .nft-selection-item:active {
-            transform: scale(0.96);
+            transform: scale(0.94);
             background: rgba(255, 255, 255, 0.08);
         }
         .nft-selection-item img {
@@ -2305,28 +2479,47 @@
             height: 80px;
             object-fit: contain;
             border-radius: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
             will-change: transform;
         }
         .nft-selection-item .name {
             font-weight: 600;
             font-size: 14px;
+            color: #e0e0e0;
+        }
+        .nft-selection-item .price {
+            font-size: 12px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
         .nft-selection-close {
-            margin-top: 20px;
+            margin-top: 18px;
             color: #888;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            padding: 8px 20px;
+            padding: 10px 28px;
             background: rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+        }
+        .nft-selection-close:active {
+            background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Win Popup */
         .win-popup {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(16px);
             z-index: 2000;
             display: none;
             flex-direction: column;
@@ -2339,20 +2532,20 @@
             display: flex;
         }
         .win-popup .win-card {
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 24px;
-            padding: 30px 24px;
-            max-width: 320px;
+            background: rgba(30, 30, 35, 0.96);
+            border-radius: 28px;
+            padding: 32px 24px;
+            max-width: 340px;
             width: 100%;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
         }
         .win-popup .money-gif {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             object-fit: contain;
-            margin-bottom: 16px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
             will-change: transform;
         }
         .win-popup .nft-img {
@@ -2360,27 +2553,29 @@
             height: 90px;
             object-fit: contain;
             border-radius: 16px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             will-change: transform;
+            border: 2px solid rgba(255, 215, 0, 0.1);
         }
         .win-popup .win-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             color: #ffd700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .win-popup .win-subtitle {
             font-size: 16px;
             color: #ccc;
+            font-weight: 500;
         }
         .win-popup button {
             margin-top: 16px;
-            padding: 12px 32px;
+            padding: 12px 36px;
             border: none;
-            border-radius: 20px;
+            border-radius: 24px;
             background: linear-gradient(135deg, #00b894, #00d2a0);
             color: white;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -2491,7 +2686,37 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
         }
 
+        /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width: 420px) {
+            .upgrade-select .nft-square {
+                width: 64px;
+                height: 64px;
+                border-radius: 12px;
+            }
+            .upgrade-select .info .name {
+                font-size: 13px;
+            }
+            .upgrade-select .info .price {
+                font-size: 12px;
+            }
+            .upgrade-select {
+                padding: 10px 8px;
+                gap: 4px;
+            }
+            .upgrade-selectors {
+                gap: 10px;
+                margin: 4px 0 6px 0;
+            }
+            .btn-upgrade {
+                font-size: 16px;
+                padding: 12px 24px;
+            }
+            .upgrade-wheel-container {
+                width: min(78vw, 290px);
+            }
+            .upgrade-header .title {
+                font-size: 16px;
+            }
             .mines-grid .tile-wrapper .tile .symbol {
                 font-size: 22px;
             }
@@ -2593,8 +2818,7 @@
                 padding: 20px 16px;
             }
             .upgrade-wheel-container {
-                width: 100%;
-                max-width: 340px;
+                width: min(78vw, 290px);
             }
             #crashNftOverlay img {
                 width: 120px;
@@ -2632,6 +2856,40 @@
                 height: 26px;
                 top: -18px;
             }
+            .nft-selection-item img {
+                width: 64px;
+                height: 64px;
+            }
+            .nft-selection-grid {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .upgrade-select .nft-square {
+                width: 54px;
+                height: 54px;
+                border-radius: 10px;
+            }
+            .upgrade-select .info .name {
+                font-size: 12px;
+            }
+            .upgrade-select .info .price {
+                font-size: 11px;
+            }
+            .upgrade-select {
+                padding: 8px 6px;
+            }
+            .upgrade-selectors {
+                gap: 8px;
+            }
+            .btn-upgrade {
+                font-size: 14px;
+                padding: 10px 18px;
+            }
+            .upgrade-wheel-container {
+                width: min(72vw, 240px);
+            }
         }
     </style>
 </head>
@@ -2666,6 +2924,7 @@
 
         <!-- NFT Selection Overlay (for upgrade) -->
         <div class="nft-selection-overlay" id="nftSelectionOverlay">
+            <div class="overlay-title" id="nftOverlayTitle">Select NFT</div>
             <div class="nft-selection-grid" id="nftSelectionGrid"></div>
             <div class="nft-selection-close" onclick="closeNftSelection()">Cancel</div>
         </div>
@@ -2828,44 +3087,58 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- UPGRADE (original layout, wheel enlarged + pattern) -->
+        <!-- ===== UPGRADE – FULL SCREEN, SEGMENTED WHEEL, FIXED ARROW ===== -->
         <div id="page-upgrade" class="page">
-            <div class="flex-between mb-8">
-                <span class="badge badge-blue"><i class="fas fa-arrow-up" style="margin-right:6px;"></i>Upgrade<span class="online-dot"></span></span>
-                <span class="badge" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
-            </div>
-            <div class="card" style="padding: 20px;">
-                <div class="card-title" style="margin-bottom: 12px; font-size: 14px;">Select NFTs to Upgrade</div>
+            <div class="upgrade-full">
+                <!-- Header -->
+                <div class="upgrade-header">
+                    <button class="back-btn" onclick="navigateTo('home')"><i class="fas fa-arrow-left"></i></button>
+                    <span class="title"><i class="fas fa-arrow-up"></i> Upgrade</span>
+                    <span class="badge badge-green" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
+                </div>
+
+                <!-- Wheel -->
+                <div class="upgrade-wheel-wrap">
+                    <div class="upgrade-wheel-container" id="wheelContainer">
+                        <canvas id="upgradeWheel" width="400" height="400"></canvas>
+                        <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
+                    </div>
+                </div>
+
+                <!-- NFT Selectors -->
                 <div class="upgrade-selectors">
-                    <div class="upgrade-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
+                    <div class="upgrade-select from-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
                         <div class="nft-square" id="fromNftSquare">
                             <img id="fromNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="fromPlaceholder">Choose</span>
                         </div>
                         <div class="info">
-                            <div class="name" id="fromNftName">Your NFT</div>
-                            <div class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                            <span class="name" id="fromNftName">Your NFT</span>
+                            <span class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
                         </div>
+                        <span class="select-badge" id="fromBadge">⬇ Your NFT</span>
                     </div>
-                    <div class="upgrade-select" id="upgradeToSelector" onclick="openNftSelection('to')">
+                    <div class="upgrade-select to-select" id="upgradeToSelector" onclick="openNftSelection('to')">
                         <div class="nft-square" id="toNftSquare">
                             <img id="toNftImg" src="" style="display:none;" decoding="async">
                             <span class="placeholder" id="toPlaceholder">Choose</span>
                         </div>
                         <div class="info">
-                            <div class="name" id="toNftName">Desired NFT</div>
-                            <div class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</div>
+                            <span class="name" id="toNftName">Desired NFT</span>
+                            <span class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
                         </div>
+                        <span class="select-badge" id="toBadge">⬆ Desired</span>
                     </div>
                 </div>
-                <div class="upgrade-wheel-container" id="wheelContainer">
-                    <canvas id="upgradeWheel" width="400" height="400"></canvas>
-                    <img id="wheelCenterNft" class="wheel-center-nft" src="" alt="Result NFT" decoding="async">
+
+                <!-- Upgrade Button -->
+                <div class="upgrade-btn-wrap">
+                    <button class="btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
+                        <span id="upgradeBtnText">Upgrade</span>
+                        <span class="upgrade-pct" id="upgradePct">—</span>
+                        <i class="fas fa-arrow-up arrow-icon"></i>
+                    </button>
                 </div>
-                <button class="btn btn-success btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
-                    <span id="upgradeBtnText">Upgrade</span>
-                    <i class="fas fa-arrow-up arrow-icon"></i>
-                </button>
             </div>
         </div>
 
@@ -2989,6 +3262,7 @@
         }
 
         function openSettings() { document.getElementById('settingsModal').classList.add('active'); }
+
         function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
 
         // ============================================================
@@ -3074,6 +3348,7 @@
         ];
 
         function getRandomRocketGif() { return ROCKET_GIFS[Math.floor(Math.random() * ROCKET_GIFS.length)]; }
+
         function getRandomMoneyGif() { return MONEY_GIFS[Math.floor(Math.random() * MONEY_GIFS.length)]; }
 
         // ============================================================
@@ -5941,7 +6216,7 @@
             }
         }
 
-        // ===== UPGRADE GAME – with pattern on wheel =====
+        // ===== UPGRADE GAME – segmented wheel, fixed arrow =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -6020,9 +6295,12 @@
             if (upgradeGame.locked) return;
             activeSelectionType = type;
             let eligible;
+            const overlayTitle = document.getElementById('nftOverlayTitle');
             if (type === 'from') {
+                overlayTitle.textContent = 'Select Your NFT';
                 eligible = state.inventory.slice();
             } else {
+                overlayTitle.textContent = 'Select Desired NFT';
                 if (!upgradeGame.fromNftId) {
                     alert('Select your NFT first.');
                     return;
@@ -6033,13 +6311,14 @@
             const grid = document.getElementById('nftSelectionGrid');
             const overlay = document.getElementById('nftSelectionOverlay');
             if (eligible.length === 0) {
-                alert('No eligible NFTs.');
+                alert(type === 'from' ? 'No NFTs in inventory.' : 'No higher-value NFTs available.');
                 return;
             }
             grid.innerHTML = eligible.map(nft => `
             <div class="nft-selection-item" onclick="selectNft('${nft.id}', '${type}')">
                 <img src="${nft.gif}" alt="${nft.name}" decoding="async">
                 <div class="name">${nft.name}</div>
+                <div class="price">${starImg('star-icon-xs')} ${nft.price}</div>
             </div>
         `).join('');
             overlay.classList.add('active');
@@ -6071,29 +6350,28 @@
             toNftId: null,
             spinning: false,
             locked: false,
-            arrowAngle: -Math.PI / 2,
+            arrowAngle: -Math.PI / 2, // fixed: arrow always points up
             canvas: document.getElementById('upgradeWheel'),
             ctx: null,
             chance: 1.0,
             targetChance: 1.0,
             chanceAnimationId: null,
-            lastTickAngle: -Math.PI / 2,
-            tickThreshold: 30 * Math.PI / 180,
+            // no tick tracking needed for fixed arrow
+            wheelAngle: 0, // rotation of the wheel itself
 
             init() {
                 this.ctx = this.canvas.getContext('2d');
                 const rect = this.canvas.getBoundingClientRect();
-                // Use the actual display size for crisp rendering
                 const dpr = window.devicePixelRatio || 1;
                 const w = rect.width || 400;
                 const h = rect.height || 400;
                 this.canvas.width = w * dpr;
                 this.canvas.height = h * dpr;
                 this.ctx.scale(dpr, dpr);
-                this.drawWheelAndArrow(this.arrowAngle);
+                this.drawWheel(this.wheelAngle);
             },
 
-            drawWheelAndArrow(arrowAngle) {
+            drawWheel(rotation) {
                 const ctx = this.ctx;
                 const w = this.canvas.width / (window.devicePixelRatio || 1);
                 const h = this.canvas.height / (window.devicePixelRatio || 1);
@@ -6104,68 +6382,84 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // --- Green/Red pie chart (the chance indicator) ---
-                const greenAngle = this.chance * 2 * Math.PI;
-                const startAngle = -Math.PI / 2;
-
-                // Green section
-                ctx.beginPath();
-                ctx.arc(cx, cy, outerR, startAngle, startAngle + greenAngle);
-                ctx.arc(cx, cy, innerR, startAngle + greenAngle, startAngle, true);
-                ctx.closePath();
-                const greenGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
-                greenGrad.addColorStop(0, '#00e676');
-                greenGrad.addColorStop(1, '#009624');
-                ctx.fillStyle = greenGrad;
-                ctx.fill();
-
-                // Red section
-                if (greenAngle < 2 * Math.PI) {
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, outerR, startAngle + greenAngle, startAngle + 2 * Math.PI);
-                    ctx.arc(cx, cy, innerR, startAngle + 2 * Math.PI, startAngle + greenAngle, true);
-                    ctx.closePath();
-                    const redGrad = ctx.createLinearGradient(cx, cy - outerR, cx, cy + outerR);
-                    redGrad.addColorStop(0, '#ff5252');
-                    redGrad.addColorStop(1, '#b71c1c');
-                    ctx.fillStyle = redGrad;
-                    ctx.fill();
-                }
-
-                // --- PATTERN: alternating radial segments (dartboard style) ---
+                // ---- Draw the wheel with alternating green/red segments ----
+                // Number of segments: 24
                 const numSegments = 24;
                 const segAngle = (2 * Math.PI) / numSegments;
-                const ringOuter = outerR - 2;
-                const ringInner = innerR + 2;
+                // Determine how many green segments based on chance
+                // Green area = chance * 2PI, so number of green segments = floor(chance * numSegments)
+                const greenSegments = Math.floor(this.chance * numSegments);
 
+                // Save and rotate the whole wheel
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(rotation);
+
+                // Draw each segment
                 for (let i = 0; i < numSegments; i++) {
-                    const a1 = -Math.PI / 2 + i * segAngle;
-                    const a2 = a1 + segAngle;
-                    const isDark = i % 2 === 0;
+                    const startA = -Math.PI / 2 + i * segAngle;
+                    const endA = startA + segAngle;
+                    const isGreen = i < greenSegments;
                     ctx.beginPath();
-                    ctx.arc(cx, cy, ringOuter, a1, a2);
-                    ctx.arc(cx, cy, ringInner, a2, a1, true);
+                    ctx.arc(0, 0, outerR, startA, endA);
+                    ctx.arc(0, 0, innerR, endA, startA, true);
                     ctx.closePath();
-                    ctx.fillStyle = isDark ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.05)';
+                    if (isGreen) {
+                        ctx.fillStyle = '#00c853';
+                    } else {
+                        ctx.fillStyle = '#d32f2f';
+                    }
                     ctx.fill();
-                    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                    // subtle border
+                    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
                     ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
 
-                // --- Inner and outer border rings ---
+                // Inner ring border
                 ctx.beginPath();
-                ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.arc(0, 0, innerR, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // --- Center circle with chance percentage ---
+                // Outer ring border
+                ctx.beginPath();
+                ctx.arc(0, 0, outerR, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.restore();
+
+                // ---- Draw the fixed arrow on top (always at top, pointing down) ----
+                ctx.save();
+                ctx.translate(cx, cy);
+                // Arrow points down (positive Y)
+                const arrowLen = outerR - 4;
+                const arrowHead = 12;
+                ctx.beginPath();
+                ctx.moveTo(0, -outerR + 6);
+                ctx.lineTo(0, outerR - 6);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = 'rgba(255,255,255,0.3)';
+                ctx.shadowBlur = 12;
+                ctx.stroke();
+                // Arrow head at the bottom
+                ctx.beginPath();
+                ctx.moveTo(0, outerR - 6);
+                ctx.lineTo(-arrowHead, outerR - 6 - arrowHead);
+                ctx.lineTo(arrowHead, outerR - 6 - arrowHead);
+                ctx.closePath();
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(255,255,255,0.4)';
+                ctx.shadowBlur = 16;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.restore();
+
+                // ---- Center percentage ----
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -6181,30 +6475,6 @@
                 ctx.fillText('CHANCE', cx, cy + 24);
                 ctx.shadowBlur = 0;
                 ctx.restore();
-
-                // --- Arrow ---
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.rotate(arrowAngle);
-                ctx.beginPath();
-                ctx.moveTo(innerR + 4, 0);
-                ctx.lineTo(outerR - 4, 0);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.shadowColor = 'rgba(255,255,255,0.3)';
-                ctx.shadowBlur = 12;
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(outerR - 4, 0);
-                ctx.lineTo(outerR - 16, -10);
-                ctx.lineTo(outerR - 16, 10);
-                ctx.closePath();
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(255,255,255,0.4)';
-                ctx.shadowBlur = 16;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-                ctx.restore();
             },
 
             animateToChance(newChance) {
@@ -6217,7 +6487,7 @@
                 const diff = newChance - startChance;
                 if (Math.abs(diff) < 0.001) {
                     this.chance = newChance;
-                    this.drawWheelAndArrow(this.arrowAngle);
+                    this.drawWheel(this.wheelAngle);
                     return;
                 }
                 const duration = 400;
@@ -6227,12 +6497,12 @@
                     const t = Math.min(elapsed / duration, 1);
                     const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
                     this.chance = startChance + diff * eased;
-                    this.drawWheelAndArrow(this.arrowAngle);
+                    this.drawWheel(this.wheelAngle);
                     if (t < 1) {
                         this.chanceAnimationId = requestAnimationFrame(animate);
                     } else {
                         this.chance = newChance;
-                        this.drawWheelAndArrow(this.arrowAngle);
+                        this.drawWheel(this.wheelAngle);
                         this.chanceAnimationId = null;
                     }
                 };
@@ -6248,8 +6518,7 @@
                 const wheelContainer = document.getElementById('wheelContainer');
                 wheelContainer.style.filter = 'drop-shadow(0 0 20px rgba(0,210,160,0.5))';
 
-                this.lastTickAngle = this.arrowAngle;
-
+                // Pre-spin tension ticks
                 let tensionCount = 0;
                 const tensionMax = 3;
                 let tensionInterval = setInterval(() => {
@@ -6258,8 +6527,9 @@
                         this.startSpin();
                         return;
                     }
-                    this.arrowAngle += (Math.random() - 0.5) * 0.25;
-                    this.drawWheelAndArrow(this.arrowAngle);
+                    // jiggle the wheel slightly
+                    this.wheelAngle += (Math.random() - 0.5) * 0.1;
+                    this.drawWheel(this.wheelAngle);
                     playTick(0.2, 600 + Math.random() * 200);
                     tensionCount++;
                 }, 120);
@@ -6267,35 +6537,36 @@
 
             startSpin() {
                 const duration = 8000 + Math.random() * 2000;
-                const startAngle = this.arrowAngle;
+                const startAngle = this.wheelAngle;
+                // Determine final angle based on chance
                 const rand = Math.random();
                 let finalAngleOnWheel;
                 if (rand < this.chance) {
+                    // win: land in green area
                     finalAngleOnWheel = Math.random() * this.chance * 2 * Math.PI;
                 } else {
+                    // lose: land in red area
                     finalAngleOnWheel = this.chance * 2 * Math.PI + Math.random() * (1 - this.chance) * 2 * Math.PI;
                 }
-                const targetArrowAngle = -Math.PI / 2 + finalAngleOnWheel + 2 * Math.PI * (6 + Math.floor(Math.random() *
-                4));
+                // Add extra full rotations for drama
+                const extraRotations = 6 + Math.floor(Math.random() * 4);
+                const targetWheelAngle = startAngle + finalAngleOnWheel + extraRotations * 2 * Math.PI;
 
                 const startTime = performance.now();
                 const animateSpin = (now) => {
                     const elapsed = now - startTime;
                     const t = Math.min(elapsed / duration, 1);
                     const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-                    this.arrowAngle = startAngle + (targetArrowAngle - startAngle) * eased;
-                    this.drawWheelAndArrow(this.arrowAngle);
+                    this.wheelAngle = startAngle + (targetWheelAngle - startAngle) * eased;
+                    this.drawWheel(this.wheelAngle);
 
-                    const angleDiff = Math.abs(this.arrowAngle - this.lastTickAngle);
-                    if (angleDiff >= this.tickThreshold) {
-                        const speed = Math.abs(targetArrowAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 -
-                            t)) / duration;
-                        const freq = 400 + speed * 100;
-                        const vol = Math.min(0.4, 0.1 + speed * 0.005);
-                        playTick(vol, freq);
-                        this.lastTickAngle = this.arrowAngle;
-                    }
+                    // sound tick
+                    const speed = Math.abs(targetWheelAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 - t)) / duration;
+                    const freq = 400 + speed * 100;
+                    const vol = Math.min(0.4, 0.1 + speed * 0.005);
+                    playTick(vol, freq);
 
+                    // glow effect
                     const glowIntensity = 0.3 + 0.7 * (1 - Math.abs(0.5 - t) * 2);
                     document.getElementById('wheelContainer').style.filter =
                         `drop-shadow(0 0 ${20 + glowIntensity * 40}px rgba(0,210,160,${0.4 + glowIntensity * 0.5})) brightness(${1 + glowIntensity * 0.12})`;
@@ -6306,9 +6577,14 @@
                         this.spinning = false;
                         this.locked = false;
                         setUpgradeLocked(false);
-                        const landed = ((targetArrowAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-                        const relativeAngle = (landed + Math.PI / 2) % (2 * Math.PI);
-                        const isGreen = relativeAngle < this.chance * 2 * Math.PI;
+                        // Determine result: check if the arrow points to green
+                        // Arrow is at top (angle = -PI/2). The wheel's rotation determines which segment is at top.
+                        // The segment at top is the one whose start angle <= (-PI/2 - wheelAngle) mod 2PI < end angle.
+                        // Simpler: compute the angle on the wheel at arrow position.
+                        const arrowWheelAngle = (-Math.PI / 2 - this.wheelAngle) % (2 * Math.PI);
+                        // Normalize to 0..2PI
+                        const normalized = ((arrowWheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                        const isGreen = normalized < this.chance * 2 * Math.PI;
                         this.resolveSpin(isGreen);
 
                         const container = document.getElementById('wheelContainer');
@@ -6320,25 +6596,26 @@
                             setTimeout(() => container.style.filter = 'none', 500);
                         }
 
+                        // Reset wheel angle slowly (bounce effect)
                         const returnDuration = 800;
-                        const returnStartAngle = this.arrowAngle;
+                        const returnStartAngle = this.wheelAngle;
                         const returnStartTime = performance.now();
                         const animateReturn = (now2) => {
                             const t2 = Math.min((now2 - returnStartTime) / returnDuration, 1);
                             const eased2 = t2 < 0.5 ? 2 * t2 * t2 : 1 - Math.pow(-2 * t2 + 2, 2) / 2;
-                            const deltaAngle = returnStartAngle - (-Math.PI / 2);
+                            const deltaAngle = returnStartAngle - 0;
                             let bounce = 0;
                             if (t2 > 0.8) {
                                 const b = (t2 - 0.8) / 0.2;
                                 bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.08;
                             }
-                            this.arrowAngle = returnStartAngle - deltaAngle * eased2 + bounce;
-                            this.drawWheelAndArrow(this.arrowAngle);
+                            this.wheelAngle = returnStartAngle - deltaAngle * eased2 + bounce;
+                            this.drawWheel(this.wheelAngle);
                             if (t2 < 1) {
                                 requestAnimationFrame(animateReturn);
                             } else {
-                                this.arrowAngle = -Math.PI / 2;
-                                this.drawWheelAndArrow(this.arrowAngle);
+                                this.wheelAngle = 0;
+                                this.drawWheel(0);
                                 this.fromNftId = null;
                                 this.toNftId = null;
                                 document.getElementById('upgradeBtn').disabled = false;
@@ -6390,6 +6667,7 @@
             const toPrice = document.getElementById('toPriceDisplay');
             const upgradeBtn = document.getElementById('upgradeBtn');
             const upgradeBtnText = document.getElementById('upgradeBtnText');
+            const upgradePct = document.getElementById('upgradePct');
 
             if (upgradeGame.fromNftId) {
                 const nft = NFT_DB[upgradeGame.fromNftId];
@@ -6435,14 +6713,17 @@
                 const multiplier = NFT_DB[upgradeGame.toNftId].price / NFT_DB[upgradeGame.fromNftId].price;
                 let newChance = 1 / multiplier;
                 newChance = Math.min(0.95, Math.max(0.05, newChance));
-                upgradeBtnText.textContent = `Upgrade (${Math.round(newChance * 100)}%)`;
+                upgradeBtnText.textContent = 'Upgrade';
+                upgradePct.textContent = Math.round(newChance * 100) + '%';
                 upgradeGame.animateToChance(newChance);
+                upgradeBtn.disabled = false;
             } else {
                 upgradeGame.animateToChance(1.0);
-                upgradeBtnText.textContent = 'Upgrade';
+                upgradeBtnText.textContent = validFrom && !validTo ? 'Select Desired' : 'Upgrade';
+                upgradePct.textContent = '—';
+                upgradeBtn.disabled = true;
             }
-
-            upgradeBtn.disabled = !(validFrom && validTo && fromOwned && !upgradeGame.spinning);
+            if (upgradeGame.spinning) upgradeBtn.disabled = true;
         }
 
         function spinUpgrade() {
@@ -6535,7 +6816,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Upgrade wheel enlarged with segment pattern (original layout preserved).');
+            console.log('✅ Casino loaded – Upgrade full‑screen, segmented green/red wheel, fixed arrow.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
