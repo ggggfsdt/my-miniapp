@@ -2133,7 +2133,7 @@
         }
 
         /* ============================================================
-           UPGRADE – FULL SCREEN, WHEEL BIGGER (ONLY THESE TWO CHANGES)
+           UPGRADE – FULL SCREEN, WHEEL BIGGER, IMPROVED UI
            ============================================================ */
         #page-upgrade {
             padding: 0;
@@ -2225,22 +2225,21 @@
             width: 18%;
             height: 18%;
             object-fit: contain;
-            border-radius: 12px;
+            border-radius: 0; /* no border */
             display: none;
             z-index: 5;
             pointer-events: none;
             filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.3));
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
-            padding: 4px;
+            background: transparent; /* transparent */
+            border: none;
+            padding: 0;
             will-change: transform;
         }
         .upgrade-selectors {
             display: flex;
             flex-direction: row;
-            gap: 14px;
-            margin: 6px 0 10px 0;
+            gap: 10px;
+            margin: 4px 0 8px 0;
             flex-shrink: 0;
             justify-content: center;
             width: 100%;
@@ -2250,12 +2249,12 @@
             max-width: 50%;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 18px;
-            padding: 12px 10px;
+            border-radius: 16px;
+            padding: 8px 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             cursor: pointer;
             transition: background 0.25s, border-color 0.25s, transform 0.2s, opacity 0.3s;
             min-width: 0;
@@ -2272,10 +2271,10 @@
             filter: grayscale(0.6);
         }
         .upgrade-select .nft-square {
-            width: 80px;
-            height: 80px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 16px;
+            width: 100px; /* bigger image */
+            height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.06);
             display: flex;
@@ -2303,30 +2302,41 @@
             text-align: center;
             width: 100%;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
         }
         .upgrade-select .info .name {
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
             color: #e0e0e0;
-            display: block;
+            display: inline-block;
         }
         .upgrade-select .info .price {
             color: #ffd700;
-            font-size: 14px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .upgrade-select .info .price img {
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+        }
+        .upgrade-select .info .name-price-wrap {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 3px;
-            font-weight: 600;
-        }
-        .upgrade-select .info .price img {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
+            flex-wrap: wrap;
+            gap: 4px;
         }
         .upgrade-select .select-badge {
             font-size: 9px;
@@ -2681,8 +2691,8 @@
         /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width: 420px) {
             .upgrade-select .nft-square {
-                width: 64px;
-                height: 64px;
+                width: 80px;
+                height: 80px;
                 border-radius: 12px;
             }
             .upgrade-select .info .name {
@@ -2692,11 +2702,11 @@
                 font-size: 12px;
             }
             .upgrade-select {
-                padding: 10px 8px;
+                padding: 8px 4px;
                 gap: 4px;
             }
             .upgrade-selectors {
-                gap: 10px;
+                gap: 8px;
                 margin: 4px 0 6px 0;
             }
             .btn-upgrade {
@@ -2859,8 +2869,8 @@
 
         @media (max-width: 370px) {
             .upgrade-select .nft-square {
-                width: 54px;
-                height: 54px;
+                width: 70px;
+                height: 70px;
                 border-radius: 10px;
             }
             .upgrade-select .info .name {
@@ -2870,10 +2880,10 @@
                 font-size: 11px;
             }
             .upgrade-select {
-                padding: 8px 6px;
+                padding: 6px 4px;
             }
             .upgrade-selectors {
-                gap: 8px;
+                gap: 6px;
             }
             .btn-upgrade {
                 font-size: 14px;
@@ -3079,7 +3089,7 @@
             <div class="mines-history" id="minesHistory"></div>
         </div>
 
-        <!-- ===== UPGRADE – FULL SCREEN, WHEEL BIGGER ===== -->
+        <!-- ===== UPGRADE – FULL SCREEN, WHEEL BIGGER, POLISHED UI ===== -->
         <div id="page-upgrade" class="page">
             <div class="upgrade-full">
                 <!-- Header -->
@@ -3105,8 +3115,10 @@
                             <span class="placeholder" id="fromPlaceholder">Choose</span>
                         </div>
                         <div class="info">
-                            <span class="name" id="fromNftName">Your NFT</span>
-                            <span class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
+                            <div class="name-price-wrap">
+                                <span class="name" id="fromNftName">Your NFT</span>
+                                <span class="price" id="fromPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
+                            </div>
                         </div>
                         <span class="select-badge" id="fromBadge">⬇ Your NFT</span>
                     </div>
@@ -3116,8 +3128,10 @@
                             <span class="placeholder" id="toPlaceholder">Choose</span>
                         </div>
                         <div class="info">
-                            <span class="name" id="toNftName">Desired NFT</span>
-                            <span class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
+                            <div class="name-price-wrap">
+                                <span class="name" id="toNftName">Desired NFT</span>
+                                <span class="price" id="toPriceDisplay"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="star-icon-xs" alt="⭐"> -</span>
+                            </div>
                         </div>
                         <span class="select-badge" id="toBadge">⬆ Desired</span>
                     </div>
@@ -6208,7 +6222,7 @@
             }
         }
 
-        // ===== UPGRADE GAME – unchanged =====
+        // ===== UPGRADE GAME – with polished UI =====
         let activeSelectionType = null;
         let audioCtx2 = null;
 
@@ -6217,7 +6231,7 @@
             return audioCtx2;
         }
 
-        function playTick(volume = 0.3, frequency = 800) {
+        function playTick(volume = 0.35, frequency = 800) {
             try {
                 const ctx = getAudioContext();
                 const osc = ctx.createOscillator();
@@ -6353,7 +6367,6 @@
 
             init() {
                 this.ctx = this.canvas.getContext('2d');
-                // Ensure canvas matches the container size
                 const rect = this.canvas.getBoundingClientRect();
                 const dpr = window.devicePixelRatio || 1;
                 const w = rect.width || 400;
@@ -6421,22 +6434,24 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Center percentage (same as original)
-                ctx.save();
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                const pct = Math.round(this.chance * 100);
-                ctx.font = 'bold 28px -apple-system, sans-serif';
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                ctx.shadowBlur = 12;
-                ctx.fillText(pct + '%', cx, cy - 2);
-                ctx.font = '11px -apple-system, sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                ctx.shadowBlur = 4;
-                ctx.fillText('CHANCE', cx, cy + 24);
-                ctx.shadowBlur = 0;
-                ctx.restore();
+                // Center percentage – hide when a desired NFT is selected (toNftId != null)
+                if (!upgradeGame.toNftId) {
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const pct = Math.round(this.chance * 100);
+                    ctx.font = 'bold 28px -apple-system, sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                    ctx.shadowBlur = 12;
+                    ctx.fillText(pct + '%', cx, cy - 2);
+                    ctx.font = '11px -apple-system, sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText('CHANCE', cx, cy + 24);
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                }
             },
 
             animateToChance(newChance) {
@@ -6492,7 +6507,7 @@
                     }
                     this.arrowAngle += (Math.random() - 0.5) * 0.2;
                     this.drawWheelAndArrow(this.arrowAngle);
-                    playTick(0.2, 600 + Math.random() * 200);
+                    playTick(0.25, 600 + Math.random() * 200);
                     tensionCount++;
                 }, 120);
             },
@@ -6523,7 +6538,7 @@
                         const speed = Math.abs(targetArrowAngle - startAngle) * (t < 0.5 ? 12 * t * t : 6 * (1 - t) * (1 -
                             t)) / duration;
                         const freq = 400 + speed * 100;
-                        const vol = Math.min(0.4, 0.1 + speed * 0.005);
+                        const vol = Math.min(0.4, 0.15 + speed * 0.005);
                         playTick(vol, freq);
                         this.lastTickAngle = this.arrowAngle;
                     }
@@ -6771,7 +6786,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Upgrade is full‑screen and wheel is bigger.');
+            console.log('✅ Casino loaded – Upgrade polished: full‑screen, bigger wheel, clean UI.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
