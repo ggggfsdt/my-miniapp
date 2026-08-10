@@ -518,16 +518,6 @@
             align-items: center;
             padding: 4px 0 8px 0;
         }
-        .lud-header .back-btn {
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 8px 12px 8px 4px;
-            transition: color 0.2s;
-            display: none; /* hide, we use badge instead */
-        }
         .lud-header .title-badge {
             font-size: 13px;
             padding: 4px 12px;
@@ -564,7 +554,6 @@
             width: 100%;
             height: 100%;
         }
-        /* removed .lud-arrow – we draw arrow on canvas */
         .lud-center-icon {
             position: absolute;
             top: 50%;
@@ -3822,8 +3811,16 @@
 
         const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
 
-        // ===== NFTs that appear in the Lud Loop wheel (price <= 1000) =====
-        const LUD_NFTS = SORTED_NFTS.filter(n => n.price <= 1000);
+        // ===== NFTs that appear in the Lud Loop wheel – tiered by bet =====
+        const LUD_NFTS_BY_BET = {
+            100: SORTED_NFTS.filter(n => n.price <= 600),
+            200: SORTED_NFTS.filter(n => n.price <= 640),
+            300: SORTED_NFTS.filter(n => n.price <= 640), // same as 200 for now
+            400: SORTED_NFTS.filter(n => n.price <= 1000),
+            600: SORTED_NFTS.filter(n => n.price <= 2330), // includes chabips papaha
+            700: SORTED_NFTS.filter(n => n.price <= 2330) // same as 600, but we could extend further
+        };
+        // Also include 500? We'll handle default to 400 if not defined.
 
         // ============================================================
         // DOM REFS
@@ -7064,12 +7061,20 @@
         // ============================================================
         // LUD LOOP – FINAL POLISH
         // ============================================================
-        const LUD_COLORS = [
-            '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3',
-            '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0',
-            '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
-            '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
-        ];
+        // Color palette based on NFT price tiers
+        function getColorForNFT(price) {
+            // Map price to color: cheap -> warm, expensive -> cool
+            const colors = [
+                '#ff6b6b', '#ff9f43', '#feca57', '#48dbfb',
+                '#0abde3', '#5f27cd', '#1dd1a1', '#f368e0',
+                '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
+                '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
+            ];
+            // Sort NFTs by price and assign colors
+            // We'll assign based on index in sorted list
+            // We'll do it dynamically in buildSegments
+            return colors;
+        }
 
         const ludGame = {
             canvas: null,
@@ -7093,6 +7098,7 @@
             resultNft: null,
             isWin: false,
             idleAnimId: null,
+            tickSoundInterval: null,
 
             init() {
                 this.canvas = document.getElementById('ludCanvas');
@@ -7124,7 +7130,6 @@
                 if (this.idleAnimId) cancelAnimationFrame(this.idleAnimId);
                 const loop = () => {
                     if (!this.spinning) {
-                        // Redraw to keep GIFs animated
                         this.draw();
                     }
                     this.idleAnimId = requestAnimationFrame(loop);
@@ -7148,13 +7153,21 @@
 
             getAvailableNfts() {
                 const bet = this.bet;
-                if (bet === 100) return LUD_NFTS.filter(n => n.price <= 600);
-                if (bet === 200) return LUD_NFTS.filter(n => n.price <= 640);
-                return LUD_NFTS.slice(); // 400,600,700 all NFTs
+                // Use tiered mapping
+                const tierMap = {
+                    100: 600,
+                    200: 640,
+                    300: 640,
+                    400: 1000,
+                    600: 2330,
+                    700: 2330
+                };
+                const maxPrice = tierMap[bet] || 1000;
+                return SORTED_NFTS.filter(n => n.price <= maxPrice);
             },
 
             hasNoPrize() {
-                return this.bet === 100 || this.bet === 200;
+                return this.bet === 100 || this.bet === 200 || this.bet === 300;
             },
 
             buildSegments() {
@@ -7166,27 +7179,36 @@
                 const weights = [];
                 const sorted = [...nfts].sort((a, b) => a.price - b.price);
 
-                // Weight: inverse of price, but with more extreme difference
+                // Weight: inverse price, more extreme for big price difference
+                // Also add a bonus for no-prize to make it more likely
                 for (const nft of sorted) {
                     let w = 1 / nft.price;
-                    w = w * 20000; // scale up
-                    w = Math.max(0.2, Math.min(6, w)); // min 0.2, max 6
+                    w = w * 30000; // scale up
+                    w = Math.max(0.1, Math.min(8, w)); // min 0.1, max 8
                     weights.push(w);
                     totalWeight += w;
                 }
 
                 let noPrizeWeight = 0;
                 if (hasNoPrize) {
-                    // Make no-prize bigger
-                    noPrizeWeight = 1.8 + (this.bet === 100 ? 0.8 : 0.4);
+                    // For 100,200,300, no-prize weight is high relative to NFTs
+                    const base = 2.5 + (this.bet === 100 ? 1.0 : (this.bet === 200 ? 0.8 : 0.6));
+                    noPrizeWeight = base;
                     totalWeight += noPrizeWeight;
                 }
 
                 let currentAngle = 0;
+                // Assign colors based on price order (more expensive -> cooler colors)
+                const colorPalette = [
+                    '#ff6b6b', '#ff9f43', '#feca57', '#48dbfb',
+                    '#0abde3', '#5f27cd', '#1dd1a1', '#f368e0',
+                    '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
+                    '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
+                ];
                 for (let i = 0; i < sorted.length; i++) {
                     const nft = sorted[i];
                     const angle = (weights[i] / totalWeight) * 2 * Math.PI;
-                    const color = LUD_COLORS[i % LUD_COLORS.length];
+                    const color = colorPalette[i % colorPalette.length];
                     this.segments.push({
                         type: 'nft',
                         nft: nft,
@@ -7205,7 +7227,7 @@
                         nft: null,
                         startAngle: currentAngle,
                         endAngle: currentAngle + angle,
-                        color: '#2d2d32', // dark gray
+                        color: '#2d2d32',
                         weight: noPrizeWeight
                     });
                 }
@@ -7314,19 +7336,18 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Draw arrow – white, pointing inward (sharp side toward center)
-                // Arrow: triangle with point at center, base at outer edge
+                // Draw arrow – exactly like upgrade wheel: triangle pointing outward
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(this.arrowAngle);
-                // Arrowhead pointing inward: point at (innerR*0.5, 0) and base at (r+4, 0) with width 14
-                const tipX = innerR * 0.5;
-                const baseX = r + 4;
-                const halfBase = 12;
+                // Arrow: base at inner radius + small offset, tip at outer radius
+                const baseR = innerR * 0.6;
+                const tipR = r + 4;
+                const halfWidth = 12;
                 ctx.beginPath();
-                ctx.moveTo(tipX, 0);
-                ctx.lineTo(baseX, -halfBase);
-                ctx.lineTo(baseX, halfBase);
+                ctx.moveTo(tipR, 0);
+                ctx.lineTo(baseR, -halfWidth);
+                ctx.lineTo(baseR, halfWidth);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowColor = 'rgba(255,255,255,0.4)';
@@ -7380,20 +7401,20 @@
 
                 triggerVibration(30, 'light');
 
-                // Determine result
+                // Determine result with weighted probabilities
                 const nfts = this.getAvailableNfts();
                 const hasNoPrize = this.hasNoPrize();
                 const allItems = [];
                 for (const nft of nfts) {
                     const w = 1 / nft.price;
-                    const scaled = w * 20000;
-                    const weight = Math.max(0.2, Math.min(6, scaled));
+                    const scaled = w * 30000;
+                    const weight = Math.max(0.1, Math.min(8, scaled));
                     for (let i = 0; i < Math.round(weight * 10); i++) {
                         allItems.push({ type: 'nft', nft: nft });
                     }
                 }
                 if (hasNoPrize) {
-                    const npWeight = 1.8 + (this.bet === 100 ? 0.8 : 0.4);
+                    const npWeight = 2.5 + (this.bet === 100 ? 1.0 : (this.bet === 200 ? 0.8 : 0.6));
                     for (let i = 0; i < Math.round(npWeight * 10); i++) {
                         allItems.push({ type: 'no-prize', nft: null });
                     }
@@ -7421,7 +7442,7 @@
                 this.resultNft = winNft;
                 this.isWin = isWin;
 
-                // Calculate target angle: arrow should point at segment center
+                // Calculate target angle: arrow points to segment center
                 const targetSeg = this.segments[targetSegmentIndex];
                 const segMid = (targetSeg.startAngle + targetSeg.endAngle) / 2;
                 const rotations = 5 + Math.floor(Math.random() * 4);
@@ -7434,6 +7455,11 @@
 
                 if (this.animId) cancelAnimationFrame(this.animId);
                 this.animateSpin();
+                // Start tick sound
+                if (this.tickSoundInterval) clearInterval(this.tickSoundInterval);
+                this.tickSoundInterval = setInterval(() => {
+                    playTick(0.15, 600 + Math.random() * 400);
+                }, 200);
             },
 
             animateSpin() {
@@ -7450,6 +7476,10 @@
                     this.arrowAngle = this.targetAngle;
                     this.draw();
                     this.spinning = false;
+                    if (this.tickSoundInterval) {
+                        clearInterval(this.tickSoundInterval);
+                        this.tickSoundInterval = null;
+                    }
                     const spinBtn = document.getElementById('ludSpinBtn');
                     spinBtn.disabled = false;
                     document.getElementById('ludSpinText').textContent = 'SPIN';
@@ -7461,7 +7491,6 @@
             },
 
             animateArrowReturn() {
-                // Smoothly rotate arrow back to 0 (top)
                 const start = this.arrowAngle;
                 const end = 0;
                 const duration = 800;
@@ -7561,6 +7590,7 @@
             if (document.hidden) {
                 if (crashGame.isPlaying) crashGame.stopContinuousVibration();
                 if (ludGame.idleAnimId) cancelAnimationFrame(ludGame.idleAnimId);
+                if (ludGame.tickSoundInterval) clearInterval(ludGame.tickSoundInterval);
             } else {
                 if (crashGame.isPlaying) crashGame.startContinuousVibration();
                 if (document.getElementById('page-rocket').classList.contains('active')) {
@@ -7630,7 +7660,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: vibrant colors, rotating white arrow, animated GIFs, smooth return.');
+            console.log('✅ Casino loaded – Lud Loop final: vibrant colors, rotating white arrow, animated GIFs, smooth return, spin sound.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
