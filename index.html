@@ -2952,6 +2952,69 @@
             color: #ffd700;
         }
 
+        /* Confirmation overlay */
+        #confirmOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #confirmOverlay.active {
+            display: flex;
+        }
+        #confirmOverlay .confirm-box {
+            background: rgba(30, 30, 35, 0.96);
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 320px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            text-align: center;
+        }
+        #confirmOverlay .confirm-box .title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        #confirmOverlay .confirm-box .sub {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 16px;
+        }
+        #confirmOverlay .confirm-box .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        #confirmOverlay .confirm-box .actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        #confirmOverlay .confirm-box .actions button:active {
+            transform: scale(0.94);
+        }
+        #confirmOverlay .confirm-box .actions .btn-confirm {
+            background: linear-gradient(135deg, #00b894, #00d2a0);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.3);
+        }
+        #confirmOverlay .confirm-box .actions .btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: #888;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .upgrade-select .nft-square {
@@ -3150,6 +3213,10 @@
             .ludloop-arrow-icon {
                 font-size: 28px;
             }
+            #confirmOverlay .confirm-box .actions button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
         }
 
         @media (max-width: 370px) {
@@ -3192,6 +3259,10 @@
             }
             .ludloop-arrow-icon {
                 font-size: 24px;
+            }
+            #confirmOverlay .confirm-box .actions button {
+                padding: 6px 12px;
+                font-size: 12px;
             }
         }
     </style>
@@ -3488,7 +3559,7 @@
                             <button data-price="700">700</button>
                         </div>
                     </div>
-                    <button class="ludloop-spin-btn" id="ludloopSpinBtn" onclick="ludloopGame.spin()">
+                    <button class="ludloop-spin-btn" id="ludloopSpinBtn" onclick="ludloopGame.requestSpin()">
                         <i class="fas fa-sync-alt spin-icon"></i> Spin
                     </button>
                     <div class="ludloop-result" id="ludloopResult">Select a price and spin!</div>
@@ -3498,6 +3569,18 @@
                         <span class="name" id="ludloopPreviewName">—</span>
                         <span class="price" id="ludloopPreviewPrice"></span>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONFIRM OVERLAY -->
+        <div id="confirmOverlay">
+            <div class="confirm-box">
+                <div class="title">Confirm Spin</div>
+                <div class="sub" id="confirmMessage">Spend <span id="confirmPrice">100</span> stars?</div>
+                <div class="actions">
+                    <button class="btn-cancel" onclick="ludloopGame.cancelSpin()">Cancel</button>
+                    <button class="btn-confirm" onclick="ludloopGame.executeSpin()">Confirm</button>
                 </div>
             </div>
         </div>
@@ -3689,7 +3772,9 @@
             // new GIFs
             'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif',
             'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif',
-            'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif'
+            'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif',
+            'https://i.postimg.cc/Y2sDwrS3/ezgif-54c8dc445a1f067a.gif',
+            'https://i.postimg.cc/q74jGgm4/ezgif-4fb5831a67b7248f.gif'
         ];
 
         async function preloadAllGifs() {
@@ -3766,7 +3851,7 @@
             timeless_book: { id: 'timeless_book', name: 'Timeless Book', price: 500,
                 gif: 'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif', tier: 'medium' },
             liberty_figure: { id: 'liberty_figure', name: 'Liberty Figure', price: 525,
-                gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp', tier: 'medium' },
+                gif: 'https://i.postimg.cc/Y2sDwrS3/ezgif-54c8dc445a1f067a.gif', tier: 'medium' },
             swag_bag: { id: 'swag_bag', name: 'Swag Bag', price: 560,
                 gif: 'https://i.postimg.cc/nc2Lx0Nb/ezgif-56ec96aa9d12b9ac.gif', tier: 'medium' },
             victory_medal: { id: 'victory_medal', name: 'Victory Medal', price: 600,
@@ -3780,7 +3865,7 @@
             snoop_cigar: { id: 'snoop_cigar', name: 'Snoop Cigar', price: 1500,
                 gif: 'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif', tier: 'high' },
             rare_bird: { id: 'rare_bird', name: 'Rare Bird', price: 2190,
-                gif: 'https://images.iimg.live/images/majestic-memory-3550.webp', tier: 'epic' },
+                gif: 'https://i.postimg.cc/q74jGgm4/ezgif-4fb5831a67b7248f.gif', tier: 'epic' },
             bling_blinky: { id: 'bling_blinky', name: 'Bling Blinky', price: 2200,
                 gif: 'https://i.postimg.cc/P5nMGrst/ezgif-8bc68a0ab30628c5.gif', tier: 'high' },
             chabips_papaha: { id: 'chabips_papaha', name: 'Chabips Papaha', price: 2330,
@@ -7082,19 +7167,19 @@
             spinPrice: 100,
             isSpinning: false,
             segments: [],
-            arrowAngle: -Math.PI / 2, // initial position: top
+            arrowAngle: -Math.PI / 2, // initial top
             animId: null,
-            result: null,
             _dpr: 1,
             renderLoopId: null,
             arrowOffset: 0,
+            pendingSpin: false, // true when confirm overlay is shown
 
-            // Price tiers – fixed according to user request
+            // Price tiers – fixed
             priceTiers: {
                 100: { maxPrice: 400, hasNoPrize: true },
-                300: { maxPrice: 700, hasNoPrize: true }, // 300 has no-prize
+                300: { maxPrice: 700, hasNoPrize: true },
                 500: { maxPrice: 1500, hasNoPrize: false },
-                700: { maxPrice: 2200, hasNoPrize: false } // max Bling Blinky
+                700: { maxPrice: 2190, hasNoPrize: false } // max Rare Bird
             },
 
             init() {
@@ -7110,13 +7195,12 @@
                 this.ctx.scale(dpr, dpr);
                 this.width = w;
                 this.height = h;
-                // Compute arrow offset: near outer edge
                 this.arrowOffset = Math.min(w, h) * 0.44;
 
-                // Set arrow icon position dynamically
+                // Position arrow icon
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
                 if (arrowIcon) {
-                    const offset = this.arrowOffset + 10; // +10 for arrow tip
+                    const offset = this.arrowOffset + 10;
                     arrowIcon.style.transform = `translate(-50%, -100%) translateY(-${offset}px)`;
                     arrowIcon.style.fontSize = Math.min(w, h) * 0.08 + 'px';
                 }
@@ -7128,7 +7212,7 @@
                 // Price buttons
                 document.querySelectorAll('#ludloopPriceSelect button').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        if (this.isSpinning) return;
+                        if (this.isSpinning || this.pendingSpin) return;
                         const price = parseInt(btn.dataset.price);
                         this.spinPrice = price;
                         document.querySelectorAll('#ludloopPriceSelect button').forEach(b => b.classList.remove(
@@ -7147,7 +7231,7 @@
                 this.arrowAngle = -Math.PI / 2;
                 this.updateArrowTransform(this.arrowAngle);
 
-                // Start render loop to animate GIFs
+                // Start render loop for GIF animation
                 if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId);
                 this.renderLoop();
             },
@@ -7211,7 +7295,7 @@
 
                 // No-prize for 100 and 300
                 if (tier.hasNoPrize) {
-                    const noPrizeAngle = 0.30 * 2 * Math.PI; // 30%
+                    const noPrizeAngle = 0.30 * 2 * Math.PI;
                     const totalSegAngle = this.segments.reduce((sum, s) => sum + s.angle, 0);
                     const scale = (2 * Math.PI - noPrizeAngle) / totalSegAngle;
                     let newStart = 0;
@@ -7291,7 +7375,7 @@
                         if (img && img.naturalWidth > 0) {
                             ctx.drawImage(img, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
                         } else {
-                            // Fallback
+                            // Try loading fallback
                             const fallbackImg = new Image();
                             fallbackImg.crossOrigin = 'anonymous';
                             fallbackImg.onload = () => {
@@ -7299,6 +7383,7 @@
                                 this.drawWheel();
                             };
                             fallbackImg.src = seg.nft.gif;
+                            // Show placeholder
                             ctx.beginPath();
                             ctx.arc(0, 0, iconSize / 2, 0, 2 * Math.PI);
                             ctx.fillStyle = 'rgba(255,255,255,0.1)';
@@ -7346,8 +7431,8 @@
                 }
             },
 
-            spin() {
-                if (this.isSpinning) return;
+            requestSpin() {
+                if (this.isSpinning || this.pendingSpin) return;
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
                 const eligible = this.getEligibleNfts();
 
@@ -7364,6 +7449,25 @@
                     return;
                 }
 
+                // Show confirmation overlay
+                this.pendingSpin = true;
+                document.getElementById('confirmPrice').textContent = this.spinPrice;
+                document.getElementById('confirmOverlay').classList.add('active');
+            },
+
+            cancelSpin() {
+                this.pendingSpin = false;
+                document.getElementById('confirmOverlay').classList.remove('active');
+            },
+
+            executeSpin() {
+                document.getElementById('confirmOverlay').classList.remove('active');
+                if (!this.pendingSpin) return;
+                this.pendingSpin = false;
+                this.isSpinning = true;
+                document.getElementById('ludloopSpinBtn').disabled = true;
+
+                // Deduct balance
                 state.balance -= this.spinPrice;
                 updateHomeUI();
                 updateProfile();
@@ -7371,8 +7475,6 @@
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 document.getElementById('ludloopResult').textContent = 'Spinning...';
                 document.getElementById('ludloopResult').className = 'ludloop-result';
-                document.getElementById('ludloopSpinBtn').disabled = true;
-                this.isSpinning = true;
 
                 // Determine result segment
                 const weightedOptions = [];
@@ -7396,11 +7498,9 @@
                     wonNft = resultSegment.nft;
                 }
 
-                // Arrow animation: rotate from current position to target
+                // Arrow animation
                 const startAngle = this.arrowAngle;
-                // Target angle: -PI/2 + midpoint of winning segment
                 const targetAngle = -Math.PI / 2 + (resultSegment.startAngle + resultSegment.angle / 2);
-                // Add extra rotations
                 const extraRotations = 5 + Math.floor(Math.random() * 4);
                 const targetRotation = targetAngle + extraRotations * 2 * Math.PI;
 
@@ -7415,9 +7515,7 @@
                     this.arrowAngle = currentAngle;
                     this.updateArrowTransform(currentAngle);
 
-                    // Tick sound
-                    const angleDiff = Math.abs(currentAngle - this._lastTickAngle);
-                    if (angleDiff > 0.3) {
+                    if (Math.abs(currentAngle - this._lastTickAngle) > 0.3) {
                         playTick(0.2, 500 + Math.random() * 300);
                         this._lastTickAngle = currentAngle;
                     }
@@ -7429,7 +7527,7 @@
                         this.updateArrowTransform(targetRotation);
                         // Resolve result
                         this.resolveSpin(isWin, wonNft, winAmount);
-                        // Animate arrow back to top (-PI/2) with bounce
+                        // Animate arrow back to top
                         this.animateArrowBack();
                     }
                 };
@@ -7447,7 +7545,6 @@
                     const elapsed = now - startTime;
                     const t = Math.min(elapsed / duration, 1);
                     const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-                    // Add a bounce effect at the end
                     let bounce = 0;
                     if (t > 0.7) {
                         const b = (t - 0.7) / 0.3;
@@ -7461,7 +7558,6 @@
                     } else {
                         this.arrowAngle = targetAngle;
                         this.updateArrowTransform(targetAngle);
-                        // Re-enable spin button
                         document.getElementById('ludloopSpinBtn').disabled = false;
                         this.isSpinning = false;
                     }
@@ -7654,7 +7750,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop fully fixed: arrow spins around wheel, GIFs show, no-prize for 300, max prize 2200.');
+            console.log('✅ Casino loaded – Lud Loop final: arrow at top, confirms, prizes align.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
