@@ -3815,12 +3815,12 @@
         const LUD_NFTS_BY_BET = {
             100: SORTED_NFTS.filter(n => n.price <= 600),
             200: SORTED_NFTS.filter(n => n.price <= 640),
-            300: SORTED_NFTS.filter(n => n.price <= 640), // same as 200 for now
+            300: SORTED_NFTS.filter(n => n.price <= 640),
             400: SORTED_NFTS.filter(n => n.price <= 1000),
+            500: SORTED_NFTS.filter(n => n.price <= 1500), // includes snoop cigar
             600: SORTED_NFTS.filter(n => n.price <= 2330), // includes chabips papaha
-            700: SORTED_NFTS.filter(n => n.price <= 2330) // same as 600, but we could extend further
+            700: SORTED_NFTS.filter(n => n.price <= 4000) // includes voodoo doll, toy bear, kissed frog
         };
-        // Also include 500? We'll handle default to 400 if not defined.
 
         // ============================================================
         // DOM REFS
@@ -7062,19 +7062,12 @@
         // LUD LOOP – FINAL POLISH
         // ============================================================
         // Color palette based on NFT price tiers
-        function getColorForNFT(price) {
-            // Map price to color: cheap -> warm, expensive -> cool
-            const colors = [
-                '#ff6b6b', '#ff9f43', '#feca57', '#48dbfb',
-                '#0abde3', '#5f27cd', '#1dd1a1', '#f368e0',
-                '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
-                '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
-            ];
-            // Sort NFTs by price and assign colors
-            // We'll assign based on index in sorted list
-            // We'll do it dynamically in buildSegments
-            return colors;
-        }
+        const colorPalette = [
+            '#ff6b6b', '#ff9f43', '#feca57', '#48dbfb',
+            '#0abde3', '#5f27cd', '#1dd1a1', '#f368e0',
+            '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
+            '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
+        ];
 
         const ludGame = {
             canvas: null,
@@ -7089,7 +7082,7 @@
             bet: 100,
             spinning: false,
             animId: null,
-            arrowAngle: 0,
+            arrowAngle: -Math.PI / 2, // start at top
             targetAngle: 0,
             spinDuration: 5000,
             spinStartTime: 0,
@@ -7116,6 +7109,7 @@
                 this.cy = h / 2;
                 this.radius = Math.min(w, h) * 0.42;
                 this.innerRadius = this.radius * 0.22;
+                this.arrowAngle = -Math.PI / 2;
                 this.buildSegments();
                 this.draw();
                 this.updateUI();
@@ -7153,14 +7147,14 @@
 
             getAvailableNfts() {
                 const bet = this.bet;
-                // Use tiered mapping
                 const tierMap = {
                     100: 600,
                     200: 640,
                     300: 640,
                     400: 1000,
+                    500: 1500,
                     600: 2330,
-                    700: 2330
+                    700: 4000
                 };
                 const maxPrice = tierMap[bet] || 1000;
                 return SORTED_NFTS.filter(n => n.price <= maxPrice);
@@ -7179,32 +7173,24 @@
                 const weights = [];
                 const sorted = [...nfts].sort((a, b) => a.price - b.price);
 
-                // Weight: inverse price, more extreme for big price difference
-                // Also add a bonus for no-prize to make it more likely
+                // Extreme weighting: cheap = huge, expensive = tiny
                 for (const nft of sorted) {
                     let w = 1 / nft.price;
-                    w = w * 30000; // scale up
-                    w = Math.max(0.1, Math.min(8, w)); // min 0.1, max 8
+                    w = w * 80000; // very high scale
+                    w = Math.max(0.05, Math.min(12, w)); // clamp
                     weights.push(w);
                     totalWeight += w;
                 }
 
                 let noPrizeWeight = 0;
                 if (hasNoPrize) {
-                    // For 100,200,300, no-prize weight is high relative to NFTs
-                    const base = 2.5 + (this.bet === 100 ? 1.0 : (this.bet === 200 ? 0.8 : 0.6));
+                    // Make no-prize very large for low bets
+                    const base = 3.5 + (this.bet === 100 ? 1.5 : (this.bet === 200 ? 1.0 : 0.7));
                     noPrizeWeight = base;
                     totalWeight += noPrizeWeight;
                 }
 
                 let currentAngle = 0;
-                // Assign colors based on price order (more expensive -> cooler colors)
-                const colorPalette = [
-                    '#ff6b6b', '#ff9f43', '#feca57', '#48dbfb',
-                    '#0abde3', '#5f27cd', '#1dd1a1', '#f368e0',
-                    '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
-                    '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
-                ];
                 for (let i = 0; i < sorted.length; i++) {
                     const nft = sorted[i];
                     const angle = (weights[i] / totalWeight) * 2 * Math.PI;
@@ -7340,18 +7326,18 @@
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(this.arrowAngle);
-                // Arrow: base at inner radius + small offset, tip at outer radius
-                const baseR = innerR * 0.6;
+                // Arrow: tip at outer radius, base at inner radius
                 const tipR = r + 4;
-                const halfWidth = 12;
+                const baseR = innerR * 0.5;
+                const halfWidth = 14;
                 ctx.beginPath();
                 ctx.moveTo(tipR, 0);
                 ctx.lineTo(baseR, -halfWidth);
                 ctx.lineTo(baseR, halfWidth);
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(255,255,255,0.4)';
-                ctx.shadowBlur = 8;
+                ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                ctx.shadowBlur = 12;
                 ctx.fill();
                 ctx.shadowBlur = 0;
                 ctx.restore();
@@ -7407,14 +7393,14 @@
                 const allItems = [];
                 for (const nft of nfts) {
                     const w = 1 / nft.price;
-                    const scaled = w * 30000;
-                    const weight = Math.max(0.1, Math.min(8, scaled));
+                    const scaled = w * 80000;
+                    const weight = Math.max(0.05, Math.min(12, scaled));
                     for (let i = 0; i < Math.round(weight * 10); i++) {
                         allItems.push({ type: 'nft', nft: nft });
                     }
                 }
                 if (hasNoPrize) {
-                    const npWeight = 2.5 + (this.bet === 100 ? 1.0 : (this.bet === 200 ? 0.8 : 0.6));
+                    const npWeight = 3.5 + (this.bet === 100 ? 1.5 : (this.bet === 200 ? 1.0 : 0.7));
                     for (let i = 0; i < Math.round(npWeight * 10); i++) {
                         allItems.push({ type: 'no-prize', nft: null });
                     }
@@ -7484,7 +7470,7 @@
                     spinBtn.disabled = false;
                     document.getElementById('ludSpinText').textContent = 'SPIN';
                     this.showResult();
-                    // Animate arrow back to top (0 angle) smoothly
+                    // Animate arrow back to top (-Math.PI/2) smoothly
                     this.animateArrowReturn();
                     this.updateUI();
                 }
@@ -7492,7 +7478,7 @@
 
             animateArrowReturn() {
                 const start = this.arrowAngle;
-                const end = 0;
+                const end = -Math.PI / 2;
                 const duration = 800;
                 const startTime = performance.now();
                 const animateReturn = (now) => {
@@ -7660,7 +7646,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: vibrant colors, rotating white arrow, animated GIFs, smooth return, spin sound.');
+            console.log('✅ Casino loaded – Lud Loop final: extreme sizes, rotating white arrow, all GIFs animated, distinct tiers.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
