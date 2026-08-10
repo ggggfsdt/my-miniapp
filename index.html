@@ -503,7 +503,7 @@
             box-shadow: 0 0 30px rgba(255, 150, 0, 0.05);
         }
 
-        /* ===== LUD LOOP PAGE ===== */
+        /* ===== LUD LOOP PAGE – new simplified layout ===== */
         #page-ludloop {
             padding: 10px 12px 70px 12px;
             display: none;
@@ -3445,7 +3445,7 @@
             </div>
         </div>
 
-        <!-- ===== LUD LOOP ===== -->
+        <!-- ===== LUD LOOP – NEW IMPLEMENTATION ===== -->
         <div id="page-ludloop" class="page">
             <div class="lud-header">
                 <span class="title-badge"><i class="fas fa-circle-notch"></i> Lud Loop</span>
@@ -3810,17 +3810,6 @@
         };
 
         const SORTED_NFTS = Object.values(NFT_DB).sort((a, b) => a.price - b.price);
-
-        // ===== NFTs that appear in the Lud Loop wheel – tiered by bet =====
-        const LUD_NFTS_BY_BET = {
-            100: SORTED_NFTS.filter(n => n.price <= 600),
-            200: SORTED_NFTS.filter(n => n.price <= 640),
-            300: SORTED_NFTS.filter(n => n.price <= 640),
-            400: SORTED_NFTS.filter(n => n.price <= 1000),
-            500: SORTED_NFTS.filter(n => n.price <= 1500), // includes snoop cigar
-            600: SORTED_NFTS.filter(n => n.price <= 2330), // includes chabips papaha
-            700: SORTED_NFTS.filter(n => n.price <= 4000) // includes voodoo doll, toy bear, kissed frog
-        };
 
         // ============================================================
         // DOM REFS
@@ -7059,15 +7048,8 @@
         }
 
         // ============================================================
-        // LUD LOOP – COMPLETE REWRITE USING UPGRADE WHEEL LOGIC
+        // LUD LOOP – BRAND NEW IMPLEMENTATION
         // ============================================================
-        const colorPalette = [
-            '#ff6b6b', '#ff9f43', '#feca57', '#48dbfb',
-            '#0abde3', '#5f27cd', '#1dd1a1', '#f368e0',
-            '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
-            '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
-        ];
-
         const ludGame = {
             canvas: null,
             ctx: null,
@@ -7081,16 +7063,22 @@
             bet: 100,
             spinning: false,
             animId: null,
-            arrowAngle: -Math.PI / 2, // start at top
+            arrowAngle: -Math.PI / 2,
             targetAngle: 0,
-            spinDuration: 5000,
+            spinDuration: 4000,
             spinStartTime: 0,
             startAngle: 0,
             resultIndex: -1,
             resultNft: null,
             isWin: false,
             idleAnimId: null,
-            tickSoundInterval: null,
+            // color palette for segments
+            colors: [
+                '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3',
+                '#54a0ff', '#5f27cd', '#1dd1a1', '#f368e0',
+                '#00d2d3', '#6c5ce7', '#fd79a8', '#00b894',
+                '#e17055', '#74b9ff', '#a29bfe', '#fdcb6e'
+            ],
 
             init() {
                 this.canvas = document.getElementById('ludCanvas');
@@ -7114,7 +7102,6 @@
                 this.updateUI();
                 this.setupSlider();
                 this.startIdleAnimation();
-
                 document.getElementById('ludBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
             },
@@ -7168,24 +7155,25 @@
                 const hasNoPrize = this.hasNoPrize();
                 this.segments = [];
 
+                // Randomize weights for each spin – but we keep them consistent for now
+                // We'll randomize on each spin, not on build
+                // For build we use fixed weights based on price
                 let totalWeight = 0;
                 const weights = [];
                 const sorted = [...nfts].sort((a, b) => a.price - b.price);
 
-                // Extreme weighting: cheap = huge, expensive = tiny
                 for (const nft of sorted) {
+                    // Higher price = smaller weight
                     let w = 1 / nft.price;
-                    w = w * 80000; // very high scale
-                    w = Math.max(0.05, Math.min(12, w)); // clamp
+                    w = w * 80000;
+                    w = Math.max(0.05, Math.min(12, w));
                     weights.push(w);
                     totalWeight += w;
                 }
 
                 let noPrizeWeight = 0;
                 if (hasNoPrize) {
-                    // Make no-prize very large for low bets
-                    const base = 3.5 + (this.bet === 100 ? 1.5 : (this.bet === 200 ? 1.0 : 0.7));
-                    noPrizeWeight = base;
+                    noPrizeWeight = 3.5 + (this.bet === 100 ? 1.5 : (this.bet === 200 ? 1.0 : 0.7));
                     totalWeight += noPrizeWeight;
                 }
 
@@ -7193,7 +7181,7 @@
                 for (let i = 0; i < sorted.length; i++) {
                     const nft = sorted[i];
                     const angle = (weights[i] / totalWeight) * 2 * Math.PI;
-                    const color = colorPalette[i % colorPalette.length];
+                    const color = this.colors[i % this.colors.length];
                     this.segments.push({
                         type: 'nft',
                         nft: nft,
@@ -7216,8 +7204,56 @@
                         weight: noPrizeWeight
                     });
                 }
+                // store for later
+                this._segmentWeights = weights;
+                this._noPrizeWeight = noPrizeWeight;
+                this._totalWeight = totalWeight;
+            },
 
-                this.segments.forEach((seg, idx) => { seg.index = idx; });
+            // Randomize segment sizes for each spin while keeping relative proportions
+            randomizeWeights() {
+                if (!this.segments.length) return;
+                // We'll generate random weights that still respect the inverse price relation
+                const nfts = this.segments.filter(s => s.type === 'nft').map(s => s.nft);
+                const hasNoPrize = this.segments.some(s => s.type === 'no-prize');
+                let totalWeight = 0;
+                const newWeights = [];
+                for (const nft of nfts) {
+                    // Base weight inverse price + random factor ±30%
+                    let base = 1 / nft.price;
+                    base = base * 80000;
+                    base = Math.max(0.05, Math.min(12, base));
+                    const randomFactor = 0.7 + Math.random() * 0.6; // 0.7 to 1.3
+                    let w = base * randomFactor;
+                    w = Math.max(0.05, Math.min(15, w));
+                    newWeights.push(w);
+                    totalWeight += w;
+                }
+                let noPrizeW = 0;
+                if (hasNoPrize) {
+                    noPrizeW = (3.5 + (this.bet === 100 ? 1.5 : (this.bet === 200 ? 1.0 : 0.7))) * (0.8 + Math.random() * 0.4);
+                    totalWeight += noPrizeW;
+                }
+                // Rebuild segments with new weights
+                let currentAngle = 0;
+                let idx = 0;
+                for (let i = 0; i < this.segments.length; i++) {
+                    const seg = this.segments[i];
+                    if (seg.type === 'nft') {
+                        const angle = (newWeights[idx] / totalWeight) * 2 * Math.PI;
+                        seg.startAngle = currentAngle;
+                        seg.endAngle = currentAngle + angle;
+                        seg.weight = newWeights[idx];
+                        currentAngle += angle;
+                        idx++;
+                    } else {
+                        const angle = (noPrizeW / totalWeight) * 2 * Math.PI;
+                        seg.startAngle = currentAngle;
+                        seg.endAngle = currentAngle + angle;
+                        seg.weight = noPrizeW;
+                        currentAngle += angle;
+                    }
+                }
             },
 
             draw() {
@@ -7237,7 +7273,7 @@
                 ctx.fillStyle = '#0a0a0c';
                 ctx.fill();
 
-                // Draw segments (static)
+                // Draw segments
                 for (const seg of this.segments) {
                     const start = seg.startAngle;
                     const end = seg.endAngle;
@@ -7321,14 +7357,14 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Draw arrow – exactly like upgrade wheel: triangle pointing outward
+                // Draw arrow – small white arrow pointing outward
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.rotate(this.arrowAngle);
-                // Arrow: tip at outer radius, base at inner radius
+                // Arrow: tip at outer radius, base at inner radius * 0.6
                 const tipR = r + 4;
-                const baseR = innerR * 0.5;
-                const halfWidth = 14;
+                const baseR = innerR * 0.6;
+                const halfWidth = 12;
                 ctx.beginPath();
                 ctx.moveTo(tipR, 0);
                 ctx.lineTo(baseR, -halfWidth);
@@ -7336,7 +7372,7 @@
                 ctx.closePath();
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowColor = 'rgba(255,255,255,0.5)';
-                ctx.shadowBlur = 12;
+                ctx.shadowBlur = 8;
                 ctx.fill();
                 ctx.shadowBlur = 0;
                 ctx.restore();
@@ -7386,50 +7422,28 @@
 
                 triggerVibration(30, 'light');
 
-                // Determine result with weighted probabilities
-                const nfts = this.getAvailableNfts();
-                const hasNoPrize = this.hasNoPrize();
-                const allItems = [];
-                for (const nft of nfts) {
-                    const w = 1 / nft.price;
-                    const scaled = w * 80000;
-                    const weight = Math.max(0.05, Math.min(12, scaled));
-                    for (let i = 0; i < Math.round(weight * 10); i++) {
-                        allItems.push({ type: 'nft', nft: nft });
-                    }
-                }
-                if (hasNoPrize) {
-                    const npWeight = 3.5 + (this.bet === 100 ? 1.5 : (this.bet === 200 ? 1.0 : 0.7));
-                    for (let i = 0; i < Math.round(npWeight * 10); i++) {
-                        allItems.push({ type: 'no-prize', nft: null });
-                    }
-                }
+                // Randomize segment weights for this spin
+                this.randomizeWeights();
 
-                const pick = allItems[Math.floor(Math.random() * allItems.length)];
-                const isWin = pick.type === 'nft' && pick.nft !== null;
-                const winNft = isWin ? pick.nft : null;
-
-                // Find segment index
-                let targetSegmentIndex = -1;
-                for (let i = 0; i < this.segments.length; i++) {
-                    const seg = this.segments[i];
-                    if (isWin && seg.type === 'nft' && seg.nft && seg.nft.id === winNft.id) {
-                        targetSegmentIndex = i;
-                        break;
-                    } else if (!isWin && seg.type === 'no-prize') {
-                        targetSegmentIndex = i;
-                        break;
-                    }
+                // Determine result based on new weights
+                const segments = this.segments;
+                const totalWeight = segments.reduce((sum, s) => sum + s.weight, 0);
+                let rand = Math.random() * totalWeight;
+                let chosenIndex = 0;
+                for (let i = 0; i < segments.length; i++) {
+                    rand -= segments[i].weight;
+                    if (rand <= 0) { chosenIndex = i; break; }
                 }
-                if (targetSegmentIndex === -1) targetSegmentIndex = 0;
+                const chosen = segments[chosenIndex];
+                const isWin = chosen.type === 'nft' && chosen.nft !== null;
+                const winNft = isWin ? chosen.nft : null;
 
-                this.resultIndex = targetSegmentIndex;
+                this.resultIndex = chosenIndex;
                 this.resultNft = winNft;
                 this.isWin = isWin;
 
                 // Calculate target angle: arrow points to segment center
-                const targetSeg = this.segments[targetSegmentIndex];
-                const segMid = (targetSeg.startAngle + targetSeg.endAngle) / 2;
+                const segMid = (chosen.startAngle + chosen.endAngle) / 2;
                 const rotations = 5 + Math.floor(Math.random() * 4);
                 const finalAngle = segMid + rotations * 2 * Math.PI + (Math.random() - 0.5) * 0.15;
 
@@ -7440,11 +7454,6 @@
 
                 if (this.animId) cancelAnimationFrame(this.animId);
                 this.animateSpin();
-                // Start tick sound
-                if (this.tickSoundInterval) clearInterval(this.tickSoundInterval);
-                this.tickSoundInterval = setInterval(() => {
-                    playTick(0.15, 600 + Math.random() * 400);
-                }, 200);
             },
 
             animateSpin() {
@@ -7461,15 +7470,10 @@
                     this.arrowAngle = this.targetAngle;
                     this.draw();
                     this.spinning = false;
-                    if (this.tickSoundInterval) {
-                        clearInterval(this.tickSoundInterval);
-                        this.tickSoundInterval = null;
-                    }
                     const spinBtn = document.getElementById('ludSpinBtn');
                     spinBtn.disabled = false;
                     document.getElementById('ludSpinText').textContent = 'SPIN';
                     this.showResult();
-                    // Animate arrow back to top (-Math.PI/2) smoothly
                     this.animateArrowReturn();
                     this.updateUI();
                 }
@@ -7478,7 +7482,7 @@
             animateArrowReturn() {
                 const start = this.arrowAngle;
                 const end = -Math.PI / 2;
-                const duration = 800;
+                const duration = 700;
                 const startTime = performance.now();
                 const animateReturn = (now) => {
                     const elapsed = now - startTime;
@@ -7575,7 +7579,6 @@
             if (document.hidden) {
                 if (crashGame.isPlaying) crashGame.stopContinuousVibration();
                 if (ludGame.idleAnimId) cancelAnimationFrame(ludGame.idleAnimId);
-                if (ludGame.tickSoundInterval) clearInterval(ludGame.tickSoundInterval);
             } else {
                 if (crashGame.isPlaying) crashGame.startContinuousVibration();
                 if (document.getElementById('page-rocket').classList.contains('active')) {
@@ -7645,7 +7648,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop fully rebuilt with Upgrade wheel logic: proper arrow, extreme segment sizes, animated GIFs.');
+            console.log('✅ Casino loaded – Lud Loop fully rebuilt from scratch: random segment sizes per spin, all GIFs animate, small arrow.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
