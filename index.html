@@ -2932,6 +2932,65 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
         }
 
+        /* ===== LUD LOOP NEW STYLES ===== */
+        .lud-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin: 2px 0;
+        }
+        .lud-slider-container label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            min-width: 50px;
+        }
+        .lud-slider-container input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: #2a2a2e;
+            outline: none;
+            transition: background 0.3s;
+            min-width: 60px;
+        }
+        .lud-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #f0932b);
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+            transition: transform 0.2s;
+        }
+        .lud-slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        .lud-slider-container input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #f0932b);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+        }
+        .lud-slider-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffd700;
+            min-width: 48px;
+            text-align: center;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .upgrade-select .nft-square {
@@ -3114,17 +3173,17 @@
             .nft-selection-grid {
                 gap: 10px;
             }
-            .lud-bet-btn {
+            .lud-slider-container {
+                padding: 2px 6px;
+                gap: 8px;
+            }
+            .lud-slider-container label {
                 font-size: 11px;
-                padding: 6px 10px;
                 min-width: 40px;
             }
-            .lud-bet-btn .sub {
-                font-size: 8px;
-            }
-            .lud-spin-btn {
-                font-size: 16px;
-                padding: 12px 16px;
+            .lud-slider-value {
+                font-size: 14px;
+                min-width: 40px;
             }
             .lud-arrow {
                 border-left-width: 12px;
@@ -3179,17 +3238,17 @@
             .upgrade-wheel-container {
                 width: min(72vw, 260px);
             }
-            .lud-bet-btn {
+            .lud-slider-container {
+                padding: 2px 4px;
+                gap: 4px;
+            }
+            .lud-slider-container label {
                 font-size: 10px;
-                padding: 5px 8px;
-                min-width: 34px;
+                min-width: 30px;
             }
-            .lud-bet-btn .sub {
-                font-size: 7px;
-            }
-            .lud-spin-btn {
-                font-size: 14px;
-                padding: 10px 14px;
+            .lud-slider-value {
+                font-size: 12px;
+                min-width: 32px;
             }
             .lud-arrow {
                 border-left-width: 10px;
@@ -3472,21 +3531,21 @@
             </div>
 
             <div class="lud-info">
-                <span><span class="bet-label">Bet:</span> <span class="bet-value" id="ludBetDisplay">100</span> ⭐</span>
+                <span><span class="bet-label">Bet:</span> <span class="bet-value" id="ludBetDisplay">100</span> ★</span>
                 <span><span class="bet-label">Pool:</span> <span id="ludPoolDisplay">8 NFTs</span></span>
             </div>
 
             <div class="lud-controls">
-                <div class="lud-bet-row" id="ludBetRow">
-                    <button class="lud-bet-btn active" data-bet="100">100 <span class="sub">⭐</span></button>
-                    <button class="lud-bet-btn" data-bet="200">200 <span class="sub">⭐</span></button>
-                    <button class="lud-bet-btn" data-bet="400">400 <span class="sub">⭐</span></button>
-                    <button class="lud-bet-btn" data-bet="600">600 <span class="sub">⭐</span></button>
-                    <button class="lud-bet-btn" data-bet="700">700 <span class="sub">⭐</span></button>
+                <!-- Slider for bet -->
+                <div class="lud-slider-container">
+                    <label>Bet</label>
+                    <input type="range" id="ludBetSlider" min="100" max="700" step="100" value="100">
+                    <span class="lud-slider-value" id="ludSliderValue">100</span>
                 </div>
+
                 <button class="lud-spin-btn" id="ludSpinBtn" onclick="ludGame.spin()">
                     <span id="ludSpinText">SPIN</span>
-                    <span class="sub-text" id="ludSpinSub">100 ⭐ • 8 NFTs</span>
+                    <span class="sub-text" id="ludSpinSub">100 ★ • 8 segments</span>
                 </button>
                 <div class="lud-result" id="ludResult"></div>
             </div>
@@ -3550,7 +3609,7 @@
             </div>
             <div class="bounce-info">
                 <span>Multiplier: <span class="multiplier" id="bounceMultiplier">0.20</span>x</span>
-                <span>Bet: <span id="bounceBetDisplay">10</span>⭐</span>
+                <span>Bet: <span id="bounceBetDisplay">10</span>★</span>
             </div>
             <div class="bounce-controls">
                 <input type="number" id="bounceBetInput" value="10" min="1" step="1">
@@ -3559,13 +3618,12 @@
             <div id="bounceResult" class="bounce-result"></div>
         </div>
 
-        <!-- BOTTOM NAV -->
+        <!-- BOTTOM NAV (no Lud Loop tab) -->
         <div class="bottom-nav">
             <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
             <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
             <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
             <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgr</span></button>
-            <button class="nav-item" data-page="ludloop"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="label">Loop</span></button>
             <button class="nav-item" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inv</span></button>
             <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
@@ -3826,8 +3884,6 @@
 
         // ===== NFTs that appear in the Lud Loop wheel (price <= 1000) =====
         const LUD_NFTS = SORTED_NFTS.filter(n => n.price <= 1000);
-        // chill_flame(320), timeless_book(500), liberty_figure(525), swag_bag(560),
-        // victory_medal(600), jolly_chimp(630), snoop_dog(630), homemade_cake(640)
 
         // ============================================================
         // DOM REFS
@@ -6389,7 +6445,7 @@
                     state.recentWinners.unshift({ name: 'You (Bounce)', amount: winAmount });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
                     resultEl.className = 'bounce-result win';
-                    resultEl.textContent = `Won ${winAmount}⭐ (${this.totalMultiplier.toFixed(2)}x)`;
+                    resultEl.textContent = `Won ${winAmount}★ (${this.totalMultiplier.toFixed(2)}x)`;
                     this.playWinSound();
                     triggerVibration(50, 'medium');
                     showNotification(winAmount, winAmount);
@@ -6399,7 +6455,7 @@
                     state.losses++;
                     state.totalGames++;
                     resultEl.className = 'bounce-result lose';
-                    resultEl.textContent = `Lost ${this.bet}⭐`;
+                    resultEl.textContent = `Lost ${this.bet}★`;
                     this.playLoseSound();
                     triggerVibration(80, 'heavy');
                     if (this.ballElement) this.ballElement.src = 'https://images.iimg.live/images/stellar-collection-3896.webp';
@@ -7066,7 +7122,7 @@
         }
 
         // ============================================================
-        // LUD LOOP – WHEEL GAME
+        // LUD LOOP – REDESIGNED
         // ============================================================
         const LUD_COLORS = [
             '#e74c3c', '#3498db', '#2ecc71', '#f1c40f',
@@ -7088,7 +7144,7 @@
             bet: 100,
             spinning: false,
             animId: null,
-            currentAngle: 0,
+            arrowAngle: 0,
             targetAngle: 0,
             spinDuration: 5000,
             spinStartTime: 0,
@@ -7096,7 +7152,6 @@
             resultIndex: -1,
             resultNft: null,
             isWin: false,
-            betTiers: [100, 200, 400, 600, 700],
 
             init() {
                 this.canvas = document.getElementById('ludCanvas');
@@ -7117,50 +7172,35 @@
                 this.buildSegments();
                 this.draw();
                 this.updateUI();
-                this.setupBetButtons();
+                this.setupSlider();
 
                 document.getElementById('ludBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
             },
 
-            setupBetButtons() {
-                const btns = document.querySelectorAll('.lud-bet-btn');
-                btns.forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        if (this.spinning) return;
-                        const bet = parseInt(btn.dataset.bet);
-                        this.bet = bet;
-                        btns.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.buildSegments();
-                        this.draw();
-                        this.updateUI();
-                    });
+            setupSlider() {
+                const slider = document.getElementById('ludBetSlider');
+                const valueDisplay = document.getElementById('ludSliderValue');
+                slider.addEventListener('input', () => {
+                    if (this.spinning) return;
+                    const val = parseInt(slider.value);
+                    this.bet = val;
+                    valueDisplay.textContent = val;
+                    this.buildSegments();
+                    this.draw();
+                    this.updateUI();
                 });
             },
 
             getAvailableNfts() {
                 const bet = this.bet;
-                // Tier 1: 100 stars – NFTs up to 600 stars
                 if (bet === 100) {
                     return LUD_NFTS.filter(n => n.price <= 600);
                 }
-                // Tier 2: 200 stars – NFTs up to 640 stars
                 if (bet === 200) {
                     return LUD_NFTS.filter(n => n.price <= 640);
                 }
-                // Tier 3: 400 stars – all NFTs, no "no prize"
-                if (bet === 400) {
-                    return LUD_NFTS.slice();
-                }
-                // Tier 4: 600 stars – all NFTs, no "no prize", better odds for expensive
-                if (bet === 600) {
-                    return LUD_NFTS.slice();
-                }
-                // Tier 5: 700 stars – all NFTs, no "no prize", best odds
-                if (bet === 700) {
-                    return LUD_NFTS.slice();
-                }
+                // 400, 600, 700 – all NFTs, no no-prize
                 return LUD_NFTS.slice();
             },
 
@@ -7173,36 +7213,25 @@
                 const hasNoPrize = this.hasNoPrize();
                 this.segments = [];
 
-                // Calculate weights: 1/price for NFTs, fixed for no-prize
                 let totalWeight = 0;
                 const weights = [];
-
-                // Sort NFTs by price (cheapest first)
                 const sorted = [...nfts].sort((a, b) => a.price - b.price);
 
                 for (const nft of sorted) {
-                    // Weight inversely proportional to price, but with a cap to avoid tiny segments
                     let w = 1 / nft.price;
-                    // Scale up for visibility
                     w = w * 10000;
-                    // Clamp to reasonable range
                     w = Math.max(0.5, Math.min(5, w));
                     weights.push(w);
                     totalWeight += w;
                 }
 
-                // Add no-prize segment if applicable
                 let noPrizeWeight = 0;
                 if (hasNoPrize) {
-                    // No-prize weight: between 0.5 and 2, depending on bet
                     noPrizeWeight = 0.8 + (this.bet === 100 ? 0.6 : 0.3);
                     totalWeight += noPrizeWeight;
                 }
 
-                // Build segments with angles
                 let currentAngle = 0;
-                const colorIdx = 0;
-
                 for (let i = 0; i < sorted.length; i++) {
                     const nft = sorted[i];
                     const angle = (weights[i] / totalWeight) * 2 * Math.PI;
@@ -7225,12 +7254,11 @@
                         nft: null,
                         startAngle: currentAngle,
                         endAngle: currentAngle + angle,
-                        color: '#2d3436',
+                        color: '#1a1a1e', // dark background
                         weight: noPrizeWeight
                     });
                 }
 
-                // Store the segment order for lookup
                 this.segments.forEach((seg, idx) => { seg.index = idx; });
             },
 
@@ -7245,16 +7273,16 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // Background
+                // Background circle
                 ctx.beginPath();
                 ctx.arc(cx, cy, r + 4, 0, 2 * Math.PI);
                 ctx.fillStyle = '#0a0a0c';
                 ctx.fill();
 
-                // Draw segments
+                // Draw segments (static, no rotation)
                 for (const seg of this.segments) {
-                    const start = seg.startAngle + this.currentAngle;
-                    const end = seg.endAngle + this.currentAngle;
+                    const start = seg.startAngle;
+                    const end = seg.endAngle;
 
                     ctx.beginPath();
                     ctx.moveTo(cx + innerR * Math.cos(start), cy + innerR * Math.sin(start));
@@ -7262,14 +7290,16 @@
                     ctx.arc(cx, cy, innerR, end, start, true);
                     ctx.closePath();
 
-                    // Fill with color
-                    ctx.fillStyle = seg.color;
-                    ctx.shadowColor = 'rgba(255,255,255,0.03)';
+                    if (seg.type === 'no-prize') {
+                        ctx.fillStyle = '#1a1a1e';
+                    } else {
+                        ctx.fillStyle = seg.color;
+                    }
+                    ctx.shadowColor = 'rgba(255,255,255,0.02)';
                     ctx.shadowBlur = 4;
                     ctx.fill();
                     ctx.shadowBlur = 0;
 
-                    // Border
                     ctx.strokeStyle = 'rgba(255,255,255,0.06)';
                     ctx.lineWidth = 0.5;
                     ctx.stroke();
@@ -7281,64 +7311,35 @@
                     const imgY = cy + imgR * Math.sin(midAngle);
 
                     if (seg.type === 'nft' && seg.nft) {
-                        // Draw NFT GIF
                         const img = GIF_CACHE[seg.nft.gif];
-                        if (img) {
+                        if (img && img.complete && img.naturalWidth > 0) {
                             const size = (r - innerR) * 0.5;
+                            const imgSize = Math.min(size, 40);
                             ctx.save();
                             ctx.translate(imgX, imgY);
-                            ctx.rotate(midAngle + (seg.endAngle - seg.startAngle) / 2);
-                            // Draw image centered
-                            const imgSize = Math.min(size, 40);
-                            // Check if image is loaded
-                            if (img.complete && img.naturalWidth > 0) {
-                                ctx.drawImage(img, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
-                            } else {
-                                // Fallback: draw a small circle
-                                ctx.beginPath();
-                                ctx.arc(0, 0, imgSize / 2.5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'rgba(255,255,255,0.1)';
-                                ctx.fill();
-                            }
+                            ctx.rotate(midAngle);
+                            ctx.drawImage(img, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
                             ctx.restore();
                         } else {
-                            // Fallback: draw a small dot
+                            // Fallback: small dot
                             ctx.beginPath();
-                            ctx.arc(imgX, imgY, 8, 0, 2 * Math.PI);
+                            ctx.arc(imgX, imgY, 6, 0, 2 * Math.PI);
                             ctx.fillStyle = 'rgba(255,255,255,0.15)';
                             ctx.fill();
                         }
-
-                        // Draw price label
+                    } else if (seg.type === 'no-prize') {
+                        // No prize: just "No Prize" text in dark segment
                         ctx.save();
-                        ctx.translate(imgX, imgY + (r - innerR) * 0.35);
-                        ctx.rotate(midAngle + (seg.endAngle - seg.startAngle) / 2);
-                        ctx.fillStyle = 'rgba(255,215,0,0.85)';
-                        ctx.font = 'bold 8px -apple-system, sans-serif';
+                        ctx.translate(imgX, imgY);
+                        ctx.rotate(midAngle);
+                        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                        ctx.font = 'bold 11px -apple-system, sans-serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.shadowColor = 'rgba(0,0,0,0.8)';
                         ctx.shadowBlur = 4;
-                        ctx.fillText('⭐' + seg.nft.price, 0, 0);
+                        ctx.fillText('No Prize', 0, 0);
                         ctx.shadowBlur = 0;
-                        ctx.restore();
-
-                    } else if (seg.type === 'no-prize') {
-                        // No prize segment
-                        ctx.save();
-                        ctx.translate(imgX, imgY);
-                        ctx.rotate(midAngle + (seg.endAngle - seg.startAngle) / 2);
-                        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                        ctx.font = 'bold 14px -apple-system, sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                        ctx.shadowBlur = 6;
-                        ctx.fillText('✕', 0, 0);
-                        ctx.shadowBlur = 0;
-                        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                        ctx.font = '7px -apple-system, sans-serif';
-                        ctx.fillText('No Prize', 0, 18);
                         ctx.restore();
                     }
                 }
@@ -7362,6 +7363,24 @@
                 ctx.strokeStyle = 'rgba(255,215,0,0.04)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
+
+                // Draw arrow (rotating) – arrow points from center outward, rotated by arrowAngle
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(this.arrowAngle);
+                // Draw arrow (triangle pointing outward)
+                ctx.beginPath();
+                const arrowLen = r + 10;
+                ctx.moveTo(arrowLen, 0);
+                ctx.lineTo(arrowLen - 16, -8);
+                ctx.lineTo(arrowLen - 16, 8);
+                ctx.closePath();
+                ctx.fillStyle = '#ffd700';
+                ctx.shadowColor = 'rgba(255,215,0,0.6)';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.restore();
             },
 
             updateUI() {
@@ -7374,7 +7393,7 @@
                 if (!this.spinning) {
                     spinBtn.disabled = false;
                     document.getElementById('ludSpinText').textContent = 'SPIN';
-                    document.getElementById('ludSpinSub').textContent = this.bet + ' ⭐ • ' + count + ' segments';
+                    document.getElementById('ludSpinSub').textContent = this.bet + ' ★ • ' + count + ' segments';
                 }
                 document.getElementById('ludBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
@@ -7386,7 +7405,7 @@
                     triggerVibration(60, 'heavy');
                     const resultEl = document.getElementById('ludResult');
                     resultEl.className = 'lud-result lose';
-                    resultEl.innerHTML = '❌ Not enough balance!';
+                    resultEl.innerHTML = 'Not enough balance!';
                     resultEl.style.display = 'flex';
                     return;
                 }
@@ -7402,7 +7421,7 @@
                 const spinBtn = document.getElementById('ludSpinBtn');
                 spinBtn.disabled = true;
                 document.getElementById('ludSpinText').textContent = 'SPINNING...';
-                document.getElementById('ludSpinSub').textContent = '🎰 Good luck!';
+                document.getElementById('ludSpinSub').textContent = 'Good luck!';
                 const resultEl = document.getElementById('ludResult');
                 resultEl.className = 'lud-result';
                 resultEl.style.display = 'none';
@@ -7412,7 +7431,6 @@
                 // Determine result
                 const nfts = this.getAvailableNfts();
                 const hasNoPrize = this.hasNoPrize();
-                // Build weighted selection
                 const allItems = [];
                 for (const nft of nfts) {
                     const w = 1 / nft.price;
@@ -7429,12 +7447,11 @@
                     }
                 }
 
-                // Pick random
                 const pick = allItems[Math.floor(Math.random() * allItems.length)];
                 const isWin = pick.type === 'nft' && pick.nft !== null;
                 const winNft = isWin ? pick.nft : null;
 
-                // Find the segment index that matches the result
+                // Find segment index
                 let targetSegmentIndex = -1;
                 for (let i = 0; i < this.segments.length; i++) {
                     const seg = this.segments[i];
@@ -7446,29 +7463,24 @@
                         break;
                     }
                 }
-
-                // If not found, fallback to first segment
-                if (targetSegmentIndex === -1) {
-                    targetSegmentIndex = 0;
-                }
+                if (targetSegmentIndex === -1) targetSegmentIndex = 0;
 
                 this.resultIndex = targetSegmentIndex;
                 this.resultNft = winNft;
                 this.isWin = isWin;
 
-                // Calculate the angle to stop at
+                // Calculate target angle: we want the arrow to point at the center of the segment
+                // The arrow is drawn at arrowAngle from the top (0 is right)
+                // We want the segment's mid angle to align with the arrow direction (which is at arrowAngle)
+                // So arrowAngle = midAngle + n*2PI
                 const targetSeg = this.segments[targetSegmentIndex];
-                const segMidAngle = (targetSeg.startAngle + targetSeg.endAngle) / 2;
-                // We want the arrow (at top = -PI/2) to point at the segment center
-                // The wheel rotates, so we need to set currentAngle so that the segment center aligns with -PI/2
-                // currentAngle + segMidAngle = -PI/2 + n*2PI (with some randomness)
-                const baseTarget = -Math.PI / 2 - segMidAngle;
-                // Add multiple full rotations for visual effect
+                const segMid = (targetSeg.startAngle + targetSeg.endAngle) / 2;
+                // Add multiple rotations
                 const rotations = 5 + Math.floor(Math.random() * 4);
-                const finalAngle = baseTarget + rotations * 2 * Math.PI + (Math.random() - 0.5) * 0.15;
+                const finalAngle = segMid + rotations * 2 * Math.PI + (Math.random() - 0.5) * 0.2;
 
                 this.targetAngle = finalAngle;
-                this.startAngle = this.currentAngle;
+                this.startAngle = this.arrowAngle;
                 this.spinStartTime = performance.now();
                 this.spinDuration = 4000 + Math.random() * 1500;
 
@@ -7480,24 +7492,19 @@
                 const now = performance.now();
                 const elapsed = now - this.spinStartTime;
                 const progress = Math.min(elapsed / this.spinDuration, 1);
-
-                // Easing: cubic-bezier-like ease-out
                 const eased = 1 - Math.pow(1 - progress, 3);
-                this.currentAngle = this.startAngle + (this.targetAngle - this.startAngle) * eased;
-
+                this.arrowAngle = this.startAngle + (this.targetAngle - this.startAngle) * eased;
                 this.draw();
 
                 if (progress < 1) {
                     this.animId = requestAnimationFrame(() => this.animateSpin());
                 } else {
-                    this.currentAngle = this.targetAngle;
+                    this.arrowAngle = this.targetAngle;
                     this.draw();
                     this.spinning = false;
                     const spinBtn = document.getElementById('ludSpinBtn');
                     spinBtn.disabled = false;
                     document.getElementById('ludSpinText').textContent = 'SPIN';
-
-                    // Show result
                     this.showResult();
                     this.updateUI();
                 }
@@ -7507,28 +7514,25 @@
                 const resultEl = document.getElementById('ludResult');
                 if (this.isWin && this.resultNft) {
                     const nft = this.resultNft;
-                    // Add NFT to inventory
                     state.inventory.push({ ...nft });
                     state.wins++;
                     state.totalGames++;
                     state.recentWinners.unshift({ name: 'You (Lud Loop)', amount: nft.price });
                     if (state.recentWinners.length > 10) state.recentWinners.pop();
-                    // Also give some stars back (the NFT value)
                     state.balance += nft.price;
 
-                    // Show win popup
                     showWinPopup(nft, () => {
                         flyNftToInventory(nft);
                     });
 
                     resultEl.className = 'lud-result win';
                     resultEl.innerHTML = `
-                        <div style="font-size:20px;">🎉 You won!</div>
+                        <div style="font-size:20px;">You won!</div>
                         <div class="result-nft">
                             <img src="${nft.gif}" alt="${nft.name}" decoding="async">
                             <div>
                                 <div class="name">${nft.name}</div>
-                                <div class="price">⭐ ${nft.price}</div>
+                                <div class="price">★ ${nft.price}</div>
                             </div>
                         </div>
                     `;
@@ -7537,12 +7541,11 @@
                     triggerVibration(50, 'medium');
                     showNotification(nft.price, nft.price);
                 } else {
-                    // No prize
                     state.losses++;
                     state.totalGames++;
                     resultEl.className = 'lud-result lose';
                     resultEl.innerHTML = `
-                        <div style="font-size:20px;">😔 No prize</div>
+                        <div style="font-size:20px;">No prize</div>
                         <div style="font-size:13px; color:#888;">Better luck next time!</div>
                     `;
                     resultEl.style.display = 'flex';
@@ -7558,7 +7561,7 @@
                 const nfts = this.getAvailableNfts();
                 const hasNoPrize = this.hasNoPrize();
                 const count = nfts.length + (hasNoPrize ? 1 : 0);
-                document.getElementById('ludSpinSub').textContent = this.bet + ' ⭐ • ' + count + ' segments';
+                document.getElementById('ludSpinSub').textContent = this.bet + ' ★ • ' + count + ' segments';
             }
         };
 
@@ -7654,7 +7657,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop added with NFT wheel!');
+            console.log('✅ Casino loaded – Lud Loop redesigned with slider, rotating arrow, no emojis.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
