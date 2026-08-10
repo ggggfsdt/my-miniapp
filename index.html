@@ -7192,6 +7192,7 @@
             pendingSpin: false,
             winSegmentIndex: -1,
             winPopTime: 0,
+            vibrationInterval: null, // for continuous vibration during spin
 
             // Price tiers
             priceTiers: {
@@ -7308,7 +7309,7 @@
                 return SORTED_NFTS.filter(n => n.price <= tier.maxPrice);
             },
 
-            // ---- MODIFIED: increased no-prize weight ----
+            // ---- increased no-prize weight ----
             buildSegments() {
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
                 const eligible = this.getEligibleNfts();
@@ -7353,9 +7354,9 @@
                     startAngle += angle;
                 }
 
-                // No-prize: keep visual angle small, but boost selection weight
+                // No-prize: visual angle small, selection weight high
                 if (tier.hasNoPrize) {
-                    const noPrizeAngle = 0.15 * 2 * Math.PI; // small visual size
+                    const noPrizeAngle = 0.15 * 2 * Math.PI;
                     const totalSegAngle = this.segments.reduce((sum, s) => sum + s.angle, 0);
                     const scale = (2 * Math.PI - noPrizeAngle) / totalSegAngle;
                     let newStart = 0;
@@ -7365,10 +7366,9 @@
                         seg.endAngle = newStart + seg.angle;
                         newStart += seg.angle;
                     }
-                    // Add no-prize segment with high selection weight
                     this.segments.push({
                         nft: null,
-                        weight: 0.65, // high chance
+                        weight: 0.65,
                         angle: noPrizeAngle,
                         startAngle: newStart,
                         endAngle: newStart + noPrizeAngle,
@@ -7398,8 +7398,8 @@
                 return `hsl(${hue}, ${sat}%, ${lig}%)`;
             },
 
-            // ---- MODIFIED: drawWheel with pop effect for highlighted segment, NO brightness change ----
-            drawWheel(angleOffset, highlightIndex) {
+            // ---- drawWheel with pop effect for highlighted segment, NO brightness change, NO GIF scaling during spin ----
+            drawWheel(angleOffset, highlightIndex, isSpinning = false) {
                 const ctx = this.ctx;
                 const w = this.width;
                 const h = this.height;
@@ -7436,12 +7436,9 @@
                         const baseIconSize = Math.min(outerR - innerR, 48) * 0.5;
                         let iconSize = baseIconSize * scaleFactor;
 
-                        // Check if this segment is highlighted (pointed by arrow)
+                        // Highlight logic: only apply pop if NOT spinning, OR if it's the win pop
                         let isHighlighted = false;
-                        if (highlightIndex === i) {
-                            isHighlighted = true;
-                        }
-                        // Also check for win pop
+                        // Win pop (always allowed)
                         if (this.winSegmentIndex === i && this.winPopTime > 0) {
                             isHighlighted = true;
                             const elapsed = (Date.now() - this.winPopTime) / 1000;
@@ -7454,12 +7451,19 @@
                             }
                         }
 
-                        // Apply pop effect for highlighted segment
-                        if (isHighlighted) {
+                        // Idle highlight (only if NOT spinning and not win pop)
+                        if (!isSpinning && highlightIndex === i && this.winSegmentIndex === -1) {
+                            isHighlighted = true;
                             const breathe = 1 + 0.25 * Math.sin(Date.now() / 300);
                             iconSize *= breathe;
                             ctx.shadowColor = 'rgba(255,215,0,0.6)';
                             ctx.shadowBlur = 30;
+                        }
+
+                        // During spin, we only show a very subtle glow, no scaling
+                        if (isSpinning && highlightIndex === i) {
+                            ctx.shadowColor = 'rgba(255,215,0,0.3)';
+                            ctx.shadowBlur = 15;
                         }
 
                         ctx.save();
@@ -7473,7 +7477,7 @@
                             fallbackImg.crossOrigin = 'anonymous';
                             fallbackImg.onload = () => {
                                 GIF_CACHE[seg.nft.gif] = fallbackImg;
-                                this.drawWheel(angleOffset, highlightIndex);
+                                this.drawWheel(angleOffset, highlightIndex, isSpinning);
                             };
                             fallbackImg.src = seg.nft.gif;
                             ctx.beginPath();
@@ -7585,8 +7589,8 @@
             },
 
             _executeSpinInternal() {
-                // --- ADD vibration on spin start ---
-                triggerVibration(30, 'light');
+                // --- Start continuous vibration ---
+                this.startSpinVibration();
 
                 this.isSpinning = true;
                 document.getElementById('ludloopSpinBtn').disabled = true;
@@ -7600,7 +7604,7 @@
                 document.getElementById('ludloopResult').textContent = 'Spinning...';
                 document.getElementById('ludloopResult').className = 'ludloop-result';
 
-                // Determine result using weighted selection (with no-prize weight boosted)
+                // Determine result using weighted selection
                 const weightedOptions = [];
                 for (const seg of this.segments) {
                     let w = seg.weight || seg.angle / (2 * Math.PI);
@@ -7633,7 +7637,6 @@
                 const duration = 6000 + Math.random() * 2000;
                 const startTime = performance.now();
 
-                // Track which segment the arrow points to during animation
                 const animateArrow = (now) => {
                     const elapsed = now - startTime;
                     const t = Math.min(elapsed / duration, 1);
@@ -7642,7 +7645,7 @@
                     this.arrowAngle = currentAngle;
                     this.updateArrowTransform(currentAngle);
 
-                    // Determine which segment is under the arrow (at top)
+                    // Determine which segment is under the arrow
                     const arrowDirection = ((-currentAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
                     let pointedIndex = -1;
                     for (let i = 0; i < this.segments.length; i++) {
@@ -7658,25 +7661,55 @@
                         }
                     }
 
-                    // Highlight only during slowing down phase
+                    // Highlight only during slowing down phase, but WITHOUT scaling (isSpinning=true)
                     let highlightIdx = -1;
                     if (t > 0.6) {
                         highlightIdx = pointedIndex;
                     }
-                    this.drawWheel(0, highlightIdx);
+                    // Pass isSpinning=true to disable GIF scaling during spin
+                    this.drawWheel(0, highlightIdx, true);
 
                     if (t < 1) {
                         requestAnimationFrame(animateArrow);
                     } else {
                         this.arrowAngle = targetRotation;
                         this.updateArrowTransform(targetRotation);
-                        // Final highlight on result
-                        this.drawWheel(0, pointedIndex);
+                        // Stop vibration
+                        this.stopSpinVibration();
+                        // Final highlight without spin flag (allows win pop)
+                        this.drawWheel(0, pointedIndex, false);
                         this.resolveSpin(isWin, wonNft, winAmount);
                         this.animateArrowBack();
                     }
                 };
                 requestAnimationFrame(animateArrow);
+            },
+
+            // ---- Continuous vibration during spin ----
+            startSpinVibration() {
+                if (this.vibrationInterval) return;
+                let count = 0;
+                this.vibrationInterval = setInterval(() => {
+                    // Vibrate every 150ms with light intensity
+                    if (settings.vibration) {
+                        try {
+                            if (window.Telegram?.WebApp) {
+                                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                            }
+                        } catch (e) {}
+                        try {
+                            if (navigator.vibrate) navigator.vibrate(10);
+                        } catch (e) {}
+                    }
+                    count++;
+                }, 150);
+            },
+
+            stopSpinVibration() {
+                if (this.vibrationInterval) {
+                    clearInterval(this.vibrationInterval);
+                    this.vibrationInterval = null;
+                }
             },
 
             animateArrowBack() {
@@ -7830,6 +7863,10 @@
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 if (crashGame.isPlaying) crashGame.stopContinuousVibration();
+                if (ludloopGame.vibrationInterval) {
+                    clearInterval(ludloopGame.vibrationInterval);
+                    ludloopGame.vibrationInterval = null;
+                }
                 if (ludloopGame.renderLoopId) cancelAnimationFrame(ludloopGame.renderLoopId);
             } else {
                 if (crashGame.isPlaying) crashGame.startContinuousVibration();
@@ -7904,7 +7941,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: vibration, pop effect, higher no-prize chance.');
+            console.log('✅ Casino loaded – Lud Loop final: vibration on spin, no GIF scaling during spin.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
