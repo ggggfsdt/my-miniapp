@@ -3473,7 +3473,7 @@
                         <canvas id="ludloopWheel" width="400" height="400"></canvas>
                         <!-- Arrow wrapper – spins around center -->
                         <div class="ludloop-arrow-wrapper" id="ludloopArrowWrapper">
-                            <div class="ludloop-arrow-icon"><i class="fas fa-chevron-down"></i></div>
+                            <div class="ludloop-arrow-icon"><i class="fas fa-chevron-up"></i></div>
                         </div>
                         <img id="ludloopCenterNft" class="ludloop-center-nft" src="https://images.iimg.live/images/radiant-capture-7834.webp" alt="Center" decoding="async">
                     </div>
@@ -3685,7 +3685,11 @@
             'https://i.postimg.cc/RZdBnc8Z/ezgif-86ccd2fd265e1e18.gif',
             'https://i.postimg.cc/sDQHk9K1/ezgif-8b61599f5def4979.gif',
             'https://i.postimg.cc/xd0R1KGR/ezgif-69a8adec4a1d8304.gif',
-            'https://i.postimg.cc/qqyWh7xf/ezgif-1bcbf26839329366.gif'
+            'https://i.postimg.cc/qqyWh7xf/ezgif-1bcbf26839329366.gif',
+            // new GIFs
+            'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif',
+            'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif',
+            'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif'
         ];
 
         async function preloadAllGifs() {
@@ -3755,12 +3759,12 @@
             inventory: []
         };
 
-        // -------- ADD VICTORY MEDAL NFT --------
+        // -------- ADD VICTORY MEDAL NFT + UPDATED GIFS --------
         const NFT_DB = {
-            chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320, gif: 'https://images.iimg.live/images/perfect-art-8369.webp',
-                tier: 'low' },
+            chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320,
+                gif: 'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif', tier: 'low' },
             timeless_book: { id: 'timeless_book', name: 'Timeless Book', price: 500,
-                gif: 'https://images.iimg.live/images/vibrant-snapshot-7656.webp', tier: 'medium' },
+                gif: 'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif', tier: 'medium' },
             liberty_figure: { id: 'liberty_figure', name: 'Liberty Figure', price: 525,
                 gif: 'https://images.iimg.live/images/wonderful-moment-9250.webp', tier: 'medium' },
             swag_bag: { id: 'swag_bag', name: 'Swag Bag', price: 560,
@@ -3774,7 +3778,7 @@
             homemade_cake: { id: 'homemade_cake', name: 'Homemade Cake', price: 640,
                 gif: 'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif', tier: 'medium' },
             snoop_cigar: { id: 'snoop_cigar', name: 'Snoop Cigar', price: 1500,
-                gif: 'https://images.iimg.live/images/excellent-masterpiece-4116.webp', tier: 'high' },
+                gif: 'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif', tier: 'high' },
             rare_bird: { id: 'rare_bird', name: 'Rare Bird', price: 2190,
                 gif: 'https://images.iimg.live/images/majestic-memory-3550.webp', tier: 'epic' },
             bling_blinky: { id: 'bling_blinky', name: 'Bling Blinky', price: 2200,
@@ -7078,19 +7082,19 @@
             spinPrice: 100,
             isSpinning: false,
             segments: [],
-            arrowAngle: 0, // radians for arrow rotation
+            arrowAngle: -Math.PI / 2, // initial position: top
             animId: null,
             result: null,
             _dpr: 1,
             renderLoopId: null,
-            arrowOffset: 0, // distance from center to arrow tip
+            arrowOffset: 0,
 
-            // Spin price -> NFT price cap mapping
+            // Price tiers – fixed according to user request
             priceTiers: {
                 100: { maxPrice: 400, hasNoPrize: true },
-                300: { maxPrice: 700, hasNoPrize: false },
+                300: { maxPrice: 700, hasNoPrize: true }, // 300 has no-prize
                 500: { maxPrice: 1500, hasNoPrize: false },
-                700: { maxPrice: Infinity, hasNoPrize: false }
+                700: { maxPrice: 2200, hasNoPrize: false } // max Bling Blinky
             },
 
             init() {
@@ -7106,8 +7110,16 @@
                 this.ctx.scale(dpr, dpr);
                 this.width = w;
                 this.height = h;
-                // Arrow offset: 45% of min dimension
+                // Compute arrow offset: near outer edge
                 this.arrowOffset = Math.min(w, h) * 0.44;
+
+                // Set arrow icon position dynamically
+                const arrowIcon = document.querySelector('.ludloop-arrow-icon');
+                if (arrowIcon) {
+                    const offset = this.arrowOffset + 10; // +10 for arrow tip
+                    arrowIcon.style.transform = `translate(-50%, -100%) translateY(-${offset}px)`;
+                    arrowIcon.style.fontSize = Math.min(w, h) * 0.08 + 'px';
+                }
 
                 this.buildSegments();
                 this.drawWheel();
@@ -7131,8 +7143,9 @@
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 this.updateUI();
 
-                // Set initial arrow position
-                this.updateArrowTransform(0);
+                // Reset arrow to top
+                this.arrowAngle = -Math.PI / 2;
+                this.updateArrowTransform(this.arrowAngle);
 
                 // Start render loop to animate GIFs
                 if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId);
@@ -7148,8 +7161,7 @@
 
             getEligibleNfts() {
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
-                const maxPrice = tier.maxPrice;
-                return SORTED_NFTS.filter(n => n.price <= maxPrice);
+                return SORTED_NFTS.filter(n => n.price <= tier.maxPrice);
             },
 
             buildSegments() {
@@ -7197,7 +7209,7 @@
                     startAngle += angle;
                 }
 
-                // No-prize segment for 100 stars – large chance (30% of wheel)
+                // No-prize for 100 and 300
                 if (tier.hasNoPrize) {
                     const noPrizeAngle = 0.30 * 2 * Math.PI; // 30%
                     const totalSegAngle = this.segments.reduce((sum, s) => sum + s.angle, 0);
@@ -7221,7 +7233,7 @@
                     });
                 }
 
-                // Shuffle segments for fairness
+                // Shuffle
                 for (let i = this.segments.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [this.segments[i], this.segments[j]] = [this.segments[j], this.segments[i]];
@@ -7271,7 +7283,6 @@
                     const ly = cy + labelR * Math.sin(midAngle);
 
                     if (seg.nft) {
-                        // Larger GIFs
                         const iconSize = Math.min(outerR - innerR, 48) * 0.6;
                         ctx.save();
                         ctx.translate(lx, ly);
@@ -7280,7 +7291,7 @@
                         if (img && img.naturalWidth > 0) {
                             ctx.drawImage(img, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
                         } else {
-                            // Fallback: try loading directly
+                            // Fallback
                             const fallbackImg = new Image();
                             fallbackImg.crossOrigin = 'anonymous';
                             fallbackImg.onload = () => {
@@ -7385,9 +7396,11 @@
                     wonNft = resultSegment.nft;
                 }
 
-                // Arrow animation: rotate the wrapper
+                // Arrow animation: rotate from current position to target
                 const startAngle = this.arrowAngle;
+                // Target angle: -PI/2 + midpoint of winning segment
                 const targetAngle = -Math.PI / 2 + (resultSegment.startAngle + resultSegment.angle / 2);
+                // Add extra rotations
                 const extraRotations = 5 + Math.floor(Math.random() * 4);
                 const targetRotation = targetAngle + extraRotations * 2 * Math.PI;
 
@@ -7414,81 +7427,117 @@
                     } else {
                         this.arrowAngle = targetRotation;
                         this.updateArrowTransform(targetRotation);
-                        this.isSpinning = false;
-                        document.getElementById('ludloopSpinBtn').disabled = false;
-
-                        if (isWin && wonNft) {
-                            state.balance += winAmount;
-                            state.wins++;
-                            state.totalGames++;
-                            if (winAmount > state.bestMultiplier * 100) {
-                                state.bestMultiplier = winAmount / 100;
-                            }
-                            state.recentWinners.unshift({ name: 'You (Lud Loop)', amount: winAmount });
-                            if (state.recentWinners.length > 10) state.recentWinners.pop();
-
-                            state.inventory.push({ ...wonNft });
-                            renderInventory();
-
-                            document.getElementById('ludloopResult').textContent =
-                                `🎉 Won ${wonNft.name}! +${winAmount}⭐`;
-                            document.getElementById('ludloopResult').className = 'ludloop-result nft-win';
-
-                            const previewImg = document.getElementById('ludloopPreviewImg');
-                            const previewName = document.getElementById('ludloopPreviewName');
-                            const previewPrice = document.getElementById('ludloopPreviewPrice');
-                            previewImg.src = wonNft.gif;
-                            previewImg.className = 'show';
-                            previewName.textContent = wonNft.name;
-                            previewPrice.innerHTML = `${starImg('star-icon-xs')} ${wonNft.price}`;
-
-                            triggerVibration(50, 'medium');
-                            playWinSound();
-                            showNotification(winAmount, winAmount);
-
-                            const centerImg = document.getElementById('ludloopCenterNft');
-                            centerImg.src = wonNft.gif;
-                            centerImg.className = 'ludloop-center-nft pop';
-
-                            setTimeout(() => {
-                                flyNftToInventory(wonNft);
-                                centerImg.className = 'ludloop-center-nft';
-                                centerImg.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
-                            }, 1800);
-
-                        } else {
-                            state.losses++;
-                            state.totalGames++;
-                            document.getElementById('ludloopResult').textContent = `😔 No prize! Lost ${this.spinPrice}⭐`;
-                            document.getElementById('ludloopResult').className = 'ludloop-result lose';
-                            document.getElementById('ludloopPreviewImg').className = '';
-                            document.getElementById('ludloopPreviewName').textContent = '—';
-                            document.getElementById('ludloopPreviewPrice').innerHTML = '';
-
-                            triggerVibration(80, 'heavy');
-                            playLoseSound();
-
-                            const centerImg = document.getElementById('ludloopCenterNft');
-                            centerImg.className = 'ludloop-center-nft';
-                            centerImg.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
-                        }
-
-                        updateHomeUI();
-                        updateProfile();
-                        document.getElementById('ludloopBalance').innerHTML =
-                            `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
-
-                        setTimeout(() => {
-                            const centerImg2 = document.getElementById('ludloopCenterNft');
-                            if (centerImg2) {
-                                centerImg2.className = 'ludloop-center-nft';
-                                centerImg2.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
-                            }
-                        }, 2500);
+                        // Resolve result
+                        this.resolveSpin(isWin, wonNft, winAmount);
+                        // Animate arrow back to top (-PI/2) with bounce
+                        this.animateArrowBack();
                     }
                 };
                 this._lastTickAngle = startAngle;
                 requestAnimationFrame(animateArrow);
+            },
+
+            animateArrowBack() {
+                const startAngle = this.arrowAngle;
+                const targetAngle = -Math.PI / 2;
+                const duration = 800;
+                const startTime = performance.now();
+
+                const animate = (now) => {
+                    const elapsed = now - startTime;
+                    const t = Math.min(elapsed / duration, 1);
+                    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                    // Add a bounce effect at the end
+                    let bounce = 0;
+                    if (t > 0.7) {
+                        const b = (t - 0.7) / 0.3;
+                        bounce = Math.sin(b * Math.PI * 3) * (1 - b) * 0.08;
+                    }
+                    const currentAngle = startAngle + (targetAngle - startAngle) * eased + bounce;
+                    this.arrowAngle = currentAngle;
+                    this.updateArrowTransform(currentAngle);
+                    if (t < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        this.arrowAngle = targetAngle;
+                        this.updateArrowTransform(targetAngle);
+                        // Re-enable spin button
+                        document.getElementById('ludloopSpinBtn').disabled = false;
+                        this.isSpinning = false;
+                    }
+                };
+                requestAnimationFrame(animate);
+            },
+
+            resolveSpin(isWin, wonNft, winAmount) {
+                if (isWin && wonNft) {
+                    state.balance += winAmount;
+                    state.wins++;
+                    state.totalGames++;
+                    if (winAmount > state.bestMultiplier * 100) {
+                        state.bestMultiplier = winAmount / 100;
+                    }
+                    state.recentWinners.unshift({ name: 'You (Lud Loop)', amount: winAmount });
+                    if (state.recentWinners.length > 10) state.recentWinners.pop();
+
+                    state.inventory.push({ ...wonNft });
+                    renderInventory();
+
+                    document.getElementById('ludloopResult').textContent =
+                        `🎉 Won ${wonNft.name}! +${winAmount}⭐`;
+                    document.getElementById('ludloopResult').className = 'ludloop-result nft-win';
+
+                    const previewImg = document.getElementById('ludloopPreviewImg');
+                    const previewName = document.getElementById('ludloopPreviewName');
+                    const previewPrice = document.getElementById('ludloopPreviewPrice');
+                    previewImg.src = wonNft.gif;
+                    previewImg.className = 'show';
+                    previewName.textContent = wonNft.name;
+                    previewPrice.innerHTML = `${starImg('star-icon-xs')} ${wonNft.price}`;
+
+                    triggerVibration(50, 'medium');
+                    playWinSound();
+                    showNotification(winAmount, winAmount);
+
+                    const centerImg = document.getElementById('ludloopCenterNft');
+                    centerImg.src = wonNft.gif;
+                    centerImg.className = 'ludloop-center-nft pop';
+
+                    setTimeout(() => {
+                        flyNftToInventory(wonNft);
+                        centerImg.className = 'ludloop-center-nft';
+                        centerImg.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
+                    }, 1800);
+
+                } else {
+                    state.losses++;
+                    state.totalGames++;
+                    document.getElementById('ludloopResult').textContent = `😔 No prize! Lost ${this.spinPrice}⭐`;
+                    document.getElementById('ludloopResult').className = 'ludloop-result lose';
+                    document.getElementById('ludloopPreviewImg').className = '';
+                    document.getElementById('ludloopPreviewName').textContent = '—';
+                    document.getElementById('ludloopPreviewPrice').innerHTML = '';
+
+                    triggerVibration(80, 'heavy');
+                    playLoseSound();
+
+                    const centerImg = document.getElementById('ludloopCenterNft');
+                    centerImg.className = 'ludloop-center-nft';
+                    centerImg.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
+                }
+
+                updateHomeUI();
+                updateProfile();
+                document.getElementById('ludloopBalance').innerHTML =
+                    `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
+
+                setTimeout(() => {
+                    const centerImg2 = document.getElementById('ludloopCenterNft');
+                    if (centerImg2) {
+                        centerImg2.className = 'ludloop-center-nft';
+                        centerImg2.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
+                    }
+                }, 2500);
             },
 
             updateUI() {
@@ -7605,7 +7654,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop fully fixed: arrow spins around center, GIFs show, no-price chance high.');
+            console.log('✅ Casino loaded – Lud Loop fully fixed: arrow spins around wheel, GIFs show, no-prize for 300, max prize 2200.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
