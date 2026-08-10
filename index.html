@@ -2755,9 +2755,9 @@
         }
         .ludloop-wheel-container {
             position: relative;
-            width: min(82vw, 340px);
+            width: min(88vw, 400px);
             aspect-ratio: 1/1;
-            max-height: 78vh;
+            max-height: 80vh;
             margin: 0 auto;
             touch-action: none;
         }
@@ -2787,10 +2787,10 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -100%) translateY(-10px);
+            transform: translate(-50%, -100%) translateY(-4px);
             color: #ffffff;
-            font-size: 34px;
-            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
+            font-size: 36px;
+            filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.6));
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
         }
         .ludloop-center-nft {
@@ -2831,6 +2831,7 @@
             gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
+            position: relative;
         }
         .ludloop-spin-row .price-select {
             display: flex;
@@ -2842,6 +2843,20 @@
             padding: 2px 4px;
             flex-wrap: wrap;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .ludloop-spin-row .price-select .price-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            height: calc(100% - 4px);
+            width: calc(25% - 4px);
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border-radius: 30px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 12px rgba(108, 92, 231, 0.3);
+            z-index: 0;
         }
         .ludloop-spin-row .price-select button {
             padding: 5px 12px;
@@ -2854,14 +2869,14 @@
             color: #666;
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             min-width: 44px;
+            z-index: 1;
+            position: relative;
         }
         .ludloop-spin-row .price-select button:active {
             transform: scale(0.92);
         }
         .ludloop-spin-row .price-select button.active {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             color: #fff;
-            box-shadow: 0 2px 12px rgba(108, 92, 231, 0.3);
         }
         .ludloop-spin-row .price-select button.disabled {
             opacity: 0.3;
@@ -3208,10 +3223,10 @@
                 min-width: 90px;
             }
             .ludloop-wheel-container {
-                width: min(78vw, 300px);
+                width: min(85vw, 360px);
             }
             .ludloop-arrow-icon {
-                font-size: 28px;
+                font-size: 30px;
             }
             #confirmOverlay .confirm-box .actions button {
                 padding: 8px 16px;
@@ -3245,7 +3260,7 @@
                 width: min(72vw, 260px);
             }
             .ludloop-wheel-container {
-                width: min(72vw, 260px);
+                width: min(80vw, 300px);
             }
             .ludloop-spin-row .price-select button {
                 padding: 3px 8px;
@@ -3258,7 +3273,7 @@
                 min-width: 72px;
             }
             .ludloop-arrow-icon {
-                font-size: 24px;
+                font-size: 26px;
             }
             #confirmOverlay .confirm-box .actions button {
                 padding: 6px 12px;
@@ -3544,7 +3559,7 @@
                         <canvas id="ludloopWheel" width="400" height="400"></canvas>
                         <!-- Arrow wrapper – spins around center -->
                         <div class="ludloop-arrow-wrapper" id="ludloopArrowWrapper">
-                            <div class="ludloop-arrow-icon"><i class="fas fa-chevron-up"></i></div>
+                            <div class="ludloop-arrow-icon"><i class="fas fa-chevron-down"></i></div>
                         </div>
                         <img id="ludloopCenterNft" class="ludloop-center-nft" src="https://images.iimg.live/images/radiant-capture-7834.webp" alt="Center" decoding="async">
                     </div>
@@ -3553,6 +3568,7 @@
                 <div class="ludloop-controls">
                     <div class="ludloop-spin-row">
                         <div class="price-select" id="ludloopPriceSelect">
+                            <div class="price-slider" id="priceSlider"></div>
                             <button data-price="100" class="active">100</button>
                             <button data-price="300">300</button>
                             <button data-price="500">500</button>
@@ -7167,12 +7183,15 @@
             spinPrice: 100,
             isSpinning: false,
             segments: [],
+            idleAngle: 0,
             arrowAngle: 0, // 0 = top
             animId: null,
             _dpr: 1,
             renderLoopId: null,
             arrowOffset: 0,
             pendingSpin: false,
+            winSegmentIndex: -1,
+            winPopTime: 0,
 
             // Price tiers
             priceTiers: {
@@ -7197,7 +7216,7 @@
                 this.height = h;
                 this.arrowOffset = Math.min(w, h) * 0.44;
 
-                // Position arrow icon at top, pointing outward (chevron-up)
+                // Position arrow icon at top, pointing outward (chevron-down)
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
                 if (arrowIcon) {
                     const offset = this.arrowOffset + 10;
@@ -7207,41 +7226,84 @@
 
                 // Build segments and draw
                 this.buildSegments();
-                this.drawWheel();
+                this.drawWheel(0);
                 this.updateUI();
 
-                // Price buttons
-                document.querySelectorAll('#ludloopPriceSelect button').forEach(btn => {
+                // Price buttons with slider
+                const buttons = document.querySelectorAll('#ludloopPriceSelect button');
+                const slider = document.getElementById('priceSlider');
+                buttons.forEach((btn, index) => {
                     btn.addEventListener('click', () => {
                         if (this.isSpinning || this.pendingSpin) return;
                         const price = parseInt(btn.dataset.price);
                         this.spinPrice = price;
-                        document.querySelectorAll('#ludloopPriceSelect button').forEach(b => b.classList.remove(
-                        'active'));
+                        buttons.forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
+                        // Animate slider
+                        const btnRect = btn.getBoundingClientRect();
+                        const parentRect = btn.parentElement.getBoundingClientRect();
+                        const offset = btnRect.left - parentRect.left;
+                        const width = btnRect.width;
+                        slider.style.transform = `translateX(${offset}px)`;
+                        slider.style.width = `${width}px`;
                         this.buildSegments();
-                        this.drawWheel();
+                        this.drawWheel(0);
                         this.updateUI();
                     });
                 });
+                // Initialize slider position
+                const activeBtn = document.querySelector('#ludloopPriceSelect button.active');
+                if (activeBtn) {
+                    const btnRect = activeBtn.getBoundingClientRect();
+                    const parentRect = activeBtn.parentElement.getBoundingClientRect();
+                    const offset = btnRect.left - parentRect.left;
+                    const width = btnRect.width;
+                    slider.style.transform = `translateX(${offset}px)`;
+                    slider.style.width = `${width}px`;
+                }
+
                 document.getElementById('ludloopBalance').innerHTML =
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 this.updateUI();
 
                 // Reset arrow to top (0)
                 this.arrowAngle = 0;
+                this.idleAngle = 0;
                 this.updateArrowTransform(0);
 
-                // Start render loop for GIF animation
+                // Start idle loop
                 if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId);
-                this.renderLoop();
+                this.idleLoop();
             },
 
-            renderLoop() {
-                if (this.canvas && this.ctx && !this.isSpinning) {
-                    this.drawWheel();
+            idleLoop() {
+                if (!this.isSpinning && !this.pendingSpin) {
+                    this.idleAngle += 0.002;
+                    // Find segment at top (-PI/2 offset)
+                    const topAngle = -Math.PI / 2;
+                    let highlightedIndex = -1;
+                    for (let i = 0; i < this.segments.length; i++) {
+                        const seg = this.segments[i];
+                        // Adjust for idle rotation
+                        const start = seg.startAngle + this.idleAngle;
+                        const end = seg.endAngle + this.idleAngle;
+                        // Normalize angles
+                        let s = start % (2 * Math.PI);
+                        if (s < 0) s += 2 * Math.PI;
+                        let e = end % (2 * Math.PI);
+                        if (e < 0) e += 2 * Math.PI;
+                        let t = topAngle % (2 * Math.PI);
+                        if (t < 0) t += 2 * Math.PI;
+                        // Check if topAngle is within segment
+                        if (s < e) {
+                            if (t >= s && t <= e) highlightedIndex = i;
+                        } else {
+                            if (t >= s || t <= e) highlightedIndex = i;
+                        }
+                    }
+                    this.drawWheel(this.idleAngle, highlightedIndex);
                 }
-                this.renderLoopId = requestAnimationFrame(() => this.renderLoop());
+                this.renderLoopId = requestAnimationFrame(() => this.idleLoop());
             },
 
             getEligibleNfts() {
@@ -7338,7 +7400,7 @@
                 return `hsl(${hue}, ${sat}%, ${lig}%)`;
             },
 
-            drawWheel() {
+            drawWheel(angleOffset, highlightIndex) {
                 const ctx = this.ctx;
                 const w = this.width;
                 const h = this.height;
@@ -7349,9 +7411,13 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                for (const seg of this.segments) {
-                    const startA = seg.startAngle;
-                    const endA = seg.endAngle;
+                // Calculate average angle for scaling
+                const avgAngle = 2 * Math.PI / this.segments.length;
+
+                for (let i = 0; i < this.segments.length; i++) {
+                    const seg = this.segments[i];
+                    const startA = seg.startAngle + angleOffset;
+                    const endA = seg.endAngle + angleOffset;
                     ctx.beginPath();
                     ctx.arc(cx, cy, outerR, startA, endA);
                     ctx.arc(cx, cy, innerR, endA, startA, true);
@@ -7369,10 +7435,35 @@
 
                     if (seg.nft) {
                         // Scale icon size based on segment angle (bigger segments = bigger icons)
-                        const avgAngle = 2 * Math.PI / this.segments.length;
-                        const scaleFactor = Math.min(2, seg.angle / avgAngle);
+                        const scaleFactor = 0.7 + 0.6 * (seg.angle / avgAngle);
                         const baseIconSize = Math.min(outerR - innerR, 48) * 0.5;
-                        const iconSize = baseIconSize * scaleFactor;
+                        let iconSize = baseIconSize * scaleFactor;
+
+                        // Check for highlight (idle pop or win pop)
+                        let isHighlighted = (highlightIndex === i);
+                        // Win pop: check if this is the winning segment and pop animation is active
+                        if (this.winSegmentIndex === i && this.winPopTime > 0) {
+                            isHighlighted = true;
+                            const elapsed = (Date.now() - this.winPopTime) / 1000;
+                            if (elapsed < 1.5) {
+                                const progress = elapsed / 1.5;
+                                const bounce = 1 + 0.6 * Math.sin(progress * Math.PI * 2) * (1 - progress);
+                                iconSize *= Math.max(1, 1 + 0.5 * Math.sin(progress * Math.PI));
+                            } else {
+                                this.winPopTime = 0;
+                                this.winSegmentIndex = -1;
+                            }
+                        }
+
+                        // Idle pop: if highlighted, apply a subtle breathing effect
+                        if (isHighlighted && this.winSegmentIndex === -1) {
+                            const breathe = 1 + 0.15 * Math.sin(Date.now() / 300);
+                            iconSize *= breathe;
+                            // Add glow
+                            ctx.shadowColor = 'rgba(255,215,0,0.4)';
+                            ctx.shadowBlur = 20;
+                        }
+
                         ctx.save();
                         ctx.translate(lx, ly);
                         ctx.rotate(midAngle + Math.PI / 2);
@@ -7385,7 +7476,7 @@
                             fallbackImg.crossOrigin = 'anonymous';
                             fallbackImg.onload = () => {
                                 GIF_CACHE[seg.nft.gif] = fallbackImg;
-                                this.drawWheel();
+                                this.drawWheel(angleOffset, highlightIndex);
                             };
                             fallbackImg.src = seg.nft.gif;
                             ctx.beginPath();
@@ -7399,6 +7490,7 @@
                             ctx.fillText(seg.nft.name.charAt(0).toUpperCase(), 0, 0);
                         }
                         ctx.restore();
+                        ctx.shadowBlur = 0;
                     } else if (seg.isNoPrize) {
                         ctx.save();
                         ctx.translate(lx, ly);
@@ -7502,7 +7594,7 @@
                 }
 
                 // Arrow animation: from current angle (0) to target
-                const startAngle = this.arrowAngle; // should be 0
+                const startAngle = this.arrowAngle;
                 // Target: segment middle angle + PI/2 to align with arrow at top
                 const targetAngle = resultSegment.startAngle + resultSegment.angle / 2 + Math.PI / 2;
                 // Add extra rotations
@@ -7565,6 +7657,9 @@
                         this.updateArrowTransform(targetAngle);
                         document.getElementById('ludloopSpinBtn').disabled = false;
                         this.isSpinning = false;
+                        // Restart idle loop
+                        if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId);
+                        this.idleLoop();
                     }
                 };
                 requestAnimationFrame(animate);
@@ -7603,6 +7698,15 @@
                     const centerImg = document.getElementById('ludloopCenterNft');
                     centerImg.src = wonNft.gif;
                     centerImg.className = 'ludloop-center-nft pop';
+
+                    // Set win pop for segment
+                    for (let i = 0; i < this.segments.length; i++) {
+                        if (this.segments[i].nft && this.segments[i].nft.id === wonNft.id) {
+                            this.winSegmentIndex = i;
+                            this.winPopTime = Date.now();
+                            break;
+                        }
+                    }
 
                     setTimeout(() => {
                         flyNftToInventory(wonNft);
@@ -7695,7 +7799,7 @@
                     setTimeout(() => {
                         ludloopGame.init();
                         if (ludloopGame.renderLoopId) cancelAnimationFrame(ludloopGame.renderLoopId);
-                        ludloopGame.renderLoop();
+                        ludloopGame.idleLoop();
                     }, 50);
                 }
             }
@@ -7755,7 +7859,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: arrow at top, correct tracking, bigger GIFs on larger segments.');
+            console.log('✅ Casino loaded – Lud Loop final: arrow at top, idle spin, GIF pop effects.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
