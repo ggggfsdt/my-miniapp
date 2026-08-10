@@ -7167,14 +7167,14 @@
             spinPrice: 100,
             isSpinning: false,
             segments: [],
-            arrowAngle: -Math.PI / 2, // initial top
+            arrowAngle: 0, // 0 = top
             animId: null,
             _dpr: 1,
             renderLoopId: null,
             arrowOffset: 0,
-            pendingSpin: false, // true when confirm overlay is shown
+            pendingSpin: false,
 
-            // Price tiers – fixed
+            // Price tiers
             priceTiers: {
                 100: { maxPrice: 400, hasNoPrize: true },
                 300: { maxPrice: 700, hasNoPrize: true },
@@ -7197,7 +7197,7 @@
                 this.height = h;
                 this.arrowOffset = Math.min(w, h) * 0.44;
 
-                // Position arrow icon
+                // Position arrow icon at top, pointing outward (chevron-up)
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
                 if (arrowIcon) {
                     const offset = this.arrowOffset + 10;
@@ -7205,6 +7205,7 @@
                     arrowIcon.style.fontSize = Math.min(w, h) * 0.08 + 'px';
                 }
 
+                // Build segments and draw
                 this.buildSegments();
                 this.drawWheel();
                 this.updateUI();
@@ -7227,9 +7228,9 @@
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 this.updateUI();
 
-                // Reset arrow to top
-                this.arrowAngle = -Math.PI / 2;
-                this.updateArrowTransform(this.arrowAngle);
+                // Reset arrow to top (0)
+                this.arrowAngle = 0;
+                this.updateArrowTransform(0);
 
                 // Start render loop for GIF animation
                 if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId);
@@ -7367,7 +7368,11 @@
                     const ly = cy + labelR * Math.sin(midAngle);
 
                     if (seg.nft) {
-                        const iconSize = Math.min(outerR - innerR, 48) * 0.6;
+                        // Scale icon size based on segment angle (bigger segments = bigger icons)
+                        const avgAngle = 2 * Math.PI / this.segments.length;
+                        const scaleFactor = Math.min(2, seg.angle / avgAngle);
+                        const baseIconSize = Math.min(outerR - innerR, 48) * 0.5;
+                        const iconSize = baseIconSize * scaleFactor;
                         ctx.save();
                         ctx.translate(lx, ly);
                         ctx.rotate(midAngle + Math.PI / 2);
@@ -7383,7 +7388,6 @@
                                 this.drawWheel();
                             };
                             fallbackImg.src = seg.nft.gif;
-                            // Show placeholder
                             ctx.beginPath();
                             ctx.arc(0, 0, iconSize / 2, 0, 2 * Math.PI);
                             ctx.fillStyle = 'rgba(255,255,255,0.1)';
@@ -7449,7 +7453,6 @@
                     return;
                 }
 
-                // Show confirmation overlay
                 this.pendingSpin = true;
                 document.getElementById('confirmPrice').textContent = this.spinPrice;
                 document.getElementById('confirmOverlay').classList.add('active');
@@ -7498,13 +7501,15 @@
                     wonNft = resultSegment.nft;
                 }
 
-                // Arrow animation
-                const startAngle = this.arrowAngle;
-                const targetAngle = -Math.PI / 2 + (resultSegment.startAngle + resultSegment.angle / 2);
+                // Arrow animation: from current angle (0) to target
+                const startAngle = this.arrowAngle; // should be 0
+                // Target: segment middle angle + PI/2 to align with arrow at top
+                const targetAngle = resultSegment.startAngle + resultSegment.angle / 2 + Math.PI / 2;
+                // Add extra rotations
                 const extraRotations = 5 + Math.floor(Math.random() * 4);
                 const targetRotation = targetAngle + extraRotations * 2 * Math.PI;
 
-                const duration = 5000 + Math.random() * 2000;
+                const duration = 6000 + Math.random() * 2000; // slower
                 const startTime = performance.now();
 
                 const animateArrow = (now) => {
@@ -7527,7 +7532,7 @@
                         this.updateArrowTransform(targetRotation);
                         // Resolve result
                         this.resolveSpin(isWin, wonNft, winAmount);
-                        // Animate arrow back to top
+                        // Animate arrow back to top (0)
                         this.animateArrowBack();
                     }
                 };
@@ -7537,7 +7542,7 @@
 
             animateArrowBack() {
                 const startAngle = this.arrowAngle;
-                const targetAngle = -Math.PI / 2;
+                const targetAngle = 0;
                 const duration = 800;
                 const startTime = performance.now();
 
@@ -7750,7 +7755,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: arrow at top, confirms, prizes align.');
+            console.log('✅ Casino loaded – Lud Loop final: arrow at top, correct tracking, bigger GIFs on larger segments.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
