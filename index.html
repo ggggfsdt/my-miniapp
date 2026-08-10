@@ -7299,6 +7299,7 @@
                             if (t >= s || t <= e) highlightedIndex = i;
                         }
                     }
+                    // Draw with glow effect on highlighted segment
                     this.drawWheel(this.idleAngle, highlightedIndex);
                 }
                 this.renderLoopId = requestAnimationFrame(() => this.idleLoop());
@@ -7406,6 +7407,9 @@
 
                 ctx.clearRect(0, 0, w, h);
 
+                // Add a subtle glow overlay when spinning
+                const isActiveSpin = this.isSpinning && !this.isReturningToStart;
+
                 const avgAngle = 2 * Math.PI / this.segments.length;
 
                 for (let i = 0; i < this.segments.length; i++) {
@@ -7416,7 +7420,20 @@
                     ctx.arc(cx, cy, outerR, startA, endA);
                     ctx.arc(cx, cy, innerR, endA, startA, true);
                     ctx.closePath();
-                    ctx.fillStyle = seg.color;
+
+                    // Slightly brighten colors during spin
+                    let fillColor = seg.color;
+                    if (isActiveSpin) {
+                        // Increase lightness
+                        const hsl = seg.color.match(/hsl\(([^,]+),\s*([^%]+)%,\s*([^%]+)%\)/);
+                        if (hsl) {
+                            const h = parseInt(hsl[1]);
+                            const s = parseInt(hsl[2]);
+                            const l = Math.min(80, parseInt(hsl[3]) + 15);
+                            fillColor = `hsl(${h}, ${s}%, ${l}%)`;
+                        }
+                    }
+                    ctx.fillStyle = fillColor;
                     ctx.fill();
                     ctx.strokeStyle = 'rgba(255,255,255,0.06)';
                     ctx.lineWidth = 0.8;
@@ -7445,7 +7462,8 @@
                             }
                         }
 
-                        if (isHighlighted && this.winSegmentIndex === -1) {
+                        // Add glow effect for highlighted segment (idle or win)
+                        if (isHighlighted) {
                             const breathe = 1 + 0.15 * Math.sin(Date.now() / 300);
                             iconSize *= breathe;
                             ctx.shadowColor = 'rgba(255,215,0,0.4)';
@@ -7490,12 +7508,14 @@
                     }
                 }
 
+                // Outer ring
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
+                // Inner circle
                 ctx.beginPath();
                 ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
                 ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -7510,40 +7530,6 @@
                 if (wrapper) {
                     wrapper.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
                 }
-            },
-
-            // --- Spin Sound ---
-            playSpinSound(duration) {
-                try {
-                    const ctx = getAudioCtx();
-                    const now = ctx.currentTime;
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sawtooth';
-                    const startFreq = 150;
-                    const endFreq = 800;
-                    osc.frequency.setValueAtTime(startFreq, now);
-                    osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(now);
-                    osc.stop(now + duration);
-
-                    // Add a second oscillator for richness
-                    const osc2 = ctx.createOscillator();
-                    const gain2 = ctx.createGain();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(startFreq * 1.5, now);
-                    osc2.frequency.exponentialRampToValueAtTime(endFreq * 0.8, now + duration);
-                    gain2.gain.setValueAtTime(0.15, now);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + duration);
-                    osc2.connect(gain2);
-                    gain2.connect(ctx.destination);
-                    osc2.start(now);
-                    osc2.stop(now + duration);
-                } catch (e) {}
             },
 
             requestSpin() {
@@ -7649,8 +7635,7 @@
                 const duration = 6000 + Math.random() * 2000;
                 const startTime = performance.now();
 
-                // Play spin sound
-                this.playSpinSound(duration / 1000);
+                // No sound - removed
 
                 const animateArrow = (now) => {
                     const elapsed = now - startTime;
@@ -7660,10 +7645,10 @@
                     this.arrowAngle = currentAngle;
                     this.updateArrowTransform(currentAngle);
 
-                    if (Math.abs(currentAngle - this._lastTickAngle) > 0.3) {
-                        playTick(0.15, 600 + Math.random() * 400);
-                        this._lastTickAngle = currentAngle;
-                    }
+                    // Add spinning glow effect - we'll highlight segments as they pass under the arrow
+                    // The drawWheel with highlightIndex will handle visual feedback
+                    // We pass -1 to avoid idle highlight, but we'll add a rotating glow in drawWheel
+                    this.drawWheel(0, -1, true);
 
                     if (t < 1) {
                         requestAnimationFrame(animateArrow);
@@ -7674,7 +7659,6 @@
                         this.animateArrowBack();
                     }
                 };
-                this._lastTickAngle = startAngle;
                 requestAnimationFrame(animateArrow);
             },
 
@@ -7903,7 +7887,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: arrow at top, idle spin, smooth return, rich sound.');
+            console.log('✅ Casino loaded – Lud Loop final: no sounds, rotating glow effect.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
