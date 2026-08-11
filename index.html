@@ -3789,7 +3789,11 @@
             'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif',
             'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif',
             'https://i.postimg.cc/Y2sDwrS3/ezgif-54c8dc445a1f067a.gif',
-            'https://i.postimg.cc/q74jGgm4/ezgif-4fb5831a67b7248f.gif'
+            'https://i.postimg.cc/q74jGgm4/ezgif-4fb5831a67b7248f.gif',
+            // new 4
+            'https://i.postimg.cc/66dZpfVL/ezgif-44edddf764b0cb14.gif',
+            'https://i.postimg.cc/4yJxdVZd/ezgif-427f3f6c420da820.gif',
+            'https://i.postimg.cc/HsrCtBSw/ezgif-4093d7b324e1f716.gif'
         ];
 
         async function preloadAllGifs() {
@@ -3859,7 +3863,7 @@
             inventory: []
         };
 
-        // -------- ADDED 4 NEW NFTS --------
+        // -------- ADDED 4 NEW NFTS (with correct GIFs) --------
         const NFT_DB = {
             chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320,
                 gif: 'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif', tier: 'low' },
@@ -7182,7 +7186,7 @@
         }
 
         // ============================================================
-        // LUD LOOP – WHEEL GAME (FIXED)
+        // LUD LOOP – WHEEL GAME (UPDATED: smaller no-prize for 500/700, performance cap)
         // ============================================================
         const ludloopGame = {
             canvas: null,
@@ -7202,14 +7206,14 @@
             pendingSpin: false,
             winSegmentIndex: -1,
             winPopTime: 0,
-            vibrationInterval: null, // for continuous vibration during spin
+            vibrationInterval: null,
 
-            // Price tiers
+            // Price tiers with custom no-prize settings
             priceTiers: {
-                100: { maxPrice: 400, hasNoPrize: true },
-                300: { maxPrice: 700, hasNoPrize: true },
-                500: { maxPrice: 1500, hasNoPrize: false },
-                700: { maxPrice: 2190, hasNoPrize: false } // max Rare Bird
+                100: { maxPrice: 400, noPrizeWeight: 0.65, noPrizeAngle: 0.15 },
+                300: { maxPrice: 700, noPrizeWeight: 0.65, noPrizeAngle: 0.15 },
+                500: { maxPrice: 1500, noPrizeWeight: 0.05, noPrizeAngle: 0.03 },
+                700: { maxPrice: 2190, noPrizeWeight: 0.05, noPrizeAngle: 0.03 }
             },
 
             init() {
@@ -7228,7 +7232,6 @@
                 // --- LOWER ARROW OFFSET (reduced from 0.44 to 0.35) ---
                 this.arrowOffset = Math.min(w, h) * 0.35;
 
-                // Position arrow icon at top, pointing outward (chevron-down)
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
                 if (arrowIcon) {
                     const offset = this.arrowOffset + 10;
@@ -7236,12 +7239,10 @@
                     arrowIcon.style.fontSize = Math.min(w, h) * 0.08 + 'px';
                 }
 
-                // Build segments and draw
                 this.buildSegments();
                 this.drawWheel(0);
                 this.updateUI();
 
-                // Price buttons with slider
                 const buttons = document.querySelectorAll('#ludloopPriceSelect button');
                 const slider = document.getElementById('priceSlider');
                 buttons.forEach((btn, index) => {
@@ -7251,7 +7252,6 @@
                         this.spinPrice = price;
                         buttons.forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
-                        // Animate slider
                         const btnRect = btn.getBoundingClientRect();
                         const parentRect = btn.parentElement.getBoundingClientRect();
                         const offset = btnRect.left - parentRect.left;
@@ -7263,7 +7263,6 @@
                         this.updateUI();
                     });
                 });
-                // Initialize slider position
                 const activeBtn = document.querySelector('#ludloopPriceSelect button.active');
                 if (activeBtn) {
                     const btnRect = activeBtn.getBoundingClientRect();
@@ -7278,12 +7277,10 @@
                     `<img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> ${state.balance.toLocaleString()}`;
                 this.updateUI();
 
-                // Reset arrow to top (0)
                 this.arrowAngle = 0;
                 this.idleAngle = 0;
                 this.updateArrowTransform(0);
 
-                // Start idle loop
                 if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId);
                 this.idleLoop();
             },
@@ -7291,7 +7288,6 @@
             idleLoop() {
                 if (!this.isSpinning && !this.pendingSpin && !this.isReturningToStart) {
                     this.idleAngle += 0.003;
-                    // Find segment at top (-PI/2 offset)
                     const topAngle = -Math.PI / 2;
                     let highlightedIndex = -1;
                     for (let i = 0; i < this.segments.length; i++) {
@@ -7320,23 +7316,16 @@
                 return SORTED_NFTS.filter(n => n.price <= tier.maxPrice);
             },
 
-            // ---- increased no-prize weight ----
             buildSegments() {
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
-                const eligible = this.getEligibleNfts();
-                this.segments = [];
+                let eligible = this.getEligibleNfts();
 
-                if (eligible.length === 0) {
-                    this.segments.push({
-                        nft: null,
-                        weight: 1,
-                        label: 'No NFTs',
-                        color: '#333',
-                        isNoPrize: true,
-                        angle: 2 * Math.PI
-                    });
-                    return;
+                // --- Performance: cap at 12 segments ---
+                if (eligible.length > 12) {
+                    eligible = eligible.slice(0, 12);
                 }
+
+                this.segments = [];
 
                 let totalWeight = 0;
                 const weights = [];
@@ -7365,29 +7354,30 @@
                     startAngle += angle;
                 }
 
-                // No-prize: visual angle small, selection weight high
-                if (tier.hasNoPrize) {
-                    const noPrizeAngle = 0.15 * 2 * Math.PI;
-                    const totalSegAngle = this.segments.reduce((sum, s) => sum + s.angle, 0);
-                    const scale = (2 * Math.PI - noPrizeAngle) / totalSegAngle;
-                    let newStart = 0;
-                    for (const seg of this.segments) {
-                        seg.angle *= scale;
-                        seg.startAngle = newStart;
-                        seg.endAngle = newStart + seg.angle;
-                        newStart += seg.angle;
-                    }
-                    this.segments.push({
-                        nft: null,
-                        weight: 0.65,
-                        angle: noPrizeAngle,
-                        startAngle: newStart,
-                        endAngle: newStart + noPrizeAngle,
-                        color: '#2a2a30',
-                        isNoPrize: true,
-                        label: 'No Prize'
-                    });
+                // ---- ALWAYS add No-Prize with tier-specific settings ----
+                const noPrizeAngle = tier.noPrizeAngle * 2 * Math.PI;
+                const noPrizeWeight = tier.noPrizeWeight;
+
+                const totalSegAngle = this.segments.reduce((sum, s) => sum + s.angle, 0);
+                const scale = (2 * Math.PI - noPrizeAngle) / totalSegAngle;
+                let newStart = 0;
+                for (const seg of this.segments) {
+                    seg.angle *= scale;
+                    seg.startAngle = newStart;
+                    seg.endAngle = newStart + seg.angle;
+                    newStart += seg.angle;
                 }
+
+                this.segments.push({
+                    nft: null,
+                    weight: noPrizeWeight,
+                    angle: noPrizeAngle,
+                    startAngle: newStart,
+                    endAngle: newStart + noPrizeAngle,
+                    color: '#2a2a30',
+                    isNoPrize: true,
+                    label: 'No Prize'
+                });
 
                 // Shuffle
                 for (let i = this.segments.length - 1; i > 0; i--) {
@@ -7409,7 +7399,6 @@
                 return `hsl(${hue}, ${sat}%, ${lig}%)`;
             },
 
-            // ---- drawWheel with pop effect for highlighted segment, NO brightness change, NO GIF scaling during spin ----
             drawWheel(angleOffset, highlightIndex, isSpinning = false) {
                 const ctx = this.ctx;
                 const w = this.width;
@@ -7431,7 +7420,7 @@
                     ctx.arc(cx, cy, outerR, startA, endA);
                     ctx.arc(cx, cy, innerR, endA, startA, true);
                     ctx.closePath();
-                    ctx.fillStyle = seg.color; // NO brightness change
+                    ctx.fillStyle = seg.color;
                     ctx.fill();
                     ctx.strokeStyle = 'rgba(255,255,255,0.06)';
                     ctx.lineWidth = 0.8;
@@ -7447,9 +7436,7 @@
                         const baseIconSize = Math.min(outerR - innerR, 48) * 0.5;
                         let iconSize = baseIconSize * scaleFactor;
 
-                        // Highlight logic: only apply pop if NOT spinning, OR if it's the win pop
                         let isHighlighted = false;
-                        // Win pop (always allowed)
                         if (this.winSegmentIndex === i && this.winPopTime > 0) {
                             isHighlighted = true;
                             const elapsed = (Date.now() - this.winPopTime) / 1000;
@@ -7462,7 +7449,6 @@
                             }
                         }
 
-                        // Idle highlight (only if NOT spinning and not win pop)
                         if (!isSpinning && highlightIndex === i && this.winSegmentIndex === -1) {
                             isHighlighted = true;
                             const breathe = 1 + 0.25 * Math.sin(Date.now() / 300);
@@ -7471,7 +7457,6 @@
                             ctx.shadowBlur = 30;
                         }
 
-                        // During spin, we only show a very subtle glow, no scaling
                         if (isSpinning && highlightIndex === i) {
                             ctx.shadowColor = 'rgba(255,215,0,0.3)';
                             ctx.shadowBlur = 15;
@@ -7515,14 +7500,12 @@
                     }
                 }
 
-                // Outer ring
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // Inner circle
                 ctx.beginPath();
                 ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
                 ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -7572,7 +7555,6 @@
                 if (!this.pendingSpin) return;
                 this.pendingSpin = false;
 
-                // --- Smooth return to start before spinning ---
                 if (Math.abs(this.idleAngle) > 0.01) {
                     this.isReturningToStart = true;
                     const startIdle = this.idleAngle;
@@ -7600,13 +7582,11 @@
             },
 
             _executeSpinInternal() {
-                // --- Start continuous vibration ---
                 this.startSpinVibration();
 
                 this.isSpinning = true;
                 document.getElementById('ludloopSpinBtn').disabled = true;
 
-                // Deduct balance
                 state.balance -= this.spinPrice;
                 updateHomeUI();
                 updateProfile();
@@ -7615,12 +7595,11 @@
                 document.getElementById('ludloopResult').textContent = 'Spinning...';
                 document.getElementById('ludloopResult').className = 'ludloop-result';
 
-                // Determine result using weighted selection
                 const weightedOptions = [];
                 for (const seg of this.segments) {
                     let w = seg.weight || seg.angle / (2 * Math.PI);
                     if (seg.isNoPrize) {
-                        w = 0.65; // high chance
+                        w = seg.weight; // already set per tier
                     }
                     weightedOptions.push({ seg, weight: w });
                 }
@@ -7640,7 +7619,6 @@
                     wonNft = resultSegment.nft;
                 }
 
-                // Arrow animation
                 const startAngle = this.arrowAngle;
                 const targetAngle = resultSegment.startAngle + resultSegment.angle / 2 + Math.PI / 2;
                 const extraRotations = 5 + Math.floor(Math.random() * 4);
@@ -7656,7 +7634,6 @@
                     this.arrowAngle = currentAngle;
                     this.updateArrowTransform(currentAngle);
 
-                    // Determine which segment is under the arrow
                     const arrowDirection = ((-currentAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
                     let pointedIndex = -1;
                     for (let i = 0; i < this.segments.length; i++) {
@@ -7672,12 +7649,10 @@
                         }
                     }
 
-                    // Highlight only during slowing down phase, but WITHOUT scaling (isSpinning=true)
                     let highlightIdx = -1;
                     if (t > 0.6) {
                         highlightIdx = pointedIndex;
                     }
-                    // Pass isSpinning=true to disable GIF scaling during spin
                     this.drawWheel(0, highlightIdx, true);
 
                     if (t < 1) {
@@ -7685,9 +7660,7 @@
                     } else {
                         this.arrowAngle = targetRotation;
                         this.updateArrowTransform(targetRotation);
-                        // Stop vibration
                         this.stopSpinVibration();
-                        // Final highlight without spin flag (allows win pop)
                         this.drawWheel(0, pointedIndex, false);
                         this.resolveSpin(isWin, wonNft, winAmount);
                         this.animateArrowBack();
@@ -7696,12 +7669,9 @@
                 requestAnimationFrame(animateArrow);
             },
 
-            // ---- Continuous vibration during spin ----
             startSpinVibration() {
                 if (this.vibrationInterval) return;
-                let count = 0;
                 this.vibrationInterval = setInterval(() => {
-                    // Vibrate every 150ms with light intensity
                     if (settings.vibration) {
                         try {
                             if (window.Telegram?.WebApp) {
@@ -7712,7 +7682,6 @@
                             if (navigator.vibrate) navigator.vibrate(10);
                         } catch (e) {}
                     }
-                    count++;
                 }, 150);
             },
 
@@ -7797,7 +7766,6 @@
                         }
                     }
 
-                    // Use the fixed flyNftToInventory with source element
                     setTimeout(() => {
                         flyNftToInventory(wonNft, document.getElementById('ludloopCenterNft'));
                         centerImg.className = 'ludloop-center-nft';
@@ -7953,7 +7921,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: vibration on spin, arrow lowered.');
+            console.log('✅ Casino loaded – Lud Loop: no-prize smaller for 500/700, arrow lowered, performance capped.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
