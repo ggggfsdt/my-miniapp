@@ -3859,7 +3859,7 @@
             inventory: []
         };
 
-        // -------- ADD VICTORY MEDAL NFT + UPDATED GIFS --------
+        // -------- ADDED 4 NEW NFTS --------
         const NFT_DB = {
             chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320,
                 gif: 'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif', tier: 'low' },
@@ -3877,6 +3877,16 @@
                 gif: 'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif', tier: 'medium' },
             homemade_cake: { id: 'homemade_cake', name: 'Homemade Cake', price: 640,
                 gif: 'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif', tier: 'medium' },
+            // ---- NEW NFTS ----
+            vice_cream: { id: 'vice_cream', name: 'Vice Cream', price: 400,
+                gif: 'https://i.postimg.cc/66dZpfVL/ezgif-44edddf764b0cb14.gif', tier: 'medium' },
+            ice_cream: { id: 'ice_cream', name: 'Ice Cream', price: 470,
+                gif: 'https://i.postimg.cc/4yJxdVZd/ezgif-427f3f6c420da820.gif', tier: 'medium' },
+            happy_brownie: { id: 'happy_brownie', name: 'Happy Brownie', price: 500,
+                gif: 'https://i.postimg.cc/4yJxdVZd/ezgif-427f3f6c420da820.gif', tier: 'medium' },
+            xmas_stockings: { id: 'xmas_stockings', name: 'Xmas Stockings', price: 390,
+                gif: 'https://i.postimg.cc/HsrCtBSw/ezgif-4093d7b324e1f716.gif', tier: 'medium' },
+            // ---- end new ----
             snoop_cigar: { id: 'snoop_cigar', name: 'Snoop Cigar', price: 1500,
                 gif: 'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif', tier: 'high' },
             rare_bird: { id: 'rare_bird', name: 'Rare Bird', price: 2190,
@@ -4393,10 +4403,10 @@
         }
 
         // ============================================================
-        // FLYING NFT ANIMATION
+        // FLYING NFT ANIMATION (fixed: accepts source element)
         // ============================================================
-        function flyNftToInventory(nft) {
-            const wheelCenter = document.getElementById('wheelCenterNft');
+        function flyNftToInventory(nft, sourceElement) {
+            const wheelCenter = sourceElement || document.getElementById('wheelCenterNft');
             if (!wheelCenter) return;
             const rect = wheelCenter.getBoundingClientRect();
             const inventoryTab = document.querySelector('.nav-item[data-page="inventory"]');
@@ -7215,7 +7225,8 @@
                 this.ctx.scale(dpr, dpr);
                 this.width = w;
                 this.height = h;
-                this.arrowOffset = Math.min(w, h) * 0.44;
+                // --- LOWER ARROW OFFSET (reduced from 0.44 to 0.35) ---
+                this.arrowOffset = Math.min(w, h) * 0.35;
 
                 // Position arrow icon at top, pointing outward (chevron-down)
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
@@ -7786,8 +7797,9 @@
                         }
                     }
 
+                    // Use the fixed flyNftToInventory with source element
                     setTimeout(() => {
-                        flyNftToInventory(wonNft);
+                        flyNftToInventory(wonNft, document.getElementById('ludloopCenterNft'));
                         centerImg.className = 'ludloop-center-nft';
                         centerImg.src = 'https://images.iimg.live/images/radiant-capture-7834.webp';
                     }, 1800);
@@ -7941,7 +7953,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop final: vibration on spin, no GIF scaling during spin.');
+            console.log('✅ Casino loaded – Lud Loop final: vibration on spin, arrow lowered.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
