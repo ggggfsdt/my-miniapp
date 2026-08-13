@@ -3328,6 +3328,13 @@
                         <div class="knob"></div>
                     </div>
                 </div>
+                <!-- NEW: Debug Mode toggle -->
+                <div class="setting-row">
+                    <span class="label">Debug Mode</span>
+                    <div class="toggle" id="debugToggle" onclick="toggleDebug()">
+                        <div class="knob"></div>
+                    </div>
+                </div>
                 <div class="close-btn" onclick="closeSettings()">Close</div>
             </div>
         </div>
@@ -3695,7 +3702,7 @@
         // ============================================================
         // SETTINGS STATE
         // ============================================================
-        const settings = { vibration: true };
+        const settings = { vibration: true, debugMode: false };
 
         function loadSettings() {
             const saved = localStorage.getItem('casino_settings');
@@ -3710,13 +3717,22 @@
         }
 
         function applySettingsUI() {
-            const toggle = document.getElementById('vibrationToggle');
-            if (settings.vibration) toggle.classList.add('active');
-            else toggle.classList.remove('active');
+            const vibrationToggle = document.getElementById('vibrationToggle');
+            const debugToggle = document.getElementById('debugToggle');
+            if (settings.vibration) vibrationToggle.classList.add('active');
+            else vibrationToggle.classList.remove('active');
+            if (settings.debugMode) debugToggle.classList.add('active');
+            else debugToggle.classList.remove('active');
         }
 
         function toggleVibration() {
             settings.vibration = !settings.vibration;
+            applySettingsUI();
+            saveSettings();
+        }
+
+        function toggleDebug() {
+            settings.debugMode = !settings.debugMode;
             applySettingsUI();
             saveSettings();
         }
@@ -6972,6 +6988,13 @@
 
             spin() {
                 if (this.spinning || !this.fromNftId || !this.toNftId) return;
+
+                // --- DEBUG MODE: force green ---
+                if (settings.debugMode) {
+                    this.resolveSpin(true);
+                    return;
+                }
+
                 this.spinning = true;
                 this.locked = true;
                 setUpgradeLocked(true);
@@ -7186,7 +7209,7 @@
         }
 
         // ============================================================
-        // LUD LOOP – WHEEL GAME (UPDATED: smaller no-prize for 500/700, performance cap)
+        // LUD LOOP – WHEEL GAME (UPDATED: smaller no-prize for 500/700, performance cap, debug mode)
         // ============================================================
         const ludloopGame = {
             canvas: null,
@@ -7198,7 +7221,7 @@
             isReturningToStart: false,
             segments: [],
             idleAngle: 0,
-            arrowAngle: 0, // 0 = top
+            arrowAngle: 0,
             animId: null,
             _dpr: 1,
             renderLoopId: null,
@@ -7229,7 +7252,7 @@
                 this.ctx.scale(dpr, dpr);
                 this.width = w;
                 this.height = h;
-                // --- LOWER ARROW OFFSET (reduced from 0.44 to 0.35) ---
+                // LOWER ARROW OFFSET
                 this.arrowOffset = Math.min(w, h) * 0.35;
 
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
@@ -7313,16 +7336,17 @@
 
             getEligibleNfts() {
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
-                return SORTED_NFTS.filter(n => n.price <= tier.maxPrice);
+                // Sort by price descending so expensive ones are kept when capping
+                return SORTED_NFTS.filter(n => n.price <= tier.maxPrice).sort((a, b) => b.price - a.price);
             },
 
             buildSegments() {
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
                 let eligible = this.getEligibleNfts();
 
-                // --- Performance: cap at 12 segments ---
-                if (eligible.length > 12) {
-                    eligible = eligible.slice(0, 12);
+                // --- Performance: cap at 14 segments, but KEEP expensive ones ---
+                if (eligible.length > 14) {
+                    eligible = eligible.slice(0, 14);
                 }
 
                 this.segments = [];
@@ -7595,11 +7619,24 @@
                 document.getElementById('ludloopResult').textContent = 'Spinning...';
                 document.getElementById('ludloopResult').className = 'ludloop-result';
 
+                // --- DEBUG MODE: always win the most expensive NFT available ---
+                if (settings.debugMode) {
+                    const eligible = this.getEligibleNfts();
+                    const topNft = eligible.length > 0 ? eligible[0] : null;
+                    if (topNft) {
+                        // Force win
+                        this.resolveSpin(true, topNft, topNft.price);
+                        this.animateArrowBack();
+                        return;
+                    }
+                }
+
+                // Normal weighted selection
                 const weightedOptions = [];
                 for (const seg of this.segments) {
                     let w = seg.weight || seg.angle / (2 * Math.PI);
                     if (seg.isNoPrize) {
-                        w = seg.weight; // already set per tier
+                        w = seg.weight;
                     }
                     weightedOptions.push({ seg, weight: w });
                 }
@@ -7921,7 +7958,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop: no-prize smaller for 500/700, arrow lowered, performance capped.');
+            console.log('✅ Casino loaded – Lud Loop: no-prize smaller for 500/700, arrow lowered, performance cap, debug mode.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
