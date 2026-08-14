@@ -939,6 +939,7 @@
             filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.3));
             transition: opacity 0.15s ease;
             will-change: transform, opacity;
+            image-rendering: auto;
         }
         .gif-overlay img.active {
             display: block;
@@ -976,6 +977,7 @@
             object-fit: contain;
             animation: explosionAnim 0.8s ease-out forwards;
             will-change: transform, opacity;
+            image-rendering: auto;
         }
         @keyframes explosionAnim {
             0% {
@@ -1063,6 +1065,7 @@
             opacity: 0.6;
             transition: none;
             will-change: transform, opacity;
+            image-rendering: auto;
         }
         .history-bar {
             position: absolute;
@@ -1621,6 +1624,7 @@
             object-fit: contain;
             border-radius: 8px;
             will-change: transform;
+            image-rendering: auto;
         }
 
         .main-action-btn {
@@ -2557,6 +2561,7 @@
             margin-bottom: 12px;
             filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
             will-change: transform;
+            image-rendering: auto;
         }
         .win-popup .nft-img {
             width: 90px;
@@ -2566,6 +2571,7 @@
             margin-bottom: 6px;
             will-change: transform;
             border: 2px solid rgba(255, 215, 0, 0.1);
+            image-rendering: auto;
         }
         .win-popup .win-title {
             font-size: 26px;
@@ -2613,6 +2619,7 @@
             border-radius: 12px;
             margin-bottom: 8px;
             will-change: transform;
+            image-rendering: auto;
         }
         .inventory-item .name {
             font-weight: 600;
@@ -2668,6 +2675,7 @@
             transition: opacity 0.6s ease, transform 0.6s ease;
             opacity: 0;
             transform: scale(0.7);
+            image-rendering: auto;
         }
         #crashNftOverlay img.visible {
             opacity: 1;
@@ -2694,10 +2702,11 @@
             opacity: 1;
             transform: scale(1);
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+            image-rendering: auto;
         }
 
         /* ============================================================
-           LUD LOOP – WHEEL GAME (FIXED)
+           LUD LOOP – WHEEL GAME
            ============================================================ */
         #page-ludloop {
             padding: 0;
@@ -2811,6 +2820,7 @@
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.08);
             transition: opacity 0.4s ease, transform 0.4s ease;
             opacity: 0.6;
+            image-rendering: auto;
         }
         .ludloop-center-nft.pop {
             opacity: 1;
@@ -2883,7 +2893,19 @@
             cursor: not-allowed;
             pointer-events: none;
         }
+
+        /* ===== DYNAMIC SPIN BUTTON WITH JELLO & WAVES ===== */
+        .ludloop-spin-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            width: fit-content;
+        }
         .ludloop-spin-btn {
+            position: relative;
+            z-index: 2;
             padding: 12px 32px;
             border: none;
             border-radius: 30px;
@@ -2903,6 +2925,10 @@
             flex: 1;
             max-width: 200px;
             margin: 0 auto;
+            transform-origin: center;
+            will-change: transform, box-shadow;
+            /* JELLO base animation (slow) */
+            animation: jelloBase 6s ease-in-out infinite;
         }
         .ludloop-spin-btn:active {
             transform: scale(0.94);
@@ -2910,12 +2936,104 @@
         .ludloop-spin-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            transform: none !important;
+            animation: none !important;
+            box-shadow: none !important;
         }
         .ludloop-spin-btn .spin-icon {
             font-size: 18px;
         }
+
+        /* Jello keyframes – smooth and slow */
+        @keyframes jelloBase {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            15% { transform: scale(1.04, 0.92) rotate(-0.5deg); }
+            30% { transform: scale(0.96, 1.04) rotate(0.5deg); }
+            45% { transform: scale(1.02, 0.98) rotate(-0.3deg); }
+            60% { transform: scale(0.98, 1.02) rotate(0.2deg); }
+            75% { transform: scale(1.01, 0.99) rotate(-0.1deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* Jiggle on click – quick shake */
+        .ludloop-spin-btn.jiggle {
+            animation: jiggle 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        }
+        @keyframes jiggle {
+            0% { transform: translateX(0) rotate(0deg); }
+            20% { transform: translateX(-6px) rotate(-2deg); }
+            40% { transform: translateX(6px) rotate(2deg); }
+            60% { transform: translateX(-4px) rotate(-1deg); }
+            80% { transform: translateX(4px) rotate(1deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+
+        /* Wave rings around the button */
+        .ludloop-spin-wrapper .wave-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(108, 92, 231, 0.2);
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            min-width: 120px;
+            min-height: 48px;
+            box-sizing: content-box;
+            animation: wavePulse 3s ease-out infinite;
+            z-index: 0;
+            opacity: 0;
+        }
+        .ludloop-spin-wrapper .wave-ring:nth-child(2) {
+            animation-delay: 0.6s;
+            border-color: rgba(162, 155, 254, 0.15);
+            border-width: 1px;
+        }
+        .ludloop-spin-wrapper .wave-ring:nth-child(3) {
+            animation-delay: 1.2s;
+            border-color: rgba(108, 92, 231, 0.1);
+            border-width: 1px;
+        }
+        @keyframes wavePulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+                border-width: 2px;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.8);
+                opacity: 0;
+                border-width: 0.5px;
+            }
+        }
+
+        /* Adjust for small screens */
+        @media (max-width: 420px) {
+            .ludloop-spin-btn {
+                padding: 10px 24px;
+                font-size: 16px;
+                min-width: 90px;
+            }
+            .ludloop-spin-wrapper .wave-ring {
+                min-width: 90px;
+                min-height: 40px;
+            }
+        }
+        @media (max-width: 370px) {
+            .ludloop-spin-btn {
+                padding: 8px 18px;
+                font-size: 14px;
+                min-width: 72px;
+            }
+            .ludloop-spin-wrapper .wave-ring {
+                min-width: 72px;
+                min-height: 34px;
+            }
+        }
+
+        /* ===== LUD LOOP – rest ===== */
         .ludloop-result {
             text-align: center;
             font-size: 14px;
@@ -2949,6 +3067,7 @@
             object-fit: contain;
             border-radius: 6px;
             display: none;
+            image-rendering: auto;
         }
         .ludloop-nft-preview img.show {
             display: block;
@@ -3217,11 +3336,6 @@
                 font-size: 11px;
                 min-width: 38px;
             }
-            .ludloop-spin-btn {
-                padding: 10px 24px;
-                font-size: 16px;
-                min-width: 90px;
-            }
             .ludloop-wheel-container {
                 width: min(85vw, 360px);
             }
@@ -3266,11 +3380,6 @@
                 padding: 3px 8px;
                 font-size: 10px;
                 min-width: 32px;
-            }
-            .ludloop-spin-btn {
-                padding: 8px 18px;
-                font-size: 14px;
-                min-width: 72px;
             }
             .ludloop-arrow-icon {
                 font-size: 26px;
@@ -3575,9 +3684,15 @@
                             <button data-price="700">700</button>
                         </div>
                     </div>
-                    <button class="ludloop-spin-btn" id="ludloopSpinBtn" onclick="ludloopGame.requestSpin()">
-                        <i class="fas fa-sync-alt spin-icon"></i> Spin
-                    </button>
+                    <!-- Wrap button with wave rings -->
+                    <div class="ludloop-spin-wrapper">
+                        <div class="wave-ring"></div>
+                        <div class="wave-ring"></div>
+                        <div class="wave-ring"></div>
+                        <button class="ludloop-spin-btn" id="ludloopSpinBtn" onclick="ludloopGame.requestSpin()">
+                            <i class="fas fa-sync-alt spin-icon"></i> Spin
+                        </button>
+                    </div>
                     <div class="ludloop-result" id="ludloopResult">Select a price and spin!</div>
                     <div class="ludloop-nft-preview" id="ludloopNftPreview">
                         <img id="ludloopPreviewImg" src="" alt="NFT" decoding="async">
@@ -3744,7 +3859,6 @@
             });
         }
 
-        // Removed the 4 new GIFs – using only the original working ones
         const ALL_GIF_URLS = [
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
             'https://images.iimg.live/images/excellent-art-9247.webp',
@@ -7173,7 +7287,7 @@
         }
 
         // ============================================================
-        // LUD LOOP – WHEEL GAME (UPDATED: smaller no-prize for 500/700, performance cap, NO DEBUG)
+        // LUD LOOP – WHEEL GAME (with jello button, wave rings, jiggle on click)
         // ============================================================
         const ludloopGame = {
             canvas: null,
@@ -7530,6 +7644,15 @@
                 this.pendingSpin = true;
                 document.getElementById('confirmPrice').textContent = this.spinPrice;
                 document.getElementById('confirmOverlay').classList.add('active');
+
+                // Jiggle the button on click
+                const btn = document.getElementById('ludloopSpinBtn');
+                if (btn) {
+                    btn.classList.remove('jiggle');
+                    void btn.offsetHeight;
+                    btn.classList.add('jiggle');
+                    setTimeout(() => btn.classList.remove('jiggle'), 600);
+                }
             },
 
             cancelSpin() {
@@ -7582,7 +7705,7 @@
                 document.getElementById('ludloopResult').textContent = 'Spinning...';
                 document.getElementById('ludloopResult').className = 'ludloop-result';
 
-                // Normal weighted selection (no debug)
+                // Normal weighted selection
                 const weightedOptions = [];
                 for (const seg of this.segments) {
                     let w = seg.weight || seg.angle / (2 * Math.PI);
@@ -7909,7 +8032,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Debug removed, original GIFs restored, arrow lowered, no-prize tuned.');
+            console.log('✅ Casino loaded – jello button with wave rings, jiggle on click, rocket GIFs optimized.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
