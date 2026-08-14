@@ -3328,13 +3328,6 @@
                         <div class="knob"></div>
                     </div>
                 </div>
-                <!-- NEW: Debug Mode toggle -->
-                <div class="setting-row">
-                    <span class="label">Debug Mode</span>
-                    <div class="toggle" id="debugToggle" onclick="toggleDebug()">
-                        <div class="knob"></div>
-                    </div>
-                </div>
                 <div class="close-btn" onclick="closeSettings()">Close</div>
             </div>
         </div>
@@ -3702,7 +3695,7 @@
         // ============================================================
         // SETTINGS STATE
         // ============================================================
-        const settings = { vibration: true, debugMode: false };
+        const settings = { vibration: true };
 
         function loadSettings() {
             const saved = localStorage.getItem('casino_settings');
@@ -3717,22 +3710,13 @@
         }
 
         function applySettingsUI() {
-            const vibrationToggle = document.getElementById('vibrationToggle');
-            const debugToggle = document.getElementById('debugToggle');
-            if (settings.vibration) vibrationToggle.classList.add('active');
-            else vibrationToggle.classList.remove('active');
-            if (settings.debugMode) debugToggle.classList.add('active');
-            else debugToggle.classList.remove('active');
+            const toggle = document.getElementById('vibrationToggle');
+            if (settings.vibration) toggle.classList.add('active');
+            else toggle.classList.remove('active');
         }
 
         function toggleVibration() {
             settings.vibration = !settings.vibration;
-            applySettingsUI();
-            saveSettings();
-        }
-
-        function toggleDebug() {
-            settings.debugMode = !settings.debugMode;
             applySettingsUI();
             saveSettings();
         }
@@ -3760,6 +3744,7 @@
             });
         }
 
+        // Removed the 4 new GIFs – using only the original working ones
         const ALL_GIF_URLS = [
             'https://images.iimg.live/images/stellar-masterpiece-3002.webp',
             'https://images.iimg.live/images/excellent-art-9247.webp',
@@ -3805,11 +3790,7 @@
             'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif',
             'https://i.postimg.cc/ZnycqmMH/ezgif-41529ba9789efbb8.gif',
             'https://i.postimg.cc/Y2sDwrS3/ezgif-54c8dc445a1f067a.gif',
-            'https://i.postimg.cc/q74jGgm4/ezgif-4fb5831a67b7248f.gif',
-            // new 4
-            'https://i.postimg.cc/66dZpfVL/ezgif-44edddf764b0cb14.gif',
-            'https://i.postimg.cc/4yJxdVZd/ezgif-427f3f6c420da820.gif',
-            'https://i.postimg.cc/HsrCtBSw/ezgif-4093d7b324e1f716.gif'
+            'https://i.postimg.cc/q74jGgm4/ezgif-4fb5831a67b7248f.gif'
         ];
 
         async function preloadAllGifs() {
@@ -3879,7 +3860,7 @@
             inventory: []
         };
 
-        // -------- ADDED 4 NEW NFTS (with correct GIFs) --------
+        // -------- ORIGINAL NFTs (removed the 4 new ones) --------
         const NFT_DB = {
             chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320,
                 gif: 'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif', tier: 'low' },
@@ -3897,16 +3878,6 @@
                 gif: 'https://i.postimg.cc/L5TmH8Ct/ezgif-55391af375fdfa8a.gif', tier: 'medium' },
             homemade_cake: { id: 'homemade_cake', name: 'Homemade Cake', price: 640,
                 gif: 'https://i.postimg.cc/BQrK8hM5/ezgif-588eba39d79608a0.gif', tier: 'medium' },
-            // ---- NEW NFTS ----
-            vice_cream: { id: 'vice_cream', name: 'Vice Cream', price: 400,
-                gif: 'https://i.postimg.cc/66dZpfVL/ezgif-44edddf764b0cb14.gif', tier: 'medium' },
-            ice_cream: { id: 'ice_cream', name: 'Ice Cream', price: 470,
-                gif: 'https://i.postimg.cc/4yJxdVZd/ezgif-427f3f6c420da820.gif', tier: 'medium' },
-            happy_brownie: { id: 'happy_brownie', name: 'Happy Brownie', price: 500,
-                gif: 'https://i.postimg.cc/4yJxdVZd/ezgif-427f3f6c420da820.gif', tier: 'medium' },
-            xmas_stockings: { id: 'xmas_stockings', name: 'Xmas Stockings', price: 390,
-                gif: 'https://i.postimg.cc/HsrCtBSw/ezgif-4093d7b324e1f716.gif', tier: 'medium' },
-            // ---- end new ----
             snoop_cigar: { id: 'snoop_cigar', name: 'Snoop Cigar', price: 1500,
                 gif: 'https://i.postimg.cc/mrb8y0PD/ezgif-261ca76b90635935.gif', tier: 'high' },
             rare_bird: { id: 'rare_bird', name: 'Rare Bird', price: 2190,
@@ -6988,13 +6959,6 @@
 
             spin() {
                 if (this.spinning || !this.fromNftId || !this.toNftId) return;
-
-                // --- DEBUG MODE: force green ---
-                if (settings.debugMode) {
-                    this.resolveSpin(true);
-                    return;
-                }
-
                 this.spinning = true;
                 this.locked = true;
                 setUpgradeLocked(true);
@@ -7209,7 +7173,7 @@
         }
 
         // ============================================================
-        // LUD LOOP – WHEEL GAME (UPDATED: smaller no-prize for 500/700, performance cap, debug mode)
+        // LUD LOOP – WHEEL GAME (UPDATED: smaller no-prize for 500/700, performance cap, NO DEBUG)
         // ============================================================
         const ludloopGame = {
             canvas: null,
@@ -7231,7 +7195,6 @@
             winPopTime: 0,
             vibrationInterval: null,
 
-            // Price tiers with custom no-prize settings
             priceTiers: {
                 100: { maxPrice: 400, noPrizeWeight: 0.65, noPrizeAngle: 0.15 },
                 300: { maxPrice: 700, noPrizeWeight: 0.65, noPrizeAngle: 0.15 },
@@ -7252,7 +7215,7 @@
                 this.ctx.scale(dpr, dpr);
                 this.width = w;
                 this.height = h;
-                // LOWER ARROW OFFSET
+                // LOWER ARROW OFFSET (0.35)
                 this.arrowOffset = Math.min(w, h) * 0.35;
 
                 const arrowIcon = document.querySelector('.ludloop-arrow-icon');
@@ -7336,7 +7299,7 @@
 
             getEligibleNfts() {
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
-                // Sort by price descending so expensive ones are kept when capping
+                // Sort descending so expensive ones (Snoop Cigar, Rare Bird) are kept
                 return SORTED_NFTS.filter(n => n.price <= tier.maxPrice).sort((a, b) => b.price - a.price);
             },
 
@@ -7344,7 +7307,7 @@
                 const tier = this.priceTiers[this.spinPrice] || this.priceTiers[100];
                 let eligible = this.getEligibleNfts();
 
-                // --- Performance: cap at 14 segments, but KEEP expensive ones ---
+                // Cap at 14 for performance, but keep expensive ones due to descending sort
                 if (eligible.length > 14) {
                     eligible = eligible.slice(0, 14);
                 }
@@ -7378,7 +7341,7 @@
                     startAngle += angle;
                 }
 
-                // ---- ALWAYS add No-Prize with tier-specific settings ----
+                // Always add No-Prize with tier settings
                 const noPrizeAngle = tier.noPrizeAngle * 2 * Math.PI;
                 const noPrizeWeight = tier.noPrizeWeight;
 
@@ -7619,19 +7582,7 @@
                 document.getElementById('ludloopResult').textContent = 'Spinning...';
                 document.getElementById('ludloopResult').className = 'ludloop-result';
 
-                // --- DEBUG MODE: always win the most expensive NFT available ---
-                if (settings.debugMode) {
-                    const eligible = this.getEligibleNfts();
-                    const topNft = eligible.length > 0 ? eligible[0] : null;
-                    if (topNft) {
-                        // Force win
-                        this.resolveSpin(true, topNft, topNft.price);
-                        this.animateArrowBack();
-                        return;
-                    }
-                }
-
-                // Normal weighted selection
+                // Normal weighted selection (no debug)
                 const weightedOptions = [];
                 for (const seg of this.segments) {
                     let w = seg.weight || seg.angle / (2 * Math.PI);
@@ -7958,7 +7909,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – Lud Loop: no-prize smaller for 500/700, arrow lowered, performance cap, debug mode.');
+            console.log('✅ Casino loaded – Debug removed, original GIFs restored, arrow lowered, no-prize tuned.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
