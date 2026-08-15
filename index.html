@@ -3389,6 +3389,41 @@
                 font-size: 12px;
             }
         }
+
+        /* ===== DYNAMIC BUTTON – JELLO DRAG EFFECT ===== */
+        .dynamic-btn {
+            will-change: transform;
+            touch-action: none;
+            cursor: grab;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: idleJello 4s ease-in-out infinite;
+        }
+        .dynamic-btn:active {
+            cursor: grabbing;
+        }
+        .dynamic-btn.dragging {
+            transition: none !important;
+            animation: none !important;
+        }
+        .dynamic-btn.dragging:active {
+            cursor: grabbing;
+        }
+        @keyframes idleJello {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            10% { transform: scale(1.02, 0.98) rotate(-0.3deg); }
+            20% { transform: scale(0.98, 1.02) rotate(0.3deg); }
+            30% { transform: scale(1.01, 0.99) rotate(-0.1deg); }
+            40% { transform: scale(0.99, 1.01) rotate(0.1deg); }
+            50% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        /* Reset animation when dragging */
+        .dynamic-btn.dragging {
+            animation: none;
+        }
+        .dynamic-btn.dragging:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body>
@@ -3455,7 +3490,7 @@
                 </div>
             </div>
             <div class="quick-grid">
-                <div class="quick-card glow-purple" onclick="navigateTo('rocket')">
+                <div class="quick-card glow-purple dynamic-btn" onclick="navigateTo('rocket')">
                     <span class="icon"><i class="fas fa-rocket"></i></span>
                     <div class="card-content">
                         <div class="label">Crash</div>
@@ -3463,7 +3498,7 @@
                     </div>
                     <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
-                <div class="quick-card glow-green" onclick="navigateTo('mines')">
+                <div class="quick-card glow-green dynamic-btn" onclick="navigateTo('mines')">
                     <span class="icon"><i class="fas fa-gem"></i></span>
                     <div class="card-content">
                         <div class="label">Mines</div>
@@ -3471,7 +3506,7 @@
                     </div>
                     <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
-                <div class="quick-card glow-blue" onclick="navigateTo('upgrade')">
+                <div class="quick-card glow-blue dynamic-btn" onclick="navigateTo('upgrade')">
                     <span class="icon"><i class="fas fa-arrow-up"></i></span>
                     <div class="card-content">
                         <div class="label">Upgrade</div>
@@ -3479,7 +3514,7 @@
                     </div>
                     <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
-                <div class="quick-card glow-gold" onclick="navigateTo('bounce')">
+                <div class="quick-card glow-gold dynamic-btn" onclick="navigateTo('bounce')">
                     <span class="icon"><i class="fas fa-arrows-alt"></i></span>
                     <div class="card-content">
                         <div class="label">Bounce</div>
@@ -3487,7 +3522,7 @@
                     </div>
                     <span class="arrow"><i class="fas fa-chevron-right"></i></span>
                 </div>
-                <div class="quick-card glow-rose" onclick="navigateTo('ludloop')">
+                <div class="quick-card glow-rose dynamic-btn" onclick="navigateTo('ludloop')">
                     <span class="icon"><i class="fas fa-circle-notch"></i></span>
                     <div class="card-content">
                         <div class="label">Lud Loop</div>
@@ -3533,7 +3568,7 @@
 
             <div class="bet-container">
                 <div class="bet-toggle-wrapper">
-                    <button class="bet-toggle-btn" id="betToggleBtn" onclick="crashGame.toggleBetType()">
+                    <button class="bet-toggle-btn dynamic-btn" id="betToggleBtn" onclick="crashGame.toggleBetType()">
                         <div class="toggle-slider" id="betToggleSlider"></div>
                         <div class="toggle-track">
                             <span class="option stars-opt active" id="starsOption">
@@ -3555,9 +3590,9 @@
                 </div>
                 <div class="bet-input-row open" id="betInputRow">
                     <input type="number" id="betInputRocket" value="10" min="1" step="1" placeholder="Bet amount">
-                    <button class="bet-confirm-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
+                    <button class="bet-confirm-btn dynamic-btn" id="betConfirmBtn" onclick="crashGame.confirmBet()">Confirm</button>
                 </div>
-                <button class="main-action-btn place-bet" id="mainActionBtn" onclick="crashGame.mainAction()">
+                <button class="main-action-btn place-bet dynamic-btn" id="mainActionBtn" onclick="crashGame.mainAction()">
                     <span id="mainActionText">Place Bet</span>
                     <span id="mainActionSub"></span>
                     <div class="nft-indicator" id="crashNftIndicator"><img id="crashNftImg" src="" alt="NFT"></div>
@@ -3570,18 +3605,18 @@
         <div id="page-mines" class="page">
             <div class="mines-header"><span><i class="fas fa-gem" style="color:#54a0ff; margin-right:6px;"></i>Mines</span><span class="multiplier" id="minesMultiplier">1.00<span class="x">x</span></span><span class="badge" id="minesBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span></div>
             <div class="grid-presets" id="gridPresets">
-                <button data-size="3" data-mines="1" class="active">3×3</button>
-                <button data-size="4" data-mines="3">4×4</button>
-                <button data-size="5" data-mines="5">5×5</button>
-                <button data-size="6" data-mines="7" class="coming-soon">6×6</button>
-                <button data-size="7" data-mines="10" class="coming-soon">7×7</button>
-                <button data-size="8" data-mines="12" class="coming-soon">8×8</button>
+                <button data-size="3" data-mines="1" class="active dynamic-btn">3×3</button>
+                <button data-size="4" data-mines="3" class="dynamic-btn">4×4</button>
+                <button data-size="5" data-mines="5" class="dynamic-btn">5×5</button>
+                <button data-size="6" data-mines="7" class="coming-soon dynamic-btn">6×6</button>
+                <button data-size="7" data-mines="10" class="coming-soon dynamic-btn">7×7</button>
+                <button data-size="8" data-mines="12" class="coming-soon dynamic-btn">8×8</button>
             </div>
             <div class="mines-grid-wrapper"><div class="mines-grid" id="minesGrid"></div></div>
             <div class="mines-message" id="minesMessage">Press "Start" to play</div>
             <div class="mines-bet-container">
-                <div class="mines-bet-input-row" id="minesBetInputRow"><input type="number" id="minesBetInput" value="10" min="1" step="1" placeholder="Bet amount"><button class="mines-bet-confirm-btn" onclick="minesGame.confirmBet()">Confirm</button></div>
-                <button class="mines-main-action-btn place-bet" id="minesMainActionBtn" onclick="minesGame.mainAction()">
+                <div class="mines-bet-input-row" id="minesBetInputRow"><input type="number" id="minesBetInput" value="10" min="1" step="1" placeholder="Bet amount"><button class="mines-bet-confirm-btn dynamic-btn" onclick="minesGame.confirmBet()">Confirm</button></div>
+                <button class="mines-main-action-btn place-bet dynamic-btn" id="minesMainActionBtn" onclick="minesGame.mainAction()">
                     <span id="minesMainActionText">Place Bet</span>
                     <span class="sub-text" id="minesMainActionSub"></span>
                     <div class="nft-indicator" id="minesNftIndicator"><img id="minesNftImg" src="" alt="NFT"></div>
@@ -3596,7 +3631,6 @@
         <!-- ===== UPGRADE – POLISHED ===== -->
         <div id="page-upgrade" class="page">
             <div class="upgrade-full">
-                <!-- Header like other tabs -->
                 <div class="upgrade-header">
                     <div class="left-badge">
                         <span class="badge badge-green"><i class="fas fa-arrow-up" style="margin-right:4px;"></i>Upgrade<span class="online-dot"></span></span>
@@ -3604,7 +3638,6 @@
                     <span class="badge upgrade-balance" id="upgradeBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
                 </div>
 
-                <!-- Wheel -->
                 <div class="upgrade-wheel-wrap">
                     <div class="upgrade-wheel-container" id="wheelContainer">
                         <canvas id="upgradeWheel" width="400" height="400"></canvas>
@@ -3612,7 +3645,6 @@
                     </div>
                 </div>
 
-                <!-- NFT Selectors – smaller squares, icon arrows -->
                 <div class="upgrade-selectors">
                     <div class="upgrade-select from-select" id="upgradeFromSelector" onclick="openNftSelection('from')">
                         <div class="nft-square" id="fromNftSquare">
@@ -3642,9 +3674,8 @@
                     </div>
                 </div>
 
-                <!-- Upgrade Button -->
                 <div class="upgrade-btn-wrap">
-                    <button class="btn-upgrade" id="upgradeBtn" onclick="spinUpgrade()" disabled>
+                    <button class="btn-upgrade dynamic-btn" id="upgradeBtn" onclick="spinUpgrade()" disabled>
                         <span id="upgradeBtnText">Upgrade</span>
                         <span class="upgrade-pct" id="upgradePct">—</span>
                         <i class="fas fa-arrow-up arrow-icon"></i>
@@ -3666,7 +3697,6 @@
                 <div class="ludloop-wheel-wrap">
                     <div class="ludloop-wheel-container" id="ludloopContainer">
                         <canvas id="ludloopWheel" width="400" height="400"></canvas>
-                        <!-- Arrow wrapper – spins around center -->
                         <div class="ludloop-arrow-wrapper" id="ludloopArrowWrapper">
                             <div class="ludloop-arrow-icon"><i class="fas fa-chevron-down"></i></div>
                         </div>
@@ -3678,18 +3708,17 @@
                     <div class="ludloop-spin-row">
                         <div class="price-select" id="ludloopPriceSelect">
                             <div class="price-slider" id="priceSlider"></div>
-                            <button data-price="100" class="active">100</button>
-                            <button data-price="300">300</button>
-                            <button data-price="500">500</button>
-                            <button data-price="700">700</button>
+                            <button data-price="100" class="active dynamic-btn">100</button>
+                            <button data-price="300" class="dynamic-btn">300</button>
+                            <button data-price="500" class="dynamic-btn">500</button>
+                            <button data-price="700" class="dynamic-btn">700</button>
                         </div>
                     </div>
-                    <!-- Wrap button with wave rings -->
                     <div class="ludloop-spin-wrapper">
                         <div class="wave-ring"></div>
                         <div class="wave-ring"></div>
                         <div class="wave-ring"></div>
-                        <button class="ludloop-spin-btn" id="ludloopSpinBtn" onclick="ludloopGame.requestSpin()">
+                        <button class="ludloop-spin-btn dynamic-btn" id="ludloopSpinBtn" onclick="ludloopGame.requestSpin()">
                             <i class="fas fa-sync-alt spin-icon"></i> Spin
                         </button>
                     </div>
@@ -3710,8 +3739,8 @@
                 <div class="title">Confirm Spin</div>
                 <div class="sub" id="confirmMessage">Spend <span id="confirmPrice">100</span> stars?</div>
                 <div class="actions">
-                    <button class="btn-cancel" onclick="ludloopGame.cancelSpin()">Cancel</button>
-                    <button class="btn-confirm" onclick="ludloopGame.executeSpin()">Confirm</button>
+                    <button class="btn-cancel dynamic-btn" onclick="ludloopGame.cancelSpin()">Cancel</button>
+                    <button class="btn-confirm dynamic-btn" onclick="ludloopGame.executeSpin()">Confirm</button>
                 </div>
             </div>
         </div>
@@ -3732,7 +3761,7 @@
         <!-- PROFILE -->
         <div id="page-profile" class="page">
             <div class="profile-header">
-                <button class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
+                <button class="settings-btn dynamic-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
                 <div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImg" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" decoding="async"><div class="fallback" id="profileAvatarFallback">XD</div></div>
                 <div class="profile-name" id="profileName">xDll_Lud</div>
                 <div class="profile-username" id="profileUsername">@xDll_Lud</div>
@@ -3761,7 +3790,7 @@
         <!-- BOUNCE PAGE -->
         <div id="page-bounce" class="page">
             <div class="bounce-header">
-                <button class="back-btn" onclick="navigateTo('home')"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="back-btn dynamic-btn" onclick="navigateTo('home')"><i class="fas fa-arrow-left"></i> Back</button>
                 <span class="title">Bounce</span>
                 <span class="badge balance-badge" id="bounceBalance"><img src="https://images.iimg.live/images/radiant-capture-7834.webp" class="balance-icon" alt="⭐"> 1,000</span>
             </div>
@@ -3778,20 +3807,20 @@
             </div>
             <div class="bounce-controls">
                 <input type="number" id="bounceBetInput" value="10" min="1" step="1">
-                <button id="bounceStartBtn" onclick="bounceGame.handleStart()">Start</button>
+                <button class="dynamic-btn" id="bounceStartBtn" onclick="bounceGame.handleStart()">Start</button>
             </div>
             <div id="bounceResult" class="bounce-result"></div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
-            <button class="nav-item active" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
-            <button class="nav-item" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
-            <button class="nav-item" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
-            <button class="nav-item" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgr</span></button>
-            <button class="nav-item" data-page="ludloop"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="label">Loop</span></button>
-            <button class="nav-item" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inv</span></button>
-            <button class="nav-item" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
+            <button class="nav-item active dynamic-btn" data-page="home"><span class="icon"><i class="fas fa-house"></i></span><span class="label">Home</span></button>
+            <button class="nav-item dynamic-btn" data-page="rocket"><span class="icon"><i class="fas fa-rocket"></i></span><span class="label">Crash</span></button>
+            <button class="nav-item dynamic-btn" data-page="mines"><span class="icon"><i class="fas fa-gem"></i></span><span class="label">Mines</span></button>
+            <button class="nav-item dynamic-btn" data-page="upgrade"><span class="icon"><i class="fas fa-arrow-up"></i></span><span class="label">Upgr</span></button>
+            <button class="nav-item dynamic-btn" data-page="ludloop"><span class="icon"><i class="fas fa-circle-notch"></i></span><span class="label">Loop</span></button>
+            <button class="nav-item dynamic-btn" data-page="inventory"><span class="icon"><i class="fas fa-box"></i></span><span class="label">Inv</span></button>
+            <button class="nav-item dynamic-btn" data-page="profile"><span class="icon"><i class="fas fa-user"></i></span><span class="label">Profile</span></button>
         </div>
     </div>
 
@@ -3974,7 +4003,6 @@
             inventory: []
         };
 
-        // -------- ORIGINAL NFTs (removed the 4 new ones) --------
         const NFT_DB = {
             chill_flame: { id: 'chill_flame', name: 'Chill Flame', price: 320,
                 gif: 'https://i.postimg.cc/8P6Kpd8p/ezgif-8989f5c025d5b9c2.gif', tier: 'low' },
@@ -4508,7 +4536,7 @@
         }
 
         // ============================================================
-        // FLYING NFT ANIMATION (fixed: accepts source element)
+        // FLYING NFT ANIMATION
         // ============================================================
         function flyNftToInventory(nft, sourceElement) {
             const wheelCenter = sourceElement || document.getElementById('wheelCenterNft');
@@ -4542,7 +4570,7 @@
         }
 
         // ============================================================
-        // CRASH GAME – NFT milestones on the existing progress line
+        // CRASH GAME
         // ============================================================
         const crashGame = {
             multiplier: 1.00,
@@ -7932,6 +7960,97 @@
         };
 
         // ============================================================
+        // DYNAMIC BUTTON – DRAG & STRETCH
+        // ============================================================
+        (function initDynamicButtons() {
+            const dynamicElements = document.querySelectorAll('.dynamic-btn');
+            let dragState = null;
+
+            dynamicElements.forEach(el => {
+                el.addEventListener('pointerdown', (e) => {
+                    // Ignore if disabled
+                    if (el.disabled) return;
+                    const rect = el.getBoundingClientRect();
+                    dragState = {
+                        element: el,
+                        startX: e.clientX,
+                        startY: e.clientY,
+                        rect: rect,
+                        isDragging: false,
+                        transform: { x: 0, y: 0, scaleX: 1, scaleY: 1, skewX: 0, skewY: 0 }
+                    };
+                    el.setPointerCapture(e.pointerId);
+                    el.classList.add('dragging');
+                });
+
+                el.addEventListener('pointermove', (e) => {
+                    if (!dragState || dragState.element !== el) return;
+                    const dx = e.clientX - dragState.startX;
+                    const dy = e.clientY - dragState.startY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance > 5) {
+                        dragState.isDragging = true;
+                    }
+                    if (dragState.isDragging) {
+                        // Compute stretch based on drag vector
+                        const maxDist = Math.min(el.offsetWidth, el.offsetHeight) * 0.4;
+                        const strength = Math.min(1, distance / maxDist);
+                        const angle = Math.atan2(dy, dx);
+                        // Stretch in direction of drag
+                        const scaleX = 1 + strength * 0.3 * Math.cos(angle);
+                        const scaleY = 1 - strength * 0.2 * Math.cos(angle);
+                        const skewX = strength * 0.15 * Math.sin(angle);
+                        const skewY = -strength * 0.15 * Math.cos(angle);
+                        // Apply transform
+                        el.style.transition = 'none';
+                        el.style.transform = `translate(${dx * 0.1}px, ${dy * 0.1}px) scale(${scaleX}, ${scaleY}) skew(${skewX}rad, ${skewY}rad)`;
+                        // Store for release
+                        dragState.transform = { x: dx * 0.1, y: dy * 0.1, scaleX, scaleY, skewX, skewY };
+                    }
+                });
+
+                el.addEventListener('pointerup', (e) => {
+                    if (!dragState || dragState.element !== el) return;
+                    const wasDragging = dragState.isDragging;
+                    el.classList.remove('dragging');
+                    if (wasDragging) {
+                        // Spring back with transition
+                        el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                        el.style.transform = 'scale(1) skew(0rad, 0rad) translate(0, 0)';
+                        // Prevent click if dragged
+                        el._dragPreventClick = true;
+                        setTimeout(() => {
+                            el._dragPreventClick = false;
+                        }, 100);
+                    } else {
+                        // Not dragged – allow click
+                        el._dragPreventClick = false;
+                    }
+                    dragState = null;
+                });
+
+                // Prevent click if drag occurred
+                el.addEventListener('click', (e) => {
+                    if (el._dragPreventClick) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            // Fallback for mouse leave
+            document.addEventListener('pointerup', () => {
+                if (dragState) {
+                    const el = dragState.element;
+                    el.classList.remove('dragging');
+                    el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    el.style.transform = 'scale(1) skew(0rad, 0rad) translate(0, 0)';
+                    dragState = null;
+                }
+            });
+        })();
+
+        // ============================================================
         // PRESET BUTTON HANDLERS
         // ============================================================
         document.querySelectorAll('.grid-presets button').forEach(btn => {
@@ -8032,7 +8151,7 @@
                 crashGame.startGameCycle();
             }
 
-            console.log('✅ Casino loaded – jello button with wave rings, jiggle on click, rocket GIFs optimized.');
+            console.log('✅ Casino loaded – all buttons are dynamic, draggable jello with stretch feedback.');
             console.log('📦 Preloaded ' + Object.keys(GIF_CACHE).length + ' GIFs');
         }
 
