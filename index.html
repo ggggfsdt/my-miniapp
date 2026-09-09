@@ -924,6 +924,40 @@
             updateBalanceUI();
         }
 
+        // ========================== DRAW PUCK (Thick Ring + Cross) ==========================
+        function drawPuck(ctx, x, y) {
+            const radius = 16;
+            ctx.save();
+            // Outer ring with glow
+            ctx.shadowColor = 'rgba(100, 200, 255, 0.9)';
+            ctx.shadowBlur = 30;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(200, 235, 255, 0.95)';
+            ctx.lineWidth = 7;
+            ctx.stroke();
+            // Inner subtle ring (makes it look "wide")
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(x, y, radius - 4, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Thin transparent cross
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(x - 9, y);
+            ctx.lineTo(x + 9, y);
+            ctx.moveTo(x, y - 9);
+            ctx.lineTo(x, y + 9);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
         // ========================== PLINKO (with history, quick bets) ==========================
         const pCanvas = document.getElementById('plinkoCanvas');
         const pCtx = pCanvas.getContext('2d');
@@ -1517,27 +1551,9 @@
                 aCtx.globalAlpha = 1;
             });
 
+            // Puck
             if (aPuck) {
-                const grad2 = aCtx.createRadialGradient(aPuck.x - 4, aPuck.y - 4, 2, aPuck.x, aPuck.y, 16);
-                grad2.addColorStop(0, '#f0f8ff');
-                grad2.addColorStop(0.4, '#c0d8f0');
-                grad2.addColorStop(1, '#3a5a7a');
-                aCtx.beginPath();
-                aCtx.arc(aPuck.x, aPuck.y, 16, 0, Math.PI * 2);
-                aCtx.fillStyle = grad2;
-                aCtx.shadowColor = '#7fc9ff';
-                aCtx.shadowBlur = 30;
-                aCtx.fill();
-                aCtx.shadowBlur = 0;
-                aCtx.strokeStyle = 'rgba(255,255,255,0.2)';
-                aCtx.lineWidth = 1.5;
-                aCtx.beginPath();
-                aCtx.arc(aPuck.x, aPuck.y, 14, 0, Math.PI * 2);
-                aCtx.stroke();
-                aCtx.beginPath();
-                aCtx.arc(aPuck.x - 4, aPuck.y - 5, 5, 0, Math.PI * 2);
-                aCtx.fillStyle = 'rgba(255,255,255,0.25)';
-                aCtx.fill();
+                drawPuck(aCtx, aPuck.x, aPuck.y);
             }
         }
 
@@ -1586,12 +1602,14 @@
             aRunning = true;
             const angle = Math.random() * 2 * Math.PI;
             const speed = 40 + Math.random() * 20;
+            const stopTime = 2 + Math.random() * 4; // 2 to 6 seconds
             aPuck = {
                 x: aW / 2,
                 y: aH / 2,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 launchTime: performance.now(),
+                stopTime: stopTime,
                 trail: []
             };
             aParticles = [];
@@ -1605,9 +1623,8 @@
                 const dt = (now - aPuck.launchTime) / 1000;
 
                 let friction = 1.0;
-                if (dt > 6) {
-                    const slowDown = Math.min(1, (dt - 6) / 2.5);
-                    friction = 1 - slowDown * 0.998;
+                if (dt > aPuck.stopTime) {
+                    friction = 0.92;
                 }
                 aPuck.vx *= friction;
                 aPuck.vy *= friction;
@@ -1640,10 +1657,9 @@
 
                 drawArena();
 
-                if (Math.abs(aPuck.vx) < 0.015 && Math.abs(aPuck.vy) < 0.015 && dt > 6.5) {
+                if (Math.abs(aPuck.vx) < 0.015 && Math.abs(aPuck.vy) < 0.015 && dt > aPuck.stopTime) {
                     let found = null;
                     for (let cell of aGridCells) {
-                        // Simple rectangular collision (since cells are scaled)
                         if (aPuck.x >= cell.x && aPuck.x <= cell.x + cell.w &&
                             aPuck.y >= cell.y && aPuck.y <= cell.y + cell.h) {
                             found = cell;
@@ -1702,7 +1718,7 @@
         });
         document.getElementById('arenaBet').addEventListener('input', () => { if (!aRunning) drawArena(); });
 
-        // ========================== ICE UPGRADE (diagonal split) ==========================
+        // ========================== ICE UPGRADE (diagonal split, random stop) ==========================
         const uCanvas = document.getElementById('upgradeCanvas');
         const uCtx = uCanvas.getContext('2d');
         const uW = uCanvas.width,
@@ -1867,26 +1883,7 @@
             });
 
             if (uPuck) {
-                const grad2 = uCtx.createRadialGradient(uPuck.x - 4, uPuck.y - 4, 2, uPuck.x, uPuck.y, 16);
-                grad2.addColorStop(0, '#f0f8ff');
-                grad2.addColorStop(0.4, '#c0d8f0');
-                grad2.addColorStop(1, '#3a5a7a');
-                uCtx.beginPath();
-                uCtx.arc(uPuck.x, uPuck.y, 16, 0, Math.PI * 2);
-                uCtx.fillStyle = grad2;
-                uCtx.shadowColor = '#7fc9ff';
-                uCtx.shadowBlur = 30;
-                uCtx.fill();
-                uCtx.shadowBlur = 0;
-                uCtx.strokeStyle = 'rgba(255,255,255,0.2)';
-                uCtx.lineWidth = 1.5;
-                uCtx.beginPath();
-                uCtx.arc(uPuck.x, uPuck.y, 14, 0, Math.PI * 2);
-                uCtx.stroke();
-                uCtx.beginPath();
-                uCtx.arc(uPuck.x - 4, uPuck.y - 5, 5, 0, Math.PI * 2);
-                uCtx.fillStyle = 'rgba(255,255,255,0.25)';
-                uCtx.fill();
+                drawPuck(uCtx, uPuck.x, uPuck.y);
             }
         }
 
@@ -1935,12 +1932,14 @@
             uRunning = true;
             const angle = Math.random() * 2 * Math.PI;
             const speed = 60 + Math.random() * 30;
+            const stopTime = 2 + Math.random() * 4; // 2 to 6 seconds
             uPuck = {
                 x: uW / 2,
                 y: uH / 2,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                launchTime: performance.now()
+                launchTime: performance.now(),
+                stopTime: stopTime
             };
             uParticles = [];
             document.getElementById('upgradeResult').textContent = '⚡ Ultra-fast puck launched!';
@@ -1953,9 +1952,8 @@
                 const dt = (now - uPuck.launchTime) / 1000;
 
                 let friction = 1.0;
-                if (dt > 4) {
-                    const slowDown = Math.min(1, (dt - 4) / 2);
-                    friction = 1 - slowDown * 0.998;
+                if (dt > uPuck.stopTime) {
+                    friction = 0.92;
                 }
                 uPuck.vx *= friction;
                 uPuck.vy *= friction;
@@ -1985,7 +1983,7 @@
 
                 drawUpgrade();
 
-                if (Math.abs(uPuck.vx) < 0.015 && Math.abs(uPuck.vy) < 0.015 && dt > 4.5) {
+                if (Math.abs(uPuck.vx) < 0.015 && Math.abs(uPuck.vy) < 0.015 && dt > uPuck.stopTime) {
                     const bet2 = getCurrentBet();
                     const greenRatio = Math.min(0.10 + (bet2 / 150), 0.90);
                     const S = uW;
@@ -2187,26 +2185,7 @@
             });
 
             if (tPuck) {
-                const grad2 = tCtx.createRadialGradient(tPuck.x - 4, tPuck.y - 4, 2, tPuck.x, tPuck.y, 16);
-                grad2.addColorStop(0, '#f0f8ff');
-                grad2.addColorStop(0.4, '#c0d8f0');
-                grad2.addColorStop(1, '#3a5a7a');
-                tCtx.beginPath();
-                tCtx.arc(tPuck.x, tPuck.y, 16, 0, Math.PI * 2);
-                tCtx.fillStyle = grad2;
-                tCtx.shadowColor = '#7fc9ff';
-                tCtx.shadowBlur = 30;
-                tCtx.fill();
-                tCtx.shadowBlur = 0;
-                tCtx.strokeStyle = 'rgba(255,255,255,0.2)';
-                tCtx.lineWidth = 1.5;
-                tCtx.beginPath();
-                tCtx.arc(tPuck.x, tPuck.y, 14, 0, Math.PI * 2);
-                tCtx.stroke();
-                tCtx.beginPath();
-                tCtx.arc(tPuck.x - 4, tPuck.y - 5, 5, 0, Math.PI * 2);
-                tCtx.fillStyle = 'rgba(255,255,255,0.25)';
-                tCtx.fill();
+                drawPuck(tCtx, tPuck.x, tPuck.y);
             } else {
                 tCtx.beginPath();
                 tCtx.arc(tW / 2, tH / 2, 16, 0, Math.PI * 2);
