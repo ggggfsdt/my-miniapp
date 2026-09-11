@@ -1,2564 +1,1308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ICE CASINO · premium</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <style>
-        /* --- GLOBAL STYLES (enhanced) --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        body {
-            background: #0a0e1a;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-            overflow-x: hidden;
-            position: relative;
-        }
-        /* Animated background particles */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        .casino {
-            position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            width: 100%;
-            background: rgba(10, 20, 40, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 3rem;
-            padding: 2rem 2rem 2rem;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: all 0.3s;
-        }
-        /* Header with stats */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            perspective: 800px;
-        }
-        .logo {
-            font-size: 2.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #b0e0ff, #6a8cff, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            transform: rotateX(2deg) rotateY(-3deg) translateZ(10px);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo i {
-            font-size: 2.8rem;
-            filter: drop-shadow(0 0 20px #4a8eff);
-            -webkit-text-fill-color: initial;
-            color: #4a8eff;
-        }
-        .top-stats {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .stat-badge {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: #b0d0ff;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .stat-badge i {
-            color: #fcd34d;
-        }
-        .stat-badge span {
-            color: white;
-            font-weight: 700;
-        }
-        .stat-badge .value {
-            color: #7fc9ff;
-        }
-        .balance-badge {
-            background: rgba(255, 215, 0, 0.08);
-            border-color: rgba(255, 215, 0, 0.15);
-            padding: 0.5rem 2rem;
-            font-size: 1.1rem;
-        }
-        .balance-badge i {
-            color: #fcd34d;
-            margin-right: 6px;
-        }
-        .balance-badge span {
-            color: white;
-            font-weight: 700;
-        }
-
-        /* Quick bet buttons */
-        .quick-bets {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .quick-bet {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 30px;
-            padding: 0.2rem 0.8rem;
-            color: #b0d0ff;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .quick-bet:hover {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: #ffd966;
-            color: white;
-        }
-        .quick-bet.active {
-            background: rgba(255, 215, 0, 0.15);
-            border-color: #ffd966;
-            color: #ffd966;
-        }
-
-        /* Game grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.2rem;
-            margin: 2rem 0;
-        }
-        .game-card {
-            background: rgba(10, 25, 50, 0.4);
-            backdrop-filter: blur(8px);
-            border-radius: 2rem;
-            padding: 1.2rem 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
-            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
-            transform: perspective(600px) rotateX(0.5deg) rotateY(1deg);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            color: #e6f2ff;
-            position: relative;
-            overflow: hidden;
-        }
-        .game-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 120%, rgba(100, 180, 255, 0.08), transparent 70%);
-            pointer-events: none;
-        }
-        .game-card:hover {
-            transform: perspective(600px) rotateX(3deg) rotateY(4deg) translateZ(20px) scale(1.03);
-            background: rgba(20, 50, 90, 0.6);
-            border-color: rgba(130, 190, 255, 0.25);
-            box-shadow: 0 20px 50px -8px #142c55;
-        }
-        .game-card i {
-            font-size: 2.8rem;
-            margin-bottom: 0.3rem;
-            filter: drop-shadow(0 8px 20px rgba(0, 20, 80, 0.5));
-            transition: 0.3s;
-        }
-        .game-card:hover i {
-            transform: scale(1.1) rotate(-5deg);
-        }
-        .game-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            background: linear-gradient(to right, #f0f9ff, #b7d9ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .game-card p {
-            font-size: 0.7rem;
-            opacity: 0.6;
-            color: #b0cbff;
-        }
-        .badge {
-            background: rgba(255, 215, 0, 0.12);
-            border-radius: 40px;
-            padding: 0.15rem 1rem;
-            font-size: 0.6rem;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            color: #fcd34d;
-            margin-top: 4px;
-        }
-        .ice-badge {
-            background: rgba(0, 200, 255, 0.12);
-            border-color: #00b7ff40;
-            color: #7fc9ff;
-        }
-
-        /* Modal enhancements */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-            animation: fadeIn 0.4s ease;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .modal-box {
-            background: rgba(8, 18, 38, 0.92);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 3rem;
-            padding: 2rem;
-            max-width: 850px;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
-            position: relative;
-            max-height: 95vh;
-            overflow-y: auto;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .modal-box.zoom .canvas-container {
-            transform: scale(1.06);
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .modal-box::-webkit-scrollbar { width: 4px; }
-        .modal-box::-webkit-scrollbar-track { background: transparent; }
-        .modal-box::-webkit-scrollbar-thumb { background: #3a5a7a; border-radius: 10px; }
-
-        .close-modal {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-            font-size: 2.2rem;
-            color: #9bb8e0;
-            cursor: pointer;
-            transition: 0.3s;
-            background: none;
-            border: none;
-            z-index: 30;
-        }
-        .close-modal:hover {
-            color: white;
-            transform: rotate(90deg) scale(1.2);
-        }
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #d0e8ff;
-            margin-bottom: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .modal-title i {
-            filter: drop-shadow(0 0 20px currentColor);
-        }
-
-        .canvas-container {
-            position: relative;
-            border-radius: 30px;
-            overflow: hidden;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            background: rgba(0, 0, 0, 0.3);
-        }
-        canvas {
-            display: block;
-            margin: 0 auto;
-            border-radius: 30px;
-            background: #0a1428;
-            box-shadow: inset 0 0 40px rgba(0, 50, 120, 0.2);
-            width: 100%;
-            height: auto;
-            aspect-ratio: 1 / 1;
-            max-height: 500px;
-            cursor: default;
-        }
-
-        .popup-result {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(12px);
-            padding: 1.2rem 2rem;
-            border-radius: 3rem;
-            color: white;
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-align: center;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
-            z-index: 25;
-            border: 2px solid rgba(255, 215, 0, 0.2);
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
-            min-width: 160px;
-        }
-        .popup-result.show {
-            transform: translate(-50%, -50%) scale(1);
-            pointer-events: auto;
-        }
-        .popup-result .sub {
-            font-size: 0.9rem;
-            font-weight: 400;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-        .popup-result.win { border-color: #2ecc71; box-shadow: 0 0 60px rgba(46,204,113,0.3); }
-        .popup-result.lose { border-color: #e74c3c; box-shadow: 0 0 60px rgba(231,76,60,0.3); }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            margin: 16px 0 10px;
-        }
-        .controls label {
-            color: #b0d0ff;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-        }
-        .controls input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #3a5a7a;
-            border-radius: 30px;
-            padding: 5px 12px;
-            color: white;
-            width: 70px;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        .controls input:focus { outline: none; border-color: #6a9aff; }
-        .controls input.editable-bet {
-            border-color: #ffd966;
-            background: rgba(255,215,0,0.08);
-            font-weight: 600;
-            color: #ffd966;
-        }
-        .controls input[type="number"] { -moz-appearance: textfield; }
-        .controls input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-        .btn {
-            padding: 0.5rem 1.4rem;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
-        .btn-primary { background: linear-gradient(145deg, #1f5a8a, #0e3a5f); }
-        .btn-primary:hover { background: linear-gradient(145deg, #2e74b0, #18508a); }
-        .btn-gold { background: linear-gradient(145deg, #b8860b, #7a5f08); }
-        .btn-gold:hover { background: linear-gradient(145deg, #d4a017, #9a7a0a); }
-        .btn-ice { background: linear-gradient(145deg, #1a6b8a, #0d425a); }
-        .btn-ice:hover { background: linear-gradient(145deg, #2a8aaa, #1a5a7a); }
-        .btn-small { padding: 0.25rem 0.9rem; font-size: 0.8rem; }
-        .btn-danger { background: linear-gradient(145deg, #8a1f1f, #5f0e0e); }
-        .btn-success { background: linear-gradient(145deg, #1f8a3f, #0e5f2a); }
-
-        .game-result {
-            margin-top: 12px;
-            padding: 10px;
-            border-radius: 40px;
-            background: rgba(0, 0, 0, 0.3);
-            color: #c0e0ff;
-            text-align: center;
-            font-size: 0.95rem;
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        /* History & stats in modals */
-        .history-bar {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 8px;
-            padding: 6px 10px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 30px;
-        }
-        .history-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: white;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .history-dot.win { background: #2ecc71; border-color: #2ecc71; }
-        .history-dot.lose { background: #e74c3c; border-color: #e74c3c; }
-
-        /* Quick bet buttons in modal */
-        .quick-bet-group {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .quick-bet-group .qb {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 30px;
-            padding: 2px 10px;
-            color: #b0d0ff;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .quick-bet-group .qb:hover {
-            background: rgba(255,215,0,0.1);
-            border-color: #ffd966;
-            color: white;
-        }
-
-        /* segment selector */
-        .segment-selector {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            flex-wrap: wrap;
-            max-width: 340px;
-        }
-        .segment-btn {
-            background: rgba(255,255,255,0.04);
-            border: 2px solid #2a4a6a;
-            border-radius: 8px;
-            padding: 3px 6px;
-            color: #b0d0ff;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 600;
-            font-size: 0.65rem;
-            flex: 1 0 32px;
-        }
-        .segment-btn.active { border-color: #ffd966; background: rgba(255,215,0,0.15); color: white; }
-        .segment-btn:hover { border-color: #6a9aff; }
-
-        /* Dice grid */
-        .dice-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            max-width: 260px;
-            margin: 8px auto;
-        }
-        .dice-btn {
-            background: rgba(255,255,255,0.04);
-            border: 2px solid #2a4a6a;
-            border-radius: 10px;
-            padding: 8px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .dice-btn:hover { border-color: #ffd966; background: rgba(255,215,0,0.1); }
-        .dice-btn.active { border-color: #ffd966; background: rgba(255,215,0,0.2); }
-
-        /* Coin flip */
-        .coin-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            margin: 10px 0;
-        }
-        .coin {
-            font-size: 6rem;
-            line-height: 1;
-            transition: transform 0.6s ease;
-            user-select: none;
-        }
-        .coin.flip { animation: flipCoin 0.6s ease; }
-        @keyframes flipCoin {
-            0% { transform: rotateY(0deg) scale(1); }
-            50% { transform: rotateY(180deg) scale(1.2); }
-            100% { transform: rotateY(360deg) scale(1); }
-        }
-
-        /* Roulette grid */
-        .roulette-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            max-width: 320px;
-            margin: 8px auto;
-        }
-        .roulette-btn {
-            background: rgba(255,255,255,0.04);
-            border: 2px solid #2a4a6a;
-            border-radius: 10px;
-            padding: 6px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .roulette-btn:hover { border-color: #ffd966; background: rgba(255,215,0,0.1); }
-        .roulette-btn.active { border-color: #ffd966; background: rgba(255,215,0,0.2); }
-
-        .drag-hint {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255,255,255,0.2);
-            font-size: 0.65rem;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 14px;
-            border-radius: 20px;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .casino { padding: 1rem; }
-            .modal-box { padding: 1.2rem; }
-            canvas { max-height: 360px; }
-            .controls { gap: 6px; }
-            .controls input { width: 55px; font-size: 0.75rem; }
-            .popup-result { font-size: 1.2rem; padding: 0.8rem 1.5rem; min-width: 120px; }
-            .grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.8rem; }
-            .game-card { padding: 0.8rem 0.5rem; border-radius: 1.5rem; }
-            .game-card i { font-size: 2.2rem; }
-            .game-card h3 { font-size: 0.95rem; }
-            .coin { font-size: 4rem; }
-            .header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-            .top-stats { justify-content: center; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Dlballs</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;overflow:hidden;background:#05060b;color:#e8e8e8;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+#dl{position:fixed;inset:0;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 0%,#1c1636 0%,#0a0a16 55%,#050507 100%)}
+#dl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.dl-top{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px;right:10px;z-index:10;
+  display:flex;align-items:center;gap:6px;pointer-events:none}
+.dl-pill{display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;
+  background:rgba(18,18,22,.66);border:1px solid rgba(255,255,255,.07);
+  border-radius:13px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  font-size:11px;font-weight:600;pointer-events:auto}
+.dl-pill .lbl{color:rgba(255,255,255,.32);font-size:9px;letter-spacing:.8px;font-weight:700}
+.dl-pill .val{color:#fff;font-variant-numeric:tabular-nums;font-weight:800}
+.dl-close{margin-left:auto;width:26px;height:26px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.07);background:rgba(18,18,22,.66);
+  color:rgba(255,255,255,.75);font-size:12px;cursor:pointer;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:flex;align-items:center;justify-content:center;transition:.15s;pointer-events:auto}
+.dl-close:active{transform:scale(.9)}
+.dl-bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:12px;z-index:10;
+  display:flex;gap:8px}
+.dl-btn{flex:1;height:38px;border-radius:12px;border:none;font-weight:700;font-size:13px;
+  cursor:pointer;transition:.15s;font-family:inherit;display:flex;align-items:center;
+  justify-content:center;letter-spacing:.2px}
+.dl-btn:active{transform:scale(.97)}
+.dl-btn:disabled{opacity:.32;pointer-events:none}
+.dl-btn-buy{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.09)}
+.dl-btn-launch{background:linear-gradient(135deg,#7b5cff,#a340ff);color:#fff;
+  box-shadow:0 4px 20px rgba(123,92,255,.35)}
+.dl-btn-launch:not(:disabled){animation:dlPulseBtn 2s ease-in-out infinite}
+@keyframes dlPulseBtn{0%,100%{box-shadow:0 4px 20px rgba(123,92,255,.35)}
+50%{box-shadow:0 4px 30px rgba(163,64,255,.6)}}
+.dl-modal{position:absolute;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.dl-modal.show{display:flex;animation:dlFade .2s ease}
+@keyframes dlFade{from{opacity:0}to{opacity:1}}
+.dl-sheet{width:100%;max-width:440px;background:#121216;border-radius:22px 22px 0 0;
+  padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 16px);
+  border-top:1px solid rgba(255,255,255,.07);animation:dlSheetUp .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes dlSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.dl-grip{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 12px}
+.dl-sheet h3{font-size:15px;font-weight:700;color:#fff;text-align:center;margin-bottom:14px}
+.dl-seg{display:flex;gap:3px;padding:3px;background:rgba(255,255,255,.04);border-radius:11px;margin-bottom:14px}
+.dl-seg button{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;
+  color:rgba(255,255,255,.45);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+.dl-seg button.on{background:rgba(123,92,255,.22);color:#fff}
+.dl-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.dl-row label{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.9px;text-transform:uppercase;
+  font-weight:700;padding-left:2px}
+.dl-input{width:100%;height:42px;padding:0 14px;border-radius:11px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);
+  color:#fff;font-size:15px;font-weight:700;text-align:center;outline:none;font-family:inherit;
+  font-variant-numeric:tabular-nums;transition:.15s}
+.dl-input:focus{border-color:rgba(123,92,255,.5);background:rgba(123,92,255,.06)}
+.dl-hint{font-size:10.5px;color:rgba(255,255,255,.3);line-height:1.5;padding:0 2px}
+.dl-tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.dl-tier{padding:10px 2px;border-radius:10px;border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.03);color:#fff;cursor:pointer;
+  font-size:10px;font-weight:800;text-align:center;font-family:inherit;line-height:1.35;transition:.15s}
+.dl-tier b{font-size:14px;display:block;margin-bottom:1px}
+.dl-tier small{font-size:9.5px;color:rgba(255,255,255,.4);font-weight:600}
+.dl-tier.on{border-color:#7b5cff;background:rgba(123,92,255,.15)}
+.dl-tier.on small{color:rgba(180,150,255,.9)}
+.dl-actions{display:flex;gap:8px;margin-top:4px}
+.dl-actions button{flex:1;height:42px;border-radius:11px;border:none;font-weight:700;
+  font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
+.dl-actions button:active{transform:scale(.97)}
+.dl-cancel{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
+.dl-confirm{background:linear-gradient(135deg,#2ecc71,#1a9a52);color:#fff;
+  box-shadow:0 4px 18px rgba(46,204,113,.3)}
+.dl-r{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;
+  justify-content:center;background:rgba(6,6,11,.94);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px)}
+.dl-r.show{display:flex}
+.dl-r-title{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:2.5px;
+  text-transform:uppercase;font-weight:800;margin-bottom:18px}
+.dl-r-stage{position:relative;width:100%;max-width:520px;height:190px}
+.dl-r-stage canvas{display:block;width:100%;height:100%}
+.dl-r-arrow{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+  color:#fff;font-size:14px;text-shadow:0 0 14px rgba(255,255,255,.9);
+  animation:dlArrowP 1s ease-in-out infinite}
+@keyframes dlArrowP{0%,100%{transform:translateX(-50%) translateY(0);opacity:.7}
+50%{transform:translateX(-50%) translateY(-4px);opacity:1}}
+.dl-result{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:20px}
+.dl-result.show{display:flex;animation:dlFade .25s ease}
+.dl-result-box{width:100%;max-width:340px;background:#121216;border:1px solid rgba(255,255,255,.07);
+  border-radius:22px;padding:26px 22px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);animation:dlPop .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes dlPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.dl-res-tag{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;
+  text-transform:uppercase;font-weight:800}
+.dl-res-amt{font-size:42px;font-weight:900;color:#7bffb8;margin:8px 0 2px;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(123,255,184,.3)}
+.dl-res-amt.lose{color:#ff7b7b;text-shadow:0 0 30px rgba(255,123,123,.3)}
+.dl-res-sub{font-size:11.5px;color:rgba(255,255,255,.4);margin-bottom:18px}
+</style>
 </head>
 <body>
 
-    <!-- Background animation canvas -->
-    <canvas id="bg-canvas"></canvas>
+<div id="dl">
+  <canvas id="dl-canvas"></canvas>
 
-    <div class="casino">
-        <div class="header">
-            <div class="logo"><i class="fas fa-cube"></i> ICE·CASINO</div>
-            <div class="top-stats">
-                <div class="stat-badge"><i class="fas fa-trophy"></i> Wins: <span id="totalWinsDisplay">0</span></div>
-                <div class="stat-badge"><i class="fas fa-skull"></i> Losses: <span id="totalLossesDisplay">0</span></div>
-                <div class="stat-badge balance-badge"><i class="fas fa-coins"></i> BAL <span id="balanceDisplay">2,450.0</span></div>
-                <button class="btn btn-small btn-danger" id="resetBalanceBtn" style="padding:0.2rem 0.8rem; font-size:0.7rem;"><i class="fas fa-undo"></i> Reset</button>
-                <button class="btn btn-small btn-ice" id="soundToggleBtn" style="padding:0.2rem 0.8rem; font-size:0.7rem;"><i class="fas fa-volume-up"></i></button>
-            </div>
-        </div>
+  <div class="dl-top">
+    <div class="dl-pill"><span class="lbl">BAL</span><span class="val" id="dl-bal">0</span></div>
+    <div class="dl-pill"><span class="lbl">HOLD</span><span class="val" id="dl-hold">0 · 0💎</span></div>
+    <button class="dl-close" id="dl-close">✕</button>
+  </div>
 
-        <div class="grid">
-            <div class="game-card" id="openPlinko" style="background:linear-gradient(145deg, rgba(90,60,20,0.4), rgba(40,20,5,0.6));">
-                <i class="fas fa-circle-nodes" style="color:#ffb347;"></i>
-                <h3>PLINKO</h3>
-                <p>⬇️ drag & drop</p>
-                <span class="badge"><i class="fas fa-arrow-trend-up"></i> real</span>
-            </div>
-            <div class="game-card" id="openArena" style="background:linear-gradient(145deg, rgba(20,60,110,0.5), rgba(5,20,50,0.6));">
-                <i class="fas fa-icicles" style="color:#7fc9ff;"></i>
-                <h3>ICE ARENA</h3>
-                <p>🏒 diagonal split</p>
-                <span class="badge ice-badge"><i class="fas fa-bolt"></i> dynamic odds</span>
-            </div>
-            <div class="game-card" id="openUpgrade" style="background:linear-gradient(145deg, rgba(10,70,90,0.5), rgba(5,30,50,0.6));">
-                <i class="fas fa-snowplow" style="color:#a0e0ff;"></i>
-                <h3>⬆️ UPGRADE</h3>
-                <p>🔮 diagonal split</p>
-                <span class="badge ice-badge">ultra-fast</span>
-            </div>
-            <div class="game-card" id="openDice" style="background:linear-gradient(145deg, rgba(120,80,20,0.5), rgba(60,40,10,0.6));">
-                <i class="fas fa-dice" style="color:#f1c40f;"></i>
-                <h3>DICE</h3>
-                <p>🎲 roll 1-6</p>
-                <span class="badge">5x payout</span>
-            </div>
-            <div class="game-card" id="openTarget" style="background:linear-gradient(145deg, rgba(20,100,120,0.5), rgba(5,50,70,0.6));">
-                <i class="fas fa-bullseye" style="color:#e67e22;"></i>
-                <h3>SPEED TARGET</h3>
-                <p>🎯 ultra-fast</p>
-                <span class="badge ice-badge">instant stop</span>
-            </div>
-            <div class="game-card" id="openCoin" style="background:linear-gradient(145deg, rgba(180,150,50,0.4), rgba(100,80,20,0.6));">
-                <i class="fas fa-coins" style="color:#f1c40f;"></i>
-                <h3>COIN FLIP</h3>
-                <p>🪙 heads/tails</p>
-                <span class="badge">2x payout</span>
-            </div>
-            <div class="game-card" id="openRoulette" style="background:linear-gradient(145deg, rgba(140,40,40,0.5), rgba(80,20,20,0.6));">
-                <i class="fas fa-circle" style="color:#e74c3c;"></i>
-                <h3>ROULETTE</h3>
-                <p>🎡 number bet</p>
-                <span class="badge">10x payout</span>
-            </div>
+  <div class="dl-bottom">
+    <button class="dl-btn dl-btn-buy" id="dl-buy">Buy Balls</button>
+    <button class="dl-btn dl-btn-launch" id="dl-launch" disabled>Launch</button>
+  </div>
+
+  <div class="dl-modal" id="dl-buy-modal">
+    <div class="dl-sheet">
+      <div class="dl-grip"></div>
+      <h3>Buy Balls</h3>
+      <div class="dl-seg">
+        <button class="on" data-tab="random">Random</button>
+        <button data-tab="tier">Choose</button>
+      </div>
+      <div id="dl-pane-random">
+        <div class="dl-row">
+          <label>Amount to spend</label>
+          <input class="dl-input" id="dl-rand-amt" value="100" inputmode="numeric">
         </div>
+        <p class="dl-hint">Weighted roll — most balls land under 50💎, rare gold can hit 1000💎.</p>
+      </div>
+      <div id="dl-pane-tier" style="display:none">
+        <div class="dl-tiers">
+          <button class="dl-tier on" data-tier="gray"   data-price="10"><b>●</b>Gray<small>10💎</small></button>
+          <button class="dl-tier" data-tier="silver" data-price="100"><b>●</b>Silver<small>100💎</small></button>
+          <button class="dl-tier" data-tier="green"  data-price="500"><b>●</b>Green<small>500💎</small></button>
+          <button class="dl-tier" data-tier="gold"   data-price="1000"><b>●</b>Gold<small>1000💎</small></button>
+        </div>
+        <div class="dl-row">
+          <label>Quantity</label>
+          <input class="dl-input" id="dl-tier-qty" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <div class="dl-actions">
+        <button class="dl-cancel" id="dl-buy-cancel">Cancel</button>
+        <button class="dl-confirm" id="dl-buy-go">Buy</button>
+      </div>
     </div>
+  </div>
 
-    <!-- ===== MODALS ===== -->
-    <!-- Plinko Modal -->
-    <div class="modal-overlay" id="plinkoModal">
-        <div class="modal-box" id="plinkoModalBox">
-            <button class="close-modal" onclick="closeModal('plinkoModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-circle-nodes" style="color:#ffb347;"></i> PLINKO · drag & drop</div>
-            <div class="canvas-container" id="plinkoCanvasContainer">
-                <canvas id="plinkoCanvas" width="550" height="550"></canvas>
-                <div class="popup-result" id="plinkoPopup"><span id="plinkoPopupMsg">🎉</span><div class="sub" id="plinkoPopupSub"></div></div>
-                <div class="drag-hint">⬇️ drag ball left/right</div>
-            </div>
-            <div class="controls">
-                <div class="quick-bet-group">
-                    <span class="qb" data-bet="10">10</span>
-                    <span class="qb" data-bet="25">25</span>
-                    <span class="qb" data-bet="50">50</span>
-                    <span class="qb" data-bet="100">100</span>
-                    <span class="qb" data-bet="250">250</span>
-                </div>
-                <button class="btn btn-primary" id="plinkoDropBtn"><i class="fas fa-arrow-down"></i> Drop</button>
-                <button class="btn btn-gold" id="plinkoResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-                <span class="stats-mini"><span id="plinkoStats">🎯 0x avg</span></span>
-            </div>
-            <div class="game-result" id="plinkoResult">⬇️ Drag ball, then drop!</div>
-            <div class="history-bar" id="plinkoHistory"></div>
-        </div>
+  <div class="dl-r" id="dl-roulette">
+    <div class="dl-r-title" id="dl-r-title">Rolling</div>
+    <div class="dl-r-stage">
+      <canvas id="dl-r-canvas"></canvas>
+      <div class="dl-r-arrow">▲</div>
     </div>
+  </div>
 
-    <!-- Arena Modal -->
-    <div class="modal-overlay" id="arenaModal">
-        <div class="modal-box" id="arenaModalBox">
-            <button class="close-modal" onclick="closeModal('arenaModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-icicles" style="color:#7fc9ff;"></i> ICE ARENA · diagonal split</div>
-            <div class="canvas-container" id="arenaCanvasContainer">
-                <canvas id="arenaCanvas" width="550" height="550"></canvas>
-                <div class="popup-result" id="arenaPopup"><span id="arenaPopupMsg">🏒</span><div class="sub" id="arenaPopupSub"></div></div>
-            </div>
-            <div class="controls">
-                <label>Bet: <input type="number" id="arenaBet" value="10" min="0.1" step="1"></label>
-                <div class="segment-selector" id="arenaSegments"></div>
-                <button class="btn btn-primary" id="arenaLaunchBtn"><i class="fas fa-play"></i> Launch</button>
-                <button class="btn btn-gold" id="arenaResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-            </div>
-            <div class="game-result" id="arenaResult">🏒 Select a cell — bet determines win zone!</div>
-            <div class="history-bar" id="arenaHistory"></div>
-        </div>
+  <div class="dl-result" id="dl-result">
+    <div class="dl-result-box">
+      <div class="dl-res-tag" id="dl-res-tag">Result</div>
+      <div class="dl-res-amt" id="dl-res-amt">+0 💎</div>
+      <div class="dl-res-sub" id="dl-res-sub"></div>
+      <button class="dl-btn dl-btn-launch" id="dl-res-ok" style="width:100%">Continue</button>
     </div>
+  </div>
+</div>
 
-    <!-- Upgrade Modal -->
-    <div class="modal-overlay" id="upgradeModal">
-        <div class="modal-box" id="upgradeModalBox">
-            <button class="close-modal" onclick="closeModal('upgradeModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-snowplow" style="color:#a0e0ff;"></i> ICE UPGRADE · diagonal split</div>
-            <div class="canvas-container" id="upgradeCanvasContainer">
-                <canvas id="upgradeCanvas" width="550" height="550"></canvas>
-                <div class="popup-result" id="upgradePopup"><span id="upgradePopupMsg">🔮</span><div class="sub" id="upgradePopupSub"></div></div>
-            </div>
-            <div class="controls">
-                <div class="bet-info">
-                    <span class="label-text">Desired:</span>
-                    <input type="number" id="upgradeDesiredBet" value="10" min="0.1" step="1">
-                    <button class="btn btn-ice btn-small" id="upgradeApplyBtn"><i class="fas fa-check"></i> Apply</button>
-                    <span class="label-text">Current:</span>
-                    <input type="number" id="upgradeCurrentBet" value="10" min="0.1" step="1" class="editable-bet">
-                </div>
-                <button class="btn btn-primary" id="upgradeLaunchBtn"><i class="fas fa-play"></i> Launch</button>
-                <button class="btn btn-gold" id="upgradeResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-            </div>
-            <div class="game-result" id="upgradeResult">🔮 Low bet = small win zone, high bet = large!</div>
-            <div class="history-bar" id="upgradeHistory"></div>
-        </div>
-    </div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
 
-    <!-- Dice Modal -->
-    <div class="modal-overlay" id="diceModal">
-        <div class="modal-box" id="diceModalBox">
-            <button class="close-modal" onclick="closeModal('diceModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-dice" style="color:#f1c40f;"></i> DICE · pick a number</div>
-            <div style="display:flex; justify-content:center; align-items:center; gap:20px; margin:10px 0; flex-wrap:wrap;">
-                <div style="font-size:4rem; background:rgba(255,255,255,0.05); border-radius:30px; padding:20px; min-width:100px; text-align:center;" id="diceResultDisplay">🎲</div>
-                <div style="font-size:1.2rem; color:#b0d0ff;">Bet: <input type="number" id="diceBet" value="10" min="1" step="1" style="width:60px; background:rgba(0,0,0,0.4); border:1px solid #3a5a7a; border-radius:30px; padding:5px 10px; color:white; text-align:center;"></div>
-            </div>
-            <div class="dice-grid" id="diceGrid">
-                <button class="dice-btn" data-num="1">1</button>
-                <button class="dice-btn" data-num="2">2</button>
-                <button class="dice-btn" data-num="3">3</button>
-                <button class="dice-btn" data-num="4">4</button>
-                <button class="dice-btn" data-num="5">5</button>
-                <button class="dice-btn" data-num="6">6</button>
-            </div>
-            <div class="controls">
-                <button class="btn btn-primary" id="diceRollBtn"><i class="fas fa-dice"></i> Roll</button>
-                <button class="btn btn-gold" id="diceResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-            </div>
-            <div class="game-result" id="diceResult">Select a number, then roll!</div>
-            <div class="history-bar" id="diceHistory"></div>
-        </div>
-    </div>
+<script type="module">
+import * as THREE from 'three';
 
-    <!-- Speed Target Modal -->
-    <div class="modal-overlay" id="targetModal">
-        <div class="modal-box" id="targetModalBox">
-            <button class="close-modal" onclick="closeModal('targetModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-bullseye" style="color:#e67e22;"></i> SPEED TARGET · ultra-fast</div>
-            <div class="canvas-container" id="targetCanvasContainer">
-                <canvas id="targetCanvas" width="550" height="550"></canvas>
-                <div class="popup-result" id="targetPopup"><span id="targetPopupMsg">🎯</span><div class="sub" id="targetPopupSub"></div></div>
-            </div>
-            <div class="controls">
-                <label>Bet: <input type="number" id="targetBet" value="10" min="0.1" step="1"></label>
-                <button class="btn btn-primary" id="targetLaunchBtn"><i class="fas fa-play"></i> Launch</button>
-                <button class="btn btn-gold" id="targetResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-            </div>
-            <div class="game-result" id="targetResult">🎯 Launch puck – ultra fast & instant stop!</div>
-            <div class="history-bar" id="targetHistory"></div>
-        </div>
-    </div>
+let BALANCE = 5000;
+try { if (window.__state?.balance) BALANCE = window.__state.balance; } catch(_){}
 
-    <!-- Coin Flip Modal -->
-    <div class="modal-overlay" id="coinModal">
-        <div class="modal-box" id="coinModalBox">
-            <button class="close-modal" onclick="closeModal('coinModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-coins" style="color:#f1c40f;"></i> COIN FLIP · heads or tails</div>
-            <div class="coin-container">
-                <div class="coin" id="coinDisplay">🪙</div>
-                <div style="margin-top:8px; display:flex; gap:12px;">
-                    <button class="btn btn-primary btn-small" id="coinHeadsBtn">Heads</button>
-                    <button class="btn btn-ice btn-small" id="coinTailsBtn">Tails</button>
-                </div>
-                <div style="margin-top:8px; color:#b0d0ff;">Bet: <input type="number" id="coinBet" value="10" min="1" step="1" style="width:60px; background:rgba(0,0,0,0.4); border:1px solid #3a5a7a; border-radius:30px; padding:5px 10px; color:white; text-align:center;"></div>
-            </div>
-            <div class="controls">
-                <button class="btn btn-primary" id="coinFlipBtn"><i class="fas fa-rotate"></i> Flip</button>
-                <button class="btn btn-gold" id="coinResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-            </div>
-            <div class="game-result" id="coinResult">Choose Heads or Tails, then flip!</div>
-            <div class="history-bar" id="coinHistory"></div>
-        </div>
-    </div>
+const TIER_MAT = {
+  gray:   { color:0x9a9aa8, metalness:0.75, roughness:0.45, emissive:0x000000, eInt:0 },
+  silver: { color:0xd8d8ee, metalness:1.00, roughness:0.14, emissive:0x1a1a30, eInt:0.3 },
+  green:  { color:0x30c977, metalness:0.90, roughness:0.18, emissive:0x084a28, eInt:0.6 },
+  gold:   { color:0xffcc33, metalness:1.00, roughness:0.10, emissive:0x6a3a08, eInt:0.8 },
+};
+function tierFor(v){ return v>=1000?'gold':v>=500?'green':v>=100?'silver':'gray'; }
+function ballR(v){ return 7 + Math.log10(v+1)*1.9; }
 
-    <!-- Roulette Modal -->
-    <div class="modal-overlay" id="rouletteModal">
-        <div class="modal-box" id="rouletteModalBox">
-            <button class="close-modal" onclick="closeModal('rouletteModal')">&times;</button>
-            <div class="modal-title"><i class="fas fa-circle" style="color:#e74c3c;"></i> ROULETTE · pick a number (1-12)</div>
-            <div style="display:flex; justify-content:center; align-items:center; flex-direction:column;">
-                <div style="font-size:4rem; background:rgba(255,255,255,0.05); border-radius:30px; padding:20px; min-width:100px; text-align:center;" id="rouletteResultDisplay">🎡</div>
-                <div style="margin-top:8px; color:#b0d0ff;">Bet: <input type="number" id="rouletteBet" value="10" min="1" step="1" style="width:60px; background:rgba(0,0,0,0.4); border:1px solid #3a5a7a; border-radius:30px; padding:5px 10px; color:white; text-align:center;"></div>
-                <div class="roulette-grid" id="rouletteGrid">
-                    <button class="roulette-btn" data-num="1">1</button>
-                    <button class="roulette-btn" data-num="2">2</button>
-                    <button class="roulette-btn" data-num="3">3</button>
-                    <button class="roulette-btn" data-num="4">4</button>
-                    <button class="roulette-btn" data-num="5">5</button>
-                    <button class="roulette-btn" data-num="6">6</button>
-                    <button class="roulette-btn" data-num="7">7</button>
-                    <button class="roulette-btn" data-num="8">8</button>
-                    <button class="roulette-btn" data-num="9">9</button>
-                    <button class="roulette-btn" data-num="10">10</button>
-                    <button class="roulette-btn" data-num="11">11</button>
-                    <button class="roulette-btn" data-num="12">12</button>
-                </div>
-            </div>
-            <div class="controls">
-                <button class="btn btn-primary" id="rouletteSpinBtn"><i class="fas fa-circle"></i> Spin</button>
-                <button class="btn btn-gold" id="rouletteResetBtn"><i class="fas fa-rotate-right"></i> Reset</button>
-            </div>
-            <div class="game-result" id="rouletteResult">Select a number, then spin!</div>
-            <div class="history-bar" id="rouletteHistory"></div>
-        </div>
-    </div>
+/* ══════════ WORLD ══════════ */
+const BOARD = { wallTopY: 420, wallBotY: 20, wallTopHalf: 205, wallBotHalf: 108, wallThick: 11, wallZ: 0 };
+const PEG = { topY: 300, botY: 90, rows: 7, r: 8, z: 0 };
+const TRI = { tipY: -50, baseY: -100, halfW: 50, slideRange: 62, speed: 105, z: 0 };
+const FLOOR = { y: -140, halfW: 95 };
+const SPIN = { cx: 0, cy: 500, cz: 0, R: 118, tube: 10 };
 
-    <script>
-        // ========================== GLOBAL ==========================
-        let balance = 2450.0;
-        let totalWins = 0,
-            totalLosses = 0;
-        let soundEnabled = true;
-        const balanceDisplay = document.getElementById('balanceDisplay');
-        const totalWinsDisplay = document.getElementById('totalWinsDisplay');
-        const totalLossesDisplay = document.getElementById('totalLossesDisplay');
+// Rims closer to holes now
+const BOWL1 = {
+  cx: 0, cz: 0, cy: -255,
+  rimR: 92, wallH: 46, wallT: 14,
+  holes: [
+    { a:  Math.PI/2,           r: 46, mult: 3.0, red: true  },
+    { a:  Math.PI/2 + 2.094,   r: 46, mult: 1.5, red: false },
+    { a:  Math.PI/2 - 2.094,   r: 46, mult: 1.5, red: false },
+  ],
+  holeR: 22,
+};
+const BOWL2 = {
+  cx: 0, cz: 0, cy: -375,
+  rimR: 72, wallH: 40, wallT: 12,
+  holes: [
+    { a:  Math.PI/2, r: 36, mult: 6.0, red: true  },
+    { a: -Math.PI/2, r: 36, mult: 3.0, red: false },
+  ],
+  holeR: 18,
+};
 
-        let audioCtx = null;
+/* ══════════ SCENE ══════════ */
+const W0 = window.innerWidth, H0 = window.innerHeight;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, W0/H0, 1, 6000);
 
-        function playSound(type) {
-            if (!soundEnabled) return;
-            try {
-                if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                if (type === 'win') {
-                    osc.frequency.value = 880;
-                    gain.gain.value = 0.15;
-                    osc.start();
-                    setTimeout(() => { osc.stop(); }, 150);
-                } else if (type === 'lose') {
-                    osc.frequency.value = 320;
-                    gain.gain.value = 0.12;
-                    osc.start();
-                    setTimeout(() => { osc.stop(); }, 200);
-                } else if (type === 'click') {
-                    osc.frequency.value = 600;
-                    gain.gain.value = 0.08;
-                    osc.start();
-                    setTimeout(() => { osc.stop(); }, 80);
-                }
-            } catch (e) { /* silent fail */ }
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+renderer.setSize(W0, H0);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const canvasHost = document.getElementById('dl-canvas');
+canvasHost.parentNode.replaceChild(renderer.domElement, canvasHost);
+renderer.domElement.id = 'dl-canvas';
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.42));
+const key = new THREE.DirectionalLight(0xffffff, 2.2);
+key.position.set(220, 800, 700);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+key.shadow.camera.left = -520; key.shadow.camera.right = 520;
+key.shadow.camera.top = 800; key.shadow.camera.bottom = -700;
+key.shadow.camera.near = 10; key.shadow.camera.far = 2500;
+key.shadow.bias = -0.0011; key.shadow.radius = 3;
+scene.add(key);
+const pd = new THREE.DirectionalLight(0x8a5cff, 1.2);
+pd.position.set(-420, 250, 350);
+scene.add(pd);
+const rim = new THREE.PointLight(0x6a2aff, 1.8, 1600);
+rim.position.set(0, -320, 350); scene.add(rim);
+const topGlow = new THREE.PointLight(0xb080ff, 0.9, 900);
+topGlow.position.set(0, 500, 350); scene.add(topGlow);
+
+const backdrop = new THREE.Mesh(
+  new THREE.PlaneGeometry(750, 1200),
+  new THREE.MeshStandardMaterial({ color:0x0d0c1c, metalness:0.4, roughness:0.85 })
+);
+backdrop.position.set(0, -60, -150);
+backdrop.receiveShadow = true;
+scene.add(backdrop);
+
+/* ══════════ FUNNEL ══════════ */
+const wallMat = new THREE.MeshStandardMaterial({
+  color: 0x4a4a72, metalness: 0.88, roughness: 0.22,
+  emissive: 0x1a1a44, emissiveIntensity: 0.55,
+});
+function buildFunnelWall(sign){
+  const x1 = sign * BOARD.wallTopHalf, y1 = BOARD.wallTopY;
+  const x2 = sign * BOARD.wallBotHalf, y2 = BOARD.wallBotY;
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy);
+  const angle = Math.atan2(dy, dx);
+  const geo = new THREE.BoxGeometry(len, BOARD.wallThick, 30);
+  const m = new THREE.Mesh(geo, wallMat);
+  m.position.set((x1+x2)/2, (y1+y2)/2, BOARD.wallZ);
+  m.rotation.z = angle;
+  m.castShadow = true; m.receiveShadow = true;
+  scene.add(m);
+  return { x1, y1, x2, y2, thick: BOARD.wallThick/2 };
+}
+const WALLS = [ buildFunnelWall(-1), buildFunnelWall(1) ];
+
+/* ══════════ PEGS ══════════ */
+const pegMatBase = new THREE.MeshStandardMaterial({
+  color: 0xc8d0ee, metalness: 1.0, roughness: 0.14,
+  emissive: 0x201a40, emissiveIntensity: 0.25,
+});
+const P = [];
+(function buildPegs(){
+  const rows = PEG.rows;
+  for (let r=0; r<rows; r++){
+    const t = r/(rows-1);
+    const y = PEG.topY + (PEG.botY - PEG.topY)*t;
+    const count = 6 + (r%2);
+    const span = 340;
+    const step = span/(count+1);
+    const startX = -span/2 + step;
+    for (let i=0; i<count; i++){
+      const x = startX + i*step;
+      const m = new THREE.Mesh(new THREE.SphereGeometry(PEG.r, 18, 12), pegMatBase.clone());
+      m.position.set(x, y, PEG.z);
+      m.castShadow = true;
+      m.userData.hit = 0;
+      scene.add(m);
+      P.push({ mesh:m, x, y, r:PEG.r });
+    }
+  }
+})();
+
+/* ══════════ TRIANGLE ══════════ */
+const triShape = new THREE.Shape();
+triShape.moveTo(0, (TRI.tipY - TRI.baseY)/2);
+triShape.lineTo(-TRI.halfW, (TRI.baseY - TRI.tipY)/2);
+triShape.lineTo(TRI.halfW, (TRI.baseY - TRI.tipY)/2);
+triShape.closePath();
+const triGeo = new THREE.ExtrudeGeometry(triShape, {
+  depth: 24, bevelEnabled: true, bevelThickness: 1.5, bevelSize: 1.5, bevelSegments: 2,
+});
+triGeo.translate(0, 0, -12);
+const triMat = new THREE.MeshStandardMaterial({
+  color: 0xf0c040, metalness: 0.92, roughness: 0.20,
+  emissive: 0x6a3010, emissiveIntensity: 0.55,
+});
+const triMesh = new THREE.Mesh(triGeo, triMat);
+triMesh.position.set(0, (TRI.tipY + TRI.baseY)/2, TRI.z);
+triMesh.castShadow = true; triMesh.receiveShadow = true;
+scene.add(triMesh);
+
+/* ══════════ SPINNER ══════════ */
+const spinMat = new THREE.MeshStandardMaterial({
+  color: 0x8a5cff, metalness: 0.94, roughness: 0.14,
+  emissive: 0x4a20a0, emissiveIntensity: 1.0,
+});
+const spinMesh = new THREE.Mesh(new THREE.TorusGeometry(SPIN.R, SPIN.tube, 16, 96), spinMat);
+spinMesh.position.set(SPIN.cx, SPIN.cy, SPIN.cz);
+spinMesh.castShadow = true; spinMesh.receiveShadow = true;
+scene.add(spinMesh);
+
+const spinRailMat = new THREE.MeshStandardMaterial({
+  color: 0xb080ff, emissive: 0x6028d0, emissiveIntensity: 1.2,
+  metalness: 0.6, roughness: 0.32,
+});
+const spinRail = new THREE.Mesh(new THREE.TorusGeometry(SPIN.R + 12, 1.4, 8, 96), spinRailMat);
+spinRail.position.copy(spinMesh.position);
+scene.add(spinRail);
+
+const spinInner = new THREE.Mesh(
+  new THREE.CircleGeometry(SPIN.R - SPIN.tube - 2, 48),
+  new THREE.MeshBasicMaterial({ color: 0x1a1030, transparent: true, opacity: 0.32, side: THREE.DoubleSide })
+);
+spinInner.position.set(SPIN.cx, SPIN.cy, SPIN.cz - 4);
+scene.add(spinInner);
+
+function setSpinnerGap(gapAngle){
+  const arc = Math.PI * 2 - gapAngle;
+  if (arc < 0.15){ spinMesh.visible = false; spinRail.visible = false; return; }
+  spinMesh.visible = true; spinRail.visible = true;
+  spinMesh.geometry.dispose();
+  spinMesh.geometry = new THREE.TorusGeometry(SPIN.R, SPIN.tube, 16, 96, arc);
+  spinMesh.rotation.z = -Math.PI/2 + gapAngle/2;
+  spinRail.geometry.dispose();
+  spinRail.geometry = new THREE.TorusGeometry(SPIN.R + 12, 1.4, 8, 96, arc);
+  spinRail.rotation.z = -Math.PI/2 + gapAngle/2;
+}
+setSpinnerGap(0);
+
+/* ══════════ BOWL BUILDER ══════════ */
+function buildBowl(cfg, accent){
+  const group = new THREE.Group();
+  group.position.set(cfg.cx, cfg.cy, cfg.cz);
+
+  const rimMat = new THREE.MeshStandardMaterial({
+    color: accent, metalness: 0.92, roughness: 0.16,
+    emissive: 0x3a1a80, emissiveIntensity: 0.65,
+    side: THREE.DoubleSide,
+  });
+  const rimGeo = new THREE.CylinderGeometry(
+    cfg.rimR + cfg.wallT/2, cfg.rimR + cfg.wallT/2, cfg.wallH, 56, 1, true
+  );
+  const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+  rimMesh.position.y = cfg.wallH / 2;
+  rimMesh.castShadow = true; rimMesh.receiveShadow = true;
+  group.add(rimMesh);
+
+  const floorShape = new THREE.Shape();
+  floorShape.absarc(0, 0, cfg.rimR, 0, Math.PI * 2, false);
+  for (const h of cfg.holes){
+    const hp = new THREE.Path();
+    hp.absarc(Math.cos(h.a) * h.r, Math.sin(h.a) * h.r, cfg.holeR, 0, Math.PI * 2, true);
+    floorShape.holes.push(hp);
+  }
+  const floorGeo = new THREE.ExtrudeGeometry(floorShape, {
+    depth: 5, bevelEnabled: false, curveSegments: 48,
+  });
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: 0x1a0f38, metalness: 0.55, roughness: 0.72,
+    emissive: 0x2a1060, emissiveIntensity: 0.35,
+    side: THREE.DoubleSide,
+  });
+  const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+  floorMesh.rotation.x = -Math.PI / 2;
+  floorMesh.position.y = -2.5;
+  floorMesh.receiveShadow = true;
+  group.add(floorMesh);
+
+  cfg.holes.forEach(h => {
+    const hx = Math.cos(h.a) * h.r;
+    const hz = Math.sin(h.a) * h.r;
+    const badgeMat = new THREE.MeshStandardMaterial({
+      color: h.red ? 0xff3355 : 0xa070ff,
+      emissive: h.red ? 0xff1030 : 0x5020c0,
+      emissiveIntensity: 1.4, metalness: 0.75, roughness: 0.28,
+    });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(cfg.holeR, 2.4, 8, 28), badgeMat);
+    ring.rotation.x = -Math.PI/2;
+    ring.position.set(hx, 0.5, hz);
+    ring.castShadow = true;
+    group.add(ring);
+    const holeDisc = new THREE.Mesh(
+      new THREE.CircleGeometry(cfg.holeR - 0.5, 24),
+      new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide })
+    );
+    holeDisc.rotation.x = -Math.PI/2;
+    holeDisc.position.set(hx, -6, hz);
+    group.add(holeDisc);
+  });
+
+  scene.add(group);
+  return { ...cfg, group };
+}
+const B1 = buildBowl(BOWL1, 0x6a4aff);
+const B2 = buildBowl(BOWL2, 0x7a2aff);
+
+/* ══════════ BALLS ══════════ */
+const ballGeoCache = new Map();
+function getBallGeo(r){
+  const k = r.toFixed(2);
+  if (ballGeoCache.has(k)) return ballGeoCache.get(k);
+  const g = new THREE.SphereGeometry(r, 20, 14);
+  ballGeoCache.set(k, g);
+  return g;
+}
+function makeBallMesh(value, tier){
+  const cfg = TIER_MAT[tier] || TIER_MAT.gray;
+  const mat = new THREE.MeshStandardMaterial({
+    color: cfg.color, metalness: cfg.metalness, roughness: cfg.roughness,
+    emissive: cfg.emissive, emissiveIntensity: cfg.eInt,
+  });
+  const m = new THREE.Mesh(getBallGeo(ballR(value)), mat);
+  m.castShadow = true;
+  return m;
+}
+
+/* ══════════ STATE ══════════ */
+const G = {
+  phase: 'idle',
+  held: [], active: [],
+  triX: 0, triDir: 1,
+  launchT: 0, launchOpen: 0, releaseTimer: 0,
+  results: [],
+  shake: 0, time: 0,
+};
+
+/* ══════════ HUD ══════════ */
+const elBal = document.getElementById('dl-bal');
+const elHold = document.getElementById('dl-hold');
+const elLaunch = document.getElementById('dl-launch');
+const elBuy = document.getElementById('dl-buy');
+const elBuyModal = document.getElementById('dl-buy-modal');
+const elRoulette = document.getElementById('dl-roulette');
+const elResult = document.getElementById('dl-result');
+const elResTag = document.getElementById('dl-res-tag');
+const elResAmt = document.getElementById('dl-res-amt');
+const elResSub = document.getElementById('dl-res-sub');
+
+function updateHud(){
+  elBal.textContent = Math.floor(BALANCE);
+  const tot = G.held.reduce((s,b)=>s+b.value,0);
+  elHold.textContent = `${G.held.length} · ${tot}💎`;
+  elLaunch.disabled = !(G.phase==='holding' && G.held.length>0);
+}
+function haptic(){ try{ navigator.vibrate?.(10); }catch(_){} }
+function randomValue(){
+  const r = Math.random();
+  if (r < 0.45) return 1 + Math.floor(Math.random()*9);
+  if (r < 0.72) return 10 + Math.floor(Math.random()*40);
+  if (r < 0.88) return 50 + Math.floor(Math.random()*150);
+  if (r < 0.97) return 200 + Math.floor(Math.random()*300);
+  return 500 + Math.floor(Math.random()*501);
+}
+
+/* ══════════ COLLISION ══════════ */
+function closestOnSeg(px,py,ax,ay,bx,by){
+  const dx=bx-ax, dy=by-ay, ls=dx*dx+dy*dy;
+  if (ls<1e-6) return {x:ax, y:ay};
+  let t = ((px-ax)*dx + (py-ay)*dy)/ls;
+  t = Math.max(0, Math.min(1, t));
+  return { x:ax+t*dx, y:ay+t*dy };
+}
+function collideSeg(b, ax,ay, bx,by, thick, rest){
+  const c = closestOnSeg(b.x, b.y, ax,ay, bx,by);
+  const dx = b.x - c.x, dy = b.y - c.y;
+  const d2 = dx*dx + dy*dy;
+  const minD = b.r + thick;
+  if (d2 >= minD*minD || d2 < 1e-6) return false;
+  const d = Math.sqrt(d2);
+  const nx = dx/d, ny = dy/d;
+  b.x += nx*(minD - d); b.y += ny*(minD - d);
+  const vn = b.vx*nx + b.vy*ny;
+  if (vn < 0){
+    b.vx -= (1+rest)*vn*nx;
+    b.vy -= (1+rest)*vn*ny;
+    b.squash = Math.min(1, Math.abs(vn)/620);
+    return true;
+  }
+  return true;
+}
+function collideCircle(b, cx, cy, cr, rest){
+  const dx = b.x - cx, dy = b.y - cy;
+  const minD = b.r + cr;
+  const d2 = dx*dx + dy*dy;
+  if (d2 >= minD*minD || d2 < 1e-6) return false;
+  const d = Math.sqrt(d2);
+  const nx = dx/d, ny = dy/d;
+  b.x = cx + nx*minD; b.y = cy + ny*minD;
+  const vn = b.vx*nx + b.vy*ny;
+  if (vn < 0){
+    b.vx -= (1+rest)*vn*nx;
+    b.vy -= (1+rest)*vn*ny;
+    b.vx += (Math.random()-.5)*20;
+    b.squash = Math.min(1, Math.abs(vn)/620);
+    return true;
+  }
+  return false;
+}
+
+/* ── Point-in-triangle + full solid triangle resolution ── */
+function pointInTri(px, py, ax, ay, bx, by, cx, cy){
+  const d1 = (px-bx)*(ay-by) - (ax-bx)*(py-by);
+  const d2 = (px-cx)*(by-cy) - (bx-cx)*(py-cy);
+  const d3 = (px-ax)*(cy-ay) - (cx-ax)*(py-ay);
+  const hasNeg = d1 < 0 || d2 < 0 || d3 < 0;
+  const hasPos = d1 > 0 || d2 > 0 || d3 > 0;
+  return !(hasNeg && hasPos);
+}
+
+function resolveTriangle(b){
+  const tipX = G.triX, tipY = TRI.tipY;
+  const blx = G.triX - TRI.halfW, bly = TRI.baseY;
+  const brx = G.triX + TRI.halfW, bry = TRI.baseY;
+
+  // Fast reject — outside bounding box + margin
+  const minX = Math.min(tipX, blx, brx) - b.r - 4;
+  const maxX = Math.max(tipX, blx, brx) + b.r + 4;
+  const minY = Math.min(tipY, bly, bry) - b.r - 4;
+  const maxY = Math.max(tipY, bly, bry) + b.r + 4;
+  if (b.x < minX || b.x > maxX || b.y < minY || b.y > maxY) return false;
+
+  // Case 1: ball center is INSIDE the triangle → push out nearest edge
+  if (pointInTri(b.x, b.y, tipX, tipY, blx, bly, brx, bry)){
+    const edges = [
+      { ax: tipX, ay: tipY, bx: blx, by: bly },
+      { ax: tipX, ay: tipY, bx: brx, by: bry },
+      { ax: blx,  ay: bly,  bx: brx, by: bry },
+    ];
+    let best = null, bestD = Infinity, bestC = null;
+    for (const e of edges){
+      const c = closestOnSeg(b.x, b.y, e.ax, e.ay, e.bx, e.by);
+      const d = Math.hypot(b.x - c.x, b.y - c.y);
+      if (d < bestD){ bestD = d; best = e; bestC = c; }
+    }
+    const dx = b.x - bestC.x, dy = b.y - bestC.y;
+    const dd = Math.hypot(dx, dy) || 1;
+    const nx = dx/dd, ny = dy/dd;
+    b.x = bestC.x + nx * (b.r + 2);
+    b.y = bestC.y + ny * (b.r + 2);
+    const vn = b.vx*nx + b.vy*ny;
+    if (vn < 0){
+      b.vx -= (1 + REST_TRI) * vn * nx;
+      b.vy -= (1 + REST_TRI) * vn * ny;
+    } else {
+      b.vx += nx * 100;
+      b.vy += ny * 100;
+    }
+    // Add sideways push off the slopes
+    const sdx = b.x - tipX;
+    b.vx += Math.sign(sdx || 1) * 40;
+    b.squash = 0.9;
+    return true;
+  }
+
+  // Case 2: ball overlaps an edge → standard segment collision
+  let hit = false;
+  if (collideSeg(b, tipX, tipY, blx, bly, 2, REST_TRI)) hit = true;
+  if (collideSeg(b, tipX, tipY, brx, bry, 2, REST_TRI)) hit = true;
+  if (hit){
+    const dx = b.x - tipX;
+    if (Math.abs(dx) < 3) b.vx += (Math.random()<0.5?-1:1)*180;
+    else                  b.vx += Math.sign(dx) * 70;
+    b.squash = Math.max(b.squash, 0.8);
+  }
+  return hit;
+}
+
+/* ══════════ PHYSICS ══════════ */
+const GRAV = 520;
+const AIR  = 0.9992;
+const REST_WALL = 0.42;
+const REST_PEG  = 0.52;
+const REST_TRI  = 0.58;
+
+/* ══════════ BALL ══════════ */
+function spawnBall(value, tier, spawnDelay){
+  const inner = SPIN.R - SPIN.tube - 14;
+  const a = Math.random() * Math.PI * 2;
+  const rad = 24 + Math.random() * (inner - 34);
+  const b = {
+    value, tier, r: ballR(value),
+    x: SPIN.cx + Math.cos(a) * rad,
+    y: SPIN.cy + Math.sin(a) * rad * 0.85,
+    z: SPIN.cz,
+    vx: (Math.random()-0.5) * 90,
+    vy: (Math.random()-0.5) * 90,
+    state: 'held',
+    popT: -(spawnDelay || 0),
+    scale: 0,
+    theta:0, rad:0, omega:0, bowlNum:0, orbitT:0,
+    stall:0, squash:0, spin:0,
+    mesh: makeBallMesh(value, tier),
+    dead: false,
+    dropTargetY: 0,
+    holeTarget: null, holeT: 0,
+    hoverT: 0, hoverDuration: 0.55,
+    hoverStartTheta: 0, hoverEndTheta: 0,
+    holeStartY: 0, holeStartScale: 1,
+  };
+  b.mesh.scale.setScalar(0.001);
+  scene.add(b.mesh);
+  return b;
+}
+function removeBall(b){
+  scene.remove(b.mesh);
+  if (b.mesh.material) b.mesh.material.dispose();
+}
+function easeOutBack(t){
+  const c1 = 1.70158, c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
+/* ══════════ HELD ══════════ */
+function updateHeld(dt){
+  const innerR = SPIN.R - SPIN.tube - 4;
+  for (let i = G.held.length - 1; i >= 0; i--){
+    const b = G.held[i];
+    if (b.popT < 0){ b.popT += dt; continue; }
+    if (b.popT < 0.55){
+      b.popT += dt;
+      const t = Math.min(b.popT / 0.55, 1);
+      b.scale = Math.max(0.001, easeOutBack(t));
+    } else b.scale = 1;
+
+    b.vy -= 90 * dt;
+    b.vx *= Math.pow(0.35, dt);
+    b.vy *= Math.pow(0.35, dt);
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+    b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.003;
+
+    const dx = b.x - SPIN.cx, dy = b.y - SPIN.cy;
+    const dist = Math.hypot(dx, dy);
+    const maxDist = innerR - b.r;
+    if (dist > maxDist && dist > 0.001){
+      const nx = dx / dist, ny = dy / dist;
+      b.x = SPIN.cx + nx * maxDist;
+      b.y = SPIN.cy + ny * maxDist;
+      const vn = b.vx * nx + b.vy * ny;
+      if (vn > 0){
+        b.vx -= 2 * vn * nx * 0.82;
+        b.vy -= 2 * vn * ny * 0.82;
+        if (Math.random() < 0.35){
+          b.vx += (Math.random()-0.5) * 55;
+          b.vy += (Math.random()-0.5) * 55;
         }
+      }
+    }
+    for (let j = 0; j < G.held.length; j++){
+      if (j === i) continue;
+      const ob = G.held[j];
+      if (ob.popT < 0) continue;
+      const ddx = b.x - ob.x, ddy = b.y - ob.y;
+      const dd = Math.hypot(ddx, ddy);
+      const minD = b.r + ob.r;
+      if (dd < minD && dd > 0.001){
+        const nx = ddx / dd, ny = ddy / dd;
+        const push = (minD - dd) * 0.5;
+        b.x += nx * push; b.y += ny * push;
+      }
+    }
+  }
+}
 
-        function updateBalanceUI() {
-            balanceDisplay.textContent = balance.toFixed(1);
-            totalWinsDisplay.textContent = totalWins;
-            totalLossesDisplay.textContent = totalLosses;
+/* ══════════ FALLING — with physics substepping ══════════ */
+function stepFalling(b, dt){
+  // Adaptive substeps based on velocity to prevent tunneling
+  const speed = Math.hypot(b.vx, b.vy);
+  const SUBSTEPS = Math.min(8, Math.max(3, Math.ceil(speed / 90)));
+  const subDt = dt / SUBSTEPS;
+
+  for (let s = 0; s < SUBSTEPS; s++){
+    b.vy -= GRAV * subDt;
+    b.vx *= AIR;
+    b.vy *= AIR;
+    b.x += b.vx * subDt;
+    b.y += b.vy * subDt;
+
+    for (const w of WALLS)
+      collideSeg(b, w.x1, w.y1, w.x2, w.y2, w.thick, REST_WALL);
+
+    for (const p of P){
+      if (Math.abs(p.x - b.x) > 40) continue;
+      if (Math.abs(p.y - b.y) > 40) continue;
+      if (collideCircle(b, p.x, p.y, p.r, REST_PEG)){
+        p.mesh.userData.hit = Math.min(1, p.mesh.userData.hit + 0.7);
+      }
+    }
+
+    resolveTriangle(b);
+  }
+
+  b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.0035;
+
+  if (b.y < FLOOR.y){
+    if (Math.abs(b.x) < FLOOR.halfW){
+      startBowlDrop(b, Math.random() < 0.30 ? 2 : 1);
+      return;
+    } else {
+      if (b.x < 0) b.vx -= 280; else b.vx += 280;
+      if (b.x < -80 || b.x > 80 || b.y < FLOOR.y - 260){
+        b.state = 'lost'; b.dead = true;
+        G.results.push({ value:b.value, mult:0 });
+      }
+    }
+  }
+
+  const spd = Math.hypot(b.vx, b.vy);
+  if (spd < 40) b.stall += dt; else b.stall = 0;
+  if (b.stall > 2.0){
+    b.vx += (Math.random()-.5)*140;
+    b.vy += 60;
+    b.stall = 0;
+  }
+}
+
+/* ══════════ DROP INTO BOWL ══════════ */
+function startBowlDrop(b, bowlNum){
+  const cfg = bowlNum === 1 ? BOWL1 : BOWL2;
+  b.state = 'drop' + bowlNum;
+  b.bowlNum = bowlNum;
+  b.dropTargetY = cfg.cy + b.r + 3;
+
+  // Force landing near the RIM so ball has to roll in — never on top of a hole
+  const minR = cfg.holes[0].r + cfg.holeR + 8;
+  const maxR = cfg.rimR - b.r - 6;
+  const offA = Math.random() * Math.PI * 2;
+  let offR;
+  if (minR >= maxR){
+    offR = (minR + maxR) * 0.5;
+  } else {
+    offR = minR + Math.random() * (maxR - minR);
+  }
+  b.x = cfg.cx + Math.cos(offA) * offR;
+  b.z = cfg.cz + Math.sin(offA) * offR;
+  b.y = cfg.cy + 240;
+  b.vx = 0; b.vy = -60;
+  b.spin = 0;
+}
+
+function updateDrop(b, dt){
+  b.vy -= GRAV * 0.9 * dt;
+  b.y += b.vy * dt;
+  b.x += b.vx * dt;
+
+  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
+  const dx = b.x - cfg.cx, dz = b.z - cfg.cz;
+  const r = Math.hypot(dx, dz);
+  const maxR = cfg.rimR - b.r - 6;
+  if (r > maxR){
+    b.x = cfg.cx + (dx/r) * maxR;
+    b.z = cfg.cz + (dz/r) * maxR;
+  }
+
+  if (b.y <= b.dropTargetY){
+    b.y = b.dropTargetY;
+    b.squash = 1.0;
+    const dx2 = b.x - cfg.cx, dz2 = b.z - cfg.cz;
+    b.theta = Math.atan2(dz2, dx2);
+    b.rad = Math.max(Math.hypot(dx2, dz2), cfg.holes[0].r + cfg.holeR + 4);
+    // Higher starting omega → multiple orbits before capture
+    b.omega = (Math.random() > 0.5 ? 1 : -1) * (2.9 + Math.random() * 0.7);
+    b.orbitT = 0;
+    b.state = 'bowl' + b.bowlNum;
+  }
+}
+
+/* ══════════ BOWL ROLLING ══════════ */
+function updateOrbit(b, dt){
+  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
+  b.orbitT += dt;
+
+  b.theta += b.omega * dt;
+  // Slow decay: 0.85^dt — ball orbits for multiple revolutions
+  b.omega *= Math.pow(0.85, dt);
+
+  // Gentle spiral inward; stronger only when slow
+  const spd = Math.abs(b.omega);
+  const inwardFactor = spd < 1.2 ? (1.2 - spd) * 28 : 0;
+  b.rad -= (3 + inwardFactor) * dt;
+
+  const holeRing = cfg.holes[0].r;
+  if (b.rad < holeRing) b.rad = holeRing;
+  if (b.rad > cfg.rimR - b.r - 4) b.rad = cfg.rimR - b.r - 4;
+
+  b.x = cfg.cx + Math.cos(b.theta) * b.rad;
+  b.z = cfg.cz + Math.sin(b.theta) * b.rad;
+  b.y = cfg.cy + b.r + 3;
+  b.spin += Math.abs(b.omega) * dt * 6;
+
+  // Must orbit for a minimum time so player sees rolling
+  if (b.orbitT < 1.6) return;
+
+  // Capture only when slow AND near a hole
+  for (const h of cfg.holes){
+    const hx = cfg.cx + Math.cos(h.a) * h.r;
+    const hz = cfg.cz + Math.sin(h.a) * h.r;
+    const dd = Math.hypot(b.x - hx, b.z - hz);
+    if (dd < cfg.holeR * 0.75 && spd < 2.1){
+      startHover(b, cfg, h);
+      return;
+    }
+  }
+
+  // Fallback — force settle if orbiting too long
+  if (b.orbitT > 7.0){
+    let best = cfg.holes[0], bd = Infinity;
+    for (const h of cfg.holes){
+      let da = b.theta - h.a;
+      da = Math.atan2(Math.sin(da), Math.cos(da));
+      if (Math.abs(da) < bd){ bd = Math.abs(da); best = h; }
+    }
+    b.theta = best.a;
+    b.rad = best.r;
+    startHover(b, cfg, best);
+  }
+}
+
+/* ══════════ HOVER + SLOW FALL (dramatic) ══════════ */
+function startHover(b, cfg, hole){
+  b.state = 'hover';
+  b.holeTarget = hole;
+  b.hoverT = 0;
+  b.holeStartY = cfg.cy + b.r + 3;
+  b.hoverStartTheta = b.theta;
+  b.hoverEndTheta = hole.a;
+  while (b.hoverEndTheta - b.hoverStartTheta >  Math.PI) b.hoverEndTheta -= Math.PI * 2;
+  while (b.hoverEndTheta - b.hoverStartTheta < -Math.PI) b.hoverEndTheta += Math.PI * 2;
+  G.results.push({ value: b.value, mult: hole.mult });
+  b.resultMult = hole.mult;
+  G.shake = Math.min(1, G.shake + (hole.red ? 0.5 : 0.25));
+}
+
+function updateHover(b, dt){
+  b.hoverT += dt;
+  const t = Math.min(b.hoverT / b.hoverDuration, 1);
+  const ease = t * t * (3 - 2 * t);
+  b.theta = b.hoverStartTheta + (b.hoverEndTheta - b.hoverStartTheta) * ease;
+  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
+  const h = b.holeTarget;
+  b.x = cfg.cx + Math.cos(b.theta) * h.r;
+  b.z = cfg.cz + Math.sin(b.theta) * h.r;
+  // Anticipation lift + wobble
+  b.y = b.holeStartY + Math.sin(t * Math.PI) * 6;
+  b.x += Math.sin(b.hoverT * 28) * 1.4;
+  b.spin += dt * 5;
+  if (t >= 1){
+    b.state = 'hole';
+    b.holeT = 0;
+    b.holeStartY = cfg.cy + b.r + 3;
+    b.holeStartScale = 1;
+  }
+}
+
+function updateHoleDrop(b, dt){
+  b.holeT += dt;
+  const DUR = 1.15;
+  const t = Math.min(b.holeT / DUR, 1);
+  // Progressive acceleration curve
+  const fall = t * t * (1.4 - t * 0.4);
+  b.y = b.holeStartY - fall * 220;
+  b.spin += dt * 9;
+  b.scale = 1 - fall * 0.62;
+  // Small wobble while falling
+  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
+  const h = b.holeTarget;
+  b.x = cfg.cx + Math.cos(h.a) * h.r + Math.sin(b.holeT * 22) * 1.8;
+  b.z = cfg.cz + Math.sin(h.a) * h.r + Math.cos(b.holeT * 22) * 1.8;
+  if (t >= 1){
+    b.state = 'settled';
+    b.y = -9999;
+  }
+}
+
+/* ══════════ UPDATE ══════════ */
+function update(dt){
+  G.time += dt;
+  G.shake *= Math.pow(0.001, dt);
+
+  if (G.phase === 'playing' || G.phase === 'ended'){
+    G.triX += G.triDir * TRI.speed * dt;
+    if (G.triX >  TRI.slideRange){ G.triX =  TRI.slideRange; G.triDir = -1; }
+    if (G.triX < -TRI.slideRange){ G.triX = -TRI.slideRange; G.triDir =  1; }
+    triMesh.position.x = G.triX;
+  }
+
+  updateHeld(dt);
+
+  if (G.phase === 'launching'){
+    G.launchT += dt;
+    G.launchOpen = Math.min(1, G.launchT / 0.85);
+    const gapAngle = G.launchOpen * Math.PI * 0.95;
+    setSpinnerGap(gapAngle);
+
+    if (G.launchT > 0.3){
+      G.releaseTimer -= dt;
+      if (G.releaseTimer <= 0 && G.held.length > 0){
+        let idx = 0, minY = Infinity;
+        for (let i=0; i<G.held.length; i++){
+          if (G.held[i].y < minY){ minY = G.held[i].y; idx = i; }
         }
-
-        function addHistory(containerId, result) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            const dot = document.createElement('span');
-            dot.className = 'history-dot ' + (result === 'win' ? 'win' : 'lose');
-            dot.textContent = result === 'win' ? '✓' : '✗';
-            container.appendChild(dot);
-            if (container.children.length > 12) container.removeChild(container.firstChild);
-        }
-
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.remove('active');
-            const box = modal.querySelector('.modal-box');
-            if (box) box.classList.remove('zoom');
-            const popups = modal.querySelectorAll('.popup-result');
-            popups.forEach(p => p.classList.remove('show', 'win', 'lose'));
-        }
-        document.querySelectorAll('.modal-overlay').forEach(el => {
-            el.addEventListener('click', (e) => { if (e.target === el) closeModal(el.id); });
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.active').forEach(el => closeModal(el.id));
-            }
-        });
-
-        function triggerPopup(gameId, message, type) {
-            const modalBox = document.getElementById(gameId + 'ModalBox');
-            const popup = document.getElementById(gameId + 'Popup');
-            const msgSpan = document.getElementById(gameId + 'PopupMsg');
-            const subSpan = document.getElementById(gameId + 'PopupSub');
-            if (!modalBox || !popup) return;
-            modalBox.classList.add('zoom');
-            msgSpan.textContent = message;
-            subSpan.textContent = type === 'win' ? '✨ WINNER ✨' : '💔 LOSS';
-            popup.className = 'popup-result ' + type;
-            setTimeout(() => { popup.classList.add('show'); }, 50);
-            setTimeout(() => { popup.classList.remove('show'); }, 3000);
-            playSound(type);
-            if (type === 'win') totalWins++;
-            else totalLosses++;
-            updateBalanceUI();
-        }
-
-        // ========================== DRAW PUCK (Thick Ring + Cross) ==========================
-        function drawPuck(ctx, x, y) {
-            const radius = 16;
-            ctx.save();
-            // Outer ring with glow
-            ctx.shadowColor = 'rgba(100, 200, 255, 0.9)';
-            ctx.shadowBlur = 30;
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'rgba(200, 235, 255, 0.95)';
-            ctx.lineWidth = 7;
-            ctx.stroke();
-            // Inner subtle ring (makes it look "wide")
-            ctx.shadowBlur = 10;
-            ctx.beginPath();
-            ctx.arc(x, y, radius - 4, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            // Thin transparent cross
-            ctx.shadowBlur = 0;
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.lineWidth = 1.8;
-            ctx.beginPath();
-            ctx.moveTo(x - 9, y);
-            ctx.lineTo(x + 9, y);
-            ctx.moveTo(x, y - 9);
-            ctx.lineTo(x, y + 9);
-            ctx.stroke();
-
-            ctx.restore();
-        }
-
-        // ========================== PLINKO (with history, quick bets) ==========================
-        const pCanvas = document.getElementById('plinkoCanvas');
-        const pCtx = pCanvas.getContext('2d');
-        const pW = pCanvas.width,
-            pH = pCanvas.height;
-        let pBall = null,
-            pPegs = [],
-            pSlots = [],
-            pAnimId = null,
-            pDropping = false,
-            pTrail = [],
-            pParticles = [],
-            pTotalDrops = 0,
-            pTotalMult = 0;
-        let pDragActive = false,
-            pDragX = pW / 2;
-        let pStopped = false;
-        let pHistory = [];
-
-        function buildPlinko() {
-            pPegs = [];
-            const rows = 12,
-                cols = 10,
-                margin = 25;
-            const spacingX = (pW - 2 * margin) / (cols + 1);
-            const spacingY = (pH - 2 * margin - 50) / (rows + 1);
-            for (let r = 0; r < rows; r++) {
-                const offset = (r % 2 === 0) ? 0 : spacingX / 2;
-                const colsThisRow = (r % 2 === 0) ? cols : cols - 1;
-                for (let c = 0; c < colsThisRow; c++) {
-                    const x = margin + offset + (c + 1) * spacingX;
-                    const y = margin + (r + 1) * spacingY;
-                    pPegs.push({ x, y, r: 5 + Math.random() * 2 });
-                }
-            }
-            pSlots = [];
-            const slotCount = 10,
-                slotWidth = (pW - 2 * margin) / slotCount;
-            const multipliers = [0.5, 0.8, 1.2, 2, 3, 5, 3, 2, 1.2, 0.8];
-            for (let i = 0; i < slotCount; i++) {
-                const x = margin + i * slotWidth + slotWidth / 2;
-                const y = pH - 22;
-                pSlots.push({ x, y, w: slotWidth, mult: multipliers[i], label: multipliers[i] + 'x' });
-            }
-        }
-
-        function resetPlinko() {
-            if (pAnimId) { cancelAnimationFrame(pAnimId);
-                pAnimId = null; }
-            pBall = null;
-            pDropping = false;
-            pTrail = [];
-            pParticles = [];
-            pStopped = false;
-            pDragActive = false;
-            pDragX = pW / 2;
-            document.getElementById('plinkoResult').textContent = '⬇️ Drag ball left/right, then drop!';
-            document.getElementById('plinkoResult').style.color = '#c0e0ff';
-            document.getElementById('plinkoModalBox').classList.remove('zoom');
-            const popup = document.getElementById('plinkoPopup');
-            popup.classList.remove('show', 'win', 'lose');
-            drawPlinko();
-        }
-
-        function spawnParticles(x, y, color, count = 18) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * 2 * Math.PI;
-                const speed = 1 + Math.random() * 4;
-                pParticles.push({
-                    x,
-                    y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 1,
-                    life: 1,
-                    decay: 0.015 + Math.random() * 0.025,
-                    r: 2 + Math.random() * 4,
-                    color
-                });
-            }
-        }
-
-        function drawPlinko() {
-            pCtx.clearRect(0, 0, pW, pH);
-            const grad = pCtx.createRadialGradient(pW / 2, pH / 2, 50, pW / 2, pH / 2, pW * 0.7);
-            grad.addColorStop(0, 'rgba(20,60,140,0.08)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            pCtx.fillStyle = grad;
-            pCtx.fillRect(0, 0, pW, pH);
-
-            pPegs.forEach(peg => {
-                const grad2 = pCtx.createRadialGradient(peg.x - 2, peg.y - 2, 1, peg.x, peg.y, peg.r);
-                grad2.addColorStop(0, '#a0d0ff');
-                grad2.addColorStop(0.5, '#4a8aff');
-                grad2.addColorStop(1, '#1a3a6a');
-                pCtx.beginPath();
-                pCtx.arc(peg.x, peg.y, peg.r, 0, Math.PI * 2);
-                pCtx.fillStyle = grad2;
-                pCtx.shadowColor = '#4a8aff';
-                pCtx.shadowBlur = 8;
-                pCtx.fill();
-                pCtx.shadowBlur = 0;
-                pCtx.strokeStyle = 'rgba(255,255,255,0.15)';
-                pCtx.lineWidth = 0.5;
-                pCtx.stroke();
-            });
-
-            pSlots.forEach(slot => {
-                const grad3 = pCtx.createLinearGradient(0, slot.y - 12, 0, slot.y + 12);
-                grad3.addColorStop(0, 'rgba(20,80,160,0.3)');
-                grad3.addColorStop(0.5, 'rgba(40,120,220,0.5)');
-                grad3.addColorStop(1, 'rgba(20,80,160,0.3)');
-                pCtx.fillStyle = grad3;
-                const rx = slot.x - slot.w / 2,
-                    ry = slot.y - 12,
-                    rw = slot.w,
-                    rh = 24;
-                pCtx.beginPath();
-                pCtx.roundRect(rx, ry, rw, rh, 6);
-                pCtx.fill();
-                pCtx.strokeStyle = 'rgba(100,180,255,0.15)';
-                pCtx.lineWidth = 1;
-                pCtx.beginPath();
-                pCtx.roundRect(rx, ry, rw, rh, 6);
-                pCtx.stroke();
-                pCtx.fillStyle = '#7fc9ff';
-                pCtx.font = 'bold 12px Segoe UI';
-                pCtx.textAlign = 'center';
-                pCtx.textBaseline = 'middle';
-                pCtx.shadowColor = '#4a8aff';
-                pCtx.shadowBlur = 12;
-                pCtx.fillText(slot.label, slot.x, slot.y + 1);
-                pCtx.shadowBlur = 0;
-            });
-
-            pTrail.forEach((pos, i) => {
-                const alpha = (i / pTrail.length) * 0.6;
-                const size = 3 + (i / pTrail.length) * 4;
-                pCtx.beginPath();
-                pCtx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
-                pCtx.fillStyle = `rgba(255, 170, 51, ${alpha})`;
-                pCtx.fill();
-            });
-
-            pParticles.forEach(pt => {
-                pCtx.globalAlpha = pt.life;
-                pCtx.beginPath();
-                pCtx.arc(pt.x, pt.y, pt.r * pt.life, 0, Math.PI * 2);
-                pCtx.fillStyle = pt.color;
-                pCtx.shadowColor = pt.color;
-                pCtx.shadowBlur = 12;
-                pCtx.fill();
-                pCtx.shadowBlur = 0;
-                pCtx.globalAlpha = 1;
-            });
-
-            if (pDragActive && !pDropping && !pBall) {
-                const grad4 = pCtx.createRadialGradient(pDragX - 5, 30 - 5, 2, pDragX, 30, 12);
-                grad4.addColorStop(0, '#fffbe6');
-                grad4.addColorStop(0.3, '#ffcc44');
-                grad4.addColorStop(1, '#e68a00');
-                pCtx.beginPath();
-                pCtx.arc(pDragX, 30, 12, 0, Math.PI * 2);
-                pCtx.fillStyle = grad4;
-                pCtx.shadowColor = '#ffaa33';
-                pCtx.shadowBlur = 35;
-                pCtx.fill();
-                pCtx.shadowBlur = 0;
-                pCtx.beginPath();
-                pCtx.arc(pDragX - 3, 26, 4, 0, Math.PI * 2);
-                pCtx.fillStyle = 'rgba(255,255,255,0.4)';
-                pCtx.fill();
-            } else if (pBall) {
-                const grad4 = pCtx.createRadialGradient(pBall.x - 5, pBall.y - 5, 2, pBall.x, pBall.y, pBall.r);
-                grad4.addColorStop(0, '#fffbe6');
-                grad4.addColorStop(0.3, '#ffcc44');
-                grad4.addColorStop(1, '#e68a00');
-                pCtx.beginPath();
-                pCtx.arc(pBall.x, pBall.y, pBall.r, 0, Math.PI * 2);
-                pCtx.fillStyle = grad4;
-                pCtx.shadowColor = '#ffaa33';
-                pCtx.shadowBlur = 35;
-                pCtx.fill();
-                pCtx.shadowBlur = 0;
-                pCtx.beginPath();
-                pCtx.arc(pBall.x - 3, pBall.y - 4, 4, 0, Math.PI * 2);
-                pCtx.fillStyle = 'rgba(255,255,255,0.4)';
-                pCtx.fill();
-            } else if (!pDropping) {
-                pCtx.beginPath();
-                pCtx.arc(pW / 2, 30, 12, 0, Math.PI * 2);
-                pCtx.fillStyle = 'rgba(255,170,51,0.2)';
-                pCtx.shadowBlur = 0;
-                pCtx.fill();
-                pCtx.strokeStyle = 'rgba(255,170,51,0.3)';
-                pCtx.lineWidth = 1;
-                pCtx.stroke();
-            }
-        }
-
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
-                const r = typeof radii === 'number' ? radii : (radii || 0);
-                this.moveTo(x + r, y);
-                this.arcTo(x + w, y, x + w, y + h, r);
-                this.arcTo(x + w, y + h, x, y + h, r);
-                this.arcTo(x, y + h, x, y, r);
-                this.arcTo(x, y, x + w, y, r);
-                return this;
-            };
-        }
-
-        function dropPlinkoFrom(xPos) {
-            if (pDropping) return;
-            const bet = 20;
-            if (balance < bet) {
-                document.getElementById('plinkoResult').textContent = '❌ Need ' + bet + ' coins!';
-                document.getElementById('plinkoResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-            pDropping = true;
-            pDragActive = false;
-            const startX = Math.min(Math.max(xPos, 20), pW - 20);
-            pBall = { x: startX, y: 26, r: 10, vx: (Math.random() - 0.5) * 1.2, vy: 1.2, restitution: 0.5 };
-            pTrail = [];
-            pParticles = [];
-            pStopped = false;
-            document.getElementById('plinkoResult').textContent = '🎱 bouncing...';
-            document.getElementById('plinkoResult').style.color = '#ffd966';
-            if (pAnimId) cancelAnimationFrame(pAnimId);
-            let lastTime = 0,
-                bounceCount = 0;
-
-            function physicsLoop(time) {
-                if (!pBall) { pDropping = false; return; }
-                const dt = Math.min((time - lastTime) / 16, 2.5);
-                lastTime = time;
-                pBall.vy += 0.28 * dt;
-                pBall.vx *= 0.9995;
-                pBall.vy *= 0.9995;
-                pBall.x += pBall.vx * dt;
-                pBall.y += pBall.vy * dt;
-
-                pPegs.forEach(peg => {
-                    const dx = pBall.x - peg.x,
-                        dy = pBall.y - peg.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const minDist = pBall.r + peg.r;
-                    if (dist < minDist && dist > 0.001) {
-                        const nx = dx / dist,
-                            ny = dy / dist;
-                        const overlap = minDist - dist;
-                        pBall.x += nx * overlap * 0.8;
-                        pBall.y += ny * overlap * 0.8;
-                        const dot = pBall.vx * nx + pBall.vy * ny;
-                        if (dot < 0) {
-                            pBall.vx -= (1 + pBall.restitution) * dot * nx;
-                            pBall.vy -= (1 + pBall.restitution) * dot * ny;
-                            pBall.vx += (Math.random() - 0.5) * 0.3;
-                            pBall.vy += (Math.random() - 0.5) * 0.3;
-                            bounceCount++;
-                            if (bounceCount % 2 === 0) {
-                                spawnParticles(peg.x, peg.y, '#4a8aff', 4);
-                            }
-                        }
-                    }
-                });
-
-                if (pBall.x - pBall.r < 0) { pBall.x = pBall.r;
-                    pBall.vx *= -0.6; }
-                if (pBall.x + pBall.r > pW) { pBall.x = pW - pBall.r;
-                    pBall.vx *= -0.6; }
-                if (pBall.y - pBall.r < 0) { pBall.y = pBall.r;
-                    pBall.vy *= -0.6; }
-
-                pTrail.push({ x: pBall.x, y: pBall.y });
-                if (pTrail.length > 22) pTrail.shift();
-
-                pParticles.forEach(pt => {
-                    pt.x += pt.vx;
-                    pt.y += pt.vy;
-                    pt.vy += 0.05;
-                    pt.life -= pt.decay;
-                });
-                pParticles = pParticles.filter(pt => pt.life > 0);
-
-                if (pBall.y + pBall.r > pH - 12) {
-                    let slotIdx = 0;
-                    for (let i = 0; i < pSlots.length; i++) {
-                        const s = pSlots[i];
-                        if (pBall.x >= s.x - s.w / 2 && pBall.x < s.x + s.w / 2) { slotIdx = i; break; }
-                    }
-                    const mult = pSlots[slotIdx].mult;
-                    const win = Math.floor(20 * mult);
-                    balance += win;
-                    updateBalanceUI();
-                    const diff = win - 20;
-                    const resultMsg = `🎯 ${mult}x! ${diff >= 0 ? '+' : ''}${diff} coins (slot ${slotIdx+1})`;
-                    document.getElementById('plinkoResult').textContent = resultMsg;
-                    document.getElementById('plinkoResult').style.color = diff >= 0 ? '#a0ffc0' : '#ff9e9e';
-                    spawnParticles(pBall.x, pBall.y, '#ffd700', 30);
-                    pTotalDrops++;
-                    pTotalMult += mult;
-                    document.getElementById('plinkoStats').textContent =
-                        `🎯 ${(pTotalMult/pTotalDrops).toFixed(1)}x avg (${pTotalDrops} drops)`;
-                    pBall = null;
-                    pDropping = false;
-                    const type = diff >= 0 ? 'win' : 'lose';
-                    triggerPopup('plinko', resultMsg, type);
-                    addHistory('plinkoHistory', type);
-                    drawPlinko();
-                    return;
-                }
-                drawPlinko();
-                pAnimId = requestAnimationFrame(physicsLoop);
-            }
-            pAnimId = requestAnimationFrame(physicsLoop);
-        }
-
-        function initPlinkoDrag() {
-            let isDragging = false;
-
-            function getCanvasCoords(e) {
-                const rect = pCanvas.getBoundingClientRect();
-                const scaleX = pCanvas.width / rect.width;
-                const scaleY = pCanvas.height / rect.height;
-                let clientX, clientY;
-                if (e.touches) {
-                    clientX = e.touches[0].clientX;
-                    clientY = e.touches[0].clientY;
-                    e.preventDefault();
-                } else {
-                    clientX = e.clientX;
-                    clientY = e.clientY;
-                }
-                return {
-                    x: (clientX - rect.left) * scaleX,
-                    y: (clientY - rect.top) * scaleY
-                };
-            }
-
-            function onStart(e) {
-                if (pDropping || pBall) return;
-                const pos = getCanvasCoords(e);
-                if (pos.y < 80 && pos.x > 0 && pos.x < pW) {
-                    isDragging = true;
-                    pDragActive = true;
-                    pDragX = Math.min(Math.max(pos.x, 20), pW - 20);
-                    drawPlinko();
-                }
-            }
-
-            function onMove(e) {
-                if (!isDragging) return;
-                const pos = getCanvasCoords(e);
-                pDragX = Math.min(Math.max(pos.x, 20), pW - 20);
-                drawPlinko();
-                e.preventDefault();
-            }
-
-            function onEnd(e) {
-                if (isDragging) {
-                    isDragging = false;
-                    pDragActive = false;
-                    dropPlinkoFrom(pDragX);
-                    drawPlinko();
-                }
-            }
-
-            pCanvas.addEventListener('mousedown', onStart);
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('mouseup', onEnd);
-            pCanvas.addEventListener('touchstart', onStart, { passive: false });
-            window.addEventListener('touchmove', onMove, { passive: false });
-            window.addEventListener('touchend', onEnd, { passive: false });
-        }
-
-        document.querySelectorAll('#plinkoModal .qb').forEach(el => {
-            el.addEventListener('click', function() {
-                document.querySelectorAll('#plinkoModal .qb').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                playSound('click');
-            });
-        });
-
-        document.getElementById('plinkoDropBtn').addEventListener('click', () => {
-            if (pDropping) return;
-            if (pDragActive) {
-                dropPlinkoFrom(pDragX);
-            } else {
-                dropPlinkoFrom(pW / 2);
-            }
-        });
-        document.getElementById('plinkoResetBtn').addEventListener('click', resetPlinko);
-        document.getElementById('openPlinko').addEventListener('click', () => {
-            buildPlinko();
-            resetPlinko();
-            pDragX = pW / 2;
-            pDragActive = true;
-            drawPlinko();
-            openModal('plinkoModal');
-        });
-
-        // ========================== ICE ARENA (diagonal split system) ==========================
-        const aCanvas = document.getElementById('arenaCanvas');
-        const aCtx = aCanvas.getContext('2d');
-        const aW = aCanvas.width,
-            aH = aCanvas.height;
-        let aPuck = null,
-            aAnimId = null,
-            aRunning = false,
-            aSelectedIdx = 0,
-            aGridCells = [],
-            aParticles = [];
-        const aCols = 4,
-            aRows = 4;
-        let aHistory = [];
-
-        function buildArenaGrid(bet, selectedIdx, threshold) {
-            const cells = [];
-            const baseW = aW / aCols,
-                baseH = aH / aRows;
-            const scale = 1 + Math.min(bet / 40, 5.0);
-            const selCol = selectedIdx % aCols;
-            const selRow = Math.floor(selectedIdx / aCols);
-
-            let colW = Array(aCols).fill(baseW);
-            let rowH = Array(aRows).fill(baseH);
-            colW[selCol] += baseW * (scale - 1);
-            rowH[selRow] += baseH * (scale - 1);
-            const tw = colW.reduce((a, b) => a + b, 0);
-            const th = rowH.reduce((a, b) => a + b, 0);
-            for (let i = 0; i < aCols; i++) colW[i] = (colW[i] / tw) * aW;
-            for (let i = 0; i < aRows; i++) rowH[i] = (rowH[i] / th) * aH;
-
-            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c',
-                '#e67e22', '#2c3e50', '#27ae60', '#2980b9', '#8e44ad', '#16a085',
-                '#d35400', '#7f8c8d', '#c0392b', '#2ecc71'
-            ];
-            let y = 0;
-            for (let r = 0; r < aRows; r++) {
-                let x = 0;
-                for (let c = 0; c < aCols; c++) {
-                    const idx = r * aCols + c;
-                    const cx = x + colW[c] / 2;
-                    const cy = y + rowH[r] / 2;
-                    // Determine if cell is on WIN side (triangle) based on diagonal threshold
-                    const isTri = (cx + cy < threshold);
-                    cells.push({
-                        x,
-                        y,
-                        w: colW[c],
-                        h: rowH[r],
-                        idx,
-                        selected: idx === selectedIdx,
-                        color: colors[idx % colors.length],
-                        label: 'P' + (idx + 1),
-                        isTri: isTri,
-                        cx: cx,
-                        cy: cy
-                    });
-                    x += colW[c];
-                }
-                y += rowH[r];
-            }
-            return cells;
-        }
-
-        function initArenaSegments() {
-            const container = document.getElementById('arenaSegments');
-            container.innerHTML = '';
-            for (let i = 0; i < 16; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'segment-btn' + (i === aSelectedIdx ? ' active' : '');
-                btn.textContent = 'P' + (i + 1);
-                btn.addEventListener('click', () => {
-                    aSelectedIdx = i;
-                    initArenaSegments();
-                    if (!aRunning) drawArena();
-                    playSound('click');
-                });
-                container.appendChild(btn);
-            }
-        }
-
-        function drawArena() {
-            aCtx.clearRect(0, 0, aW, aH);
-            const bet = parseFloat(document.getElementById('arenaBet').value) || 10;
-
-            // --- Diagonal split logic (same as Upgrade) ---
-            const S = aW;
-            const greenRatio = Math.min(0.10 + (bet / 150), 0.90);
-            let threshold;
-            if (greenRatio <= 0.5) {
-                const a = S * Math.sqrt(2 * greenRatio);
-                threshold = a;
-            } else {
-                const b = S * Math.sqrt(2 * (1 - greenRatio));
-                threshold = 2 * S - b;
-            }
-
-            aGridCells = buildArenaGrid(bet, aSelectedIdx, threshold);
-
-            // Draw cells with diagonal-based coloring
-            aGridCells.forEach(cell => {
-                const x = cell.x,
-                    y = cell.y,
-                    w = cell.w,
-                    h = cell.h;
-
-                // Fill based on WIN/LOSE side
-                if (cell.isTri) {
-                    aCtx.fillStyle = 'rgba(46, 204, 113, 0.35)';
-                } else {
-                    aCtx.fillStyle = 'rgba(231, 76, 60, 0.35)';
-                }
-                aCtx.fillRect(x, y, w, h);
-
-                // Grid lines
-                aCtx.strokeStyle = 'rgba(255,255,255,0.08)';
-                aCtx.lineWidth = 1.5;
-                aCtx.strokeRect(x, y, w, h);
-
-                // Label
-                aCtx.fillStyle = 'rgba(255,255,255,0.85)';
-                aCtx.font = 'bold 18px Segoe UI';
-                aCtx.textAlign = 'center';
-                aCtx.textBaseline = 'middle';
-                aCtx.shadowColor = 'rgba(0,0,0,0.5)';
-                aCtx.shadowBlur = 8;
-                aCtx.fillText(cell.label, cell.cx, cell.cy - 4);
-                aCtx.shadowBlur = 0;
-
-                // Selected cell highlight
-                if (cell.selected) {
-                    aCtx.shadowColor = '#ffd966';
-                    aCtx.shadowBlur = 30;
-                    aCtx.strokeStyle = '#ffd966';
-                    aCtx.lineWidth = 4;
-                    aCtx.strokeRect(x + 2, y + 2, w - 4, h - 4);
-                    aCtx.shadowBlur = 0;
-                    aCtx.fillStyle = '#ffd966';
-                    aCtx.font = 'bold 12px Segoe UI';
-                    aCtx.fillText('💰 ' + bet.toFixed(1), cell.cx, cell.y + cell.h - 18);
-                }
-            });
-
-            // Draw the diagonal line
-            let lineX1, lineY1, lineX2, lineY2;
-            if (greenRatio <= 0.5) {
-                lineX1 = threshold;
-                lineY1 = 0;
-                lineX2 = 0;
-                lineY2 = threshold;
-            } else {
-                const b = S * Math.sqrt(2 * (1 - greenRatio));
-                const c = 2 * S - b;
-                lineX1 = c;
-                lineY1 = 0;
-                lineX2 = 0;
-                lineY2 = c;
-            }
-            aCtx.beginPath();
-            aCtx.moveTo(lineX1, lineY1);
-            aCtx.lineTo(lineX2, lineY2);
-            aCtx.strokeStyle = 'rgba(255,255,255,0.4)';
-            aCtx.lineWidth = 3;
-            aCtx.stroke();
-
-            // Percentage display
-            aCtx.fillStyle = '#ffd966';
-            aCtx.font = 'bold 18px Segoe UI';
-            aCtx.textAlign = 'center';
-            aCtx.textBaseline = 'bottom';
-            aCtx.shadowColor = 'rgba(0,0,0,0.6)';
-            aCtx.shadowBlur = 8;
-            aCtx.fillText('WIN ' + (greenRatio * 100).toFixed(0) + '%', aW / 2, aH - 10);
-            aCtx.shadowBlur = 0;
-
-            // Particles
-            aParticles.forEach(pt => {
-                aCtx.globalAlpha = pt.life;
-                aCtx.beginPath();
-                aCtx.arc(pt.x, pt.y, pt.r * pt.life, 0, Math.PI * 2);
-                aCtx.fillStyle = pt.color;
-                aCtx.shadowColor = pt.color;
-                aCtx.shadowBlur = 10;
-                aCtx.fill();
-                aCtx.shadowBlur = 0;
-                aCtx.globalAlpha = 1;
-            });
-
-            // Puck
-            if (aPuck) {
-                drawPuck(aCtx, aPuck.x, aPuck.y);
-            }
-        }
-
-        function resetArena() {
-            if (aAnimId) { cancelAnimationFrame(aAnimId);
-                aAnimId = null; }
-            aPuck = null;
-            aRunning = false;
-            aParticles = [];
-            document.getElementById('arenaResult').textContent = '🏒 Select a cell — bet determines win zone!';
-            document.getElementById('arenaResult').style.color = '#c0e0ff';
-            document.getElementById('arenaModalBox').classList.remove('zoom');
-            const popup = document.getElementById('arenaPopup');
-            popup.classList.remove('show', 'win', 'lose');
-            drawArena();
-        }
-
-        function spawnAParticles(x, y, color, count = 25) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * 2 * Math.PI;
-                const speed = 1 + Math.random() * 5;
-                aParticles.push({
-                    x,
-                    y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 0.5,
-                    life: 1,
-                    decay: 0.012 + Math.random() * 0.025,
-                    r: 2 + Math.random() * 5,
-                    color
-                });
-            }
-        }
-
-        function launchArena() {
-            if (aRunning) return;
-            const bet = parseFloat(document.getElementById('arenaBet').value) || 10;
-            if (bet < 0.1) { alert('Min bet 0.1'); return; }
-            if (balance < bet) {
-                document.getElementById('arenaResult').textContent = '❌ Not enough balance!';
-                document.getElementById('arenaResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-            aRunning = true;
-            const angle = Math.random() * 2 * Math.PI;
-            const speed = 40 + Math.random() * 20;
-            const stopTime = 2 + Math.random() * 4; // 2 to 6 seconds
-            aPuck = {
-                x: aW / 2,
-                y: aH / 2,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                launchTime: performance.now(),
-                stopTime: stopTime,
-                trail: []
-            };
-            aParticles = [];
-            document.getElementById('arenaResult').textContent = '🏒 sliding...';
-            document.getElementById('arenaResult').style.color = '#ffd966';
-            if (aAnimId) cancelAnimationFrame(aAnimId);
-
-            function updatePuck() {
-                if (!aPuck) { aRunning = false; return; }
-                const now = performance.now();
-                const dt = (now - aPuck.launchTime) / 1000;
-
-                let friction = 1.0;
-                if (dt > aPuck.stopTime) {
-                    friction = 0.92;
-                }
-                aPuck.vx *= friction;
-                aPuck.vy *= friction;
-                aPuck.x += aPuck.vx;
-                aPuck.y += aPuck.vy;
-
-                aPuck.trail.push({ x: aPuck.x, y: aPuck.y });
-                if (aPuck.trail.length > 25) aPuck.trail.shift();
-
-                if (aPuck.x < 16) { aPuck.x = 16;
-                    aPuck.vx *= -0.7; }
-                if (aPuck.x > aW - 16) { aPuck.x = aW - 16;
-                    aPuck.vx *= -0.7; }
-                if (aPuck.y < 16) { aPuck.y = 16;
-                    aPuck.vy *= -0.7; }
-                if (aPuck.y > aH - 16) { aPuck.y = aH - 16;
-                    aPuck.vy *= -0.7; }
-
-                if (Math.abs(aPuck.vx) + Math.abs(aPuck.vy) > 0.5 && Math.random() < 0.15) {
-                    spawnAParticles(aPuck.x, aPuck.y, '#7fc9ff', 2);
-                }
-
-                aParticles.forEach(pt => {
-                    pt.x += pt.vx;
-                    pt.y += pt.vy;
-                    pt.vy += 0.04;
-                    pt.life -= pt.decay;
-                });
-                aParticles = aParticles.filter(pt => pt.life > 0);
-
-                drawArena();
-
-                if (Math.abs(aPuck.vx) < 0.015 && Math.abs(aPuck.vy) < 0.015 && dt > aPuck.stopTime) {
-                    let found = null;
-                    for (let cell of aGridCells) {
-                        if (aPuck.x >= cell.x && aPuck.x <= cell.x + cell.w &&
-                            aPuck.y >= cell.y && aPuck.y <= cell.y + cell.h) {
-                            found = cell;
-                            break;
-                        }
-                    }
-                    let resultMsg = '';
-                    let type = 'lose';
-                    if (found) {
-                        if (found.selected) {
-                            const win = bet * 2;
-                            balance += win;
-                            resultMsg = `🏆 WIN! +${win.toFixed(1)} coins (${found.label})`;
-                            type = 'win';
-                            spawnAParticles(found.cx, found.cy, '#ffd700', 40);
-                        } else {
-                            resultMsg = `❌ LOSE! (${found.label})`;
-                            type = 'lose';
-                            spawnAParticles(found.cx, found.cy, '#ff4444', 20);
-                        }
-                        updateBalanceUI();
-                    } else {
-                        resultMsg = '⏳ Puck off the board!';
-                        type = 'lose';
-                    }
-                    document.getElementById('arenaResult').textContent = resultMsg;
-                    document.getElementById('arenaResult').style.color = type === 'win' ? '#a0ffc0' : '#ff9e9e';
-                    triggerPopup('arena', resultMsg, type);
-                    addHistory('arenaHistory', type);
-                    aPuck = null;
-                    aRunning = false;
-                    drawArena();
-                    return;
-                }
-
-                if (aPuck.x < -60 || aPuck.x > aW + 60 || aPuck.y < -60 || aPuck.y > aH + 60) {
-                    aPuck = null;
-                    aRunning = false;
-                    document.getElementById('arenaResult').textContent = '⏳ Puck flew off!';
-                    document.getElementById('arenaResult').style.color = '#ff9e9e';
-                    drawArena();
-                    return;
-                }
-
-                aAnimId = requestAnimationFrame(updatePuck);
-            }
-            aAnimId = requestAnimationFrame(updatePuck);
-        }
-
-        document.getElementById('arenaLaunchBtn').addEventListener('click', launchArena);
-        document.getElementById('arenaResetBtn').addEventListener('click', resetArena);
-        document.getElementById('openArena').addEventListener('click', () => {
-            initArenaSegments();
-            resetArena();
-            openModal('arenaModal');
-        });
-        document.getElementById('arenaBet').addEventListener('input', () => { if (!aRunning) drawArena(); });
-
-        // ========================== ICE UPGRADE (diagonal split, random stop) ==========================
-        const uCanvas = document.getElementById('upgradeCanvas');
-        const uCtx = uCanvas.getContext('2d');
-        const uW = uCanvas.width,
-            uH = uCanvas.height;
-        let uPuck = null,
-            uAnimId = null,
-            uRunning = false,
-            uParticles = [];
-        let uHistory = [];
-
-        const uDesiredInput = document.getElementById('upgradeDesiredBet');
-        const uCurrentInput = document.getElementById('upgradeCurrentBet');
-
-        function getCurrentBet() { return parseFloat(uCurrentInput.value) || 10; }
-
-        function setCurrentBet(val) {
-            const clamped = Math.max(0.1, Math.min(500, val));
-            uCurrentInput.value = clamped;
-            if (!uRunning) drawUpgrade();
-        }
-
-        uCurrentInput.addEventListener('input', () => {
-            const val = parseFloat(uCurrentInput.value) || 0.1;
-            if (val < 0.1) uCurrentInput.value = 0.1;
-            if (val > 500) uCurrentInput.value = 500;
-            if (!uRunning) drawUpgrade();
-        });
-
-        document.getElementById('upgradeApplyBtn').addEventListener('click', () => {
-            const val = parseFloat(uDesiredInput.value) || 10;
-            setCurrentBet(val);
-            uDesiredInput.value = val;
-            if (!uRunning) drawUpgrade();
-            playSound('click');
-        });
-        uDesiredInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') document.getElementById('upgradeApplyBtn').click();
-        });
-
-        function drawUpgrade() {
-            uCtx.clearRect(0, 0, uW, uH);
-            const bet = getCurrentBet();
-            const greenRatio = Math.min(0.10 + (bet / 150), 0.90);
-            const S = uW;
-            let threshold;
-            if (greenRatio <= 0.5) {
-                const a = S * Math.sqrt(2 * greenRatio);
-                threshold = a;
-            } else {
-                const b = S * Math.sqrt(2 * (1 - greenRatio));
-                threshold = 2 * S - b;
-            }
-
-            // Draw green region (WIN)
-            uCtx.beginPath();
-            if (greenRatio <= 0.5) {
-                uCtx.moveTo(0, 0);
-                uCtx.lineTo(threshold, 0);
-                uCtx.lineTo(0, threshold);
-                uCtx.closePath();
-                uCtx.fillStyle = 'rgba(46, 204, 113, 0.6)';
-                uCtx.fill();
-                uCtx.strokeStyle = '#27ae60';
-                uCtx.lineWidth = 2;
-                uCtx.stroke();
-
-                // Red region (LOSE)
-                uCtx.beginPath();
-                uCtx.moveTo(threshold, 0);
-                uCtx.lineTo(S, 0);
-                uCtx.lineTo(S, S);
-                uCtx.lineTo(0, S);
-                uCtx.lineTo(0, threshold);
-                uCtx.closePath();
-                uCtx.fillStyle = 'rgba(231, 76, 60, 0.6)';
-                uCtx.fill();
-                uCtx.strokeStyle = '#c0392b';
-                uCtx.lineWidth = 2;
-                uCtx.stroke();
-
-                uCtx.beginPath();
-                uCtx.moveTo(0, threshold);
-                uCtx.lineTo(threshold, 0);
-                uCtx.strokeStyle = 'rgba(255,255,255,0.3)';
-                uCtx.lineWidth = 3;
-                uCtx.stroke();
-
-            } else {
-                // Green pentagon (WIN)
-                uCtx.beginPath();
-                uCtx.moveTo(0, 0);
-                uCtx.lineTo(S, 0);
-                uCtx.lineTo(S, S);
-                uCtx.lineTo(0, S);
-                uCtx.closePath();
-                uCtx.fillStyle = 'rgba(46, 204, 113, 0.6)';
-                uCtx.fill();
-                uCtx.strokeStyle = '#27ae60';
-                uCtx.lineWidth = 2;
-                uCtx.stroke();
-
-                // Red triangle (LOSE)
-                const b = S * Math.sqrt(2 * (1 - greenRatio));
-                const C = 2 * S - b;
-                uCtx.beginPath();
-                uCtx.moveTo(S, S);
-                uCtx.lineTo(S - b, S);
-                uCtx.lineTo(S, S - b);
-                uCtx.closePath();
-                uCtx.fillStyle = 'rgba(231, 76, 60, 0.6)';
-                uCtx.fill();
-                uCtx.strokeStyle = '#c0392b';
-                uCtx.lineWidth = 2;
-                uCtx.stroke();
-
-                uCtx.beginPath();
-                uCtx.moveTo(0, C);
-                uCtx.lineTo(C, 0);
-                uCtx.strokeStyle = 'rgba(255,255,255,0.3)';
-                uCtx.lineWidth = 3;
-                uCtx.stroke();
-            }
-
-            // Labels
-            uCtx.fillStyle = 'rgba(255,255,255,0.9)';
-            uCtx.font = 'bold 36px Segoe UI';
-            uCtx.textAlign = 'center';
-            uCtx.textBaseline = 'middle';
-            uCtx.shadowColor = 'rgba(0,0,0,0.5)';
-            uCtx.shadowBlur = 12;
-            if (greenRatio <= 0.5) {
-                uCtx.fillText('WIN', threshold * 0.3, threshold * 0.3);
-                uCtx.fillText('LOSE', S * 0.6, S * 0.6);
-            } else {
-                uCtx.fillText('WIN', S * 0.5, S * 0.5);
-                uCtx.fillText('LOSE', S * 0.75, S * 0.75);
-            }
-            uCtx.shadowBlur = 0;
-
-            uCtx.fillStyle = '#ffd966';
-            uCtx.font = 'bold 20px Segoe UI';
-            uCtx.textAlign = 'center';
-            uCtx.textBaseline = 'bottom';
-            uCtx.fillText((greenRatio * 100).toFixed(0) + '%', S / 2, S - 10);
-
-            uCtx.fillStyle = '#b0d0ff';
-            uCtx.font = 'bold 16px Segoe UI';
-            uCtx.textAlign = 'left';
-            uCtx.textBaseline = 'top';
-            uCtx.fillText('💰 Bet: ' + bet.toFixed(1), 16, 16);
-
-            uParticles.forEach(pt => {
-                uCtx.globalAlpha = pt.life;
-                uCtx.beginPath();
-                uCtx.arc(pt.x, pt.y, pt.r * pt.life, 0, Math.PI * 2);
-                uCtx.fillStyle = pt.color;
-                uCtx.shadowColor = pt.color;
-                uCtx.shadowBlur = 10;
-                uCtx.fill();
-                uCtx.shadowBlur = 0;
-                uCtx.globalAlpha = 1;
-            });
-
-            if (uPuck) {
-                drawPuck(uCtx, uPuck.x, uPuck.y);
-            }
-        }
-
-        function resetUpgrade() {
-            if (uAnimId) { cancelAnimationFrame(uAnimId);
-                uAnimId = null; }
-            uPuck = null;
-            uRunning = false;
-            uParticles = [];
-            document.getElementById('upgradeResult').textContent = '🔮 Low bet = small win zone, high bet = large!';
-            document.getElementById('upgradeResult').style.color = '#c0e0ff';
-            document.getElementById('upgradeModalBox').classList.remove('zoom');
-            const popup = document.getElementById('upgradePopup');
-            popup.classList.remove('show', 'win', 'lose');
-            drawUpgrade();
-        }
-
-        function spawnUParticles(x, y, color, count = 25) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * 2 * Math.PI;
-                const speed = 1 + Math.random() * 5;
-                uParticles.push({
-                    x,
-                    y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 0.5,
-                    life: 1,
-                    decay: 0.012 + Math.random() * 0.025,
-                    r: 2 + Math.random() * 5,
-                    color
-                });
-            }
-        }
-
-        function launchUpgrade() {
-            if (uRunning) return;
-            const bet = getCurrentBet();
-            if (bet < 0.1) { alert('Min bet 0.1'); return; }
-            if (balance < bet) {
-                document.getElementById('upgradeResult').textContent = '❌ Not enough balance!';
-                document.getElementById('upgradeResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-            uRunning = true;
-            const angle = Math.random() * 2 * Math.PI;
-            const speed = 60 + Math.random() * 30;
-            const stopTime = 2 + Math.random() * 4; // 2 to 6 seconds
-            uPuck = {
-                x: uW / 2,
-                y: uH / 2,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                launchTime: performance.now(),
-                stopTime: stopTime
-            };
-            uParticles = [];
-            document.getElementById('upgradeResult').textContent = '⚡ Ultra-fast puck launched!';
-            document.getElementById('upgradeResult').style.color = '#ffd966';
-            if (uAnimId) cancelAnimationFrame(uAnimId);
-
-            function updatePuck() {
-                if (!uPuck) { uRunning = false; return; }
-                const now = performance.now();
-                const dt = (now - uPuck.launchTime) / 1000;
-
-                let friction = 1.0;
-                if (dt > uPuck.stopTime) {
-                    friction = 0.92;
-                }
-                uPuck.vx *= friction;
-                uPuck.vy *= friction;
-                uPuck.x += uPuck.vx;
-                uPuck.y += uPuck.vy;
-
-                if (uPuck.x < 16) { uPuck.x = 16;
-                    uPuck.vx *= -0.7; }
-                if (uPuck.x > uW - 16) { uPuck.x = uW - 16;
-                    uPuck.vx *= -0.7; }
-                if (uPuck.y < 16) { uPuck.y = 16;
-                    uPuck.vy *= -0.7; }
-                if (uPuck.y > uH - 16) { uPuck.y = uH - 16;
-                    uPuck.vy *= -0.7; }
-
-                if (Math.abs(uPuck.vx) + Math.abs(uPuck.vy) > 0.5 && Math.random() < 0.12) {
-                    spawnUParticles(uPuck.x, uPuck.y, '#a0e0ff', 2);
-                }
-
-                uParticles.forEach(pt => {
-                    pt.x += pt.vx;
-                    pt.y += pt.vy;
-                    pt.vy += 0.04;
-                    pt.life -= pt.decay;
-                });
-                uParticles = uParticles.filter(pt => pt.life > 0);
-
-                drawUpgrade();
-
-                if (Math.abs(uPuck.vx) < 0.015 && Math.abs(uPuck.vy) < 0.015 && dt > uPuck.stopTime) {
-                    const bet2 = getCurrentBet();
-                    const greenRatio = Math.min(0.10 + (bet2 / 150), 0.90);
-                    const S = uW;
-                    let threshold;
-                    if (greenRatio <= 0.5) {
-                        const a = S * Math.sqrt(2 * greenRatio);
-                        threshold = a;
-                    } else {
-                        const b = S * Math.sqrt(2 * (1 - greenRatio));
-                        threshold = 2 * S - b;
-                    }
-                    const win = (uPuck.x + uPuck.y <= threshold);
-                    let resultMsg = '';
-                    let type = 'lose';
-                    if (win) {
-                        const payout = bet2 * 2;
-                        balance += payout;
-                        resultMsg = `🟢 WIN! +${payout.toFixed(1)} coins (${(greenRatio*100).toFixed(0)}% zone)`;
-                        type = 'win';
-                        spawnUParticles(uPuck.x, uPuck.y, '#2ecc71', 40);
-                    } else {
-                        resultMsg = `🔴 LOSE! (${((1-greenRatio)*100).toFixed(0)}% zone)`;
-                        type = 'lose';
-                        spawnUParticles(uPuck.x, uPuck.y, '#e74c3c', 30);
-                    }
-                    updateBalanceUI();
-                    document.getElementById('upgradeResult').textContent = resultMsg;
-                    document.getElementById('upgradeResult').style.color = type === 'win' ? '#a0ffc0' : '#ff9e9e';
-                    triggerPopup('upgrade', resultMsg, type);
-                    addHistory('upgradeHistory', type);
-                    uPuck = null;
-                    uRunning = false;
-                    drawUpgrade();
-                    return;
-                }
-
-                if (uPuck.x < -60 || uPuck.x > uW + 60 || uPuck.y < -60 || uPuck.y > uH + 60) {
-                    uPuck = null;
-                    uRunning = false;
-                    document.getElementById('upgradeResult').textContent = '⏳ Puck flew off!';
-                    document.getElementById('upgradeResult').style.color = '#ff9e9e';
-                    drawUpgrade();
-                    return;
-                }
-
-                uAnimId = requestAnimationFrame(updatePuck);
-            }
-            uAnimId = requestAnimationFrame(updatePuck);
-        }
-
-        document.getElementById('upgradeLaunchBtn').addEventListener('click', launchUpgrade);
-        document.getElementById('upgradeResetBtn').addEventListener('click', resetUpgrade);
-        document.getElementById('openUpgrade').addEventListener('click', () => {
-            uDesiredInput.value = getCurrentBet();
-            resetUpgrade();
-            openModal('upgradeModal');
-        });
-
-        // ========================== DICE (with history) ==========================
-        let diceSelected = null;
-        const diceBtns = document.querySelectorAll('.dice-btn');
-        diceBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                diceBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                diceSelected = parseInt(btn.dataset.num);
-                document.getElementById('diceResult').textContent = `Selected: ${diceSelected}`;
-                document.getElementById('diceResult').style.color = '#c0e0ff';
-                playSound('click');
-            });
-        });
-
-        document.getElementById('diceRollBtn').addEventListener('click', () => {
-            if (diceSelected === null) {
-                document.getElementById('diceResult').textContent = '❗ Select a number first!';
-                document.getElementById('diceResult').style.color = '#ff9e9e';
-                return;
-            }
-            const bet = parseFloat(document.getElementById('diceBet').value) || 10;
-            if (bet < 1) { alert('Min bet 1'); return; }
-            if (balance < bet) {
-                document.getElementById('diceResult').textContent = '❌ Not enough balance!';
-                document.getElementById('diceResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-
-            const roll = Math.floor(Math.random() * 6) + 1;
-            const resultDisplay = document.getElementById('diceResultDisplay');
-            resultDisplay.textContent = `🎲 ${roll}`;
-            let win = false;
-            if (roll === diceSelected) {
-                const payout = bet * 5;
-                balance += payout;
-                win = true;
-                document.getElementById('diceResult').textContent = `🎉 WIN! You rolled ${roll}! +${payout.toFixed(1)} coins!`;
-                document.getElementById('diceResult').style.color = '#a0ffc0';
-                triggerPopup('dice', `🎉 ${roll} → +${payout.toFixed(1)}`, 'win');
-                addHistory('diceHistory', 'win');
-            } else {
-                document.getElementById('diceResult').textContent = `❌ LOSE! You rolled ${roll}, not ${diceSelected}.`;
-                document.getElementById('diceResult').style.color = '#ff9e9e';
-                triggerPopup('dice', `💔 ${roll} → lost`, 'lose');
-                addHistory('diceHistory', 'lose');
-            }
-            updateBalanceUI();
-        });
-
-        document.getElementById('diceResetBtn').addEventListener('click', () => {
-            diceSelected = null;
-            diceBtns.forEach(b => b.classList.remove('active'));
-            document.getElementById('diceResultDisplay').textContent = '🎲';
-            document.getElementById('diceResult').textContent = 'Select a number, then roll!';
-            document.getElementById('diceResult').style.color = '#c0e0ff';
-            document.getElementById('diceModalBox').classList.remove('zoom');
-            const popup = document.getElementById('dicePopup');
-            popup.classList.remove('show', 'win', 'lose');
-        });
-
-        document.getElementById('openDice').addEventListener('click', () => {
-            diceSelected = null;
-            diceBtns.forEach(b => b.classList.remove('active'));
-            document.getElementById('diceResultDisplay').textContent = '🎲';
-            document.getElementById('diceResult').textContent = 'Select a number, then roll!';
-            document.getElementById('diceResult').style.color = '#c0e0ff';
-            document.getElementById('diceModalBox').classList.remove('zoom');
-            const popup = document.getElementById('dicePopup');
-            popup.classList.remove('show', 'win', 'lose');
-            openModal('diceModal');
-        });
-
-        // ========================== SPEED TARGET (with history) ==========================
-        const tCanvas = document.getElementById('targetCanvas');
-        const tCtx = tCanvas.getContext('2d');
-        const tW = tCanvas.width,
-            tH = tCanvas.height;
-        let tPuck = null,
-            tAnimId = null,
-            tRunning = false,
-            tTarget = { x: 0, y: 0, r: 40 },
-            tParticles = [];
-        let tHistory = [];
-
-        function drawTarget() {
-            tCtx.clearRect(0, 0, tW, tH);
-            const grad = tCtx.createRadialGradient(tW / 2, tH / 2, 50, tW / 2, tH / 2, tW * 0.7);
-            grad.addColorStop(0, 'rgba(20,60,140,0.08)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            tCtx.fillStyle = grad;
-            tCtx.fillRect(0, 0, tW, tH);
-
-            const cx = tTarget.x,
-                cy = tTarget.y,
-                r = tTarget.r;
-            tCtx.beginPath();
-            tCtx.arc(cx, cy, r, 0, Math.PI * 2);
-            tCtx.fillStyle = 'rgba(231, 76, 60, 0.3)';
-            tCtx.fill();
-            tCtx.strokeStyle = '#e74c3c';
-            tCtx.lineWidth = 2;
-            tCtx.stroke();
-            tCtx.beginPath();
-            tCtx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
-            tCtx.fillStyle = 'rgba(231, 76, 60, 0.2)';
-            tCtx.fill();
-            tCtx.strokeStyle = '#c0392b';
-            tCtx.lineWidth = 2;
-            tCtx.stroke();
-            tCtx.beginPath();
-            tCtx.arc(cx, cy, r * 0.3, 0, Math.PI * 2);
-            tCtx.fillStyle = 'rgba(231, 76, 60, 0.5)';
-            tCtx.fill();
-            tCtx.strokeStyle = '#ff6b6b';
-            tCtx.lineWidth = 2;
-            tCtx.stroke();
-
-            tCtx.strokeStyle = 'rgba(255,255,255,0.1)';
-            tCtx.lineWidth = 1;
-            tCtx.setLineDash([5, 10]);
-            tCtx.beginPath();
-            tCtx.moveTo(cx - r * 1.5, cy);
-            tCtx.lineTo(cx + r * 1.5, cy);
-            tCtx.moveTo(cx, cy - r * 1.5);
-            tCtx.lineTo(cx, cy + r * 1.5);
-            tCtx.stroke();
-            tCtx.setLineDash([]);
-
-            tParticles.forEach(pt => {
-                tCtx.globalAlpha = pt.life;
-                tCtx.beginPath();
-                tCtx.arc(pt.x, pt.y, pt.r * pt.life, 0, Math.PI * 2);
-                tCtx.fillStyle = pt.color;
-                tCtx.shadowColor = pt.color;
-                tCtx.shadowBlur = 10;
-                tCtx.fill();
-                tCtx.shadowBlur = 0;
-                tCtx.globalAlpha = 1;
-            });
-
-            if (tPuck) {
-                drawPuck(tCtx, tPuck.x, tPuck.y);
-            } else {
-                tCtx.beginPath();
-                tCtx.arc(tW / 2, tH / 2, 16, 0, Math.PI * 2);
-                tCtx.fillStyle = 'rgba(255,255,255,0.05)';
-                tCtx.shadowBlur = 0;
-                tCtx.fill();
-                tCtx.strokeStyle = 'rgba(255,255,255,0.1)';
-                tCtx.lineWidth = 1;
-                tCtx.stroke();
-            }
-
-            tCtx.fillStyle = 'rgba(255,255,255,0.2)';
-            tCtx.font = '14px Segoe UI';
-            tCtx.textAlign = 'center';
-            tCtx.textBaseline = 'bottom';
-            tCtx.fillText('🎯 Hit the bullseye!', tW / 2, tH - 10);
-        }
-
-        function resetTarget() {
-            if (tAnimId) { cancelAnimationFrame(tAnimId);
-                tAnimId = null; }
-            tPuck = null;
-            tRunning = false;
-            tParticles = [];
-            tTarget.x = 60 + Math.random() * (tW - 120);
-            tTarget.y = 60 + Math.random() * (tH - 120);
-            tTarget.r = 40 + Math.random() * 20;
-            document.getElementById('targetResult').textContent = '🎯 Launch puck – ultra fast & instant stop!';
-            document.getElementById('targetResult').style.color = '#c0e0ff';
-            document.getElementById('targetModalBox').classList.remove('zoom');
-            const popup = document.getElementById('targetPopup');
-            popup.classList.remove('show', 'win', 'lose');
-            drawTarget();
-        }
-
-        function spawnTParticles(x, y, color, count = 30) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * 2 * Math.PI;
-                const speed = 2 + Math.random() * 6;
-                tParticles.push({
-                    x,
-                    y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 1,
-                    life: 1,
-                    decay: 0.015 + Math.random() * 0.025,
-                    r: 2 + Math.random() * 5,
-                    color
-                });
-            }
-        }
-
-        function launchTarget() {
-            if (tRunning) return;
-            const bet = parseFloat(document.getElementById('targetBet').value) || 10;
-            if (bet < 0.1) { alert('Min bet 0.1'); return; }
-            if (balance < bet) {
-                document.getElementById('targetResult').textContent = '❌ Not enough balance!';
-                document.getElementById('targetResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-            tRunning = true;
-            const angle = Math.random() * 2 * Math.PI;
-            const speed = 150 + Math.random() * 50;
-            tPuck = {
-                x: tW / 2,
-                y: tH / 2,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                launchTime: performance.now()
-            };
-            tParticles = [];
-            document.getElementById('targetResult').textContent = '⚡ Ultra-fast puck launched!';
-            document.getElementById('targetResult').style.color = '#ffd966';
-            if (tAnimId) cancelAnimationFrame(tAnimId);
-
-            let frames = 0;
-            const maxFrames = 5;
-
-            function updateTarget() {
-                if (!tPuck) { tRunning = false; return; }
-                const dt = 0.016;
-                tPuck.x += tPuck.vx * dt;
-                tPuck.y += tPuck.vy * dt;
-                if (tPuck.x < 16) { tPuck.x = 16;
-                    tPuck.vx *= -0.7; }
-                if (tPuck.x > tW - 16) { tPuck.x = tW - 16;
-                    tPuck.vx *= -0.7; }
-                if (tPuck.y < 16) { tPuck.y = 16;
-                    tPuck.vy *= -0.7; }
-                if (tPuck.y > tH - 16) { tPuck.y = tH - 16;
-                    tPuck.vy *= -0.7; }
-
-                frames++;
-                drawTarget();
-
-                if (frames >= maxFrames) {
-                    const dx = tPuck.x - tTarget.x;
-                    const dy = tPuck.y - tTarget.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    let win = false;
-                    let resultMsg = '';
-                    if (dist < tTarget.r) {
-                        const payout = bet * 3;
-                        balance += payout;
-                        win = true;
-                        resultMsg = `🎯 BULLSEYE! +${payout.toFixed(1)} coins!`;
-                        document.getElementById('targetResult').style.color = '#a0ffc0';
-                        spawnTParticles(tPuck.x, tPuck.y, '#ffd700', 40);
-                        triggerPopup('target', `🎯 Hit! +${payout.toFixed(1)}`, 'win');
-                        addHistory('targetHistory', 'win');
-                    } else {
-                        resultMsg = `❌ Missed! (${(dist).toFixed(0)}px away)`;
-                        document.getElementById('targetResult').style.color = '#ff9e9e';
-                        spawnTParticles(tPuck.x, tPuck.y, '#ff4444', 20);
-                        triggerPopup('target', `💔 Missed`, 'lose');
-                        addHistory('targetHistory', 'lose');
-                    }
-                    updateBalanceUI();
-                    document.getElementById('targetResult').textContent = resultMsg;
-                    tPuck = null;
-                    tRunning = false;
-                    drawTarget();
-                    return;
-                }
-
-                tAnimId = requestAnimationFrame(updateTarget);
-            }
-            tAnimId = requestAnimationFrame(updateTarget);
-        }
-
-        document.getElementById('targetLaunchBtn').addEventListener('click', launchTarget);
-        document.getElementById('targetResetBtn').addEventListener('click', resetTarget);
-        document.getElementById('openTarget').addEventListener('click', () => {
-            resetTarget();
-            openModal('targetModal');
-        });
-
-        // ========================== COIN FLIP ==========================
-        let coinChoice = null;
-        const coinDisplay = document.getElementById('coinDisplay');
-        document.getElementById('coinHeadsBtn').addEventListener('click', () => {
-            coinChoice = 'heads';
-            document.getElementById('coinResult').textContent = 'Selected: Heads';
-            document.getElementById('coinResult').style.color = '#c0e0ff';
-            playSound('click');
-        });
-        document.getElementById('coinTailsBtn').addEventListener('click', () => {
-            coinChoice = 'tails';
-            document.getElementById('coinResult').textContent = 'Selected: Tails';
-            document.getElementById('coinResult').style.color = '#c0e0ff';
-            playSound('click');
-        });
-
-        document.getElementById('coinFlipBtn').addEventListener('click', () => {
-            if (coinChoice === null) {
-                document.getElementById('coinResult').textContent = '❗ Select Heads or Tails first!';
-                document.getElementById('coinResult').style.color = '#ff9e9e';
-                return;
-            }
-            const bet = parseFloat(document.getElementById('coinBet').value) || 10;
-            if (bet < 1) { alert('Min bet 1'); return; }
-            if (balance < bet) {
-                document.getElementById('coinResult').textContent = '❌ Not enough balance!';
-                document.getElementById('coinResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-
-            coinDisplay.classList.remove('flip');
-            void coinDisplay.offsetWidth;
-            coinDisplay.classList.add('flip');
-
-            const result = Math.random() < 0.5 ? 'heads' : 'tails';
-            setTimeout(() => {
-                let win = false;
-                if (result === coinChoice) {
-                    const payout = bet * 2;
-                    balance += payout;
-                    win = true;
-                    document.getElementById('coinResult').textContent = `🪙 ${result.toUpperCase()}! WIN! +${payout.toFixed(1)} coins!`;
-                    document.getElementById('coinResult').style.color = '#a0ffc0';
-                    triggerPopup('coin', `🪙 ${result} → +${payout.toFixed(1)}`, 'win');
-                    addHistory('coinHistory', 'win');
-                } else {
-                    document.getElementById('coinResult').textContent = `🪙 ${result.toUpperCase()}! LOSE.`;
-                    document.getElementById('coinResult').style.color = '#ff9e9e';
-                    triggerPopup('coin', `🪙 ${result} → lost`, 'lose');
-                    addHistory('coinHistory', 'lose');
-                }
-                updateBalanceUI();
-                setTimeout(() => {
-                    coinDisplay.textContent = '🪙';
-                }, 400);
-            }, 400);
-        });
-
-        document.getElementById('coinResetBtn').addEventListener('click', () => {
-            coinChoice = null;
-            document.getElementById('coinResult').textContent = 'Choose Heads or Tails, then flip!';
-            document.getElementById('coinResult').style.color = '#c0e0ff';
-            document.getElementById('coinModalBox').classList.remove('zoom');
-            const popup = document.getElementById('coinPopup');
-            popup.classList.remove('show', 'win', 'lose');
-            coinDisplay.textContent = '🪙';
-        });
-
-        document.getElementById('openCoin').addEventListener('click', () => {
-            coinChoice = null;
-            document.getElementById('coinResult').textContent = 'Choose Heads or Tails, then flip!';
-            document.getElementById('coinResult').style.color = '#c0e0ff';
-            document.getElementById('coinModalBox').classList.remove('zoom');
-            const popup = document.getElementById('coinPopup');
-            popup.classList.remove('show', 'win', 'lose');
-            coinDisplay.textContent = '🪙';
-            openModal('coinModal');
-        });
-
-        // ========================== ROULETTE ==========================
-        let rouletteSelected = null;
-        const rouletteBtns = document.querySelectorAll('.roulette-btn');
-        rouletteBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                rouletteBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                rouletteSelected = parseInt(btn.dataset.num);
-                document.getElementById('rouletteResult').textContent = `Selected: ${rouletteSelected}`;
-                document.getElementById('rouletteResult').style.color = '#c0e0ff';
-                playSound('click');
-            });
-        });
-
-        document.getElementById('rouletteSpinBtn').addEventListener('click', () => {
-            if (rouletteSelected === null) {
-                document.getElementById('rouletteResult').textContent = '❗ Select a number first!';
-                document.getElementById('rouletteResult').style.color = '#ff9e9e';
-                return;
-            }
-            const bet = parseFloat(document.getElementById('rouletteBet').value) || 10;
-            if (bet < 1) { alert('Min bet 1'); return; }
-            if (balance < bet) {
-                document.getElementById('rouletteResult').textContent = '❌ Not enough balance!';
-                document.getElementById('rouletteResult').style.color = '#ff9e9e';
-                return;
-            }
-            balance -= bet;
-            updateBalanceUI();
-
-            const result = Math.floor(Math.random() * 12) + 1;
-            const resultDisplay = document.getElementById('rouletteResultDisplay');
-            resultDisplay.textContent = `🎡 ${result}`;
-            let win = false;
-            if (result === rouletteSelected) {
-                const payout = bet * 10;
-                balance += payout;
-                win = true;
-                document.getElementById('rouletteResult').textContent = `🎉 WIN! Number ${result}! +${payout.toFixed(1)} coins!`;
-                document.getElementById('rouletteResult').style.color = '#a0ffc0';
-                triggerPopup('roulette', `🎉 ${result} → +${payout.toFixed(1)}`, 'win');
-                addHistory('rouletteHistory', 'win');
-            } else {
-                document.getElementById('rouletteResult').textContent = `❌ LOSE! Number ${result}, not ${rouletteSelected}.`;
-                document.getElementById('rouletteResult').style.color = '#ff9e9e';
-                triggerPopup('roulette', `💔 ${result} → lost`, 'lose');
-                addHistory('rouletteHistory', 'lose');
-            }
-            updateBalanceUI();
-        });
-
-        document.getElementById('rouletteResetBtn').addEventListener('click', () => {
-            rouletteSelected = null;
-            rouletteBtns.forEach(b => b.classList.remove('active'));
-            document.getElementById('rouletteResultDisplay').textContent = '🎡';
-            document.getElementById('rouletteResult').textContent = 'Select a number, then spin!';
-            document.getElementById('rouletteResult').style.color = '#c0e0ff';
-            document.getElementById('rouletteModalBox').classList.remove('zoom');
-            const popup = document.getElementById('roulettePopup');
-            popup.classList.remove('show', 'win', 'lose');
-        });
-
-        document.getElementById('openRoulette').addEventListener('click', () => {
-            rouletteSelected = null;
-            rouletteBtns.forEach(b => b.classList.remove('active'));
-            document.getElementById('rouletteResultDisplay').textContent = '🎡';
-            document.getElementById('rouletteResult').textContent = 'Select a number, then spin!';
-            document.getElementById('rouletteResult').style.color = '#c0e0ff';
-            document.getElementById('rouletteModalBox').classList.remove('zoom');
-            const popup = document.getElementById('roulettePopup');
-            popup.classList.remove('show', 'win', 'lose');
-            openModal('rouletteModal');
-        });
-
-        // ========================== RESET BALANCE ==========================
-        document.getElementById('resetBalanceBtn').addEventListener('click', () => {
-            balance = 2450.0;
-            totalWins = 0;
-            totalLosses = 0;
-            updateBalanceUI();
-            playSound('click');
-        });
-
-        // ========================== SOUND TOGGLE ==========================
-        document.getElementById('soundToggleBtn').addEventListener('click', function() {
-            soundEnabled = !soundEnabled;
-            this.innerHTML = soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
-            playSound('click');
-        });
-
-        // ========================== BACKGROUND ANIMATION ==========================
-        const bgCanvas = document.getElementById('bg-canvas');
-        const bgCtx = bgCanvas.getContext('2d');
-        let bgW, bgH;
-        let snowflakes = [];
-
-        function resizeBg() {
-            bgW = bgCanvas.width = window.innerWidth;
-            bgH = bgCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeBg);
-        resizeBg();
-
-        class Snowflake {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * bgW;
-                this.y = Math.random() * bgH;
-                this.r = Math.random() * 2.5 + 0.5;
-                this.speed = Math.random() * 0.8 + 0.2;
-                this.wind = (Math.random() - 0.5) * 0.3;
-                this.opacity = Math.random() * 0.6 + 0.2;
-            }
-            update() {
-                this.y += this.speed;
-                this.x += this.wind + Math.sin(this.y * 0.01) * 0.2;
-                if (this.y > bgH) { this.reset();
-                    this.y = -5; }
-                if (this.x > bgW) this.x = 0;
-                if (this.x < 0) this.x = bgW;
-            }
-            draw() {
-                bgCtx.beginPath();
-                bgCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                bgCtx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                bgCtx.shadowColor = 'rgba(255,255,255,0.1)';
-                bgCtx.shadowBlur = 10;
-                bgCtx.fill();
-                bgCtx.shadowBlur = 0;
-            }
-        }
-
-        for (let i = 0; i < 120; i++) snowflakes.push(new Snowflake());
-
-        function animateBg() {
-            bgCtx.clearRect(0, 0, bgW, bgH);
-            snowflakes.forEach(s => { s.update();
-                s.draw(); });
-            requestAnimationFrame(animateBg);
-        }
-        animateBg();
-
-        // ========================== INIT ==========================
-        updateBalanceUI();
-        buildPlinko();
-        resetPlinko();
-        initPlinkoDrag();
-        initArenaSegments();
-        resetArena();
-        resetUpgrade();
-        resetTarget();
-        document.querySelectorAll('.qb').forEach(el => el.classList.remove('active'));
-    </script>
+        const b = G.held.splice(idx, 1)[0];
+        b.state = 'falling';
+        b.vx = (Math.random() - 0.5) * 40;
+        b.vy = -80;
+        b.z = 0;
+        b.stall = 0; b.squash = 0;
+        G.active.push(b);
+        G.releaseTimer = 0.14;
+        haptic();
+      }
+    }
+
+    if (G.launchT > 1.9 && G.held.length > 0){
+      while (G.held.length){
+        const b = G.held.pop();
+        b.state = 'falling';
+        b.vx = (Math.random()-0.5)*40;
+        b.vy = -80;
+        b.z = 0;
+        G.active.push(b);
+      }
+    }
+
+    if (G.launchT > 1.9 && G.held.length === 0){
+      G.phase = 'playing';
+      G._ending = false;
+      updateHud();
+    }
+  }
+
+  for (let i = G.active.length - 1; i >= 0; i--){
+    const b = G.active[i];
+    b.squash *= Math.pow(0.0008, dt);
+
+    if (b.state === 'falling')                        stepFalling(b, dt);
+    else if (b.state === 'drop1' || b.state === 'drop2') updateDrop(b, dt);
+    else if (b.state === 'bowl1' || b.state === 'bowl2') updateOrbit(b, dt);
+    else if (b.state === 'hover')                     updateHover(b, dt);
+    else if (b.state === 'hole')                      updateHoleDrop(b, dt);
+
+    if (b.dead){
+      removeBall(b);
+      G.active.splice(i, 1);
+    }
+  }
+
+  for (const p of P){
+    if (p.mesh.userData.hit > 0){
+      p.mesh.userData.hit *= Math.pow(0.0005, dt);
+      const h = p.mesh.userData.hit;
+      p.mesh.material.emissive.setHSL(0.72, 1, 0.4);
+      p.mesh.material.emissiveIntensity = h * 1.4;
+      p.mesh.scale.setScalar(1 + h * 0.35);
+    }
+  }
+
+  if (G.phase === 'playing'
+      && G.held.length === 0
+      && G.active.every(b => b.state === 'settled' || b.state === 'lost' || b.dead)
+      && !G._ending){
+    G._ending = true;
+    setTimeout(finishRound, 900);
+  }
+}
+
+/* ══════════ MESH SYNC ══════════ */
+function syncMeshes(){
+  G.held.forEach(b => {
+    b.mesh.position.set(b.x, b.y, b.z);
+    b.mesh.scale.setScalar(b.scale);
+    b.mesh.rotation.y += 0.02;
+  });
+  G.active.forEach(b => {
+    if (b.dead) return;
+    if (b.state === 'settled'){ b.mesh.visible = false; return; }
+    const sx = 1 + b.squash * 0.22;
+    const sy = 1 - b.squash * 0.22;
+    const sz = 1 + b.squash * 0.10;
+    const sc = b.scale || 1;
+    b.mesh.position.set(b.x, b.y, b.z);
+    if (b.state === 'hole'){
+      b.mesh.scale.setScalar(sc);
+    } else {
+      b.mesh.scale.set(sx * sc, sy * sc, sz * sc);
+    }
+    b.mesh.rotation.z = Math.sin(b.spin) * 0.4;
+    b.mesh.rotation.x = Math.cos(b.spin * 0.7) * 0.3;
+  });
+}
+
+/* ══════════ LOOP ══════════ */
+let last = performance.now();
+function loop(now){
+  const dt = Math.min((now - last) / 1000, 1/30);
+  last = now;
+  try {
+    update(dt);
+    syncMeshes();
+    const sx = (Math.random()-.5) * G.shake * 8;
+    const sy = (Math.random()-.5) * G.shake * 8;
+    renderer.domElement.style.transform = `translate(${sx}px,${sy}px)`;
+    renderer.render(scene, camera);
+  } catch (e){ console.error(e); }
+  requestAnimationFrame(loop);
+}
+
+/* ══════════ RESIZE ══════════ */
+function onResize(){
+  const w = window.innerWidth, h = window.innerHeight;
+  camera.aspect = w/h;
+  const yTop = 640, yBot = -450;
+  const centre = (yTop + yBot)/2;
+  const span = (yTop - yBot) * 1.10;
+  const fovRad = camera.fov * Math.PI/180;
+  const dist = span / (2 * Math.tan(fovRad/2));
+  const angle = 18 * Math.PI/180;
+  camera.position.set(0, centre + Math.sin(angle) * dist, Math.cos(angle) * dist);
+  camera.lookAt(0, centre, 0);
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  if (elRoulette.classList.contains('show')) sizeRoulette();
+}
+window.addEventListener('resize', onResize);
+
+/* ══════════ BUY ══════════ */
+let buyTab='random', buyTier='gray';
+document.querySelectorAll('.dl-seg button').forEach(b => {
+  b.addEventListener('click', () => {
+    buyTab = b.dataset.tab;
+    document.querySelectorAll('.dl-seg button').forEach(x => x.classList.toggle('on', x===b));
+    document.getElementById('dl-pane-random').style.display = buyTab==='random'?'block':'none';
+    document.getElementById('dl-pane-tier').style.display   = buyTab==='tier'  ?'block':'none';
+  });
+});
+document.querySelectorAll('.dl-tier').forEach(b => {
+  b.addEventListener('click', () => {
+    buyTier = b.dataset.tier;
+    document.querySelectorAll('.dl-tier').forEach(x => x.classList.toggle('on', x===b));
+  });
+});
+elBuy.addEventListener('click', () => {
+  if (G.phase !== 'idle') return;
+  elBuyModal.classList.add('show');
+});
+document.getElementById('dl-buy-cancel').addEventListener('click', ()=>elBuyModal.classList.remove('show'));
+
+document.getElementById('dl-buy-go').addEventListener('click', () => {
+  let cost=0, balls=[];
+  if (buyTab==='random'){
+    cost = Math.max(10, Math.floor(Number(document.getElementById('dl-rand-amt').value)||0));
+    if (cost > BALANCE) return flashResult('Oops','Not enough 💎', true);
+    const n = Math.max(1, Math.min(10, Math.round(Math.sqrt(cost)/2.4)));
+    for (let i=0;i<n;i++){ const v = randomValue(); balls.push({ value:v, tier:tierFor(v) }); }
+  } else {
+    const qty = Math.max(1, Math.min(20, Math.floor(Number(document.getElementById('dl-tier-qty').value)||1)));
+    const price = Number(document.querySelector('.dl-tier.on')?.dataset.price || 10);
+    cost = price * qty;
+    if (cost > BALANCE) return flashResult('Oops','Not enough 💎', true);
+    for (let i=0;i<qty;i++) balls.push({ value:price, tier:buyTier });
+  }
+  elBuyModal.classList.remove('show');
+  BALANCE -= cost;
+  updateHud();
+  spinAll(balls, () => {
+    balls.forEach((b, i) => G.held.push(spawnBall(b.value, b.tier, i * 0.16)));
+    G.phase = 'holding';
+    updateHud();
+  });
+});
+
+/* ══════════ ROULETTE ══════════ */
+function sizeRoulette(){
+  const cv = document.getElementById('dl-r-canvas');
+  const stage = cv.parentElement;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  const dpr = Math.min(window.devicePixelRatio, 2);
+  cv.width = w*dpr; cv.height = h*dpr;
+  cv.style.width = w+'px'; cv.style.height = h+'px';
+  cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+}
+
+function spinAll(balls, done){
+  let i = 0;
+  const next = () => {
+    if (i >= balls.length){ done(); return; }
+    spinOne(balls[i++], () => setTimeout(next, 160));
+  };
+  next();
+}
+
+function spinOne(target, done){
+  elRoulette.classList.add('show');
+  sizeRoulette();
+  const cv = document.getElementById('dl-r-canvas');
+  const rc = cv.getContext('2d');
+  const stage = cv.parentElement;
+  const W = stage.clientWidth, H = stage.clientHeight;
+  const strip = [];
+  for (let i=0;i<40;i++){ const v = randomValue(); strip.push({ value:v, tier:tierFor(v) }); }
+  const landIdx = 34;
+  strip[landIdx] = { value:target.value, tier:target.tier };
+  const itemW = 78;
+  const y = H * 0.5;
+  const totalShift = landIdx*itemW + itemW*0.5 - W*0.5;
+  const DUR = 1.9;                            // longer, dramatic spin
+  const startTime = performance.now();        // use REAL time, not assumed 60fps
+  let raf;
+
+  function frame(now){
+    const elapsed = (now - startTime) / 1000;
+    const p = Math.min(elapsed / DUR, 1);
+    // Slow ease-out so it decelerates dramatically at the end
+    const ease = 1 - Math.pow(1 - p, 4.2);
+    const shift = totalShift * ease;
+    rc.clearRect(0,0,W,H);
+
+    for (let i=0;i<strip.length;i++){
+      const x = i*itemW - shift + W*0.5 - landIdx*itemW + itemW*0.5;
+      if (x < -itemW || x > W+itemW) continue;
+      const distC = Math.abs(x - W*0.5)/(W*0.5);
+      const scale = Math.max(0.68, 1 - distC * 0.28);
+      const r = 28 * scale;
+      drawRouletteBall(rc, x, y, r, strip[i].value, strip[i].tier);
+      rc.save();
+      rc.fillStyle = `rgba(255,255,255,${0.55 + scale * 0.45})`;
+      rc.font = `800 ${Math.max(10, 13*scale)}px system-ui,sans-serif`;
+      rc.textAlign = 'center';
+      rc.textBaseline = 'top';
+      rc.fillText('💎' + strip[i].value, x, y + r + 8);
+      rc.restore();
+    }
+    // Minimal edge fade so balls never appear to vanish
+    const lf = rc.createLinearGradient(0,0,W*0.06,0);
+    lf.addColorStop(0,'rgba(6,6,11,0.9)'); lf.addColorStop(1,'rgba(6,6,11,0)');
+    rc.fillStyle = lf; rc.fillRect(0,0,W*0.06,H);
+    const rf = rc.createLinearGradient(W,0,W*0.94,0);
+    rf.addColorStop(0,'rgba(6,6,11,0.9)'); rf.addColorStop(1,'rgba(6,6,11,0)');
+    rc.fillStyle = rf; rc.fillRect(W*0.94,0,W*0.06,H);
+
+    if (p >= 1){
+      cancelAnimationFrame(raf);
+      setTimeout(() => { elRoulette.classList.remove('show'); done(); }, 380);
+      return;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+}
+
+function drawRouletteBall(c, x, y, r, value, tier){
+  const cfg = TIER_MAT[tier] || TIER_MAT.gray;
+  const baseCol = new THREE.Color(cfg.color);
+  const hiCol = baseCol.clone().lerp(new THREE.Color(0xffffff), 0.85);
+  const loCol = baseCol.clone().lerp(new THREE.Color(0x000000), 0.75);
+
+  c.save();
+  c.fillStyle = 'rgba(0,0,0,0.55)';
+  c.beginPath();
+  c.ellipse(x, y + r*0.98, r*0.85, r*0.22, 0, 0, Math.PI*2);
+  c.fill();
+  c.restore();
+
+  const g = c.createRadialGradient(x - r*0.38, y - r*0.42, r*0.05, x, y, r);
+  g.addColorStop(0, '#' + hiCol.getHexString());
+  g.addColorStop(0.5, '#' + baseCol.getHexString());
+  g.addColorStop(1, '#' + loCol.getHexString());
+  c.fillStyle = g;
+  c.beginPath(); c.arc(x, y, r, 0, Math.PI*2); c.fill();
+
+  c.strokeStyle = 'rgba(0,0,0,0.35)';
+  c.lineWidth = Math.max(0.8, r*0.09);
+  c.beginPath(); c.arc(x, y, r*0.94, 0, Math.PI*2); c.stroke();
+
+  const sg = c.createRadialGradient(x - r*0.42, y - r*0.48, 0, x - r*0.42, y - r*0.48, r*0.6);
+  sg.addColorStop(0, 'rgba(255,255,255,0.95)');
+  sg.addColorStop(0.45, 'rgba(255,255,255,0.35)');
+  sg.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = sg;
+  c.beginPath(); c.arc(x - r*0.42, y - r*0.48, r*0.6, 0, Math.PI*2); c.fill();
+
+  c.fillStyle = 'rgba(255,255,255,0.9)';
+  c.beginPath();
+  c.arc(x - r*0.35, y - r*0.45, Math.max(1.6, r*0.09), 0, Math.PI*2);
+  c.fill();
+
+  if (r >= 10){
+    c.font = `900 ${Math.max(10, r*0.72)}px system-ui,sans-serif`;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillStyle = 'rgba(0,0,0,0.45)';
+    c.fillText(String(value), x + 1, y + 1.4);
+    c.fillStyle = tier === 'gold' ? '#2a1400' : (tier === 'green' ? '#042a18' : '#0a0a14');
+    c.fillText(String(value), x, y + 0.3);
+  }
+}
+
+/* ══════════ LAUNCH ══════════ */
+elLaunch.addEventListener('click', () => {
+  if (G.phase !== 'holding' || G.held.length===0) return;
+  G.phase = 'launching';
+  G.launchT = 0;
+  G.launchOpen = 0;
+  G.releaseTimer = 0;
+  setSpinnerGap(0);
+  elLaunch.disabled = true;
+  haptic();
+});
+
+/* ══════════ FINISH ══════════ */
+function finishRound(){
+  let total = 0, won = 0, lost = 0;
+  for (const r of G.results){
+    total += r.value * r.mult;
+    if (r.mult === 0) lost++; else won++;
+  }
+  const winnings = Math.floor(total);
+  BALANCE += winnings;
+  updateHud();
+  flashResult(
+    winnings > 0 ? 'Round Results' : 'Round Over',
+    (winnings>0?'+':'') + winnings + ' 💎',
+    false,
+    `${won} won · ${lost} lost`
+  );
+}
+document.getElementById('dl-res-ok').addEventListener('click', () => {
+  elResult.classList.remove('show');
+  G.active.forEach(removeBall);
+  G.active = []; G.held.forEach(removeBall); G.held = [];
+  G.results = [];
+  G.launchT = 0; G.launchOpen = 0; G._ending = false;
+  G.phase = 'idle';
+  setSpinnerGap(0);
+  updateHud();
+});
+function flashResult(tag, amt, isLose, sub){
+  elResTag.textContent = tag;
+  elResAmt.textContent = amt;
+  elResAmt.classList.toggle('lose', !!isLose);
+  elResSub.textContent = sub || '';
+  elResult.classList.add('show');
+}
+
+/* ══════════ CLOSE ══════════ */
+document.getElementById('dl-close').addEventListener('click', () => {
+  try {
+    if (window.__state){
+      window.__state.balance = BALANCE;
+      window.__state.updateBalance?.();
+    }
+  } catch(_){}
+  window.dispatchEvent(new CustomEvent('dlballs-close'));
+});
+
+/* ══════════ BOOT ══════════ */
+onResize();
+setSpinnerGap(0);
+updateHud();
+requestAnimationFrame(loop);
+</script>
 </body>
 </html>
