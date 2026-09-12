@@ -23,6 +23,13 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
 .dl-pill.pot .val{color:#ffdd44}
 .dl-pill.map{border-color:rgba(120,200,255,.35)}
 .dl-pill.map .val{color:#7fc8ff;font-size:10px}
+.diamond-mini{width:13px;height:13px;object-fit:contain;flex-shrink:0;
+  filter:drop-shadow(0 0 3px rgba(255,220,80,.7));
+  animation:dlDiamondPulse 2.2s ease-in-out infinite}
+@keyframes dlDiamondPulse{
+  0%,100%{filter:drop-shadow(0 0 3px rgba(255,220,80,.4))}
+  50%{filter:drop-shadow(0 0 8px rgba(255,220,80,1)) brightness(1.15)}
+}
 .dl-close{margin-left:auto;width:26px;height:26px;border-radius:50%;
   border:1px solid rgba(255,255,255,.07);background:rgba(10,10,12,.85);
   color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;
@@ -36,9 +43,10 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
   background:rgba(10,10,12,.75);border:1px solid rgba(255,255,255,.06);
   border-radius:10px;padding:3px 9px;font-size:10px;font-weight:600;
   color:rgba(255,255,255,.75);white-space:nowrap;
-  display:flex;align-items:center;gap:5px;
+  display:flex;align-items:center;gap:4px;
   animation:dlChipIn .35s cubic-bezier(.2,.9,.3,1.1)}
 .dl-ticker .chip .amt{color:#8fe5b0;font-weight:800}
+.dl-ticker .chip img{width:11px;height:11px}
 @keyframes dlChipIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
 .dl-bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:12px;z-index:10;
   display:flex;gap:8px}
@@ -115,7 +123,8 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
 .dl-res-tag{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:2px;
   text-transform:uppercase;font-weight:800}
 .dl-res-amt{font-size:44px;font-weight:900;color:#fff;margin:8px 0 4px;letter-spacing:-1.5px;
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:8px}
+.dl-res-amt img{width:32px;height:32px}
 .dl-res-amt.lose{color:#7a7a82}
 .dl-res-mult{font-size:22px;font-weight:800;color:#ffdd44;margin-bottom:4px;
   font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
@@ -152,7 +161,8 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
 .dl-r-amount{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;
   font-variant-numeric:tabular-nums;opacity:0;transform:scale(.7);
   transition:opacity .3s ease,transform .35s cubic-bezier(.2,.9,.3,1.2);
-  min-height:38px;text-align:center}
+  min-height:38px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.dl-r-amount img{width:26px;height:26px}
 .dl-r-amount.show{opacity:1;transform:scale(1)}
 </style>
 </head>
@@ -162,8 +172,8 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
   <canvas id="dl-canvas"></canvas>
 
   <div class="dl-top">
-    <div class="dl-pill"><span class="lbl">BAL</span><span class="val" id="dl-bal">0</span></div>
-    <div class="dl-pill pot"><span class="lbl">POT</span><span class="val" id="dl-pot">0</span></div>
+    <div class="dl-pill"><span class="lbl">BAL</span><img class="diamond-mini" src="https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif" alt=""><span class="val" id="dl-bal">0</span></div>
+    <div class="dl-pill pot"><span class="lbl">POT</span><img class="diamond-mini" src="https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif" alt=""><span class="val" id="dl-pot">0</span></div>
     <div class="dl-pill map"><span class="lbl">MAP</span><span class="val" id="dl-map">Classic</span></div>
     <button class="dl-close" id="dl-close">✕</button>
   </div>
@@ -178,7 +188,7 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
   <div class="dl-modal" id="dl-buy-modal">
     <div class="dl-sheet">
       <div class="dl-grip"></div>
-      <h3>Buy Balls</h3>
+      <h3>Buy Balls <small style="color:rgba(255,255,255,.4);font-size:11px;font-weight:500">· max 20</small></h3>
       <div class="dl-seg">
         <button class="on" data-tab="random">Random</button>
         <button data-tab="tier">Choose</button>
@@ -202,7 +212,7 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
             <span class="dot gold"></span>Gold<small>1000💎</small></button>
         </div>
         <div class="dl-row">
-          <label>Quantity</label>
+          <label>Quantity (max 20)</label>
           <input class="dl-input" id="dl-tier-qty" value="1" inputmode="numeric">
         </div>
       </div>
@@ -233,7 +243,7 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
     <div class="dl-result-box">
       <div class="dl-res-tag" id="dl-res-tag">Result</div>
       <div class="dl-res-mult" id="dl-res-mult">×0.00</div>
-      <div class="dl-res-amt" id="dl-res-amt">+0 💎</div>
+      <div class="dl-res-amt" id="dl-res-amt"></div>
       <div class="dl-res-sub" id="dl-res-sub"></div>
       <button class="dl-btn dl-btn-launch" id="dl-res-ok" style="width:100%">Continue</button>
     </div>
@@ -249,6 +259,11 @@ import * as THREE from 'three';
 
 let BALANCE = 5000;
 try { if (window.__state?.balance) BALANCE = window.__state.balance; } catch(_){}
+
+const DIAMOND_GIF = 'https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif';
+const BG_GIF = 'https://i.postimg.cc/dQmVp6vQ/ezgif-40c67249a3685ff3.gif';
+const TRI_GIF = 'https://i.postimg.cc/QtKjfgmD/ezgif-2b4855fe8e25a8f6.gif';
+const MAX_BALLS = 20;
 
 /* Shared resources */
 const TIER_CFG = {
@@ -282,16 +297,14 @@ function makeBallMesh(value, tier){
 /* ══════════════════════════════════════════════════════════════
    MAP SYSTEM
    ══════════════════════════════════════════════════════════════ */
-const MAP_TYPES = ['classic', 'gears', 'maze'];
-const MAP_NAMES = { classic: 'Classic', gears: 'Gears', maze: 'Maze' };
+const MAP_TYPES = ['classic', 'maze', 'puck'];
+const MAP_NAMES = { classic: 'Classic', maze: 'Maze', puck: 'Puck Arena' };
 const MAP = { type: 'classic' };
 
 function regenerateMap(){
-  // 30% classic, 35% gears, 35% maze
   const r = Math.random();
-  MAP.type = r < 0.3 ? 'classic' : r < 0.65 ? 'gears' : 'maze';
+  MAP.type = r < 0.4 ? 'classic' : r < 0.7 ? 'maze' : 'puck';
 
-  // Shared across maps
   MAP.spinCy = 1300;
   MAP.spinR = 130;
   MAP.spinTube = 12;
@@ -301,68 +314,51 @@ function regenerateMap(){
   MAP.lowerBotHalf = 118 + Math.random() * 10;
   MAP.floorY = -240;
   MAP.floorOpen = 100 + Math.random() * 20;
-  MAP.triHalf = 62 + Math.random() * 14;
-  MAP.triTipY = 260 + Math.random() * 30;
-  MAP.triBaseY = MAP.triTipY - (45 + Math.random() * 20);
-  MAP.triRange = 170 + Math.random() * 30;
-  MAP.triSpeed = 190 + Math.random() * 40;
-
-  // Map-specific layouts
   MAP.pegs = [];
-  MAP.gears = [];
   MAP.bars = [];
+  MAP.puckArena = null;
 
   if (MAP.type === 'classic'){
-    // Standard pegs + triangle
     MAP.upperBotY = 380;
     MAP.upperBotHalf = 130 + Math.random() * 20;
     MAP.lowerTopY = 200;
     MAP.lowerTopHalf = 140 + Math.random() * 15;
+
+    MAP.triTipY = 260 + Math.random() * 30;
+    MAP.triBaseY = MAP.triTipY - (45 + Math.random() * 20);
+    MAP.triHalf = 62 + Math.random() * 14;
+    MAP.triRange = 170 + Math.random() * 30;
+    MAP.triSpeed = 190 + Math.random() * 40;
+    MAP.useTriangle = true;
 
     MAP.pegTop = 1050;
     MAP.pegBot = MAP.upperBotY + 40;
     MAP.pegRows = 6 + Math.floor(Math.random() * 3);
     MAP.pegSpan = 320 + Math.random() * 60;
     MAP.pegR = 13;
-
-    for (let r2 = 0; r2 < MAP.pegRows; r2++){
-      const t = r2/(MAP.pegRows-1);
+    for (let rr = 0; rr < MAP.pegRows; rr++){
+      const t = rr/(MAP.pegRows-1);
       const y = MAP.pegTop + (MAP.pegBot - MAP.pegTop)*t;
-      const count = 5 + (r2 % 2);
+      const count = 5 + (rr % 2);
       const step = MAP.pegSpan/(count+1);
       const startX = -MAP.pegSpan/2 + step;
       for (let i=0; i<count; i++){
         MAP.pegs.push({ x: startX + i*step, y, r: MAP.pegR });
       }
     }
-  } else if (MAP.type === 'gears'){
-    // Rotating rings with gaps
-    MAP.upperBotY = 200;
-    MAP.upperBotHalf = 145;
-    MAP.lowerTopY = 100;
-    MAP.lowerTopHalf = 130;
-
-    const gearCount = 3 + Math.floor(Math.random() * 2);   // 3–4
-    const startY = 1050;
-    const endY = 320;
-    const spacing = (startY - endY) / Math.max(1, gearCount - 1);
-    for (let i = 0; i < gearCount; i++){
-      MAP.gears.push({
-        y: startY - i * spacing,
-        r: 120 + (i % 2) * 25 + Math.random() * 15,
-        speed: (0.5 + Math.random() * 0.7) * (i % 2 === 0 ? 1 : -1),
-        gap: 0.55 + Math.random() * 0.2,     // radians
-        angle: Math.random() * Math.PI * 2,
-      });
-    }
   } else if (MAP.type === 'maze'){
-    // Sliding horizontal bars
     MAP.upperBotY = 200;
     MAP.upperBotHalf = 150;
     MAP.lowerTopY = 100;
     MAP.lowerTopHalf = 130;
+    MAP.useTriangle = true;
+    MAP.triTipY = 260 + Math.random() * 20;
+    MAP.triBaseY = MAP.triTipY - (45 + Math.random() * 20);
+    MAP.triHalf = 62 + Math.random() * 14;
+    MAP.triRange = 170 + Math.random() * 30;
+    MAP.triSpeed = 190 + Math.random() * 40;
 
-    const barCount = 4 + Math.floor(Math.random() * 3);   // 4–6
+    const barCount = 4 + Math.floor(Math.random() * 3);
     const startY = 1050;
     const endY = 320;
     const spacing = (startY - endY) / Math.max(1, barCount - 1);
@@ -378,6 +374,55 @@ function regenerateMap(){
         phase: Math.random() * Math.PI * 2,
       });
     }
+  } else if (MAP.type === 'puck'){
+    // Puck arena replaces the middle section
+    MAP.useTriangle = false;
+    MAP.upperBotY = 320;
+    MAP.upperBotHalf = 160;
+    MAP.lowerTopY = -160;
+    MAP.lowerTopHalf = 120;
+
+    // Some pegs above the arena
+    MAP.pegTop = 1050;
+    MAP.pegBot = MAP.upperBotY + 60;
+    MAP.pegRows = 4;
+    MAP.pegSpan = 320;
+    MAP.pegR = 13;
+    for (let rr = 0; rr < MAP.pegRows; rr++){
+      const t = rr/(MAP.pegRows-1);
+      const y = MAP.pegTop + (MAP.pegBot - MAP.pegTop)*t;
+      const count = 5 + (rr % 2);
+      const step = MAP.pegSpan/(count+1);
+      const startX = -MAP.pegSpan/2 + step;
+      for (let i=0; i<count; i++){
+        MAP.pegs.push({ x: startX + i*step, y, r: MAP.pegR });
+      }
+    }
+
+    // Puck arena
+    const W = 380;
+    const H = 200;
+    const CY = 30;                 // center Y
+    const wallT = 8;
+    const puckR = 34;
+    MAP.puckArena = {
+      cx: 0, cy: CY,
+      w: W, h: H,
+      wallT: wallT,
+      topOpeningW: 70,
+      bottomOpenings: [
+        { x: -95, w: 40 },
+        { x:  95, w: 40 },
+      ],
+      puck: {
+        x: 0,
+        y: CY - H/2 + wallT/2 + puckR + 2,
+        vx: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 60),
+        vy: 0,
+        r: puckR,
+        angle: 0,
+      },
+    };
   }
 
   // Bowls
@@ -394,14 +439,14 @@ function regenerateMap(){
   MAP.endWallH = 22;
   MAP.endWallT = 16;
 
-  // Bonus coin — random position somewhere in the upper play area
-  if (Math.random() < 0.7){                                // 70% chance to appear
+  // Bonus coin
+  if (Math.random() < 0.7){
     MAP.bonus = {
       x: (Math.random() - 0.5) * 200,
       y: 500 + Math.random() * 400,
       r: 18,
       collected: false,
-      points: 0,                                            // set at spawn based on pot
+      points: 0,
     };
   } else {
     MAP.bonus = null;
@@ -443,18 +488,14 @@ canvasHost.parentNode.replaceChild(renderer.domElement, canvasHost);
 renderer.domElement.id = 'dl-canvas';
 renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:1';
 
-renderer.domElement.addEventListener('webglcontextlost', () => {
-  console.warn('WebGL context lost');
-});
-renderer.domElement.addEventListener('webglcontextrestored', () => {
-  console.warn('WebGL context restored');
-});
+renderer.domElement.addEventListener('webglcontextlost', () => console.warn('WebGL lost'));
+renderer.domElement.addEventListener('webglcontextrestored', () => console.warn('WebGL restored'));
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-const key = new THREE.DirectionalLight(0xffffff, 2.6);
-key.position.set(220, 900, 700); scene.add(key);
-const fill = new THREE.DirectionalLight(0xd8d8e0, 1.8);
-fill.position.set(-420, 300, 400); scene.add(fill);
+const keyL = new THREE.DirectionalLight(0xffffff, 2.6);
+keyL.position.set(220, 900, 700); scene.add(keyL);
+const fillL = new THREE.DirectionalLight(0xd8d8e0, 1.8);
+fillL.position.set(-420, 300, 400); scene.add(fillL);
 const rimL = new THREE.PointLight(0xc8c8d0, 2.2, 2400);
 rimL.position.set(0, -400, 500); scene.add(rimL);
 const topL = new THREE.PointLight(0xffffff, 1.4, 1800);
@@ -464,11 +505,51 @@ const goldL2 = new THREE.PointLight(0xffdd44, 0, 600);
 goldL1.visible = false; goldL2.visible = false;
 scene.add(goldL1, goldL2);
 
+/* ── Animated background GIF ── */
+const bgImg = new Image();
+bgImg.crossOrigin = 'anonymous';
+bgImg.src = BG_GIF;
+bgImg.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;pointer-events:none;opacity:0;';
+document.body.appendChild(bgImg);
+const bgCanvas = document.createElement('canvas');
+bgCanvas.width = 256; bgCanvas.height = 256;
+const bgCtx = bgCanvas.getContext('2d');
+const bgTex = new THREE.CanvasTexture(bgCanvas);
+bgTex.colorSpace = THREE.SRGBColorSpace;
+bgTex.minFilter = THREE.LinearFilter;
+bgTex.magFilter = THREE.LinearFilter;
+let bgReady = false;
+bgImg.onload = () => {
+  bgCanvas.width = bgImg.naturalWidth || 256;
+  bgCanvas.height = bgImg.naturalHeight || 256;
+  bgReady = true;
+};
+let bgLast = 0;
+function tickBg(now){
+  if (!bgReady) return;
+  if (now - bgLast < 50) return;
+  bgLast = now;
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+  bgCtx.drawImage(bgImg, 0, 0);
+  bgTex.needsUpdate = true;
+}
+
+const bgMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(900, 2800),
+  new THREE.MeshBasicMaterial({
+    map: bgTex, transparent: true, opacity: 0.18, depthWrite: false,
+  })
+);
+bgMesh.position.set(0, 300, -240);
+bgMesh.renderOrder = -10;
+scene.add(bgMesh);
+
+/* Dark backdrop for the map area */
 const backdrop = new THREE.Mesh(
   new THREE.PlaneGeometry(1000, 2600),
-  new THREE.MeshStandardMaterial({ color:0x141418, metalness:0.35, roughness:0.9 })
+  new THREE.MeshStandardMaterial({ color:0x141418, metalness:0.35, roughness:0.9, transparent:true, opacity:0.85 })
 );
-backdrop.position.set(0, 300, -250);
+backdrop.position.set(0, 300, -230);
 scene.add(backdrop);
 
 /* ══════════════════════════════════════════════════════════════
@@ -478,11 +559,12 @@ const mapGroup = new THREE.Group();
 scene.add(mapGroup);
 let WALLS = [];
 let PEGS = [];
-let GEARS = [];    // { mesh, y, r, speed, gap, angle }
-let BARS = [];     // { mesh, y, halfW, x, speed, range, dir, phase }
+let BARS = [];
 let triMesh = null, gifPlane = null;
 let spinMesh = null, spinRail = null, spinInner = null;
 let bonusMesh = null;
+let puckGroup = null;
+let puckWalls = [];       // visual arena walls
 let currentGap = 0;
 
 const wallMat = new THREE.MeshStandardMaterial({
@@ -492,14 +574,6 @@ const wallMat = new THREE.MeshStandardMaterial({
 const pegMat = new THREE.MeshStandardMaterial({
   color: 0xf6f6fc, metalness: 1.0, roughness: 0.13,
   emissive: 0x242430, emissiveIntensity: 0.3,
-});
-const gearMat = new THREE.MeshStandardMaterial({
-  color: 0xd8d8e4, metalness: 0.9, roughness: 0.18,
-  emissive: 0x303040, emissiveIntensity: 0.6,
-});
-const gearHotMat = new THREE.MeshStandardMaterial({
-  color: 0xff5566, metalness: 0.85, roughness: 0.2,
-  emissive: 0x802030, emissiveIntensity: 0.9,
 });
 const barMat = new THREE.MeshStandardMaterial({
   color: 0xe0e0e8, metalness: 0.9, roughness: 0.22,
@@ -537,11 +611,15 @@ const bonusMat = new THREE.MeshStandardMaterial({
   color: 0xffdd44, metalness: 1.0, roughness: 0.1,
   emissive: 0xffaa00, emissiveIntensity: 1.4,
 });
+const arenaMat = new THREE.MeshStandardMaterial({
+  color: 0xf0f0f6, metalness: 0.9, roughness: 0.16,
+  emissive: 0x50505a, emissiveIntensity: 0.8,
+});
 
-/* GIF */
+/* ── Triangle GIF (frog) ── */
 const gifImg = new Image();
 gifImg.crossOrigin = 'anonymous';
-gifImg.src = 'https://i.postimg.cc/QtKjfgmD/ezgif-2b4855fe8e25a8f6.gif';
+gifImg.src = TRI_GIF;
 gifImg.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;pointer-events:none;opacity:0;';
 document.body.appendChild(gifImg);
 const gifCanvas = document.createElement('canvas');
@@ -580,12 +658,14 @@ function clearMapGroup(){
 
 function buildMap(){
   clearMapGroup();
-  WALLS = []; PEGS = []; GEARS = []; BARS = [];
+  WALLS = []; PEGS = []; BARS = [];
   triMesh = null; gifPlane = null;
   spinMesh = null; spinRail = null; spinInner = null;
   bonusMesh = null;
+  puckGroup = null;
+  puckWalls = [];
 
-  // Walls — always two funnels with gap between
+  // Funnel walls
   function wall(ax, ay, bx, by){
     const dx = bx-ax, dy = by-ay;
     const len = Math.hypot(dx, dy);
@@ -601,49 +681,29 @@ function buildMap(){
   wall(-MAP.lowerTopHalf, MAP.lowerTopY, -MAP.lowerBotHalf, MAP.lowerBotY);
   wall( MAP.lowerTopHalf, MAP.lowerTopY,  MAP.lowerBotHalf, MAP.lowerBotY);
 
-  // Map-specific content
-  if (MAP.type === 'classic'){
-    MAP.pegs.forEach(p => {
-      const m = new THREE.Mesh(new THREE.SphereGeometry(p.r, 14, 10), pegMat);
-      m.position.set(p.x, p.y, 0);
-      m.userData.hit = 0;
-      mapGroup.add(m);
-      PEGS.push({ mesh: m, x: p.x, y: p.y, r: p.r });
-    });
-  } else if (MAP.type === 'gears'){
-    MAP.gears.forEach(g => {
-      // Ring = torus with gap; render as a full torus and use physics to
-      // prevent ball from entering through gap. Simpler visually and works.
-      const torus = new THREE.Mesh(
-        new THREE.TorusGeometry(g.r, 10, 14, 48),
-        gearMat
-      );
-      torus.position.set(0, g.y, 0);
-      mapGroup.add(torus);
-      // Gap visual marker (small glowing arc)
-      const gapArc = new THREE.Mesh(
-        new THREE.TorusGeometry(g.r, 11, 12, 8, g.gap * 2),
-        gearHotMat
-      );
-      gapArc.position.set(0, g.y, 0);
-      mapGroup.add(gapArc);
-      GEARS.push({ mesh: torus, gapMesh: gapArc, y: g.y, r: g.r, speed: g.speed, gap: g.gap, angle: g.angle });
-    });
-  } else if (MAP.type === 'maze'){
-    MAP.bars.forEach(b => {
-      const geo = new THREE.BoxGeometry(b.halfW * 2, 12, 28);
-      const m = new THREE.Mesh(geo, barMat);
-      m.position.set(b.x, b.y, 0);
-      mapGroup.add(m);
-      BARS.push({
-        mesh: m, y: b.y, halfW: b.halfW, x: b.x, baseX: b.baseX,
-        speed: b.speed, range: b.range, dir: b.dir, phase: b.phase,
-      });
-    });
-  }
+  // Pegs
+  MAP.pegs.forEach(p => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(p.r, 14, 10), pegMat);
+    m.position.set(p.x, p.y, 0);
+    m.userData.hit = 0;
+    mapGroup.add(m);
+    PEGS.push({ mesh: m, x: p.x, y: p.y, r: p.r });
+  });
 
-  // Triangle — used in classic and maze, skipped in gears (gears are the challenge)
-  if (MAP.type !== 'gears'){
+  // Bars (maze)
+  MAP.bars.forEach(b => {
+    const geo = new THREE.BoxGeometry(b.halfW * 2, 12, 28);
+    const m = new THREE.Mesh(geo, barMat);
+    m.position.set(b.x, b.y, 0);
+    mapGroup.add(m);
+    BARS.push({
+      mesh: m, y: b.y, halfW: b.halfW, x: b.x, baseX: b.baseX,
+      speed: b.speed, range: b.range, dir: b.dir, phase: b.phase,
+    });
+  });
+
+  // Triangle + GIF
+  if (MAP.useTriangle){
     const triShape = new THREE.Shape();
     triShape.moveTo(0, (MAP.triTipY - MAP.triBaseY)/2);
     triShape.lineTo(-MAP.triHalf, (MAP.triBaseY - MAP.triTipY)/2);
@@ -658,12 +718,17 @@ function buildMap(){
     mapGroup.add(triMesh);
 
     gifPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(Math.min(50, MAP.triHalf*1.4), 30),
+      new THREE.PlaneGeometry(Math.min(60, MAP.triHalf*1.4), 42),
       new THREE.MeshBasicMaterial({ map: gifTex, transparent: true, depthWrite: false })
     );
-    gifPlane.position.set(0, (MAP.triTipY + MAP.triBaseY)/2, 14);
-    gifPlane.renderOrder = 5;
+    gifPlane.position.set(0, (MAP.triTipY + MAP.triBaseY)/2, 12);
+    gifPlane.renderOrder = 200;
     mapGroup.add(gifPlane);
+  }
+
+  // Puck arena
+  if (MAP.puckArena){
+    buildPuckArena(MAP.puckArena);
   }
 
   // Spinner
@@ -692,6 +757,79 @@ function buildMap(){
     bonusMesh.rotation.x = Math.PI / 2;
     mapGroup.add(bonusMesh);
   }
+}
+
+function buildPuckArena(A){
+  // Walls — segments with openings
+  function addWall(ax, ay, bx, by){
+    const dx = bx-ax, dy = by-ay;
+    const len = Math.hypot(dx, dy);
+    if (len < 1) return;
+    const angle = Math.atan2(dy, dx);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(len + 6, A.wallT, 32), arenaMat);
+    m.position.set((ax+bx)/2, (ay+by)/2, 0);
+    m.rotation.z = angle;
+    mapGroup.add(m);
+    WALLS.push({ x1:ax, y1:ay, x2:bx, y2:by, thick: A.wallT/2 });
+  }
+
+  const leftX = A.cx - A.w/2;
+  const rightX = A.cx + A.w/2;
+  const topY = A.cy + A.h/2;
+  const botY = A.cy - A.h/2;
+
+  // Sides
+  addWall(leftX, topY, leftX, botY);
+  addWall(rightX, topY, rightX, botY);
+
+  // Top with middle opening
+  addWall(leftX, topY, -A.topOpeningW/2, topY);
+  addWall(A.topOpeningW/2, topY, rightX, topY);
+
+  // Bottom with openings
+  const opens = [...A.bottomOpenings].sort((a, b) => a.x - b.x);
+  let prevX = leftX;
+  for (const o of opens){
+    addWall(prevX, botY, o.x - o.w/2, botY);
+    prevX = o.x + o.w/2;
+  }
+  addWall(prevX, botY, rightX, botY);
+
+  // Puck group
+  puckGroup = new THREE.Group();
+  const puckR = A.puck.r;
+
+  // Outer white ring
+  const ringMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff, metalness: 0.9, roughness: 0.15,
+    emissive: 0xa0a0b0, emissiveIntensity: 0.9,
+  });
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(puckR, 5, 12, 32), ringMat);
+  puckGroup.add(ring);
+
+  // Cross bars (semi-transparent)
+  const crossMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true, opacity: 0.4, depthWrite: false,
+  });
+  const barLen = puckR * 1.75;
+  const barThick = 4;
+  const cross1 = new THREE.Mesh(new THREE.BoxGeometry(barLen, barThick, barThick), crossMat);
+  const cross2 = new THREE.Mesh(new THREE.BoxGeometry(barThick, barLen, barThick), crossMat);
+  puckGroup.add(cross1, cross2);
+
+  // Inner soft glow
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true, opacity: 0.08, depthWrite: false,
+  });
+  const glow = new THREE.Mesh(new THREE.CircleGeometry(puckR * 0.9, 24), glowMat);
+  glow.position.z = -1;
+  puckGroup.add(glow);
+
+  puckGroup.position.set(A.puck.x, A.puck.y, 0);
+  mapGroup.add(puckGroup);
+
+  // Store cross/ring rotation target
+  A.puck.group = puckGroup;
 }
 
 function setSpinnerGap(gapAngle){
@@ -812,7 +950,7 @@ function randomValue(){
 function addTickerChip(amount, mult, extra){
   const chip = document.createElement('div');
   chip.className = 'chip';
-  chip.innerHTML = `<span>💎</span><span class="amt">+${amount}</span>` +
+  chip.innerHTML = `<img src="${DIAMOND_GIF}" alt=""><span class="amt">+${amount}</span>` +
                     (mult ? `<span style="color:#ffdd44;font-weight:800">×${mult.toFixed(2)}</span>` : '') +
                     (extra ? `<span style="color:#7fc8ff;font-weight:800">${extra}</span>` : '');
   elTicker.prepend(chip);
@@ -821,7 +959,7 @@ function addTickerChip(amount, mult, extra){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   COLLISION
+   COLLISION HELPERS
    ══════════════════════════════════════════════════════════════ */
 function closestOnSeg(px,py,ax,ay,bx,by){
   const dx=bx-ax, dy=by-ay, ls=dx*dx+dy*dy;
@@ -877,13 +1015,13 @@ function pointInTri(px, py, ax, ay, bx, by, cx, cy){
    ══════════════════════════════════════════════════════════════ */
 const REST_TRI = 0.5;
 function resolveTriangle(b){
+  if (!triMesh) return;
   const tipX = G.triX, tipY = MAP.triTipY;
   const blx = G.triX - MAP.triHalf, bly = MAP.triBaseY;
   const brx = G.triX + MAP.triHalf, bry = MAP.triBaseY;
   const pad = b.r + 6;
   if (b.x < Math.min(tipX,blx,brx)-pad || b.x > Math.max(tipX,blx,brx)+pad) return;
   if (b.y < Math.min(tipY,bly,bry)-pad || b.y > Math.max(tipY,bly,bry)+pad) return;
-
   if (pointInTri(b.x, b.y, tipX, tipY, blx, bly, brx, bry)){
     const side = (b.x - tipX) >= 0 ? 1 : -1;
     const sx = side > 0 ? brx : blx;
@@ -911,60 +1049,15 @@ function resolveTriangle(b){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GEARS — rotating rings with gaps
-   ══════════════════════════════════════════════════════════════ */
-const REST_GEAR = 0.55;
-function resolveGear(b, gear){
-  const dx = b.x, dy = b.y - gear.y;
-  const dist = Math.hypot(dx, dy);
-  const tubeR = 10;
-  const minD = gear.r - b.r - tubeR;
-  const maxD = gear.r + b.r + tubeR;
-  if (dist < minD || dist > maxD) return;
-
-  // Is ball in gap?
-  const ballAngle = Math.atan2(dy, dx);
-  let da = ballAngle - gear.angle;
-  da = Math.atan2(Math.sin(da), Math.cos(da));
-  if (Math.abs(da) < gear.gap) return;   // pass through
-
-  // Collide with ring edge — push away from ring
-  const nx = dx / dist, ny = dy / dist;
-  const inside = dist < gear.r;
-  const targetDist = gear.r + (inside ? -1 : 1) * (b.r + tubeR);
-  const push = targetDist - dist;
-  b.x += nx * push;
-  b.y += ny * push;
-
-  const vn = b.vx*nx + b.vy*ny;
-  if (inside && vn < 0){
-    b.vx -= (1+REST_GEAR) * vn * nx;
-    b.vy -= (1+REST_GEAR) * vn * ny;
-  } else if (!inside && vn > 0){
-    b.vx -= (1+REST_GEAR) * vn * nx;
-    b.vy -= (1+REST_GEAR) * vn * ny;
-  }
-
-  // Tangential push from rotating ring
-  const tangX = -ny * gear.speed * 40;
-  const tangY =  nx * gear.speed * 40;
-  b.vx += tangX;
-  b.vy += tangY;
-  b.squash = Math.max(b.squash, 0.6);
-}
-
-/* ══════════════════════════════════════════════════════════════
    SLIDING BARS
    ══════════════════════════════════════════════════════════════ */
 const REST_BAR = 0.5;
 function resolveBar(b, bar){
-  // Treat bar as horizontal segment y = bar.y, from bar.x - halfW to bar.x + halfW
   const dy = b.y - bar.y;
   if (Math.abs(dy) > b.r + 8) return;
   const dx = b.x - bar.x;
   if (Math.abs(dx) > bar.halfW + b.r) return;
   if (Math.abs(dx) < bar.halfW){
-    // Ball is under/over the bar — push out vertically
     const dir = dy >= 0 ? 1 : -1;
     b.y = bar.y + dir * (b.r + 7);
     const vn = b.vy * dir;
@@ -974,10 +1067,7 @@ function resolveBar(b, bar){
       b.vy = -Math.abs(b.vy) * 0.3;
     }
     b.squash = Math.max(b.squash, 0.7);
-    // Fling sideways if bar is fast
-    if (Math.abs(bar.dir) > 0){
-      b.vx += bar.dir * 40;
-    }
+    if (bar.dir !== 0) b.vx += bar.dir * 40;
   }
 }
 
@@ -1103,17 +1193,15 @@ function stepFalling(b, dt){
       }
     }
 
-    for (const g of GEARS){
-      if (Math.abs(g.y - b.y) > 40) continue;
-      resolveGear(b, g);
-    }
-
     for (const bar of BARS){
       if (Math.abs(bar.y - b.y) > 30) continue;
       resolveBar(b, bar);
     }
 
     if (triMesh && b.y < MAP.triTipY + 50 && b.y > MAP.triBaseY - 50) resolveTriangle(b);
+
+    // Puck arena collision
+    if (MAP.puckArena) collideWithPuck(b);
 
     // Bonus coin
     if (MAP.bonus && !MAP.bonus.collected){
@@ -1132,7 +1220,7 @@ function stepFalling(b, dt){
 
   b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.0035;
 
-  // Anti-stuck using position history
+  // Anti-stuck
   b.stuckCheckT += dt;
   if (b.stuckCheckT > 0.5){
     const moved = Math.hypot(b.x - b.lastX, b.y - b.lastY);
@@ -1140,20 +1228,16 @@ function stepFalling(b, dt){
       b.stuckCount++;
       b.vx += (Math.random() - 0.5) * 260;
       b.vy -= 60;
-      // If still stuck after 3 tries, teleport down a bit
       if (b.stuckCount >= 3){
         b.y -= 90;
         b.vx = (Math.random() - 0.5) * 100;
         b.stuckCount = 0;
       }
-    } else {
-      b.stuckCount = 0;
-    }
+    } else b.stuckCount = 0;
     b.lastX = b.x; b.lastY = b.y;
     b.stuckCheckT = 0;
   }
 
-  // Knocked off the sides
   if (b.x < -450 || b.x > 450){
     b.state = 'lost'; b.dead = true;
     G.results.push({ value: b.value, mult: 0 });
@@ -1171,6 +1255,74 @@ function stepFalling(b, dt){
         G.results.push({ value: b.value, mult: 0 });
       }
     }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PUCK ARENA
+   ══════════════════════════════════════════════════════════════ */
+function updatePuck(dt){
+  if (!MAP.puckArena) return;
+  const A = MAP.puckArena;
+  const p = A.puck;
+
+  p.x += p.vx * dt;
+  p.angle += p.vx * dt * 0.006;   // visual rotation from sliding
+
+  // Bounce off left/right arena sides
+  const leftBound = A.cx - A.w/2 + A.wallT/2 + p.r;
+  const rightBound = A.cx + A.w/2 - A.wallT/2 - p.r;
+  if (p.x < leftBound){
+    p.x = leftBound;
+    p.vx = Math.abs(p.vx);
+    p.vy = (Math.random() - 0.5) * 80;
+  }
+  if (p.x > rightBound){
+    p.x = rightBound;
+    p.vx = -Math.abs(p.vx);
+    p.vy = (Math.random() - 0.5) * 80;
+  }
+
+  // Slight upward drift from any vy, but pull back down
+  p.y += p.vy * dt;
+  p.vy *= Math.pow(0.05, dt);
+  const homeY = A.cy - A.h/2 + A.wallT/2 + p.r + 2;
+  p.y += (homeY - p.y) * Math.min(1, dt * 6);
+
+  // Sync visual
+  if (p.group){
+    p.group.position.set(p.x, p.y, 0);
+    p.group.rotation.z = p.angle;
+  }
+}
+
+function collideWithPuck(b){
+  const A = MAP.puckArena;
+  const p = A.puck;
+  const dx = b.x - p.x;
+  const dy = b.y - p.y;
+  const d = Math.hypot(dx, dy);
+  const minD = b.r + p.r;
+  if (d < minD && d > 0.001){
+    const nx = dx/d, ny = dy/d;
+    b.x = p.x + nx * minD;
+    b.y = p.y + ny * minD;
+    const relVx = b.vx - p.vx;
+    const relVy = b.vy - p.vy;
+    const relVn = relVx*nx + relVy*ny;
+    if (relVn < 0){
+      b.vx -= 1.8 * relVn * nx;
+      b.vy -= 1.8 * relVn * ny;
+    }
+    // Puck's velocity transfers to ball
+    b.vx += p.vx * 0.8;
+    b.vy -= 40;
+    b.squash = 0.95;
+    // Flash the puck's glow
+    if (A.puck.group){
+      A.puck.flash = 1;
+    }
+    haptic();
   }
 }
 
@@ -1348,7 +1500,7 @@ function updateEndRest(b, dt){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   BALL-BALL SOFT COLLISION
+   BALL-BALL
    ══════════════════════════════════════════════════════════════ */
 function resolveBallBallCollisions(){
   const falling = G.active.filter(b => !b.dead && b.state === 'falling');
@@ -1363,7 +1515,6 @@ function resolveBallBallCollisions(){
         const push = (minD - d) * 0.5;
         a.x -= nx*push; a.y -= ny*push;
         b.x += nx*push; b.y += ny*push;
-        // Simple momentum exchange along normal
         const vn1 = a.vx*nx + a.vy*ny;
         const vn2 = b.vx*nx + b.vy*ny;
         const diff = vn2 - vn1;
@@ -1409,7 +1560,6 @@ function update(dt){
     spinRail.rotation.z = -Math.PI/2 + currentGap/2 + rot;
   }
 
-  // Peg hits
   for (const p of PEGS){
     if (p.mesh.userData.hit > 0){
       p.mesh.userData.hit *= Math.pow(0.0005, dt);
@@ -1417,21 +1567,12 @@ function update(dt){
     }
   }
 
-  // Gears rotate
-  for (const g of GEARS){
-    g.angle += g.speed * dt;
-    if (g.mesh) g.mesh.rotation.z = g.angle;
-    if (g.gapMesh) g.gapMesh.rotation.z = g.angle - g.gap;
-  }
-
-  // Bars slide
   for (const bar of BARS){
     bar.phase += dt;
     bar.x = bar.baseX + Math.sin(bar.phase) * bar.range;
     if (bar.mesh) bar.mesh.position.x = bar.x;
   }
 
-  // Triangle
   if (triMesh && gifPlane && (G.phase === 'playing' || G.phase === 'ended' || G.phase === 'launching')){
     G.triX += G.triDir * MAP.triSpeed * dt;
     if (G.triX >  MAP.triRange){ G.triX =  MAP.triRange; G.triDir = -1; }
@@ -1440,11 +1581,23 @@ function update(dt){
     gifPlane.position.x = G.triX;
   }
 
-  // Bonus coin pulse
   if (bonusMesh && !MAP.bonus.collected){
     bonusMesh.rotation.z += dt * 3;
     const s = 1 + Math.sin(G.time * 5) * 0.15;
     bonusMesh.scale.setScalar(s);
+  }
+
+  // Update puck
+  updatePuck(dt);
+  if (MAP.puckArena && MAP.puckArena.puck.group){
+    // Puck glow pulse on hit
+    if (MAP.puckArena.puck.flash > 0){
+      MAP.puckArena.puck.flash *= Math.pow(0.0005, dt);
+      const f = MAP.puckArena.puck.flash;
+      MAP.puckArena.puck.group.scale.setScalar(1 + f * 0.25);
+    } else {
+      MAP.puckArena.puck.group.scale.setScalar(1);
+    }
   }
 
   updateHeld(dt);
@@ -1565,6 +1718,7 @@ function loop(now){
   const realDt = Math.min((now - last) / 1000, 1/30);
   last = now;
 
+  tickBg(now);
   tickGif(now);
 
   let gameDt = realDt;
@@ -1657,14 +1811,14 @@ document.getElementById('dl-buy-go').addEventListener('click', () => {
   const isRandom = buyTab === 'random';
   if (isRandom){
     cost = Math.max(10, Math.floor(Number(document.getElementById('dl-rand-amt').value)||0));
-    if (cost > BALANCE) return flashResult('Oops','Not enough 💎', true);
-    const n = Math.max(1, Math.min(10, Math.round(Math.sqrt(cost)/2.4)));
+    if (cost > BALANCE) return flashResult('Oops','Not enough', true);
+    const n = Math.max(1, Math.min(MAX_BALLS, Math.round(Math.sqrt(cost)/2.4)));
     for (let i=0;i<n;i++){ const v = randomValue(); balls.push({ value:v, tier:tierFor(v) }); }
   } else {
-    const qty = Math.max(1, Math.min(20, Math.floor(Number(document.getElementById('dl-tier-qty').value)||1)));
+    const qty = Math.max(1, Math.min(MAX_BALLS, Math.floor(Number(document.getElementById('dl-tier-qty').value)||1)));
     const price = Number(document.querySelector('.dl-tier.on')?.dataset.price || 10);
     cost = price * qty;
-    if (cost > BALANCE) return flashResult('Oops','Not enough 💎', true);
+    if (cost > BALANCE) return flashResult('Oops','Not enough', true);
     for (let i=0;i<qty;i++) balls.push({ value:price, tier:buyTier });
   }
   elBuyModal.classList.remove('show');
@@ -1672,10 +1826,7 @@ document.getElementById('dl-buy-go').addEventListener('click', () => {
   G.wagered += cost;
   updateHud();
 
-  // Set bonus value based on pot
-  if (MAP.bonus){
-    MAP.bonus.points = Math.max(50, Math.floor(cost * 0.15));
-  }
+  if (MAP.bonus) MAP.bonus.points = Math.max(50, Math.floor(cost * 0.15));
 
   const spawnAll = () => {
     balls.forEach((b, i) => G.held.push(spawnBall(b.value, b.tier, i * 0.18)));
@@ -1704,7 +1855,7 @@ function spinAll(balls, done){
   const availH = Math.min(window.innerHeight * 0.62, 560);
   const gapPx = 8;
   let rowH = Math.floor((availH - (n-1)*gapPx) / n);
-  rowH = Math.max(64, Math.min(180, rowH));
+  rowH = Math.max(50, Math.min(180, rowH));
 
   const baseAngles = [];
   for (let i = 0; i < ROULETTE_N; i++) baseAngles.push((i/ROULETTE_N)*360);
@@ -1721,7 +1872,7 @@ function spinAll(balls, done){
     const ptrEl = document.createElement('div');
     ptrEl.className = 'dl-r-pointer';
     ptrEl.textContent = '▲';
-    ptrEl.style.fontSize = Math.max(10, Math.min(18, rowH*0.18)) + 'px';
+    ptrEl.style.fontSize = Math.max(9, Math.min(18, rowH*0.18)) + 'px';
     rowEl.appendChild(ptrEl);
     elRRows.appendChild(rowEl);
 
@@ -1733,8 +1884,8 @@ function spinAll(balls, done){
     const winnerIdx = Math.floor(Math.random() * ROULETTE_N);
     items[winnerIdx] = { value: ball.value, tier: ball.tier };
 
-    const ballSize = Math.min(88, Math.max(40, rowH - 18));
-    const fontSize = Math.max(10, ballSize * 0.26);
+    const ballSize = Math.min(88, Math.max(32, rowH - 18));
+    const fontSize = Math.max(9, ballSize * 0.26);
 
     const ballEls = [];
     items.forEach(b => {
@@ -1794,7 +1945,7 @@ function spinAll(balls, done){
         if (myToken !== spinToken) return;
         elRTitle.textContent = 'You got';
         const totalVal = balls.reduce((s,b)=>s+b.value, 0);
-        elRAmount.textContent = '💎' + totalVal;
+        elRAmount.innerHTML = `<img src="${DIAMOND_GIF}" alt=""><span>${totalVal}</span>`;
         elRAmount.classList.add('show');
         haptic();
       }, 250);
@@ -1832,7 +1983,6 @@ function finishRound(){
     total += r.value * r.mult;
     if (r.mult === 0) lost++; else won++;
   }
-  // Bonus coin adds points if collected
   if (G.bonusCollected && MAP.bonus) total += MAP.bonus.points;
 
   const winnings = Math.floor(total);
@@ -1843,11 +1993,11 @@ function finishRound(){
   if (winnings > 0) addTickerChip(winnings, mult, G.bonusCollected ? '+BONUS' : '');
 
   elResTag.textContent = winnings > 0 ? 'Round Results' : 'Round Over';
-  elResAmt.textContent = (winnings > 0 ? '+' : '') + winnings + ' 💎';
+  elResAmt.innerHTML = `<img src="${DIAMOND_GIF}" alt=""><span>${(winnings > 0 ? '+' : '') + winnings}</span>`;
   elResAmt.classList.toggle('lose', winnings === 0);
   elResMult.textContent = '×' + mult.toFixed(2);
   elResMult.classList.toggle('lose', winnings === 0);
-  elResSub.textContent = `${won} won · ${lost} lost` + (G.bonusCollected ? ' · 💰 BONUS collected' : '');
+  elResSub.textContent = `${won} won · ${lost} lost` + (G.bonusCollected ? ' · BONUS collected' : '');
   elResult.classList.add('show');
 }
 
@@ -1878,7 +2028,7 @@ document.getElementById('dl-res-ok').addEventListener('click', () => {
 });
 function flashResult(tag, amt, isLose, sub){
   elResTag.textContent = tag;
-  elResAmt.textContent = amt;
+  elResAmt.innerHTML = `<span>${amt}</span>`;
   elResAmt.classList.toggle('lose', !!isLose);
   elResMult.textContent = '';
   elResSub.textContent = sub || '';
@@ -1895,9 +2045,6 @@ document.getElementById('dl-close').addEventListener('click', () => {
   window.dispatchEvent(new CustomEvent('dlballs-close'));
 });
 
-/* ══════════════════════════════════════════════════════════════
-   BOOT
-   ══════════════════════════════════════════════════════════════ */
 regenerateMap();
 buildMap();
 onResize();
