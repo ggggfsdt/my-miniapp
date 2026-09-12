@@ -8,13 +8,11 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 
-/* ============ STAGE ============ */
 #dl{position:fixed;inset:0;overflow:hidden;background:
   radial-gradient(ellipse 120% 80% at 50% -10%,#1c1c24 0%,transparent 55%),
   radial-gradient(ellipse 100% 60% at 50% 110%,#14141c 0%,transparent 60%),
   linear-gradient(180deg,#08080c 0%,#04040a 100%)}
 
-/* Aurora sweep overlay */
 .dl-aurora{position:absolute;inset:-15%;z-index:2;pointer-events:none;mix-blend-mode:screen;
   background:
     radial-gradient(circle at 22% 18%,rgba(120,80,255,.16) 0%,transparent 32%),
@@ -29,7 +27,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 
 #dl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:1}
 
-/* ============ TOP PILLS ============ */
 .dl-top{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px;right:10px;z-index:10;
   display:flex;align-items:center;gap:6px;pointer-events:none}
 .dl-pill{position:relative;display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;
@@ -74,7 +71,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
   box-shadow:0 4px 20px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
 .dl-close:active{transform:scale(.88);background:rgba(255,80,80,.22)}
 
-/* ============ TICKER ============ */
 .dl-ticker{position:absolute;top:calc(env(safe-area-inset-top,0px) + 48px);left:10px;right:10px;z-index:9;
   display:flex;gap:5px;overflow:hidden;pointer-events:none;height:22px;align-items:center;
   mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
@@ -91,7 +87,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
   60%{transform:translateY(2px) scale(1.05)}
   100%{transform:translateY(0) scale(1);opacity:1}}
 
-/* ============ MAP BAR ============ */
 .dl-mapbar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 76px);left:8px;right:8px;z-index:11;
   display:flex;gap:5px;justify-content:center;flex-wrap:wrap;pointer-events:none}
 .dl-mapbar button{position:relative;pointer-events:auto;height:26px;padding:0 11px;border-radius:9px;
@@ -110,7 +105,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 @keyframes dlMapPulse{0%,100%{box-shadow:0 3px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.35),0 0 20px rgba(255,255,255,.28)}
   50%{box-shadow:0 3px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.35),0 0 32px rgba(255,255,255,.45)}}
 
-/* ============ BOTTOM BUTTONS ============ */
 .dl-bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:14px;right:14px;z-index:10;
   display:flex;gap:10px}
 .dl-btn{position:relative;flex:1;height:48px;border-radius:15px;border:none;
@@ -137,7 +131,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
   transform:scale(0);animation:dlRipple .55s ease-out;opacity:.85}
 @keyframes dlRipple{to{transform:scale(1);opacity:0}}
 
-/* ============ MODAL ============ */
 .dl-modal{position:absolute;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;
   background:rgba(0,0,0,.72);backdrop-filter:blur(14px) saturate(120%)}
 .dl-modal.show{display:flex;animation:dlF .22s ease}
@@ -205,7 +198,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 .dl-confirm{background:linear-gradient(135deg,#ffffff,#e2e2ea);color:#0a0a10;
   box-shadow:0 6px 22px rgba(255,255,255,.22),inset 0 1px 0 rgba(255,255,255,1)}
 
-/* ============ RESULT ============ */
 .dl-result{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
   background:rgba(0,0,0,.86);backdrop-filter:blur(16px) saturate(130%);padding:20px}
 .dl-result.show{display:flex;animation:dlF .25s ease}
@@ -228,7 +220,6 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 .dl-res-mult.lose{color:#6a6a72;text-shadow:none}
 .dl-res-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:20px}
 
-/* ============ ROULETTE ============ */
 .dl-r{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;
   gap:12px;padding:24px 16px;overflow:hidden;
   background:radial-gradient(ellipse at 50% 50%,#181820 0%,#08080c 65%,#020205 100%)}
@@ -443,7 +434,7 @@ function regenerateMap(){
       },
     };
   } else if (MAP.type === 'brick'){
-    // ===== Brick map: purple jelly platforms instead of plinko pegs =====
+    // Pink jelly platforms (instead of plinko pegs)
     const jellyLayout = [
       { x: -70, y: 1000, halfW: 118 },
       { x:  80, y: 870,  halfW: 128 },
@@ -452,11 +443,15 @@ function regenerateMap(){
       { x: -60, y: 480,  halfW: 112 },
     ];
     jellyLayout.forEach(p => {
+      // tiltDir points toward the center opening — left rolls right, right rolls left
+      const tiltDir = p.x < 0 ? 1 : -1;
       MAP.jellyPlatforms.push({
         x: p.x, y: p.y,
         halfW: p.halfW, halfH: 13,
         squeeze: 0,
         squeezeVel: 0,
+        tiltDir,
+        tiltAngle: -tiltDir * 0.10,
         mesh: null,
       });
     });
@@ -486,9 +481,7 @@ function regenerateMap(){
     MAP.dartBox = {
       cx: 0, cy: 100, w: 480, h: 700, wallT: 14,
       topOpeningW: 200,
-      // ONE opening at bottom center
       bottomOpenings: [{x:0,w:130}],
-      // ONE small opening on left + right side (same y)
       sideOpening: { y: 100, h: 84 },
       shootTimer: 0,
       active: null,
@@ -749,21 +742,22 @@ function buildMap(){
     });
   }
 
-  // ===== Purple jelly platforms (brick map only) =====
+  // ===== Pink jelly platforms (brick map) =====
   if (MAP.jellyPlatforms && MAP.jellyPlatforms.length){
     MAP.jellyPlatforms.forEach(j => {
       const geo = roundedBoxGeo(j.halfW*2, j.halfH*2, 36, 10, 3.2);
       const mat = new THREE.MeshStandardMaterial({
-        color: 0xa040ff,
-        metalness: 0.25,
-        roughness: 0.28,
-        emissive: 0x5a10a0,
-        emissiveIntensity: 0.6,
+        color: 0xff5cb8,
+        metalness: 0.15,
+        roughness: 0.22,
+        emissive: 0xa02060,
+        emissiveIntensity: 0.75,
         transparent: true,
-        opacity: 0.94,
+        opacity: 0.93,
       });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(j.x, j.y, 0);
+      mesh.rotation.z = j.tiltAngle;
       addOutline(mesh, 1.07);
       mapGroup.add(mesh);
       j.mesh = mesh;
@@ -892,7 +886,7 @@ function buildDartBox(D){
     WALLS.push({x1,y1,x2,y2,thick:D.wallT/2});
   }
 
-  // Top wall with a single opening (balls enter here)
+  // Top wall with a single opening
   seg(leftX, topY, -D.topOpeningW/2, topY);
   seg(D.topOpeningW/2, topY, rightX, topY);
 
@@ -911,7 +905,7 @@ function buildDartBox(D){
   seg(rightX, topY, rightX, sTop);
   seg(rightX, sBot, rightX, botY);
 
-  // Dartboard — alternating RED + WHITE only, deep black outer
+  // Dartboard
   const R = 130;
   const layers = [
     { r: R,        mat: DART_BLACK, z: -10 },
@@ -990,7 +984,6 @@ function buildBowl(cfg){
     ring.position.set(hx, 1, hz);
     g.add(ring);
 
-    // Multiplier label floating above the hole
     const label = makeMultSprite('×' + h.mult.toFixed(1), h.red ? '#ff5577' : '#ffffff');
     label.position.set(hx, 62, hz);
     g.add(label);
@@ -1258,12 +1251,11 @@ function resolveDartBricks(b){
   return hit;
 }
 
-// ===== Purple jelly platform collision (brick map) =====
+// Pink jelly platform collision (brick map)
 function collideJelly(b){
   if (!JELLY.length) return false;
   for (let i = 0; i < JELLY.length; i++){
     const j = JELLY[i];
-    // Visual top accounts for current squeeze
     const curHalfH = j.halfH * (1 - j.squeeze * 0.5);
     const dx = b.x - j.x;
     const dy = b.y - j.y;
@@ -1272,13 +1264,14 @@ function collideJelly(b){
     if (overlapX <= 0 || overlapY <= 0) continue;
 
     if (overlapY < overlapX){
-      // Vertical contact
       const dir = dy > 0 ? 1 : -1;
       b.y = j.y + dir * (curHalfH + b.r + 0.5);
       if (dir > 0 && b.vy < 0){
-        // BOUNCE off top — jelly energy
+        // BOUNCE
         b.vy = -b.vy * 0.92 + 30;
-        b.vx += (dx / j.halfW) * 180;
+        // Outward + nudge toward opening
+        b.vx += (dx / j.halfW) * 170;
+        b.vx += j.tiltDir * 120;
         b.squash = Math.min(1, Math.abs(b.vy) / 500);
         j.squeeze = Math.min(0.85, j.squeeze + 0.6);
         j.squeezeVel = -j.squeeze * 9;
@@ -1286,8 +1279,12 @@ function collideJelly(b){
       } else {
         b.vy = -b.vy * 0.35;
       }
+      // Smooth roll toward opening while in contact with the top
+      if (dir > 0){
+        const desired = j.tiltDir * 70;
+        b.vx += (desired - b.vx) * 0.06;
+      }
     } else {
-      // Side contact
       const dir = dx > 0 ? 1 : -1;
       b.x = j.x + dir * (j.halfW + b.r + 0.5);
       b.vx = -b.vx * 0.5;
@@ -1316,6 +1313,7 @@ function spawnBall(value, tier, spawnDelay){
     hoverStartTheta:0, hoverEndTheta:0, holeStartY:0,
     escT:0, escFromX:0, escFromY:0, escFromZ:0, escToX:0, escToY:0, escToZ:0,
     escapedBowl2:false, slowMoDone:false,
+    slipT:0,
     lastX:0, lastY:0, stuckCheckT:0, stuckCount:0,
   };
   b.mesh.scale.setScalar(0.001);
@@ -1416,7 +1414,6 @@ function stepFalling(b, dt){
   if (b.y < MAP.floorY){
     if (isBallInDartBox(b)) return;
     if (MAP.type === 'dart'){
-      // Dart map: any ball that exits the box goes to a bowl
       startBowlDrop(b, Math.random() < 0.20 ? 2 : 1);
       return;
     }
@@ -1579,6 +1576,7 @@ function startBowlDrop(b, bowlNum){
   const sT = cfg.cy + cfg.wallH + 120;
   if (b.y < sT) b.y = sT;
   b.vx = 0; b.vy = Math.max(-320, Math.min(b.vy,-80)); b.spin = 0;
+  b.orbitT = 0;
 }
 function updateDrop(b, dt){
   const cfg = b.bowlNum === 1 ? MAP.bowl1 : MAP.bowl2;
@@ -1614,14 +1612,27 @@ function updateOrbit(b, dt){
   b.z = Math.sin(b.theta)*b.rad;
   b.y = cfg.cy + b.r + 0.5;
   b.spin += Math.abs(b.omega)*dt*6;
+
+  // ===== NEW: Slip-through chance — ball falls out of the bowl and is LOST =====
+  // Starts after 2.4s of orbiting, ramps up over time. Faster spinners are safer.
+  if (b.orbitT > 2.4){
+    const slipRate = (b.orbitT - 2.4) * 0.75 * (spd < 2.8 ? 1 : 0.25);
+    if (Math.random() < slipRate * dt){
+      b.state = 'slip';
+      b.slipT = 0;
+      return;
+    }
+  }
+
   if (b.orbitT < 1.4) return;
   if (b.bowlNum === 1 && !b.escapedBowl2 && b.orbitT > 2.4){
     b.escapedBowl2 = true;
     if (Math.random() < 0.20){ startEscape2(b); return; }
   }
+  // Hole catch radius tightened from 1.15 to 0.92 (harder to land)
   for (const h of cfg.holes){
     const hx = Math.cos(h.a)*h.r, hz = Math.sin(h.a)*h.r;
-    if (Math.hypot(b.x-hx, b.z-hz) < cfg.holeR*1.15 && spd < 3.0){ startHover(b, cfg, h); return; }
+    if (Math.hypot(b.x-hx, b.z-hz) < cfg.holeR*0.92 && spd < 3.0){ startHover(b, cfg, h); return; }
   }
   if (b.orbitT > 6.5){
     let best = cfg.holes[0], bd = Infinity;
@@ -1634,6 +1645,20 @@ function updateOrbit(b, dt){
     startHover(b, cfg, best);
   }
 }
+
+// Ball slipped through the bowl — falls through and fades out as a LOSS
+function updateSlip(b, dt){
+  b.slipT += dt;
+  b.y -= 300 * dt;
+  b.spin += dt * 9;
+  b.scale = Math.max(0, 1 - b.slipT / 0.75);
+  if (b.slipT >= 0.75){
+    b.dead = true;
+    G.results.push({value: b.value, mult: 0});
+    G.shake = Math.min(1, G.shake + 0.15);
+  }
+}
+
 function startEscape2(b){
   b.state = 'esc2'; b.escT = 0;
   b.escFromX = b.x; b.escFromY = b.y; b.escFromZ = b.z;
@@ -1830,7 +1855,7 @@ function update(dt){
     }
   }
 
-  // ===== Purple jelly springs (brick map) =====
+  // Jelly springs
   for (const j of JELLY){
     const k = 55, damp = 6.5;
     j.squeezeVel += (-j.squeeze * k) * dt - j.squeezeVel * damp * dt;
@@ -1846,7 +1871,7 @@ function update(dt){
       j.mesh.scale.set(sx, sy, sz);
       j.mesh.position.x = j.x + Math.sin(G.time * 22) * sq * 3;
       j.mesh.position.y = j.y;
-      j.mesh.rotation.z = Math.sin(G.time * 26) * sq * 0.09;
+      j.mesh.rotation.z = j.tiltAngle + Math.sin(G.time * 26) * sq * 0.09;
     }
   }
 
@@ -1915,6 +1940,7 @@ function update(dt){
     else if (b.state === 'bowl1' || b.state === 'bowl2') updateOrbit(b, dt);
     else if (b.state === 'hover') updateHover(b, dt);
     else if (b.state === 'hole') updateHoleDrop(b, dt);
+    else if (b.state === 'slip') updateSlip(b, dt);
     else if (b.state === 'esc2') updateEscape2(b, dt);
     else if (b.state === 'endFall') updateEndFall(b, dt);
     else if (b.state === 'endRest') updateEndRest(b, dt);
@@ -1947,7 +1973,7 @@ function syncMeshes(){
   G.active.forEach(b => {
     if (b.dead) return;
     if (b.state === 'settled'){ b.mesh.visible = false; return; }
-    if (b.state === 'endRest' || b.state === 'endFall' || b.state === 'hole'){
+    if (b.state === 'slip' || b.state === 'endRest' || b.state === 'endFall' || b.state === 'hole'){
       b.mesh.position.set(b.x,b.y,b.z);
       b.mesh.scale.setScalar(b.scale || 1);
       b.mesh.rotation.z += 0.05;
@@ -2053,7 +2079,6 @@ function onResize(){
 }
 addEventListener('resize', onResize);
 
-// MAP CHOOSER
 document.querySelectorAll('#dl-mapbar button').forEach(btn => {
   btn.addEventListener('click', () => {
     FORCED_MAP = btn.dataset.mt;
@@ -2138,7 +2163,6 @@ document.getElementById('dl-buy-go').addEventListener('click', () => {
   else spawnAll();
 });
 
-/* ====== ROULETTE ====== */
 const ROULETTE_N = 16;
 const DEG2RAD = Math.PI / 180;
 let spinToken = 0;
