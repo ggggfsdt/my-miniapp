@@ -6,102 +6,154 @@
 <title>Dlballs</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{height:100%;overflow:hidden;background:#05060b;color:#e8e8e8;
+html,body{height:100%;overflow:hidden;background:#050506;color:#eee;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 #dl{position:fixed;inset:0;overflow:hidden;
-  background:radial-gradient(ellipse at 50% 0%,#1c1636 0%,#0a0a16 55%,#050507 100%)}
-#dl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  background:radial-gradient(ellipse at 50% 0%,#1e1e24 0%,#0e0e12 55%,#050507 100%)}
+#dl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:1}
 .dl-top{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px;right:10px;z-index:10;
   display:flex;align-items:center;gap:6px;pointer-events:none}
-.dl-pill{display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;
-  background:rgba(18,18,22,.66);border:1px solid rgba(255,255,255,.07);
+.dl-pill{display:flex;align-items:center;gap:5px;height:26px;padding:0 10px;
+  background:rgba(10,10,12,.85);border:1px solid rgba(255,255,255,.07);
   border-radius:13px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  font-size:11px;font-weight:600;pointer-events:auto}
-.dl-pill .lbl{color:rgba(255,255,255,.32);font-size:9px;letter-spacing:.8px;font-weight:700}
+  font-size:11px;font-weight:600;pointer-events:auto;flex-shrink:0}
+.dl-pill .lbl{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.8px;font-weight:700}
 .dl-pill .val{color:#fff;font-variant-numeric:tabular-nums;font-weight:800}
+.dl-pill.pot{border-color:rgba(255,220,80,.35)}
+.dl-pill.pot .val{color:#ffdd44}
+.dl-pill.map{border-color:rgba(120,200,255,.35)}
+.dl-pill.map .val{color:#7fc8ff;font-size:10px}
 .dl-close{margin-left:auto;width:26px;height:26px;border-radius:50%;
-  border:1px solid rgba(255,255,255,.07);background:rgba(18,18,22,.66);
-  color:rgba(255,255,255,.75);font-size:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.07);background:rgba(10,10,12,.85);
+  color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  display:flex;align-items:center;justify-content:center;transition:.15s;pointer-events:auto}
+  display:flex;align-items:center;justify-content:center;transition:.15s;pointer-events:auto;flex-shrink:0}
 .dl-close:active{transform:scale(.9)}
+.dl-ticker{position:absolute;top:calc(env(safe-area-inset-top,0px) + 42px);left:10px;right:10px;
+  z-index:9;display:flex;gap:4px;overflow:hidden;pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%)}
+.dl-ticker .chip{flex-shrink:0;
+  background:rgba(10,10,12,.75);border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;padding:3px 9px;font-size:10px;font-weight:600;
+  color:rgba(255,255,255,.75);white-space:nowrap;
+  display:flex;align-items:center;gap:5px;
+  animation:dlChipIn .35s cubic-bezier(.2,.9,.3,1.1)}
+.dl-ticker .chip .amt{color:#8fe5b0;font-weight:800}
+@keyframes dlChipIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
 .dl-bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:12px;z-index:10;
   display:flex;gap:8px}
-.dl-btn{flex:1;height:38px;border-radius:12px;border:none;font-weight:700;font-size:13px;
-  cursor:pointer;transition:.15s;font-family:inherit;display:flex;align-items:center;
-  justify-content:center;letter-spacing:.2px}
+.dl-btn{flex:1;height:44px;border-radius:13px;border:none;font-weight:700;font-size:13px;
+  cursor:pointer;transition:transform .15s ease,background .15s ease;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;letter-spacing:.3px}
 .dl-btn:active{transform:scale(.97)}
-.dl-btn:disabled{opacity:.32;pointer-events:none}
-.dl-btn-buy{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.09)}
-.dl-btn-launch{background:linear-gradient(135deg,#7b5cff,#a340ff);color:#fff;
-  box-shadow:0 4px 20px rgba(123,92,255,.35)}
-.dl-btn-launch:not(:disabled){animation:dlPulseBtn 2s ease-in-out infinite}
-@keyframes dlPulseBtn{0%,100%{box-shadow:0 4px 20px rgba(123,92,255,.35)}
-50%{box-shadow:0 4px 30px rgba(163,64,255,.6)}}
+.dl-btn:disabled{opacity:.3;pointer-events:none}
+.dl-btn-buy{background:rgba(20,20,24,.9);color:#fff;border:1px solid rgba(255,255,255,.08)}
+.dl-btn-launch{background:#f4f4f8;color:#0a0a0c}
+.dl-btn-launch:not(:disabled){animation:dlPulseBtn 2.2s ease-in-out infinite}
+@keyframes dlPulseBtn{0%,100%{opacity:1}50%{opacity:.85}}
 .dl-modal{position:absolute;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;
-  background:rgba(0,0,0,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .dl-modal.show{display:flex;animation:dlFade .2s ease}
 @keyframes dlFade{from{opacity:0}to{opacity:1}}
-.dl-sheet{width:100%;max-width:440px;background:#121216;border-radius:22px 22px 0 0;
+.dl-sheet{width:100%;max-width:440px;background:#0e0e12;border-radius:22px 22px 0 0;
   padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 16px);
-  border-top:1px solid rgba(255,255,255,.07);animation:dlSheetUp .3s cubic-bezier(.2,.9,.3,1.2)}
+  border-top:1px solid rgba(255,255,255,.06);animation:dlSheetUp .3s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes dlSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.dl-grip{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 12px}
+.dl-grip{width:36px;height:3px;background:rgba(255,255,255,.14);border-radius:2px;margin:0 auto 12px}
 .dl-sheet h3{font-size:15px;font-weight:700;color:#fff;text-align:center;margin-bottom:14px}
 .dl-seg{display:flex;gap:3px;padding:3px;background:rgba(255,255,255,.04);border-radius:11px;margin-bottom:14px}
 .dl-seg button{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;
-  color:rgba(255,255,255,.45);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
-.dl-seg button.on{background:rgba(123,92,255,.22);color:#fff}
+  color:rgba(255,255,255,.5);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+.dl-seg button.on{background:rgba(255,255,255,.14);color:#fff}
 .dl-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-.dl-row label{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.9px;text-transform:uppercase;
+.dl-row.inline{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dl-row label{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.9px;text-transform:uppercase;
   font-weight:700;padding-left:2px}
+.dl-row.inline label{font-size:13px;color:#fff;letter-spacing:0;text-transform:none;font-weight:600;padding:0}
+.dl-row .sub{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:1px;padding-left:2px}
 .dl-input{width:100%;height:42px;padding:0 14px;border-radius:11px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
   color:#fff;font-size:15px;font-weight:700;text-align:center;outline:none;font-family:inherit;
   font-variant-numeric:tabular-nums;transition:.15s}
-.dl-input:focus{border-color:rgba(123,92,255,.5);background:rgba(123,92,255,.06)}
-.dl-hint{font-size:10.5px;color:rgba(255,255,255,.3);line-height:1.5;padding:0 2px}
+.dl-input:focus{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.08)}
+.dl-hint{font-size:10.5px;color:rgba(255,255,255,.35);line-height:1.5;padding:0 2px}
 .dl-tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-.dl-tier{padding:10px 2px;border-radius:10px;border:1px solid rgba(255,255,255,.06);
+.dl-tier{padding:10px 2px;border-radius:10px;border:1px solid rgba(255,255,255,.08);
   background:rgba(255,255,255,.03);color:#fff;cursor:pointer;
-  font-size:10px;font-weight:800;text-align:center;font-family:inherit;line-height:1.35;transition:.15s}
-.dl-tier b{font-size:14px;display:block;margin-bottom:1px}
-.dl-tier small{font-size:9.5px;color:rgba(255,255,255,.4);font-weight:600}
-.dl-tier.on{border-color:#7b5cff;background:rgba(123,92,255,.15)}
-.dl-tier.on small{color:rgba(180,150,255,.9)}
+  font-size:10px;font-weight:800;text-align:center;font-family:inherit;
+  line-height:1.35;transition:.15s;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
+.dl-tier .dot{width:18px;height:18px;border-radius:50%;flex-shrink:0}
+.dl-tier .dot.gray{background:radial-gradient(circle at 32% 28%,#e8e8ee 0%,#8a8a92 55%,#3a3a40 100%)}
+.dl-tier .dot.silver{background:radial-gradient(circle at 32% 28%,#ffffff 0%,#d0d0dc 45%,#5a5a70 100%)}
+.dl-tier .dot.green{background:radial-gradient(circle at 32% 28%,#e0ffe8 0%,#30c977 50%,#0a3a20 100%)}
+.dl-tier .dot.gold{background:radial-gradient(circle at 32% 28%,#fffbd0 0%,#ffcc33 45%,#8a5a10 100%)}
+.dl-tier small{font-size:9.5px;color:rgba(255,255,255,.5);font-weight:600}
+.dl-tier.on{border-color:#fff;background:rgba(255,255,255,.13)}
+.dl-tier.on small{color:rgba(255,255,255,.9)}
+.dl-switch{position:relative;width:46px;height:28px;flex-shrink:0;cursor:pointer}
+.dl-switch input{opacity:0;width:0;height:0;position:absolute}
+.dl-switch-slider{position:absolute;inset:0;background:rgba(255,255,255,.14);border-radius:999px;
+  transition:background .22s cubic-bezier(.2,.9,.3,1.05)}
+.dl-switch-slider::before{content:"";position:absolute;width:24px;height:24px;left:2px;top:2px;
+  background:#fff;border-radius:50%;transition:transform .22s cubic-bezier(.2,.9,.3,1.05)}
+.dl-switch input:checked + .dl-switch-slider{background:#3aa55a}
+.dl-switch input:checked + .dl-switch-slider::before{transform:translateX(18px)}
 .dl-actions{display:flex;gap:8px;margin-top:4px}
 .dl-actions button{flex:1;height:42px;border-radius:11px;border:none;font-weight:700;
-  font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
+  font-size:13px;cursor:pointer;font-family:inherit;transition:transform .15s ease}
 .dl-actions button:active{transform:scale(.97)}
-.dl-cancel{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
-.dl-confirm{background:linear-gradient(135deg,#2ecc71,#1a9a52);color:#fff;
-  box-shadow:0 4px 18px rgba(46,204,113,.3)}
-.dl-r{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;
-  justify-content:center;background:rgba(6,6,11,.94);backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px)}
-.dl-r.show{display:flex}
-.dl-r-title{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:2.5px;
-  text-transform:uppercase;font-weight:800;margin-bottom:18px}
-.dl-r-stage{position:relative;width:100%;max-width:520px;height:190px}
-.dl-r-stage canvas{display:block;width:100%;height:100%}
-.dl-r-arrow{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
-  color:#fff;font-size:14px;text-shadow:0 0 14px rgba(255,255,255,.9);
-  animation:dlArrowP 1s ease-in-out infinite}
-@keyframes dlArrowP{0%,100%{transform:translateX(-50%) translateY(0);opacity:.7}
-50%{transform:translateX(-50%) translateY(-4px);opacity:1}}
+.dl-cancel{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7)}
+.dl-confirm{background:#f4f4f8;color:#0a0a0c}
 .dl-result{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:20px}
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:20px}
 .dl-result.show{display:flex;animation:dlFade .25s ease}
-.dl-result-box{width:100%;max-width:340px;background:#121216;border:1px solid rgba(255,255,255,.07);
+.dl-result-box{width:100%;max-width:360px;background:#0e0e12;border:1px solid rgba(255,255,255,.08);
   border-radius:22px;padding:26px 22px;text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,.8);animation:dlPop .35s cubic-bezier(.2,.9,.3,1.2)}
+  animation:dlPop .35s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes dlPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-.dl-res-tag{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;
+.dl-res-tag{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:2px;
   text-transform:uppercase;font-weight:800}
-.dl-res-amt{font-size:42px;font-weight:900;color:#7bffb8;margin:8px 0 2px;letter-spacing:-1px;
-  font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(123,255,184,.3)}
-.dl-res-amt.lose{color:#ff7b7b;text-shadow:0 0 30px rgba(255,123,123,.3)}
-.dl-res-sub{font-size:11.5px;color:rgba(255,255,255,.4);margin-bottom:18px}
+.dl-res-amt{font-size:44px;font-weight:900;color:#fff;margin:8px 0 4px;letter-spacing:-1.5px;
+  font-variant-numeric:tabular-nums}
+.dl-res-amt.lose{color:#7a7a82}
+.dl-res-mult{font-size:22px;font-weight:800;color:#ffdd44;margin-bottom:4px;
+  font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
+.dl-res-mult.lose{color:#7a7a82}
+.dl-res-sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-bottom:18px}
+.dl-r{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;padding:24px 16px;
+  background:radial-gradient(ellipse at 50% 50%,#14141a 0%,#07070a 70%,#020203 100%)}
+.dl-r.show{display:flex;animation:dlFade .2s ease}
+.dl-r-title{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2.5px;
+  text-transform:uppercase;font-weight:800;min-height:14px;text-align:center}
+.dl-r-rows{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.dl-r-row{position:relative;flex-shrink:0;border-radius:18px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,255,255,.05) 0%,transparent 65%),
+    linear-gradient(180deg,rgba(24,24,30,.85),rgba(6,6,8,.95));
+  border:1px solid rgba(255,255,255,.06);
+  perspective:900px;perspective-origin:50% 50%}
+.dl-r-viewport{position:absolute;inset:0;overflow:hidden}
+.dl-r-ball{position:absolute;left:50%;top:50%;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-family:-apple-system,system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;will-change:transform,opacity}
+.dl-r-ball.gray   {background:radial-gradient(circle at 32% 28%,#e8e8ee 0%,#8a8a92 55%,#3a3a40 100%);color:#101014}
+.dl-r-ball.silver {background:radial-gradient(circle at 32% 28%,#ffffff 0%,#d0d0dc 45%,#5a5a70 100%);color:#15151e}
+.dl-r-ball.green  {background:radial-gradient(circle at 32% 28%,#e0ffe8 0%,#30c977 50%,#0a3a20 100%);color:#042a18}
+.dl-r-ball.gold   {background:radial-gradient(circle at 32% 28%,#fffbd0 0%,#ffcc33 45%,#8a5a10 100%);color:#3a2000}
+.dl-r-ball.winner::before{content:'';position:absolute;inset:-5px;border-radius:50%;
+  border:2px solid #fff;animation:dlWinRing 1s ease-in-out infinite}
+@keyframes dlWinRing{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+.dl-r-pointer{position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);
+  font-size:14px;line-height:1;color:#fff;font-weight:900;
+  text-shadow:0 0 14px rgba(255,255,255,1),0 0 28px rgba(255,255,255,.5);
+  pointer-events:none;z-index:500}
+.dl-r-amount{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums;opacity:0;transform:scale(.7);
+  transition:opacity .3s ease,transform .35s cubic-bezier(.2,.9,.3,1.2);
+  min-height:38px;text-align:center}
+.dl-r-amount.show{opacity:1;transform:scale(1)}
 </style>
 </head>
 <body>
@@ -111,9 +163,12 @@ html,body{height:100%;overflow:hidden;background:#05060b;color:#e8e8e8;
 
   <div class="dl-top">
     <div class="dl-pill"><span class="lbl">BAL</span><span class="val" id="dl-bal">0</span></div>
-    <div class="dl-pill"><span class="lbl">HOLD</span><span class="val" id="dl-hold">0 · 0💎</span></div>
+    <div class="dl-pill pot"><span class="lbl">POT</span><span class="val" id="dl-pot">0</span></div>
+    <div class="dl-pill map"><span class="lbl">MAP</span><span class="val" id="dl-map">Classic</span></div>
     <button class="dl-close" id="dl-close">✕</button>
   </div>
+
+  <div class="dl-ticker" id="dl-ticker"></div>
 
   <div class="dl-bottom">
     <button class="dl-btn dl-btn-buy" id="dl-buy">Buy Balls</button>
@@ -137,15 +192,29 @@ html,body{height:100%;overflow:hidden;background:#05060b;color:#e8e8e8;
       </div>
       <div id="dl-pane-tier" style="display:none">
         <div class="dl-tiers">
-          <button class="dl-tier on" data-tier="gray"   data-price="10"><b>●</b>Gray<small>10💎</small></button>
-          <button class="dl-tier" data-tier="silver" data-price="100"><b>●</b>Silver<small>100💎</small></button>
-          <button class="dl-tier" data-tier="green"  data-price="500"><b>●</b>Green<small>500💎</small></button>
-          <button class="dl-tier" data-tier="gold"   data-price="1000"><b>●</b>Gold<small>1000💎</small></button>
+          <button class="dl-tier on" data-tier="gray"   data-price="10">
+            <span class="dot gray"></span>Gray<small>10💎</small></button>
+          <button class="dl-tier" data-tier="silver" data-price="100">
+            <span class="dot silver"></span>Silver<small>100💎</small></button>
+          <button class="dl-tier" data-tier="green"  data-price="500">
+            <span class="dot green"></span>Green<small>500💎</small></button>
+          <button class="dl-tier" data-tier="gold"   data-price="1000">
+            <span class="dot gold"></span>Gold<small>1000💎</small></button>
         </div>
         <div class="dl-row">
           <label>Quantity</label>
           <input class="dl-input" id="dl-tier-qty" value="1" inputmode="numeric">
         </div>
+      </div>
+      <div class="dl-row inline">
+        <div>
+          <label>Fast Spin</label>
+          <div class="sub">Faster reveal animation</div>
+        </div>
+        <label class="dl-switch">
+          <input type="checkbox" id="dl-fast-spin">
+          <span class="dl-switch-slider"></span>
+        </label>
       </div>
       <div class="dl-actions">
         <button class="dl-cancel" id="dl-buy-cancel">Cancel</button>
@@ -156,15 +225,14 @@ html,body{height:100%;overflow:hidden;background:#05060b;color:#e8e8e8;
 
   <div class="dl-r" id="dl-roulette">
     <div class="dl-r-title" id="dl-r-title">Rolling</div>
-    <div class="dl-r-stage">
-      <canvas id="dl-r-canvas"></canvas>
-      <div class="dl-r-arrow">▲</div>
-    </div>
+    <div class="dl-r-rows" id="dl-r-rows"></div>
+    <div class="dl-r-amount" id="dl-r-amount"></div>
   </div>
 
   <div class="dl-result" id="dl-result">
     <div class="dl-result-box">
       <div class="dl-res-tag" id="dl-res-tag">Result</div>
+      <div class="dl-res-mult" id="dl-res-mult">×0.00</div>
       <div class="dl-res-amt" id="dl-res-amt">+0 💎</div>
       <div class="dl-res-sub" id="dl-res-sub"></div>
       <button class="dl-btn dl-btn-launch" id="dl-res-ok" style="width:100%">Continue</button>
@@ -173,11 +241,7 @@ html,body{height:100%;overflow:hidden;background:#05060b;color:#e8e8e8;
 </div>
 
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-  }
-}
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
 </script>
 
 <script type="module">
@@ -186,209 +250,470 @@ import * as THREE from 'three';
 let BALANCE = 5000;
 try { if (window.__state?.balance) BALANCE = window.__state.balance; } catch(_){}
 
-const TIER_MAT = {
-  gray:   { color:0x9a9aa8, metalness:0.75, roughness:0.45, emissive:0x000000, eInt:0 },
-  silver: { color:0xd8d8ee, metalness:1.00, roughness:0.14, emissive:0x1a1a30, eInt:0.3 },
-  green:  { color:0x30c977, metalness:0.90, roughness:0.18, emissive:0x084a28, eInt:0.6 },
-  gold:   { color:0xffcc33, metalness:1.00, roughness:0.10, emissive:0x6a3a08, eInt:0.8 },
+/* Shared resources */
+const TIER_CFG = {
+  gray:   { color:0x9a9aa0, metalness:0.75, roughness:0.42, emissive:0x000000, eInt:0 },
+  silver: { color:0xe0e0e6, metalness:1.00, roughness:0.14, emissive:0x151520, eInt:0.35 },
+  green:  { color:0x30c977, metalness:0.90, roughness:0.18, emissive:0x0a4a2c, eInt:0.7 },
+  gold:   { color:0xffcc33, metalness:1.00, roughness:0.10, emissive:0x8a4a10, eInt:1.1 },
 };
 function tierFor(v){ return v>=1000?'gold':v>=500?'green':v>=100?'silver':'gray'; }
-function ballR(v){ return 7 + Math.log10(v+1)*1.9; }
+function ballR(v){ return Math.round(8 + Math.log10(v+1)*2.1); }
 
-/* ══════════ WORLD ══════════ */
-const BOARD = { wallTopY: 420, wallBotY: 20, wallTopHalf: 205, wallBotHalf: 108, wallThick: 11, wallZ: 0 };
-const PEG = { topY: 300, botY: 90, rows: 7, r: 8, z: 0 };
-const TRI = { tipY: -50, baseY: -100, halfW: 50, slideRange: 62, speed: 105, z: 0 };
-const FLOOR = { y: -140, halfW: 95 };
-const SPIN = { cx: 0, cy: 500, cz: 0, R: 118, tube: 10 };
+const SHARED_MAT = {};
+for (const t in TIER_CFG){
+  const c = TIER_CFG[t];
+  SHARED_MAT[t] = new THREE.MeshStandardMaterial({
+    color: c.color, metalness: c.metalness, roughness: c.roughness,
+    emissive: c.emissive, emissiveIntensity: c.eInt,
+  });
+}
+const ballGeoCache = new Map();
+function getBallGeo(r){
+  if (ballGeoCache.has(r)) return ballGeoCache.get(r);
+  const g = new THREE.SphereGeometry(r, 14, 10);
+  ballGeoCache.set(r, g);
+  return g;
+}
+function makeBallMesh(value, tier){
+  return new THREE.Mesh(getBallGeo(ballR(value)), SHARED_MAT[tier] || SHARED_MAT.gray);
+}
 
-// Rims closer to holes now
-const BOWL1 = {
-  cx: 0, cz: 0, cy: -255,
-  rimR: 92, wallH: 46, wallT: 14,
-  holes: [
-    { a:  Math.PI/2,           r: 46, mult: 3.0, red: true  },
-    { a:  Math.PI/2 + 2.094,   r: 46, mult: 1.5, red: false },
-    { a:  Math.PI/2 - 2.094,   r: 46, mult: 1.5, red: false },
-  ],
-  holeR: 22,
-};
-const BOWL2 = {
-  cx: 0, cz: 0, cy: -375,
-  rimR: 72, wallH: 40, wallT: 12,
-  holes: [
-    { a:  Math.PI/2, r: 36, mult: 6.0, red: true  },
-    { a: -Math.PI/2, r: 36, mult: 3.0, red: false },
-  ],
-  holeR: 18,
-};
+/* ══════════════════════════════════════════════════════════════
+   MAP SYSTEM
+   ══════════════════════════════════════════════════════════════ */
+const MAP_TYPES = ['classic', 'gears', 'maze'];
+const MAP_NAMES = { classic: 'Classic', gears: 'Gears', maze: 'Maze' };
+const MAP = { type: 'classic' };
 
-/* ══════════ SCENE ══════════ */
-const W0 = window.innerWidth, H0 = window.innerHeight;
+function regenerateMap(){
+  // 30% classic, 35% gears, 35% maze
+  const r = Math.random();
+  MAP.type = r < 0.3 ? 'classic' : r < 0.65 ? 'gears' : 'maze';
+
+  // Shared across maps
+  MAP.spinCy = 1300;
+  MAP.spinR = 130;
+  MAP.spinTube = 12;
+  MAP.upperTopY = 1180;
+  MAP.upperTopHalf = 210 + Math.random() * 50;
+  MAP.lowerBotY = -240;
+  MAP.lowerBotHalf = 118 + Math.random() * 10;
+  MAP.floorY = -240;
+  MAP.floorOpen = 100 + Math.random() * 20;
+  MAP.triHalf = 62 + Math.random() * 14;
+  MAP.triTipY = 260 + Math.random() * 30;
+  MAP.triBaseY = MAP.triTipY - (45 + Math.random() * 20);
+  MAP.triRange = 170 + Math.random() * 30;
+  MAP.triSpeed = 190 + Math.random() * 40;
+
+  // Map-specific layouts
+  MAP.pegs = [];
+  MAP.gears = [];
+  MAP.bars = [];
+
+  if (MAP.type === 'classic'){
+    // Standard pegs + triangle
+    MAP.upperBotY = 380;
+    MAP.upperBotHalf = 130 + Math.random() * 20;
+    MAP.lowerTopY = 200;
+    MAP.lowerTopHalf = 140 + Math.random() * 15;
+
+    MAP.pegTop = 1050;
+    MAP.pegBot = MAP.upperBotY + 40;
+    MAP.pegRows = 6 + Math.floor(Math.random() * 3);
+    MAP.pegSpan = 320 + Math.random() * 60;
+    MAP.pegR = 13;
+
+    for (let r2 = 0; r2 < MAP.pegRows; r2++){
+      const t = r2/(MAP.pegRows-1);
+      const y = MAP.pegTop + (MAP.pegBot - MAP.pegTop)*t;
+      const count = 5 + (r2 % 2);
+      const step = MAP.pegSpan/(count+1);
+      const startX = -MAP.pegSpan/2 + step;
+      for (let i=0; i<count; i++){
+        MAP.pegs.push({ x: startX + i*step, y, r: MAP.pegR });
+      }
+    }
+  } else if (MAP.type === 'gears'){
+    // Rotating rings with gaps
+    MAP.upperBotY = 200;
+    MAP.upperBotHalf = 145;
+    MAP.lowerTopY = 100;
+    MAP.lowerTopHalf = 130;
+
+    const gearCount = 3 + Math.floor(Math.random() * 2);   // 3–4
+    const startY = 1050;
+    const endY = 320;
+    const spacing = (startY - endY) / Math.max(1, gearCount - 1);
+    for (let i = 0; i < gearCount; i++){
+      MAP.gears.push({
+        y: startY - i * spacing,
+        r: 120 + (i % 2) * 25 + Math.random() * 15,
+        speed: (0.5 + Math.random() * 0.7) * (i % 2 === 0 ? 1 : -1),
+        gap: 0.55 + Math.random() * 0.2,     // radians
+        angle: Math.random() * Math.PI * 2,
+      });
+    }
+  } else if (MAP.type === 'maze'){
+    // Sliding horizontal bars
+    MAP.upperBotY = 200;
+    MAP.upperBotHalf = 150;
+    MAP.lowerTopY = 100;
+    MAP.lowerTopHalf = 130;
+
+    const barCount = 4 + Math.floor(Math.random() * 3);   // 4–6
+    const startY = 1050;
+    const endY = 320;
+    const spacing = (startY - endY) / Math.max(1, barCount - 1);
+    for (let i = 0; i < barCount; i++){
+      MAP.bars.push({
+        y: startY - i * spacing,
+        halfW: 55 + Math.random() * 40,
+        x: (Math.random() - 0.5) * 100,
+        speed: 100 + Math.random() * 80,
+        range: 120 + Math.random() * 40,
+        dir: Math.random() < 0.5 ? 1 : -1,
+        baseX: (Math.random() - 0.5) * 100,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  // Bowls
+  MAP.bowl1 = {
+    cy: -440, rimR: 130, wallH: 30, wallT: 24, holeR: 34,
+    holes: shuffleHoles(3, 3.0, 1.5),
+  };
+  MAP.bowl2 = {
+    cy: -720, rimR: 105, wallH: 26, wallT: 22, holeR: 30,
+    holes: shuffleHoles(2, 6.0, 3.0),
+  };
+  MAP.endCy = -940;
+  MAP.endRimR = 78;
+  MAP.endWallH = 22;
+  MAP.endWallT = 16;
+
+  // Bonus coin — random position somewhere in the upper play area
+  if (Math.random() < 0.7){                                // 70% chance to appear
+    MAP.bonus = {
+      x: (Math.random() - 0.5) * 200,
+      y: 500 + Math.random() * 400,
+      r: 18,
+      collected: false,
+      points: 0,                                            // set at spawn based on pot
+    };
+  } else {
+    MAP.bonus = null;
+  }
+}
+
+function shuffleHoles(n, redMult, normalMult){
+  const baseA = Math.random() * Math.PI * 2;
+  const redIdx = Math.floor(Math.random() * n);
+  const holes = [];
+  for (let i = 0; i < n; i++){
+    const spread = n >= 3 ? (Math.PI * 2 / n) : Math.PI;
+    const a = baseA + i * spread + (Math.random() - 0.5) * 0.3;
+    const isRed = i === redIdx;
+    holes.push({
+      a,
+      r: 44 + Math.random() * 10,
+      mult: isRed ? redMult : normalMult,
+      red: isRed,
+    });
+  }
+  return holes;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCENE
+   ══════════════════════════════════════════════════════════════ */
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, W0/H0, 1, 6000);
-
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 8000);
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
-renderer.setSize(W0, H0);
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = false;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+renderer.toneMappingExposure = 1.3;
 
 const canvasHost = document.getElementById('dl-canvas');
 canvasHost.parentNode.replaceChild(renderer.domElement, canvasHost);
 renderer.domElement.id = 'dl-canvas';
+renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:1';
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.42));
-const key = new THREE.DirectionalLight(0xffffff, 2.2);
-key.position.set(220, 800, 700);
-key.castShadow = true;
-key.shadow.mapSize.set(1024, 1024);
-key.shadow.camera.left = -520; key.shadow.camera.right = 520;
-key.shadow.camera.top = 800; key.shadow.camera.bottom = -700;
-key.shadow.camera.near = 10; key.shadow.camera.far = 2500;
-key.shadow.bias = -0.0011; key.shadow.radius = 3;
-scene.add(key);
-const pd = new THREE.DirectionalLight(0x8a5cff, 1.2);
-pd.position.set(-420, 250, 350);
-scene.add(pd);
-const rim = new THREE.PointLight(0x6a2aff, 1.8, 1600);
-rim.position.set(0, -320, 350); scene.add(rim);
-const topGlow = new THREE.PointLight(0xb080ff, 0.9, 900);
-topGlow.position.set(0, 500, 350); scene.add(topGlow);
+renderer.domElement.addEventListener('webglcontextlost', () => {
+  console.warn('WebGL context lost');
+});
+renderer.domElement.addEventListener('webglcontextrestored', () => {
+  console.warn('WebGL context restored');
+});
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+const key = new THREE.DirectionalLight(0xffffff, 2.6);
+key.position.set(220, 900, 700); scene.add(key);
+const fill = new THREE.DirectionalLight(0xd8d8e0, 1.8);
+fill.position.set(-420, 300, 400); scene.add(fill);
+const rimL = new THREE.PointLight(0xc8c8d0, 2.2, 2400);
+rimL.position.set(0, -400, 500); scene.add(rimL);
+const topL = new THREE.PointLight(0xffffff, 1.4, 1800);
+topL.position.set(0, 900, 500); scene.add(topL);
+const goldL1 = new THREE.PointLight(0xffdd44, 0, 600);
+const goldL2 = new THREE.PointLight(0xffdd44, 0, 600);
+goldL1.visible = false; goldL2.visible = false;
+scene.add(goldL1, goldL2);
 
 const backdrop = new THREE.Mesh(
-  new THREE.PlaneGeometry(750, 1200),
-  new THREE.MeshStandardMaterial({ color:0x0d0c1c, metalness:0.4, roughness:0.85 })
+  new THREE.PlaneGeometry(1000, 2600),
+  new THREE.MeshStandardMaterial({ color:0x141418, metalness:0.35, roughness:0.9 })
 );
-backdrop.position.set(0, -60, -150);
-backdrop.receiveShadow = true;
+backdrop.position.set(0, 300, -250);
 scene.add(backdrop);
 
-/* ══════════ FUNNEL ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   MAP GROUP
+   ══════════════════════════════════════════════════════════════ */
+const mapGroup = new THREE.Group();
+scene.add(mapGroup);
+let WALLS = [];
+let PEGS = [];
+let GEARS = [];    // { mesh, y, r, speed, gap, angle }
+let BARS = [];     // { mesh, y, halfW, x, speed, range, dir, phase }
+let triMesh = null, gifPlane = null;
+let spinMesh = null, spinRail = null, spinInner = null;
+let bonusMesh = null;
+let currentGap = 0;
+
 const wallMat = new THREE.MeshStandardMaterial({
-  color: 0x4a4a72, metalness: 0.88, roughness: 0.22,
-  emissive: 0x1a1a44, emissiveIntensity: 0.55,
+  color: 0xa8a8b0, metalness: 0.88, roughness: 0.28,
+  emissive: 0x24242c, emissiveIntensity: 0.55,
 });
-function buildFunnelWall(sign){
-  const x1 = sign * BOARD.wallTopHalf, y1 = BOARD.wallTopY;
-  const x2 = sign * BOARD.wallBotHalf, y2 = BOARD.wallBotY;
-  const dx = x2 - x1, dy = y2 - y1;
-  const len = Math.hypot(dx, dy);
-  const angle = Math.atan2(dy, dx);
-  const geo = new THREE.BoxGeometry(len, BOARD.wallThick, 30);
-  const m = new THREE.Mesh(geo, wallMat);
-  m.position.set((x1+x2)/2, (y1+y2)/2, BOARD.wallZ);
-  m.rotation.z = angle;
-  m.castShadow = true; m.receiveShadow = true;
-  scene.add(m);
-  return { x1, y1, x2, y2, thick: BOARD.wallThick/2 };
-}
-const WALLS = [ buildFunnelWall(-1), buildFunnelWall(1) ];
-
-/* ══════════ PEGS ══════════ */
-const pegMatBase = new THREE.MeshStandardMaterial({
-  color: 0xc8d0ee, metalness: 1.0, roughness: 0.14,
-  emissive: 0x201a40, emissiveIntensity: 0.25,
+const pegMat = new THREE.MeshStandardMaterial({
+  color: 0xf6f6fc, metalness: 1.0, roughness: 0.13,
+  emissive: 0x242430, emissiveIntensity: 0.3,
 });
-const P = [];
-(function buildPegs(){
-  const rows = PEG.rows;
-  for (let r=0; r<rows; r++){
-    const t = r/(rows-1);
-    const y = PEG.topY + (PEG.botY - PEG.topY)*t;
-    const count = 6 + (r%2);
-    const span = 340;
-    const step = span/(count+1);
-    const startX = -span/2 + step;
-    for (let i=0; i<count; i++){
-      const x = startX + i*step;
-      const m = new THREE.Mesh(new THREE.SphereGeometry(PEG.r, 18, 12), pegMatBase.clone());
-      m.position.set(x, y, PEG.z);
-      m.castShadow = true;
-      m.userData.hit = 0;
-      scene.add(m);
-      P.push({ mesh:m, x, y, r:PEG.r });
-    }
-  }
-})();
-
-/* ══════════ TRIANGLE ══════════ */
-const triShape = new THREE.Shape();
-triShape.moveTo(0, (TRI.tipY - TRI.baseY)/2);
-triShape.lineTo(-TRI.halfW, (TRI.baseY - TRI.tipY)/2);
-triShape.lineTo(TRI.halfW, (TRI.baseY - TRI.tipY)/2);
-triShape.closePath();
-const triGeo = new THREE.ExtrudeGeometry(triShape, {
-  depth: 24, bevelEnabled: true, bevelThickness: 1.5, bevelSize: 1.5, bevelSegments: 2,
+const gearMat = new THREE.MeshStandardMaterial({
+  color: 0xd8d8e4, metalness: 0.9, roughness: 0.18,
+  emissive: 0x303040, emissiveIntensity: 0.6,
 });
-triGeo.translate(0, 0, -12);
+const gearHotMat = new THREE.MeshStandardMaterial({
+  color: 0xff5566, metalness: 0.85, roughness: 0.2,
+  emissive: 0x802030, emissiveIntensity: 0.9,
+});
+const barMat = new THREE.MeshStandardMaterial({
+  color: 0xe0e0e8, metalness: 0.9, roughness: 0.22,
+  emissive: 0x2a2a34, emissiveIntensity: 0.5,
+});
 const triMat = new THREE.MeshStandardMaterial({
-  color: 0xf0c040, metalness: 0.92, roughness: 0.20,
-  emissive: 0x6a3010, emissiveIntensity: 0.55,
+  color: 0xb8b8c0, metalness: 0.85, roughness: 0.3,
+  emissive: 0x2a2a34, emissiveIntensity: 0.6,
 });
-const triMesh = new THREE.Mesh(triGeo, triMat);
-triMesh.position.set(0, (TRI.tipY + TRI.baseY)/2, TRI.z);
-triMesh.castShadow = true; triMesh.receiveShadow = true;
-scene.add(triMesh);
-
-/* ══════════ SPINNER ══════════ */
 const spinMat = new THREE.MeshStandardMaterial({
-  color: 0x8a5cff, metalness: 0.94, roughness: 0.14,
-  emissive: 0x4a20a0, emissiveIntensity: 1.0,
+  color: 0xffffff, metalness: 0.85, roughness: 0.14,
+  emissive: 0x80808a, emissiveIntensity: 0.75,
 });
-const spinMesh = new THREE.Mesh(new THREE.TorusGeometry(SPIN.R, SPIN.tube, 16, 96), spinMat);
-spinMesh.position.set(SPIN.cx, SPIN.cy, SPIN.cz);
-spinMesh.castShadow = true; spinMesh.receiveShadow = true;
-scene.add(spinMesh);
-
 const spinRailMat = new THREE.MeshStandardMaterial({
-  color: 0xb080ff, emissive: 0x6028d0, emissiveIntensity: 1.2,
-  metalness: 0.6, roughness: 0.32,
+  color: 0xf0f0f8, emissive: 0x8a8a92, emissiveIntensity: 1.15,
+  metalness: 0.6, roughness: 0.3,
 });
-const spinRail = new THREE.Mesh(new THREE.TorusGeometry(SPIN.R + 12, 1.4, 8, 96), spinRailMat);
-spinRail.position.copy(spinMesh.position);
-scene.add(spinRail);
+const rimMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff, metalness: 0.8, roughness: 0.24,
+  emissive: 0x60606a, emissiveIntensity: 0.7, side: THREE.DoubleSide,
+});
+const floorMat = new THREE.MeshStandardMaterial({
+  color: 0x3a3a42, metalness: 0.6, roughness: 0.7,
+  emissive: 0x22222a, emissiveIntensity: 0.4, side: THREE.DoubleSide,
+});
+const ringRedMat = new THREE.MeshStandardMaterial({
+  color: 0xff3355, emissive: 0xc01030, emissiveIntensity: 1.4,
+  metalness: 0.8, roughness: 0.26,
+});
+const ringWhiteMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff, emissive: 0x9a9aa8, emissiveIntensity: 0.9,
+  metalness: 0.8, roughness: 0.26,
+});
+const bonusMat = new THREE.MeshStandardMaterial({
+  color: 0xffdd44, metalness: 1.0, roughness: 0.1,
+  emissive: 0xffaa00, emissiveIntensity: 1.4,
+});
 
-const spinInner = new THREE.Mesh(
-  new THREE.CircleGeometry(SPIN.R - SPIN.tube - 2, 48),
-  new THREE.MeshBasicMaterial({ color: 0x1a1030, transparent: true, opacity: 0.32, side: THREE.DoubleSide })
-);
-spinInner.position.set(SPIN.cx, SPIN.cy, SPIN.cz - 4);
-scene.add(spinInner);
+/* GIF */
+const gifImg = new Image();
+gifImg.crossOrigin = 'anonymous';
+gifImg.src = 'https://i.postimg.cc/QtKjfgmD/ezgif-2b4855fe8e25a8f6.gif';
+gifImg.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;pointer-events:none;opacity:0;';
+document.body.appendChild(gifImg);
+const gifCanvas = document.createElement('canvas');
+gifCanvas.width = 128; gifCanvas.height = 128;
+const gifCtx = gifCanvas.getContext('2d');
+const gifTex = new THREE.CanvasTexture(gifCanvas);
+gifTex.colorSpace = THREE.SRGBColorSpace;
+gifTex.minFilter = THREE.LinearFilter;
+gifTex.magFilter = THREE.LinearFilter;
+let gifReady = false;
+gifImg.onload = () => {
+  gifCanvas.width = gifImg.naturalWidth || 128;
+  gifCanvas.height = gifImg.naturalHeight || 128;
+  gifReady = true;
+};
+let gifLast = 0;
+function tickGif(now){
+  if (!gifReady) return;
+  if (now - gifLast < 33) return;
+  gifLast = now;
+  gifCtx.clearRect(0, 0, gifCanvas.width, gifCanvas.height);
+  gifCtx.drawImage(gifImg, 0, 0, gifCanvas.width, gifCanvas.height);
+  gifTex.needsUpdate = true;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MAP BUILD
+   ══════════════════════════════════════════════════════════════ */
+function clearMapGroup(){
+  while (mapGroup.children.length){
+    const c = mapGroup.children[0];
+    mapGroup.remove(c);
+    if (c.geometry) c.geometry.dispose();
+  }
+}
+
+function buildMap(){
+  clearMapGroup();
+  WALLS = []; PEGS = []; GEARS = []; BARS = [];
+  triMesh = null; gifPlane = null;
+  spinMesh = null; spinRail = null; spinInner = null;
+  bonusMesh = null;
+
+  // Walls — always two funnels with gap between
+  function wall(ax, ay, bx, by){
+    const dx = bx-ax, dy = by-ay;
+    const len = Math.hypot(dx, dy);
+    const angle = Math.atan2(dy, dx);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(len, 12, 32), wallMat);
+    m.position.set((ax+bx)/2, (ay+by)/2, 0);
+    m.rotation.z = angle;
+    mapGroup.add(m);
+    WALLS.push({ x1:ax, y1:ay, x2:bx, y2:by, thick: 6 });
+  }
+  wall(-MAP.upperTopHalf, MAP.upperTopY, -MAP.upperBotHalf, MAP.upperBotY);
+  wall( MAP.upperTopHalf, MAP.upperTopY,  MAP.upperBotHalf, MAP.upperBotY);
+  wall(-MAP.lowerTopHalf, MAP.lowerTopY, -MAP.lowerBotHalf, MAP.lowerBotY);
+  wall( MAP.lowerTopHalf, MAP.lowerTopY,  MAP.lowerBotHalf, MAP.lowerBotY);
+
+  // Map-specific content
+  if (MAP.type === 'classic'){
+    MAP.pegs.forEach(p => {
+      const m = new THREE.Mesh(new THREE.SphereGeometry(p.r, 14, 10), pegMat);
+      m.position.set(p.x, p.y, 0);
+      m.userData.hit = 0;
+      mapGroup.add(m);
+      PEGS.push({ mesh: m, x: p.x, y: p.y, r: p.r });
+    });
+  } else if (MAP.type === 'gears'){
+    MAP.gears.forEach(g => {
+      // Ring = torus with gap; render as a full torus and use physics to
+      // prevent ball from entering through gap. Simpler visually and works.
+      const torus = new THREE.Mesh(
+        new THREE.TorusGeometry(g.r, 10, 14, 48),
+        gearMat
+      );
+      torus.position.set(0, g.y, 0);
+      mapGroup.add(torus);
+      // Gap visual marker (small glowing arc)
+      const gapArc = new THREE.Mesh(
+        new THREE.TorusGeometry(g.r, 11, 12, 8, g.gap * 2),
+        gearHotMat
+      );
+      gapArc.position.set(0, g.y, 0);
+      mapGroup.add(gapArc);
+      GEARS.push({ mesh: torus, gapMesh: gapArc, y: g.y, r: g.r, speed: g.speed, gap: g.gap, angle: g.angle });
+    });
+  } else if (MAP.type === 'maze'){
+    MAP.bars.forEach(b => {
+      const geo = new THREE.BoxGeometry(b.halfW * 2, 12, 28);
+      const m = new THREE.Mesh(geo, barMat);
+      m.position.set(b.x, b.y, 0);
+      mapGroup.add(m);
+      BARS.push({
+        mesh: m, y: b.y, halfW: b.halfW, x: b.x, baseX: b.baseX,
+        speed: b.speed, range: b.range, dir: b.dir, phase: b.phase,
+      });
+    });
+  }
+
+  // Triangle — used in classic and maze, skipped in gears (gears are the challenge)
+  if (MAP.type !== 'gears'){
+    const triShape = new THREE.Shape();
+    triShape.moveTo(0, (MAP.triTipY - MAP.triBaseY)/2);
+    triShape.lineTo(-MAP.triHalf, (MAP.triBaseY - MAP.triTipY)/2);
+    triShape.lineTo(MAP.triHalf, (MAP.triBaseY - MAP.triTipY)/2);
+    triShape.closePath();
+    const triGeo = new THREE.ExtrudeGeometry(triShape, {
+      depth: 16, bevelEnabled: true, bevelThickness: 1.4, bevelSize: 1.4, bevelSegments: 2,
+    });
+    triGeo.translate(0, 0, -8);
+    triMesh = new THREE.Mesh(triGeo, triMat);
+    triMesh.position.set(0, (MAP.triTipY + MAP.triBaseY)/2, 0);
+    mapGroup.add(triMesh);
+
+    gifPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(Math.min(50, MAP.triHalf*1.4), 30),
+      new THREE.MeshBasicMaterial({ map: gifTex, transparent: true, depthWrite: false })
+    );
+    gifPlane.position.set(0, (MAP.triTipY + MAP.triBaseY)/2, 14);
+    gifPlane.renderOrder = 5;
+    mapGroup.add(gifPlane);
+  }
+
+  // Spinner
+  spinMesh = new THREE.Mesh(new THREE.TorusGeometry(MAP.spinR, MAP.spinTube, 18, 80), spinMat);
+  spinMesh.position.set(0, MAP.spinCy, 0);
+  mapGroup.add(spinMesh);
+  spinRail = new THREE.Mesh(new THREE.TorusGeometry(MAP.spinR + 14, 2, 8, 80), spinRailMat);
+  spinRail.position.copy(spinMesh.position);
+  mapGroup.add(spinRail);
+  spinInner = new THREE.Mesh(
+    new THREE.CircleGeometry(MAP.spinR - MAP.spinTube - 4, 40),
+    new THREE.MeshBasicMaterial({ color: 0x1c1c22, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+  );
+  spinInner.position.set(0, MAP.spinCy, -4);
+  mapGroup.add(spinInner);
+
+  setSpinnerGap(0);
+  buildBowl(MAP.bowl1);
+  buildBowl(MAP.bowl2);
+  buildEndZone();
+
+  // Bonus coin
+  if (MAP.bonus && !MAP.bonus.collected){
+    bonusMesh = new THREE.Mesh(new THREE.TorusGeometry(MAP.bonus.r, 5, 10, 24), bonusMat);
+    bonusMesh.position.set(MAP.bonus.x, MAP.bonus.y, 0);
+    bonusMesh.rotation.x = Math.PI / 2;
+    mapGroup.add(bonusMesh);
+  }
+}
 
 function setSpinnerGap(gapAngle){
+  currentGap = gapAngle;
   const arc = Math.PI * 2 - gapAngle;
   if (arc < 0.15){ spinMesh.visible = false; spinRail.visible = false; return; }
   spinMesh.visible = true; spinRail.visible = true;
   spinMesh.geometry.dispose();
-  spinMesh.geometry = new THREE.TorusGeometry(SPIN.R, SPIN.tube, 16, 96, arc);
-  spinMesh.rotation.z = -Math.PI/2 + gapAngle/2;
+  spinMesh.geometry = new THREE.TorusGeometry(MAP.spinR, MAP.spinTube, 18, 80, arc);
   spinRail.geometry.dispose();
-  spinRail.geometry = new THREE.TorusGeometry(SPIN.R + 12, 1.4, 8, 96, arc);
-  spinRail.rotation.z = -Math.PI/2 + gapAngle/2;
+  spinRail.geometry = new THREE.TorusGeometry(MAP.spinR + 14, 2, 8, 80, arc);
 }
-setSpinnerGap(0);
 
-/* ══════════ BOWL BUILDER ══════════ */
-function buildBowl(cfg, accent){
+function buildBowl(cfg){
   const group = new THREE.Group();
-  group.position.set(cfg.cx, cfg.cy, cfg.cz);
-
-  const rimMat = new THREE.MeshStandardMaterial({
-    color: accent, metalness: 0.92, roughness: 0.16,
-    emissive: 0x3a1a80, emissiveIntensity: 0.65,
-    side: THREE.DoubleSide,
-  });
-  const rimGeo = new THREE.CylinderGeometry(
-    cfg.rimR + cfg.wallT/2, cfg.rimR + cfg.wallT/2, cfg.wallH, 56, 1, true
+  group.position.set(0, cfg.cy, 0);
+  const rim = new THREE.Mesh(
+    new THREE.CylinderGeometry(cfg.rimR + cfg.wallT/2, cfg.rimR + cfg.wallT/2, cfg.wallH, 56, 1, true),
+    rimMat
   );
-  const rimMesh = new THREE.Mesh(rimGeo, rimMat);
-  rimMesh.position.y = cfg.wallH / 2;
-  rimMesh.castShadow = true; rimMesh.receiveShadow = true;
-  group.add(rimMesh);
-
+  rim.position.y = cfg.wallH / 2;
+  group.add(rim);
   const floorShape = new THREE.Shape();
   floorShape.absarc(0, 0, cfg.rimR, 0, Math.PI * 2, false);
   for (const h of cfg.holes){
@@ -397,109 +722,110 @@ function buildBowl(cfg, accent){
     floorShape.holes.push(hp);
   }
   const floorGeo = new THREE.ExtrudeGeometry(floorShape, {
-    depth: 5, bevelEnabled: false, curveSegments: 48,
-  });
-  const floorMat = new THREE.MeshStandardMaterial({
-    color: 0x1a0f38, metalness: 0.55, roughness: 0.72,
-    emissive: 0x2a1060, emissiveIntensity: 0.35,
-    side: THREE.DoubleSide,
+    depth: 6, bevelEnabled: false, curveSegments: 40,
   });
   const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-  floorMesh.rotation.x = -Math.PI / 2;
-  floorMesh.position.y = -2.5;
-  floorMesh.receiveShadow = true;
+  floorMesh.rotation.x = Math.PI / 2;
   group.add(floorMesh);
-
   cfg.holes.forEach(h => {
     const hx = Math.cos(h.a) * h.r;
     const hz = Math.sin(h.a) * h.r;
-    const badgeMat = new THREE.MeshStandardMaterial({
-      color: h.red ? 0xff3355 : 0xa070ff,
-      emissive: h.red ? 0xff1030 : 0x5020c0,
-      emissiveIntensity: 1.4, metalness: 0.75, roughness: 0.28,
-    });
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(cfg.holeR, 2.4, 8, 28), badgeMat);
-    ring.rotation.x = -Math.PI/2;
-    ring.position.set(hx, 0.5, hz);
-    ring.castShadow = true;
-    group.add(ring);
-    const holeDisc = new THREE.Mesh(
-      new THREE.CircleGeometry(cfg.holeR - 0.5, 24),
-      new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide })
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(cfg.holeR + 2, 3, 8, 24),
+      h.red ? ringRedMat : ringWhiteMat
     );
-    holeDisc.rotation.x = -Math.PI/2;
-    holeDisc.position.set(hx, -6, hz);
-    group.add(holeDisc);
+    ring.rotation.x = -Math.PI/2;
+    ring.position.set(hx, 1, hz);
+    group.add(ring);
   });
-
-  scene.add(group);
-  return { ...cfg, group };
-}
-const B1 = buildBowl(BOWL1, 0x6a4aff);
-const B2 = buildBowl(BOWL2, 0x7a2aff);
-
-/* ══════════ BALLS ══════════ */
-const ballGeoCache = new Map();
-function getBallGeo(r){
-  const k = r.toFixed(2);
-  if (ballGeoCache.has(k)) return ballGeoCache.get(k);
-  const g = new THREE.SphereGeometry(r, 20, 14);
-  ballGeoCache.set(k, g);
-  return g;
-}
-function makeBallMesh(value, tier){
-  const cfg = TIER_MAT[tier] || TIER_MAT.gray;
-  const mat = new THREE.MeshStandardMaterial({
-    color: cfg.color, metalness: cfg.metalness, roughness: cfg.roughness,
-    emissive: cfg.emissive, emissiveIntensity: cfg.eInt,
-  });
-  const m = new THREE.Mesh(getBallGeo(ballR(value)), mat);
-  m.castShadow = true;
-  return m;
+  mapGroup.add(group);
 }
 
-/* ══════════ STATE ══════════ */
+function buildEndZone(){
+  const group = new THREE.Group();
+  group.position.set(0, MAP.endCy, 0);
+  const rim = new THREE.Mesh(
+    new THREE.CylinderGeometry(MAP.endRimR + MAP.endWallT/2, MAP.endRimR + MAP.endWallT/2, MAP.endWallH, 44, 1, true),
+    rimMat
+  );
+  rim.position.y = MAP.endWallH / 2;
+  group.add(rim);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(MAP.endRimR, 40), floorMat);
+  floor.rotation.x = -Math.PI/2;
+  group.add(floor);
+  mapGroup.add(group);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════ */
 const G = {
-  phase: 'idle',
-  held: [], active: [],
+  phase: 'idle', held: [], active: [], particles: [],
   triX: 0, triDir: 1,
-  launchT: 0, launchOpen: 0, releaseTimer: 0,
-  results: [],
-  shake: 0, time: 0,
+  launchT: 0, launchOpen: 0,
+  results: [], shake: 0, time: 0, wagered: 0,
+  bonusCollected: false,
 };
+const slowMo = { active: false, t: 0, duration: 2.2, ball: null };
 
-/* ══════════ HUD ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   HUD
+   ══════════════════════════════════════════════════════════════ */
 const elBal = document.getElementById('dl-bal');
-const elHold = document.getElementById('dl-hold');
+const elPot = document.getElementById('dl-pot');
+const elMap = document.getElementById('dl-map');
 const elLaunch = document.getElementById('dl-launch');
 const elBuy = document.getElementById('dl-buy');
 const elBuyModal = document.getElementById('dl-buy-modal');
 const elRoulette = document.getElementById('dl-roulette');
+const elRRows = document.getElementById('dl-r-rows');
+const elRAmount = document.getElementById('dl-r-amount');
+const elRTitle = document.getElementById('dl-r-title');
+const elTicker = document.getElementById('dl-ticker');
+const elFastSpin = document.getElementById('dl-fast-spin');
 const elResult = document.getElementById('dl-result');
 const elResTag = document.getElementById('dl-res-tag');
 const elResAmt = document.getElementById('dl-res-amt');
+const elResMult = document.getElementById('dl-res-mult');
 const elResSub = document.getElementById('dl-res-sub');
+
+let FAST_SPIN = false;
+elFastSpin.addEventListener('change', () => { FAST_SPIN = elFastSpin.checked; haptic(); });
 
 function updateHud(){
   elBal.textContent = Math.floor(BALANCE);
-  const tot = G.held.reduce((s,b)=>s+b.value,0);
-  elHold.textContent = `${G.held.length} · ${tot}💎`;
-  elLaunch.disabled = !(G.phase==='holding' && G.held.length>0);
+  const heldVal = G.held.reduce((s,b)=>s+b.value, 0);
+  const activeVal = G.active.reduce((s,b)=> s + (b.value || 0), 0);
+  elPot.textContent = heldVal + activeVal;
+  elMap.textContent = MAP_NAMES[MAP.type] || 'Classic';
+  elLaunch.disabled = !(G.phase === 'holding' && G.held.length > 0);
 }
 function haptic(){ try{ navigator.vibrate?.(10); }catch(_){} }
 function randomValue(){
   const r = Math.random();
-  if (r < 0.45) return 1 + Math.floor(Math.random()*9);
-  if (r < 0.72) return 10 + Math.floor(Math.random()*40);
-  if (r < 0.88) return 50 + Math.floor(Math.random()*150);
-  if (r < 0.97) return 200 + Math.floor(Math.random()*300);
+  if (r < 0.42) return 1 + Math.floor(Math.random()*9);
+  if (r < 0.70) return 10 + Math.floor(Math.random()*40);
+  if (r < 0.86) return 50 + Math.floor(Math.random()*150);
+  if (r < 0.96) return 200 + Math.floor(Math.random()*300);
   return 500 + Math.floor(Math.random()*501);
 }
+function addTickerChip(amount, mult, extra){
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.innerHTML = `<span>💎</span><span class="amt">+${amount}</span>` +
+                    (mult ? `<span style="color:#ffdd44;font-weight:800">×${mult.toFixed(2)}</span>` : '') +
+                    (extra ? `<span style="color:#7fc8ff;font-weight:800">${extra}</span>` : '');
+  elTicker.prepend(chip);
+  while (elTicker.children.length > 8) elTicker.removeChild(elTicker.lastChild);
+  setTimeout(() => { if (chip.parentNode) chip.parentNode.removeChild(chip); }, 12000);
+}
 
-/* ══════════ COLLISION ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   COLLISION
+   ══════════════════════════════════════════════════════════════ */
 function closestOnSeg(px,py,ax,ay,bx,by){
   const dx=bx-ax, dy=by-ay, ls=dx*dx+dy*dy;
-  if (ls<1e-6) return {x:ax, y:ay};
+  if (ls<1e-6) return { x:ax, y:ay };
   let t = ((px-ax)*dx + (py-ay)*dy)/ls;
   t = Math.max(0, Math.min(1, t));
   return { x:ax+t*dx, y:ay+t*dy };
@@ -534,196 +860,242 @@ function collideCircle(b, cx, cy, cr, rest){
   if (vn < 0){
     b.vx -= (1+rest)*vn*nx;
     b.vy -= (1+rest)*vn*ny;
-    b.vx += (Math.random()-.5)*20;
     b.squash = Math.min(1, Math.abs(vn)/620);
     return true;
   }
   return false;
 }
-
-/* ── Point-in-triangle + full solid triangle resolution ── */
 function pointInTri(px, py, ax, ay, bx, by, cx, cy){
   const d1 = (px-bx)*(ay-by) - (ax-bx)*(py-by);
   const d2 = (px-cx)*(by-cy) - (bx-cx)*(py-cy);
   const d3 = (px-ax)*(cy-ay) - (cx-ax)*(py-ay);
-  const hasNeg = d1 < 0 || d2 < 0 || d3 < 0;
-  const hasPos = d1 > 0 || d2 > 0 || d3 > 0;
-  return !(hasNeg && hasPos);
+  return !((d1<0||d2<0||d3<0) && (d1>0||d2>0||d3>0));
 }
 
+/* ══════════════════════════════════════════════════════════════
+   TRIANGLE
+   ══════════════════════════════════════════════════════════════ */
+const REST_TRI = 0.5;
 function resolveTriangle(b){
-  const tipX = G.triX, tipY = TRI.tipY;
-  const blx = G.triX - TRI.halfW, bly = TRI.baseY;
-  const brx = G.triX + TRI.halfW, bry = TRI.baseY;
+  const tipX = G.triX, tipY = MAP.triTipY;
+  const blx = G.triX - MAP.triHalf, bly = MAP.triBaseY;
+  const brx = G.triX + MAP.triHalf, bry = MAP.triBaseY;
+  const pad = b.r + 6;
+  if (b.x < Math.min(tipX,blx,brx)-pad || b.x > Math.max(tipX,blx,brx)+pad) return;
+  if (b.y < Math.min(tipY,bly,bry)-pad || b.y > Math.max(tipY,bly,bry)+pad) return;
 
-  // Fast reject — outside bounding box + margin
-  const minX = Math.min(tipX, blx, brx) - b.r - 4;
-  const maxX = Math.max(tipX, blx, brx) + b.r + 4;
-  const minY = Math.min(tipY, bly, bry) - b.r - 4;
-  const maxY = Math.max(tipY, bly, bry) + b.r + 4;
-  if (b.x < minX || b.x > maxX || b.y < minY || b.y > maxY) return false;
-
-  // Case 1: ball center is INSIDE the triangle → push out nearest edge
   if (pointInTri(b.x, b.y, tipX, tipY, blx, bly, brx, bry)){
-    const edges = [
-      { ax: tipX, ay: tipY, bx: blx, by: bly },
-      { ax: tipX, ay: tipY, bx: brx, by: bry },
-      { ax: blx,  ay: bly,  bx: brx, by: bry },
-    ];
-    let best = null, bestD = Infinity, bestC = null;
-    for (const e of edges){
-      const c = closestOnSeg(b.x, b.y, e.ax, e.ay, e.bx, e.by);
-      const d = Math.hypot(b.x - c.x, b.y - c.y);
-      if (d < bestD){ bestD = d; best = e; bestC = c; }
-    }
-    const dx = b.x - bestC.x, dy = b.y - bestC.y;
-    const dd = Math.hypot(dx, dy) || 1;
-    const nx = dx/dd, ny = dy/dd;
-    b.x = bestC.x + nx * (b.r + 2);
-    b.y = bestC.y + ny * (b.r + 2);
-    const vn = b.vx*nx + b.vy*ny;
+    const side = (b.x - tipX) >= 0 ? 1 : -1;
+    const sx = side > 0 ? brx : blx;
+    const sy = side > 0 ? bry : bly;
+    const c = closestOnSeg(b.x, b.y, tipX, tipY, sx, sy);
+    const dx = b.x - c.x, dy = b.y - c.y;
+    const dd = Math.hypot(dx, dy) || 0.001;
+    b.x = c.x + (dx/dd) * (b.r + 3);
+    b.y = c.y + (dy/dd) * (b.r + 3);
+    const vn = b.vx*(dx/dd) + b.vy*(dy/dd);
     if (vn < 0){
-      b.vx -= (1 + REST_TRI) * vn * nx;
-      b.vy -= (1 + REST_TRI) * vn * ny;
-    } else {
-      b.vx += nx * 100;
-      b.vy += ny * 100;
+      b.vx -= (1+REST_TRI)*vn*(dx/dd);
+      b.vy -= (1+REST_TRI)*vn*(dy/dd);
     }
-    // Add sideways push off the slopes
-    const sdx = b.x - tipX;
-    b.vx += Math.sign(sdx || 1) * 40;
-    b.squash = 0.9;
-    return true;
+    b.vx += side * 60;
+    b.squash = 0.85;
+    return;
   }
-
-  // Case 2: ball overlaps an edge → standard segment collision
-  let hit = false;
-  if (collideSeg(b, tipX, tipY, blx, bly, 2, REST_TRI)) hit = true;
-  if (collideSeg(b, tipX, tipY, brx, bry, 2, REST_TRI)) hit = true;
-  if (hit){
-    const dx = b.x - tipX;
-    if (Math.abs(dx) < 3) b.vx += (Math.random()<0.5?-1:1)*180;
-    else                  b.vx += Math.sign(dx) * 70;
-    b.squash = Math.max(b.squash, 0.8);
+  const hitL = collideSeg(b, tipX, tipY, blx, bly, 3, REST_TRI);
+  const hitR = collideSeg(b, tipX, tipY, brx, bry, 3, REST_TRI);
+  if (hitL || hitR){
+    const side = (b.x - tipX) >= 0 ? 1 : -1;
+    b.vx += side * 45;
   }
-  return hit;
 }
 
-/* ══════════ PHYSICS ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   GEARS — rotating rings with gaps
+   ══════════════════════════════════════════════════════════════ */
+const REST_GEAR = 0.55;
+function resolveGear(b, gear){
+  const dx = b.x, dy = b.y - gear.y;
+  const dist = Math.hypot(dx, dy);
+  const tubeR = 10;
+  const minD = gear.r - b.r - tubeR;
+  const maxD = gear.r + b.r + tubeR;
+  if (dist < minD || dist > maxD) return;
+
+  // Is ball in gap?
+  const ballAngle = Math.atan2(dy, dx);
+  let da = ballAngle - gear.angle;
+  da = Math.atan2(Math.sin(da), Math.cos(da));
+  if (Math.abs(da) < gear.gap) return;   // pass through
+
+  // Collide with ring edge — push away from ring
+  const nx = dx / dist, ny = dy / dist;
+  const inside = dist < gear.r;
+  const targetDist = gear.r + (inside ? -1 : 1) * (b.r + tubeR);
+  const push = targetDist - dist;
+  b.x += nx * push;
+  b.y += ny * push;
+
+  const vn = b.vx*nx + b.vy*ny;
+  if (inside && vn < 0){
+    b.vx -= (1+REST_GEAR) * vn * nx;
+    b.vy -= (1+REST_GEAR) * vn * ny;
+  } else if (!inside && vn > 0){
+    b.vx -= (1+REST_GEAR) * vn * nx;
+    b.vy -= (1+REST_GEAR) * vn * ny;
+  }
+
+  // Tangential push from rotating ring
+  const tangX = -ny * gear.speed * 40;
+  const tangY =  nx * gear.speed * 40;
+  b.vx += tangX;
+  b.vy += tangY;
+  b.squash = Math.max(b.squash, 0.6);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDING BARS
+   ══════════════════════════════════════════════════════════════ */
+const REST_BAR = 0.5;
+function resolveBar(b, bar){
+  // Treat bar as horizontal segment y = bar.y, from bar.x - halfW to bar.x + halfW
+  const dy = b.y - bar.y;
+  if (Math.abs(dy) > b.r + 8) return;
+  const dx = b.x - bar.x;
+  if (Math.abs(dx) > bar.halfW + b.r) return;
+  if (Math.abs(dx) < bar.halfW){
+    // Ball is under/over the bar — push out vertically
+    const dir = dy >= 0 ? 1 : -1;
+    b.y = bar.y + dir * (b.r + 7);
+    const vn = b.vy * dir;
+    if (vn < 0){
+      b.vy -= (1 + REST_BAR) * vn * dir;
+    } else {
+      b.vy = -Math.abs(b.vy) * 0.3;
+    }
+    b.squash = Math.max(b.squash, 0.7);
+    // Fling sideways if bar is fast
+    if (Math.abs(bar.dir) > 0){
+      b.vx += bar.dir * 40;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PHYSICS
+   ══════════════════════════════════════════════════════════════ */
 const GRAV = 520;
 const AIR  = 0.9992;
 const REST_WALL = 0.42;
-const REST_PEG  = 0.52;
-const REST_TRI  = 0.58;
+const REST_PEG  = 0.55;
 
-/* ══════════ BALL ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   BALL
+   ══════════════════════════════════════════════════════════════ */
 function spawnBall(value, tier, spawnDelay){
-  const inner = SPIN.R - SPIN.tube - 14;
   const a = Math.random() * Math.PI * 2;
-  const rad = 24 + Math.random() * (inner - 34);
+  const rad = Math.random() * 16;
   const b = {
     value, tier, r: ballR(value),
-    x: SPIN.cx + Math.cos(a) * rad,
-    y: SPIN.cy + Math.sin(a) * rad * 0.85,
-    z: SPIN.cz,
-    vx: (Math.random()-0.5) * 90,
-    vy: (Math.random()-0.5) * 90,
-    state: 'held',
-    popT: -(spawnDelay || 0),
-    scale: 0,
+    x: Math.cos(a) * rad, y: MAP.spinCy + Math.sin(a) * rad, z: 0,
+    vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60,
+    state: 'held', popT: -(spawnDelay || 0), scale: 0,
     theta:0, rad:0, omega:0, bowlNum:0, orbitT:0,
     stall:0, squash:0, spin:0,
-    mesh: makeBallMesh(value, tier),
-    dead: false,
+    mesh: makeBallMesh(value, tier), dead: false,
     dropTargetY: 0,
     holeTarget: null, holeT: 0,
     hoverT: 0, hoverDuration: 0.55,
-    hoverStartTheta: 0, hoverEndTheta: 0,
-    holeStartY: 0, holeStartScale: 1,
+    hoverStartTheta: 0, hoverEndTheta: 0, holeStartY: 0,
+    escT: 0, escFromX:0, escFromY:0, escFromZ:0, escToX:0, escToY:0, escToZ:0,
+    escapedBowl2: false, slowMoDone: false,
+    lastX: 0, lastY: 0, stuckCheckT: 0, stuckCount: 0,
   };
   b.mesh.scale.setScalar(0.001);
   scene.add(b.mesh);
   return b;
 }
-function removeBall(b){
-  scene.remove(b.mesh);
-  if (b.mesh.material) b.mesh.material.dispose();
-}
+function removeBall(b){ scene.remove(b.mesh); }
 function easeOutBack(t){
   const c1 = 1.70158, c3 = c1 + 1;
   return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 }
 
-/* ══════════ HELD ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   HELD
+   ══════════════════════════════════════════════════════════════ */
 function updateHeld(dt){
-  const innerR = SPIN.R - SPIN.tube - 4;
+  const innerR = MAP.spinR - MAP.spinTube - 6;
+  const ringRot = G.time * 1.6;
+  const gapCenterWorld = ringRot - Math.PI/2;
   for (let i = G.held.length - 1; i >= 0; i--){
     const b = G.held[i];
     if (b.popT < 0){ b.popT += dt; continue; }
     if (b.popT < 0.55){
       b.popT += dt;
-      const t = Math.min(b.popT / 0.55, 1);
-      b.scale = Math.max(0.001, easeOutBack(t));
+      b.scale = Math.max(0.001, easeOutBack(Math.min(b.popT/0.55, 1)));
     } else b.scale = 1;
-
-    b.vy -= 90 * dt;
-    b.vx *= Math.pow(0.35, dt);
-    b.vy *= Math.pow(0.35, dt);
-    b.x += b.vx * dt;
-    b.y += b.vy * dt;
-    b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.003;
-
-    const dx = b.x - SPIN.cx, dy = b.y - SPIN.cy;
+    b.vy -= 380 * dt;
+    const drag = Math.pow(0.35, dt);
+    b.vx *= drag; b.vy *= drag;
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.004;
+    const dx = b.x, dy = b.y - MAP.spinCy;
     const dist = Math.hypot(dx, dy);
     const maxDist = innerR - b.r;
-    if (dist > maxDist && dist > 0.001){
-      const nx = dx / dist, ny = dy / dist;
-      b.x = SPIN.cx + nx * maxDist;
-      b.y = SPIN.cy + ny * maxDist;
-      const vn = b.vx * nx + b.vy * ny;
-      if (vn > 0){
-        b.vx -= 2 * vn * nx * 0.82;
-        b.vy -= 2 * vn * ny * 0.82;
-        if (Math.random() < 0.35){
-          b.vx += (Math.random()-0.5) * 55;
-          b.vy += (Math.random()-0.5) * 55;
-        }
+    if (G.phase === 'launching' && G.launchOpen > 0.5 && dist > maxDist - 6){
+      let ballAngle = Math.atan2(dy, dx);
+      let da = ballAngle - gapCenterWorld;
+      da = Math.atan2(Math.sin(da), Math.cos(da));
+      if (Math.abs(da) < currentGap * 0.5 * 0.9){
+        b.state = 'falling';
+        b.vx = (Math.random() - 0.5) * 40;
+        b.vy = -60;
+        G.active.push(b); G.held.splice(i, 1); haptic();
+        continue;
       }
     }
-    for (let j = 0; j < G.held.length; j++){
-      if (j === i) continue;
+    if (dist > maxDist && dist > 0.001){
+      const nx = dx/dist, ny = dy/dist;
+      b.x = nx * maxDist;
+      b.y = MAP.spinCy + ny * maxDist;
+      const vn = b.vx*nx + b.vy*ny;
+      if (vn > 0){ b.vx -= 1.55*vn*nx; b.vy -= 1.55*vn*ny; }
+    }
+    for (let j = i+1; j < G.held.length; j++){
       const ob = G.held[j];
       if (ob.popT < 0) continue;
       const ddx = b.x - ob.x, ddy = b.y - ob.y;
       const dd = Math.hypot(ddx, ddy);
       const minD = b.r + ob.r;
       if (dd < minD && dd > 0.001){
-        const nx = ddx / dd, ny = ddy / dd;
+        const nx = ddx/dd, ny = ddy/dd;
         const push = (minD - dd) * 0.5;
-        b.x += nx * push; b.y += ny * push;
+        b.x += nx*push; b.y += ny*push;
+        ob.x -= nx*push; ob.y -= ny*push;
       }
     }
   }
 }
 
-/* ══════════ FALLING — with physics substepping ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   FALLING
+   ══════════════════════════════════════════════════════════════ */
 function stepFalling(b, dt){
-  // Adaptive substeps based on velocity to prevent tunneling
   const speed = Math.hypot(b.vx, b.vy);
-  const SUBSTEPS = Math.min(8, Math.max(3, Math.ceil(speed / 90)));
+  const stepsNeeded = Math.ceil(speed * dt / 3);
+  const SUBSTEPS = Math.min(50, Math.max(4, stepsNeeded));
   const subDt = dt / SUBSTEPS;
 
   for (let s = 0; s < SUBSTEPS; s++){
     b.vy -= GRAV * subDt;
-    b.vx *= AIR;
-    b.vy *= AIR;
+    b.vx *= AIR; b.vy *= AIR;
     b.x += b.vx * subDt;
     b.y += b.vy * subDt;
 
-    for (const w of WALLS)
-      collideSeg(b, w.x1, w.y1, w.x2, w.y2, w.thick, REST_WALL);
+    for (const w of WALLS) collideSeg(b, w.x1, w.y1, w.x2, w.y2, w.thick, REST_WALL);
 
-    for (const p of P){
+    for (const p of PEGS){
       if (Math.abs(p.x - b.x) > 40) continue;
       if (Math.abs(p.y - b.y) > 40) continue;
       if (collideCircle(b, p.x, p.y, p.r, REST_PEG)){
@@ -731,141 +1103,181 @@ function stepFalling(b, dt){
       }
     }
 
-    resolveTriangle(b);
-  }
+    for (const g of GEARS){
+      if (Math.abs(g.y - b.y) > 40) continue;
+      resolveGear(b, g);
+    }
 
-  b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.0035;
+    for (const bar of BARS){
+      if (Math.abs(bar.y - b.y) > 30) continue;
+      resolveBar(b, bar);
+    }
 
-  if (b.y < FLOOR.y){
-    if (Math.abs(b.x) < FLOOR.halfW){
-      startBowlDrop(b, Math.random() < 0.30 ? 2 : 1);
-      return;
-    } else {
-      if (b.x < 0) b.vx -= 280; else b.vx += 280;
-      if (b.x < -80 || b.x > 80 || b.y < FLOOR.y - 260){
-        b.state = 'lost'; b.dead = true;
-        G.results.push({ value:b.value, mult:0 });
+    if (triMesh && b.y < MAP.triTipY + 50 && b.y > MAP.triBaseY - 50) resolveTriangle(b);
+
+    // Bonus coin
+    if (MAP.bonus && !MAP.bonus.collected){
+      const bdx = b.x - MAP.bonus.x, bdy = b.y - MAP.bonus.y;
+      if (Math.hypot(bdx, bdy) < b.r + MAP.bonus.r + 4){
+        MAP.bonus.collected = true;
+        G.bonusCollected = true;
+        G.shake = 1;
+        if (bonusMesh) bonusMesh.visible = false;
+        spawnConfetti(MAP.bonus.x, MAP.bonus.y, 0, true);
+        addTickerChip(0, 0, '+BONUS');
+        haptic();
       }
     }
   }
 
-  const spd = Math.hypot(b.vx, b.vy);
-  if (spd < 40) b.stall += dt; else b.stall = 0;
-  if (b.stall > 2.0){
-    b.vx += (Math.random()-.5)*140;
-    b.vy += 60;
-    b.stall = 0;
+  b.spin += (Math.abs(b.vx) + Math.abs(b.vy)) * 0.0035;
+
+  // Anti-stuck using position history
+  b.stuckCheckT += dt;
+  if (b.stuckCheckT > 0.5){
+    const moved = Math.hypot(b.x - b.lastX, b.y - b.lastY);
+    if (moved < 8 && b.state === 'falling'){
+      b.stuckCount++;
+      b.vx += (Math.random() - 0.5) * 260;
+      b.vy -= 60;
+      // If still stuck after 3 tries, teleport down a bit
+      if (b.stuckCount >= 3){
+        b.y -= 90;
+        b.vx = (Math.random() - 0.5) * 100;
+        b.stuckCount = 0;
+      }
+    } else {
+      b.stuckCount = 0;
+    }
+    b.lastX = b.x; b.lastY = b.y;
+    b.stuckCheckT = 0;
+  }
+
+  // Knocked off the sides
+  if (b.x < -450 || b.x > 450){
+    b.state = 'lost'; b.dead = true;
+    G.results.push({ value: b.value, mult: 0 });
+    return;
+  }
+
+  if (b.y < MAP.floorY){
+    if (Math.abs(b.x) < MAP.floorOpen){
+      startBowlDrop(b, Math.random() < 0.20 ? 2 : 1);
+      return;
+    } else {
+      if (b.x < 0) b.vx -= 180; else b.vx += 180;
+      if (b.y < MAP.floorY - 300){
+        b.state = 'lost'; b.dead = true;
+        G.results.push({ value: b.value, mult: 0 });
+      }
+    }
   }
 }
 
-/* ══════════ DROP INTO BOWL ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   BOWL DROP + ORBIT + HOLE + END
+   ══════════════════════════════════════════════════════════════ */
 function startBowlDrop(b, bowlNum){
-  const cfg = bowlNum === 1 ? BOWL1 : BOWL2;
+  const cfg = bowlNum === 1 ? MAP.bowl1 : MAP.bowl2;
   b.state = 'drop' + bowlNum;
   b.bowlNum = bowlNum;
-  b.dropTargetY = cfg.cy + b.r + 3;
-
-  // Force landing near the RIM so ball has to roll in — never on top of a hole
-  const minR = cfg.holes[0].r + cfg.holeR + 8;
-  const maxR = cfg.rimR - b.r - 6;
+  b.dropTargetY = cfg.cy + b.r + 1;
+  const minR = cfg.holes[0].r + cfg.holeR + 10;
+  const maxR = cfg.rimR - b.r - 8;
   const offA = Math.random() * Math.PI * 2;
-  let offR;
-  if (minR >= maxR){
-    offR = (minR + maxR) * 0.5;
-  } else {
-    offR = minR + Math.random() * (maxR - minR);
-  }
-  b.x = cfg.cx + Math.cos(offA) * offR;
-  b.z = cfg.cz + Math.sin(offA) * offR;
-  b.y = cfg.cy + 240;
-  b.vx = 0; b.vy = -60;
-  b.spin = 0;
+  const offR = minR >= maxR ? (minR + maxR) * 0.5 : minR + Math.random() * (maxR - minR);
+  b.x = Math.cos(offA) * offR;
+  b.z = Math.sin(offA) * offR;
+  const safeTop = cfg.cy + cfg.wallH + 120;
+  if (b.y < safeTop) b.y = safeTop;
+  b.vx = 0; b.vy = Math.max(-320, Math.min(b.vy, -80)); b.spin = 0;
 }
-
 function updateDrop(b, dt){
-  b.vy -= GRAV * 0.9 * dt;
-  b.y += b.vy * dt;
-  b.x += b.vx * dt;
-
-  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
-  const dx = b.x - cfg.cx, dz = b.z - cfg.cz;
-  const r = Math.hypot(dx, dz);
-  const maxR = cfg.rimR - b.r - 6;
-  if (r > maxR){
-    b.x = cfg.cx + (dx/r) * maxR;
-    b.z = cfg.cz + (dz/r) * maxR;
-  }
-
-  if (b.y <= b.dropTargetY){
-    b.y = b.dropTargetY;
-    b.squash = 1.0;
-    const dx2 = b.x - cfg.cx, dz2 = b.z - cfg.cz;
-    b.theta = Math.atan2(dz2, dx2);
-    b.rad = Math.max(Math.hypot(dx2, dz2), cfg.holes[0].r + cfg.holeR + 4);
-    // Higher starting omega → multiple orbits before capture
-    b.omega = (Math.random() > 0.5 ? 1 : -1) * (2.9 + Math.random() * 0.7);
-    b.orbitT = 0;
-    b.state = 'bowl' + b.bowlNum;
-  }
-}
-
-/* ══════════ BOWL ROLLING ══════════ */
-function updateOrbit(b, dt){
-  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
-  b.orbitT += dt;
-
-  b.theta += b.omega * dt;
-  // Slow decay: 0.85^dt — ball orbits for multiple revolutions
-  b.omega *= Math.pow(0.85, dt);
-
-  // Gentle spiral inward; stronger only when slow
-  const spd = Math.abs(b.omega);
-  const inwardFactor = spd < 1.2 ? (1.2 - spd) * 28 : 0;
-  b.rad -= (3 + inwardFactor) * dt;
-
-  const holeRing = cfg.holes[0].r;
-  if (b.rad < holeRing) b.rad = holeRing;
-  if (b.rad > cfg.rimR - b.r - 4) b.rad = cfg.rimR - b.r - 4;
-
-  b.x = cfg.cx + Math.cos(b.theta) * b.rad;
-  b.z = cfg.cz + Math.sin(b.theta) * b.rad;
-  b.y = cfg.cy + b.r + 3;
-  b.spin += Math.abs(b.omega) * dt * 6;
-
-  // Must orbit for a minimum time so player sees rolling
-  if (b.orbitT < 1.6) return;
-
-  // Capture only when slow AND near a hole
-  for (const h of cfg.holes){
-    const hx = cfg.cx + Math.cos(h.a) * h.r;
-    const hz = cfg.cz + Math.sin(h.a) * h.r;
-    const dd = Math.hypot(b.x - hx, b.z - hz);
-    if (dd < cfg.holeR * 0.75 && spd < 2.1){
-      startHover(b, cfg, h);
+  const cfg = b.bowlNum === 1 ? MAP.bowl1 : MAP.bowl2;
+  const speed = Math.abs(b.vy);
+  const SUBSTEPS = Math.min(20, Math.max(3, Math.ceil(speed * dt / 3)));
+  const subDt = dt / SUBSTEPS;
+  for (let s = 0; s < SUBSTEPS; s++){
+    b.vy -= GRAV * 0.9 * subDt;
+    b.y += b.vy * subDt;
+    const dx = b.x, dz = b.z;
+    const r = Math.hypot(dx, dz);
+    const maxR = cfg.rimR - b.r - 8;
+    if (r > maxR){ b.x = (dx/r)*maxR; b.z = (dz/r)*maxR; }
+    if (b.y <= b.dropTargetY || b.y < cfg.cy + b.r){
+      b.y = b.dropTargetY;
+      b.squash = 1.0;
+      b.theta = Math.atan2(b.z, b.x);
+      b.rad = Math.max(Math.hypot(b.x, b.z), cfg.holes[0].r + cfg.holeR + 4);
+      b.omega = (Math.random() > 0.5 ? 1 : -1) * (2.9 + Math.random() * 0.7);
+      b.orbitT = 0;
+      b.state = 'bowl' + b.bowlNum;
       return;
     }
   }
-
-  // Fallback — force settle if orbiting too long
-  if (b.orbitT > 7.0){
+}
+function updateOrbit(b, dt){
+  const cfg = b.bowlNum === 1 ? MAP.bowl1 : MAP.bowl2;
+  b.orbitT += dt;
+  b.theta += b.omega * dt;
+  b.omega *= Math.pow(0.85, dt);
+  const spd = Math.abs(b.omega);
+  const inward = spd < 1.2 ? (1.2 - spd) * 30 : 0;
+  b.rad -= (4 + inward) * dt;
+  const holeRing = cfg.holes[0].r;
+  if (b.rad < holeRing) b.rad = holeRing;
+  if (b.rad > cfg.rimR - b.r - 4) b.rad = cfg.rimR - b.r - 4;
+  b.x = Math.cos(b.theta) * b.rad;
+  b.z = Math.sin(b.theta) * b.rad;
+  b.y = cfg.cy + b.r + 0.5;
+  b.spin += Math.abs(b.omega) * dt * 6;
+  if (b.orbitT < 1.4) return;
+  if (b.bowlNum === 1 && !b.escapedBowl2 && b.orbitT > 2.4){
+    b.escapedBowl2 = true;
+    if (Math.random() < 0.20){ startEscape2(b); return; }
+  }
+  for (const h of cfg.holes){
+    const hx = Math.cos(h.a) * h.r;
+    const hz = Math.sin(h.a) * h.r;
+    if (Math.hypot(b.x - hx, b.z - hz) < cfg.holeR * 1.15 && spd < 3.0){
+      startHover(b, cfg, h); return;
+    }
+  }
+  if (b.orbitT > 6.5){
     let best = cfg.holes[0], bd = Infinity;
     for (const h of cfg.holes){
       let da = b.theta - h.a;
       da = Math.atan2(Math.sin(da), Math.cos(da));
       if (Math.abs(da) < bd){ bd = Math.abs(da); best = h; }
     }
-    b.theta = best.a;
-    b.rad = best.r;
+    b.theta = best.a; b.rad = best.r;
     startHover(b, cfg, best);
   }
 }
-
-/* ══════════ HOVER + SLOW FALL (dramatic) ══════════ */
+function startEscape2(b){
+  b.state = 'esc2'; b.escT = 0;
+  b.escFromX = b.x; b.escFromY = b.y; b.escFromZ = b.z;
+  b.escToX = 0; b.escToY = MAP.bowl2.cy + MAP.bowl2.wallH + 60; b.escToZ = 0;
+}
+function updateEscape2(b, dt){
+  b.escT += dt;
+  const t = Math.min(b.escT / 0.9, 1);
+  b.x = b.escFromX + (b.escToX - b.escFromX) * (1 - Math.pow(1-t, 3));
+  b.y = b.escFromY + (b.escToY - b.escFromY) * (t*t);
+  b.z = b.escFromZ + (b.escToZ - b.escFromZ) * (1 - Math.pow(1-t, 3));
+  b.spin += dt * 12;
+  b.scale = 1 - t * 0.15;
+  if (t >= 1){
+    b.state = 'drop2'; b.bowlNum = 2;
+    b.dropTargetY = MAP.bowl2.cy + b.r + 1;
+    b.vy = -60;
+  }
+}
 function startHover(b, cfg, hole){
   b.state = 'hover';
   b.holeTarget = hole;
   b.hoverT = 0;
-  b.holeStartY = cfg.cy + b.r + 3;
+  b.holeStartY = cfg.cy + b.r + 0.5;
   b.hoverStartTheta = b.theta;
   b.hoverEndTheta = hole.a;
   while (b.hoverEndTheta - b.hoverStartTheta >  Math.PI) b.hoverEndTheta -= Math.PI * 2;
@@ -873,59 +1285,166 @@ function startHover(b, cfg, hole){
   G.results.push({ value: b.value, mult: hole.mult });
   b.resultMult = hole.mult;
   G.shake = Math.min(1, G.shake + (hole.red ? 0.5 : 0.25));
+  if (hole.red && b.tier === 'gold' && !slowMo.active && !b.slowMoDone){
+    b.slowMoDone = true;
+    slowMo.active = true; slowMo.t = 0; slowMo.ball = b;
+    goldL1.visible = true; goldL2.visible = true;
+    haptic();
+  }
 }
-
 function updateHover(b, dt){
   b.hoverT += dt;
   const t = Math.min(b.hoverT / b.hoverDuration, 1);
-  const ease = t * t * (3 - 2 * t);
-  b.theta = b.hoverStartTheta + (b.hoverEndTheta - b.hoverStartTheta) * ease;
-  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
+  const e = t * t * (3 - 2 * t);
+  b.theta = b.hoverStartTheta + (b.hoverEndTheta - b.hoverStartTheta) * e;
+  const cfg = b.bowlNum === 1 ? MAP.bowl1 : MAP.bowl2;
   const h = b.holeTarget;
-  b.x = cfg.cx + Math.cos(b.theta) * h.r;
-  b.z = cfg.cz + Math.sin(b.theta) * h.r;
-  // Anticipation lift + wobble
+  b.x = Math.cos(b.theta) * h.r;
+  b.z = Math.sin(b.theta) * h.r;
   b.y = b.holeStartY + Math.sin(t * Math.PI) * 6;
-  b.x += Math.sin(b.hoverT * 28) * 1.4;
-  b.spin += dt * 5;
-  if (t >= 1){
-    b.state = 'hole';
-    b.holeT = 0;
-    b.holeStartY = cfg.cy + b.r + 3;
-    b.holeStartScale = 1;
-  }
+  b.x += Math.sin(b.hoverT * 30) * 1.6;
+  b.spin += dt * 6;
+  if (t >= 1){ b.state = 'hole'; b.holeT = 0; b.holeStartY = cfg.cy + b.r + 0.5; }
 }
-
 function updateHoleDrop(b, dt){
   b.holeT += dt;
-  const DUR = 1.15;
-  const t = Math.min(b.holeT / DUR, 1);
-  // Progressive acceleration curve
+  const t = Math.min(b.holeT / 1.05, 1);
   const fall = t * t * (1.4 - t * 0.4);
-  b.y = b.holeStartY - fall * 220;
-  b.spin += dt * 9;
-  b.scale = 1 - fall * 0.62;
-  // Small wobble while falling
-  const cfg = b.bowlNum === 1 ? BOWL1 : BOWL2;
+  const DROP = b.bowlNum === 1 ? 100 : 200;
+  b.y = b.holeStartY - fall * DROP;
+  b.spin += dt * 10;
+  b.scale = 1 - fall * 0.7;
+  const cfg = b.bowlNum === 1 ? MAP.bowl1 : MAP.bowl2;
   const h = b.holeTarget;
-  b.x = cfg.cx + Math.cos(h.a) * h.r + Math.sin(b.holeT * 22) * 1.8;
-  b.z = cfg.cz + Math.sin(h.a) * h.r + Math.cos(b.holeT * 22) * 1.8;
+  b.x = Math.cos(h.a) * h.r + Math.sin(b.holeT * 24) * 2;
+  b.z = Math.sin(h.a) * h.r + Math.cos(b.holeT * 24) * 2;
   if (t >= 1){
-    b.state = 'settled';
-    b.y = -9999;
+    if (b.bowlNum === 2){
+      b.state = 'endFall'; b.vy = -60; b.scale = 1;
+      b.x = (Math.random() - 0.5) * 40;
+      b.z = (Math.random() - 0.5) * 40;
+    } else {
+      b.state = 'settled'; b.y = -99999;
+    }
+    spawnConfetti(0, cfg.cy - 30, 0, h.red);
+  }
+}
+function updateEndFall(b, dt){
+  b.vy -= GRAV * 0.8 * dt;
+  b.y += b.vy * dt;
+  const targetY = MAP.endCy + b.r + 1;
+  if (b.y <= targetY){
+    b.y = targetY; b.vy = 0; b.squash = 1.0;
+    b.state = 'endRest'; b.restT = 0;
+  }
+}
+function updateEndRest(b, dt){
+  b.restT += dt;
+  b.squash *= Math.pow(0.0008, dt);
+  if (b.restT > 1.2){
+    b.scale = Math.max(0, b.scale - dt * 2.5);
+    if (b.scale <= 0){ b.state = 'settled'; b.y = -99999; }
   }
 }
 
-/* ══════════ UPDATE ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   BALL-BALL SOFT COLLISION
+   ══════════════════════════════════════════════════════════════ */
+function resolveBallBallCollisions(){
+  const falling = G.active.filter(b => !b.dead && b.state === 'falling');
+  for (let i = 0; i < falling.length; i++){
+    for (let j = i+1; j < falling.length; j++){
+      const a = falling[i], b = falling[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const d = Math.hypot(dx, dy);
+      const minD = a.r + b.r;
+      if (d < minD && d > 0.001){
+        const nx = dx/d, ny = dy/d;
+        const push = (minD - d) * 0.5;
+        a.x -= nx*push; a.y -= ny*push;
+        b.x += nx*push; b.y += ny*push;
+        // Simple momentum exchange along normal
+        const vn1 = a.vx*nx + a.vy*ny;
+        const vn2 = b.vx*nx + b.vy*ny;
+        const diff = vn2 - vn1;
+        if (diff > 0){
+          const imp = diff * 0.5;
+          a.vx += imp * nx; a.vy += imp * ny;
+          b.vx -= imp * nx; b.vy -= imp * ny;
+        }
+      }
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PARTICLES
+   ══════════════════════════════════════════════════════════════ */
+const CONF_COLORS = [0xffffff, 0xffdd44, 0xff5577, 0x55ddff, 0x8fe5b0];
+const CONF_MATS = CONF_COLORS.map(c => new THREE.MeshBasicMaterial({ color: c, transparent: true }));
+const CONF_GEO = new THREE.SphereGeometry(3.2, 6, 6);
+function spawnConfetti(x, y, z, big){
+  const count = big ? 50 : 20;
+  for (let i = 0; i < count; i++){
+    const mesh = new THREE.Mesh(CONF_GEO, CONF_MATS[i % CONF_MATS.length]);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    G.particles.push({
+      mesh, vx:(Math.random()-.5)*500, vy:250 + Math.random()*500, vz:(Math.random()-.5)*350,
+      life: 1.8, gravity: 480,
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UPDATE
+   ══════════════════════════════════════════════════════════════ */
 function update(dt){
   G.time += dt;
   G.shake *= Math.pow(0.001, dt);
 
-  if (G.phase === 'playing' || G.phase === 'ended'){
-    G.triX += G.triDir * TRI.speed * dt;
-    if (G.triX >  TRI.slideRange){ G.triX =  TRI.slideRange; G.triDir = -1; }
-    if (G.triX < -TRI.slideRange){ G.triX = -TRI.slideRange; G.triDir =  1; }
+  if (spinMesh && spinRail){
+    const rot = G.time * 1.6;
+    spinMesh.rotation.z = -Math.PI/2 + currentGap/2 + rot;
+    spinRail.rotation.z = -Math.PI/2 + currentGap/2 + rot;
+  }
+
+  // Peg hits
+  for (const p of PEGS){
+    if (p.mesh.userData.hit > 0){
+      p.mesh.userData.hit *= Math.pow(0.0005, dt);
+      p.mesh.scale.setScalar(1 + p.mesh.userData.hit * 0.4);
+    }
+  }
+
+  // Gears rotate
+  for (const g of GEARS){
+    g.angle += g.speed * dt;
+    if (g.mesh) g.mesh.rotation.z = g.angle;
+    if (g.gapMesh) g.gapMesh.rotation.z = g.angle - g.gap;
+  }
+
+  // Bars slide
+  for (const bar of BARS){
+    bar.phase += dt;
+    bar.x = bar.baseX + Math.sin(bar.phase) * bar.range;
+    if (bar.mesh) bar.mesh.position.x = bar.x;
+  }
+
+  // Triangle
+  if (triMesh && gifPlane && (G.phase === 'playing' || G.phase === 'ended' || G.phase === 'launching')){
+    G.triX += G.triDir * MAP.triSpeed * dt;
+    if (G.triX >  MAP.triRange){ G.triX =  MAP.triRange; G.triDir = -1; }
+    if (G.triX < -MAP.triRange){ G.triX = -MAP.triRange; G.triDir =  1; }
     triMesh.position.x = G.triX;
+    gifPlane.position.x = G.triX;
+  }
+
+  // Bonus coin pulse
+  if (bonusMesh && !MAP.bonus.collected){
+    bonusMesh.rotation.z += dt * 3;
+    const s = 1 + Math.sin(G.time * 5) * 0.15;
+    bonusMesh.scale.setScalar(s);
   }
 
   updateHeld(dt);
@@ -933,142 +1452,185 @@ function update(dt){
   if (G.phase === 'launching'){
     G.launchT += dt;
     G.launchOpen = Math.min(1, G.launchT / 0.85);
-    const gapAngle = G.launchOpen * Math.PI * 0.95;
-    setSpinnerGap(gapAngle);
-
-    if (G.launchT > 0.3){
-      G.releaseTimer -= dt;
-      if (G.releaseTimer <= 0 && G.held.length > 0){
-        let idx = 0, minY = Infinity;
-        for (let i=0; i<G.held.length; i++){
-          if (G.held[i].y < minY){ minY = G.held[i].y; idx = i; }
-        }
-        const b = G.held.splice(idx, 1)[0];
-        b.state = 'falling';
-        b.vx = (Math.random() - 0.5) * 40;
-        b.vy = -80;
-        b.z = 0;
-        b.stall = 0; b.squash = 0;
-        G.active.push(b);
-        G.releaseTimer = 0.14;
-        haptic();
-      }
-    }
-
-    if (G.launchT > 1.9 && G.held.length > 0){
+    setSpinnerGap(G.launchOpen * Math.PI * 0.95);
+    if (G.launchT > 12 && G.held.length > 0){
       while (G.held.length){
         const b = G.held.pop();
-        b.state = 'falling';
-        b.vx = (Math.random()-0.5)*40;
-        b.vy = -80;
-        b.z = 0;
+        b.state = 'falling'; b.vx = (Math.random()-0.5)*40; b.vy = -60;
         G.active.push(b);
       }
     }
-
-    if (G.launchT > 1.9 && G.held.length === 0){
-      G.phase = 'playing';
-      G._ending = false;
-      updateHud();
+    if (G.launchT > 1.4 && G.held.length === 0){
+      G.phase = 'playing'; G._ending = false; updateHud();
     }
   }
 
   for (let i = G.active.length - 1; i >= 0; i--){
     const b = G.active[i];
     b.squash *= Math.pow(0.0008, dt);
-
-    if (b.state === 'falling')                        stepFalling(b, dt);
+    if      (b.state === 'falling') stepFalling(b, dt);
     else if (b.state === 'drop1' || b.state === 'drop2') updateDrop(b, dt);
     else if (b.state === 'bowl1' || b.state === 'bowl2') updateOrbit(b, dt);
-    else if (b.state === 'hover')                     updateHover(b, dt);
-    else if (b.state === 'hole')                      updateHoleDrop(b, dt);
-
-    if (b.dead){
-      removeBall(b);
-      G.active.splice(i, 1);
-    }
+    else if (b.state === 'hover') updateHover(b, dt);
+    else if (b.state === 'hole') updateHoleDrop(b, dt);
+    else if (b.state === 'esc2') updateEscape2(b, dt);
+    else if (b.state === 'endFall') updateEndFall(b, dt);
+    else if (b.state === 'endRest') updateEndRest(b, dt);
+    if (b.dead){ removeBall(b); G.active.splice(i, 1); }
   }
 
-  for (const p of P){
-    if (p.mesh.userData.hit > 0){
-      p.mesh.userData.hit *= Math.pow(0.0005, dt);
-      const h = p.mesh.userData.hit;
-      p.mesh.material.emissive.setHSL(0.72, 1, 0.4);
-      p.mesh.material.emissiveIntensity = h * 1.4;
-      p.mesh.scale.setScalar(1 + h * 0.35);
-    }
+  resolveBallBallCollisions();
+
+  for (let i = G.particles.length - 1; i >= 0; i--){
+    const p = G.particles[i];
+    p.mesh.position.x += p.vx * dt;
+    p.mesh.position.y += p.vy * dt;
+    p.mesh.position.z += p.vz * dt;
+    p.vy -= p.gravity * dt;
+    p.life -= dt;
+    if (p.life <= 0){ scene.remove(p.mesh); G.particles.splice(i, 1); }
   }
 
   if (G.phase === 'playing'
       && G.held.length === 0
-      && G.active.every(b => b.state === 'settled' || b.state === 'lost' || b.dead)
+      && G.active.every(b => b.state === 'settled' || b.state === 'lost' || b.state === 'endRest' || b.dead)
       && !G._ending){
     G._ending = true;
-    setTimeout(finishRound, 900);
+    setTimeout(finishRound, 1200);
   }
 }
 
-/* ══════════ MESH SYNC ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   MESH SYNC
+   ══════════════════════════════════════════════════════════════ */
 function syncMeshes(){
   G.held.forEach(b => {
     b.mesh.position.set(b.x, b.y, b.z);
     b.mesh.scale.setScalar(b.scale);
-    b.mesh.rotation.y += 0.02;
   });
   G.active.forEach(b => {
     if (b.dead) return;
     if (b.state === 'settled'){ b.mesh.visible = false; return; }
+    if (b.state === 'endRest' || b.state === 'endFall' || b.state === 'hole'){
+      b.mesh.position.set(b.x, b.y, b.z);
+      b.mesh.scale.setScalar(b.scale || 1);
+      b.mesh.rotation.z += 0.05;
+      return;
+    }
     const sx = 1 + b.squash * 0.22;
     const sy = 1 - b.squash * 0.22;
     const sz = 1 + b.squash * 0.10;
     const sc = b.scale || 1;
     b.mesh.position.set(b.x, b.y, b.z);
-    if (b.state === 'hole'){
-      b.mesh.scale.setScalar(sc);
-    } else {
-      b.mesh.scale.set(sx * sc, sy * sc, sz * sc);
-    }
+    b.mesh.scale.set(sx*sc, sy*sc, sz*sc);
     b.mesh.rotation.z = Math.sin(b.spin) * 0.4;
     b.mesh.rotation.x = Math.cos(b.spin * 0.7) * 0.3;
   });
 }
 
-/* ══════════ LOOP ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   CAMERA
+   ══════════════════════════════════════════════════════════════ */
+const camState = { lookY: 1200, targetLookY: 1200, dist: 1200, targetDist: 1200 };
+function updateCamera(realDt){
+  if (slowMo.active && slowMo.ball){
+    camState.targetLookY = slowMo.ball.y;
+    camState.targetDist = 700;
+  } else if (G.phase === 'launching' || G.phase === 'holding' || G.phase === 'idle'){
+    camState.targetLookY = MAP.spinCy - 100;
+    camState.targetDist = 1200;
+  } else if (G.active.length){
+    const ys = G.active.filter(b=>!b.dead && b.state !== 'settled').map(b=>b.y).sort((a,b)=>a-b);
+    const med = ys.length ? ys[Math.floor(ys.length/2)] : camState.lookY;
+    camState.targetLookY = med + 180;
+    camState.targetDist = 1200;
+  } else {
+    camState.targetLookY = camState.lookY;
+  }
+  const smooth = 1 - Math.pow(0.0035, realDt);
+  camState.lookY += (camState.targetLookY - camState.lookY) * smooth;
+  camState.dist  += (camState.targetDist  - camState.dist)  * smooth * 0.7;
+  if (!isFinite(camState.lookY)) camState.lookY = 0;
+  if (!isFinite(camState.dist))  camState.dist = 1200;
+  camera.position.set(0, camState.lookY + 100, camState.dist);
+  camera.lookAt(0, camState.lookY, 0);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOOP
+   ══════════════════════════════════════════════════════════════ */
 let last = performance.now();
+let errCount = 0;
 function loop(now){
-  const dt = Math.min((now - last) / 1000, 1/30);
+  const realDt = Math.min((now - last) / 1000, 1/30);
   last = now;
+
+  tickGif(now);
+
+  let gameDt = realDt;
+  if (slowMo.active){
+    slowMo.t += realDt;
+    const p = slowMo.t / slowMo.duration;
+    let scale;
+    if (p < 0.15)      scale = 1 - (p/0.15) * 0.88;
+    else if (p < 0.85) scale = 0.12;
+    else               scale = 0.12 + ((p-0.85)/0.15) * 0.88;
+    gameDt = realDt * scale;
+    if (slowMo.ball && !slowMo.ball.dead){
+      const bx = slowMo.ball.x, by = slowMo.ball.y;
+      const flash = 0.8 + 0.6 * Math.sin(slowMo.t * 30);
+      goldL1.position.set(bx - 45, by + 35, 90);
+      goldL2.position.set(bx + 45, by + 35, 90);
+      goldL1.intensity = 3.5 * flash;
+      goldL2.intensity = 3.5 * flash;
+    }
+    if (p >= 1){
+      slowMo.active = false;
+      goldL1.visible = false; goldL2.visible = false;
+      goldL1.intensity = 0; goldL2.intensity = 0;
+    }
+  }
+
   try {
-    update(dt);
+    update(gameDt);
     syncMeshes();
+    updateCamera(realDt);
     const sx = (Math.random()-.5) * G.shake * 8;
     const sy = (Math.random()-.5) * G.shake * 8;
     renderer.domElement.style.transform = `translate(${sx}px,${sy}px)`;
     renderer.render(scene, camera);
-  } catch (e){ console.error(e); }
+    errCount = 0;
+  } catch (e){
+    errCount++;
+    console.error('Frame error:', e);
+    if (errCount >= 5){
+      errCount = 0;
+      try {
+        G.active.forEach(b => removeBall(b));
+        G.held.forEach(b => removeBall(b));
+        G.active = []; G.held = []; G.particles = [];
+        G.results = []; G._ending = false;
+        G.phase = 'idle';
+      } catch(_){}
+    }
+  }
   requestAnimationFrame(loop);
 }
 
-/* ══════════ RESIZE ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   RESIZE
+   ══════════════════════════════════════════════════════════════ */
 function onResize(){
-  const w = window.innerWidth, h = window.innerHeight;
-  camera.aspect = w/h;
-  const yTop = 640, yBot = -450;
-  const centre = (yTop + yBot)/2;
-  const span = (yTop - yBot) * 1.10;
-  const fovRad = camera.fov * Math.PI/180;
-  const dist = span / (2 * Math.tan(fovRad/2));
-  const angle = 18 * Math.PI/180;
-  camera.position.set(0, centre + Math.sin(angle) * dist, Math.cos(angle) * dist);
-  camera.lookAt(0, centre, 0);
+  camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(w, h);
+  renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  if (elRoulette.classList.contains('show')) sizeRoulette();
 }
 window.addEventListener('resize', onResize);
 
-/* ══════════ BUY ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   BUY
+   ══════════════════════════════════════════════════════════════ */
 let buyTab='random', buyTier='gray';
 document.querySelectorAll('.dl-seg button').forEach(b => {
   b.addEventListener('click', () => {
@@ -1092,7 +1654,8 @@ document.getElementById('dl-buy-cancel').addEventListener('click', ()=>elBuyModa
 
 document.getElementById('dl-buy-go').addEventListener('click', () => {
   let cost=0, balls=[];
-  if (buyTab==='random'){
+  const isRandom = buyTab === 'random';
+  if (isRandom){
     cost = Math.max(10, Math.floor(Number(document.getElementById('dl-rand-amt').value)||0));
     if (cost > BALANCE) return flashResult('Oops','Not enough 💎', true);
     const n = Math.max(1, Math.min(10, Math.round(Math.sqrt(cost)/2.4)));
@@ -1106,188 +1669,222 @@ document.getElementById('dl-buy-go').addEventListener('click', () => {
   }
   elBuyModal.classList.remove('show');
   BALANCE -= cost;
+  G.wagered += cost;
   updateHud();
-  spinAll(balls, () => {
-    balls.forEach((b, i) => G.held.push(spawnBall(b.value, b.tier, i * 0.16)));
+
+  // Set bonus value based on pot
+  if (MAP.bonus){
+    MAP.bonus.points = Math.max(50, Math.floor(cost * 0.15));
+  }
+
+  const spawnAll = () => {
+    balls.forEach((b, i) => G.held.push(spawnBall(b.value, b.tier, i * 0.18)));
     G.phase = 'holding';
     updateHud();
-  });
+  };
+  if (isRandom) spinAll(balls, spawnAll);
+  else spawnAll();
 });
 
-/* ══════════ ROULETTE ══════════ */
-function sizeRoulette(){
-  const cv = document.getElementById('dl-r-canvas');
-  const stage = cv.parentElement;
-  const w = stage.clientWidth, h = stage.clientHeight;
-  const dpr = Math.min(window.devicePixelRatio, 2);
-  cv.width = w*dpr; cv.height = h*dpr;
-  cv.style.width = w+'px'; cv.style.height = h+'px';
-  cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
-}
-
+/* ══════════════════════════════════════════════════════════════
+   ROULETTE
+   ══════════════════════════════════════════════════════════════ */
+const ROULETTE_N = 30;
+let spinToken = 0;
 function spinAll(balls, done){
-  let i = 0;
-  const next = () => {
-    if (i >= balls.length){ done(); return; }
-    spinOne(balls[i++], () => setTimeout(next, 160));
-  };
-  next();
-}
-
-function spinOne(target, done){
+  spinToken++;
+  const myToken = spinToken;
   elRoulette.classList.add('show');
-  sizeRoulette();
-  const cv = document.getElementById('dl-r-canvas');
-  const rc = cv.getContext('2d');
-  const stage = cv.parentElement;
-  const W = stage.clientWidth, H = stage.clientHeight;
-  const strip = [];
-  for (let i=0;i<40;i++){ const v = randomValue(); strip.push({ value:v, tier:tierFor(v) }); }
-  const landIdx = 34;
-  strip[landIdx] = { value:target.value, tier:target.tier };
-  const itemW = 78;
-  const y = H * 0.5;
-  const totalShift = landIdx*itemW + itemW*0.5 - W*0.5;
-  const DUR = 1.9;                            // longer, dramatic spin
-  const startTime = performance.now();        // use REAL time, not assumed 60fps
-  let raf;
+  elRTitle.textContent = 'Rolling';
+  elRAmount.classList.remove('show');
+  elRAmount.textContent = '';
+  elRRows.innerHTML = '';
+
+  const n = balls.length;
+  const availH = Math.min(window.innerHeight * 0.62, 560);
+  const gapPx = 8;
+  let rowH = Math.floor((availH - (n-1)*gapPx) / n);
+  rowH = Math.max(64, Math.min(180, rowH));
+
+  const baseAngles = [];
+  for (let i = 0; i < ROULETTE_N; i++) baseAngles.push((i/ROULETTE_N)*360);
+
+  const rows = [];
+  for (let idx = 0; idx < n; idx++){
+    const ball = balls[idx];
+    const rowEl = document.createElement('div');
+    rowEl.className = 'dl-r-row';
+    rowEl.style.height = rowH + 'px';
+    const vpEl = document.createElement('div');
+    vpEl.className = 'dl-r-viewport';
+    rowEl.appendChild(vpEl);
+    const ptrEl = document.createElement('div');
+    ptrEl.className = 'dl-r-pointer';
+    ptrEl.textContent = '▲';
+    ptrEl.style.fontSize = Math.max(10, Math.min(18, rowH*0.18)) + 'px';
+    rowEl.appendChild(ptrEl);
+    elRRows.appendChild(rowEl);
+
+    const items = [];
+    for (let k = 0; k < ROULETTE_N; k++){
+      const v = randomValue();
+      items.push({ value: v, tier: tierFor(v) });
+    }
+    const winnerIdx = Math.floor(Math.random() * ROULETTE_N);
+    items[winnerIdx] = { value: ball.value, tier: ball.tier };
+
+    const ballSize = Math.min(88, Math.max(40, rowH - 18));
+    const fontSize = Math.max(10, ballSize * 0.26);
+
+    const ballEls = [];
+    items.forEach(b => {
+      const d = document.createElement('div');
+      d.className = 'dl-r-ball ' + b.tier;
+      d.textContent = b.value;
+      d.style.width = ballSize + 'px';
+      d.style.height = ballSize + 'px';
+      d.style.marginLeft = (-ballSize/2) + 'px';
+      d.style.marginTop = (-ballSize/2) + 'px';
+      d.style.fontSize = fontSize + 'px';
+      vpEl.appendChild(d);
+      ballEls.push(d);
+    });
+
+    rows.push({
+      ballEls, winnerIdx,
+      endW: -baseAngles[winnerIdx] - 360 * (5 + Math.floor(Math.random()*4)),
+    });
+  }
+
+  const vpW = elRRows.clientWidth || 380;
+  const RADIUS = Math.max(120, Math.min(240, vpW * 0.52));
+  function applyRow(rowData, W){
+    for (let i = 0; i < ROULETTE_N; i++){
+      const A = (W + baseAngles[i]) * Math.PI / 180;
+      const c = Math.cos(A), s = Math.sin(A);
+      const x = s * RADIUS;
+      const depth = (c + 1) / 2;
+      const scale = 0.55 + 0.45 * depth;
+      const el = rowData.ballEls[i];
+      el.style.transform = `translateX(${x}px) scale(${scale})`;
+      el.style.zIndex = String(Math.round(depth * 1000));
+      el.style.opacity = String(0.4 + 0.6 * depth);
+    }
+  }
+
+  const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
+  const easeOutBack = t => { const c1 = 1.4, c3 = c1 + 1; return 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2); };
+  const DURATION = FAST_SPIN ? 1100 : 2400;
+  const t0 = performance.now();
+  rows.forEach(r => applyRow(r, 0));
 
   function frame(now){
-    const elapsed = (now - startTime) / 1000;
-    const p = Math.min(elapsed / DUR, 1);
-    // Slow ease-out so it decelerates dramatically at the end
-    const ease = 1 - Math.pow(1 - p, 4.2);
-    const shift = totalShift * ease;
-    rc.clearRect(0,0,W,H);
-
-    for (let i=0;i<strip.length;i++){
-      const x = i*itemW - shift + W*0.5 - landIdx*itemW + itemW*0.5;
-      if (x < -itemW || x > W+itemW) continue;
-      const distC = Math.abs(x - W*0.5)/(W*0.5);
-      const scale = Math.max(0.68, 1 - distC * 0.28);
-      const r = 28 * scale;
-      drawRouletteBall(rc, x, y, r, strip[i].value, strip[i].tier);
-      rc.save();
-      rc.fillStyle = `rgba(255,255,255,${0.55 + scale * 0.45})`;
-      rc.font = `800 ${Math.max(10, 13*scale)}px system-ui,sans-serif`;
-      rc.textAlign = 'center';
-      rc.textBaseline = 'top';
-      rc.fillText('💎' + strip[i].value, x, y + r + 8);
-      rc.restore();
-    }
-    // Minimal edge fade so balls never appear to vanish
-    const lf = rc.createLinearGradient(0,0,W*0.06,0);
-    lf.addColorStop(0,'rgba(6,6,11,0.9)'); lf.addColorStop(1,'rgba(6,6,11,0)');
-    rc.fillStyle = lf; rc.fillRect(0,0,W*0.06,H);
-    const rf = rc.createLinearGradient(W,0,W*0.94,0);
-    rf.addColorStop(0,'rgba(6,6,11,0.9)'); rf.addColorStop(1,'rgba(6,6,11,0)');
-    rc.fillStyle = rf; rc.fillRect(W*0.94,0,W*0.06,H);
-
+    if (myToken !== spinToken) return;
+    const p = Math.min((now - t0) / DURATION, 1);
+    const eased = p < 0.9
+      ? easeOutQuint(p/0.9) * 0.985
+      : 0.985 + (easeOutBack((p-0.9)/0.1) * 0.015);
+    rows.forEach(r => applyRow(r, r.endW * eased));
     if (p >= 1){
-      cancelAnimationFrame(raf);
-      setTimeout(() => { elRoulette.classList.remove('show'); done(); }, 380);
+      rows.forEach(r => {
+        applyRow(r, r.endW);
+        r.ballEls[r.winnerIdx].classList.add('winner');
+      });
+      setTimeout(() => {
+        if (myToken !== spinToken) return;
+        elRTitle.textContent = 'You got';
+        const totalVal = balls.reduce((s,b)=>s+b.value, 0);
+        elRAmount.textContent = '💎' + totalVal;
+        elRAmount.classList.add('show');
+        haptic();
+      }, 250);
+      setTimeout(() => {
+        if (myToken !== spinToken) return;
+        elRoulette.classList.remove('show');
+        elRRows.innerHTML = '';
+        done();
+      }, FAST_SPIN ? 1000 : 1700);
       return;
     }
-    raf = requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
   }
-  raf = requestAnimationFrame(frame);
+  requestAnimationFrame(frame);
 }
 
-function drawRouletteBall(c, x, y, r, value, tier){
-  const cfg = TIER_MAT[tier] || TIER_MAT.gray;
-  const baseCol = new THREE.Color(cfg.color);
-  const hiCol = baseCol.clone().lerp(new THREE.Color(0xffffff), 0.85);
-  const loCol = baseCol.clone().lerp(new THREE.Color(0x000000), 0.75);
-
-  c.save();
-  c.fillStyle = 'rgba(0,0,0,0.55)';
-  c.beginPath();
-  c.ellipse(x, y + r*0.98, r*0.85, r*0.22, 0, 0, Math.PI*2);
-  c.fill();
-  c.restore();
-
-  const g = c.createRadialGradient(x - r*0.38, y - r*0.42, r*0.05, x, y, r);
-  g.addColorStop(0, '#' + hiCol.getHexString());
-  g.addColorStop(0.5, '#' + baseCol.getHexString());
-  g.addColorStop(1, '#' + loCol.getHexString());
-  c.fillStyle = g;
-  c.beginPath(); c.arc(x, y, r, 0, Math.PI*2); c.fill();
-
-  c.strokeStyle = 'rgba(0,0,0,0.35)';
-  c.lineWidth = Math.max(0.8, r*0.09);
-  c.beginPath(); c.arc(x, y, r*0.94, 0, Math.PI*2); c.stroke();
-
-  const sg = c.createRadialGradient(x - r*0.42, y - r*0.48, 0, x - r*0.42, y - r*0.48, r*0.6);
-  sg.addColorStop(0, 'rgba(255,255,255,0.95)');
-  sg.addColorStop(0.45, 'rgba(255,255,255,0.35)');
-  sg.addColorStop(1, 'rgba(255,255,255,0)');
-  c.fillStyle = sg;
-  c.beginPath(); c.arc(x - r*0.42, y - r*0.48, r*0.6, 0, Math.PI*2); c.fill();
-
-  c.fillStyle = 'rgba(255,255,255,0.9)';
-  c.beginPath();
-  c.arc(x - r*0.35, y - r*0.45, Math.max(1.6, r*0.09), 0, Math.PI*2);
-  c.fill();
-
-  if (r >= 10){
-    c.font = `900 ${Math.max(10, r*0.72)}px system-ui,sans-serif`;
-    c.textAlign = 'center';
-    c.textBaseline = 'middle';
-    c.fillStyle = 'rgba(0,0,0,0.45)';
-    c.fillText(String(value), x + 1, y + 1.4);
-    c.fillStyle = tier === 'gold' ? '#2a1400' : (tier === 'green' ? '#042a18' : '#0a0a14');
-    c.fillText(String(value), x, y + 0.3);
-  }
-}
-
-/* ══════════ LAUNCH ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   LAUNCH
+   ══════════════════════════════════════════════════════════════ */
 elLaunch.addEventListener('click', () => {
   if (G.phase !== 'holding' || G.held.length===0) return;
   G.phase = 'launching';
-  G.launchT = 0;
-  G.launchOpen = 0;
-  G.releaseTimer = 0;
+  G.launchT = 0; G.launchOpen = 0;
   setSpinnerGap(0);
   elLaunch.disabled = true;
   haptic();
 });
 
-/* ══════════ FINISH ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   FINISH
+   ══════════════════════════════════════════════════════════════ */
 function finishRound(){
   let total = 0, won = 0, lost = 0;
   for (const r of G.results){
     total += r.value * r.mult;
     if (r.mult === 0) lost++; else won++;
   }
+  // Bonus coin adds points if collected
+  if (G.bonusCollected && MAP.bonus) total += MAP.bonus.points;
+
   const winnings = Math.floor(total);
   BALANCE += winnings;
+  const mult = G.wagered > 0 ? (winnings / G.wagered) : 0;
+  G.wagered = 0;
   updateHud();
-  flashResult(
-    winnings > 0 ? 'Round Results' : 'Round Over',
-    (winnings>0?'+':'') + winnings + ' 💎',
-    false,
-    `${won} won · ${lost} lost`
-  );
+  if (winnings > 0) addTickerChip(winnings, mult, G.bonusCollected ? '+BONUS' : '');
+
+  elResTag.textContent = winnings > 0 ? 'Round Results' : 'Round Over';
+  elResAmt.textContent = (winnings > 0 ? '+' : '') + winnings + ' 💎';
+  elResAmt.classList.toggle('lose', winnings === 0);
+  elResMult.textContent = '×' + mult.toFixed(2);
+  elResMult.classList.toggle('lose', winnings === 0);
+  elResSub.textContent = `${won} won · ${lost} lost` + (G.bonusCollected ? ' · 💰 BONUS collected' : '');
+  elResult.classList.add('show');
 }
+
 document.getElementById('dl-res-ok').addEventListener('click', () => {
   elResult.classList.remove('show');
-  G.active.forEach(removeBall);
-  G.active = []; G.held.forEach(removeBall); G.held = [];
+  G.active.forEach(b => removeBall(b));
+  G.held.forEach(b => removeBall(b));
+  G.active = []; G.held = [];
+  for (const p of G.particles) scene.remove(p.mesh);
+  G.particles = [];
   G.results = [];
   G.launchT = 0; G.launchOpen = 0; G._ending = false;
   G.phase = 'idle';
+  G.bonusCollected = false;
+  slowMo.active = false; slowMo.ball = null; slowMo.t = 0;
+  goldL1.visible = false; goldL2.visible = false;
+  goldL1.intensity = 0; goldL2.intensity = 0;
   setSpinnerGap(0);
+
+  regenerateMap();
+  buildMap();
+  G.triX = 0; G.triDir = 1;
+  camState.lookY = MAP.spinCy - 100;
+  camState.targetLookY = MAP.spinCy - 100;
+
+  document.querySelectorAll('.dl-modal,.dl-r,.dl-result').forEach(el => el.classList.remove('show'));
   updateHud();
 });
 function flashResult(tag, amt, isLose, sub){
   elResTag.textContent = tag;
   elResAmt.textContent = amt;
   elResAmt.classList.toggle('lose', !!isLose);
+  elResMult.textContent = '';
   elResSub.textContent = sub || '';
   elResult.classList.add('show');
 }
 
-/* ══════════ CLOSE ══════════ */
 document.getElementById('dl-close').addEventListener('click', () => {
   try {
     if (window.__state){
@@ -1298,9 +1895,12 @@ document.getElementById('dl-close').addEventListener('click', () => {
   window.dispatchEvent(new CustomEvent('dlballs-close'));
 });
 
-/* ══════════ BOOT ══════════ */
+/* ══════════════════════════════════════════════════════════════
+   BOOT
+   ══════════════════════════════════════════════════════════════ */
+regenerateMap();
+buildMap();
 onResize();
-setSpinnerGap(0);
 updateHud();
 requestAnimationFrame(loop);
 </script>
