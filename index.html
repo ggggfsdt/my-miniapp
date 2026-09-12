@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Dlballs</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
 #dl{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,#1a1a20 0%,#0a0a10 55%,#050507 100%)}
 #dl-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:1}
 .dl-top{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px;right:10px;z-index:10;display:flex;align-items:center;gap:6px;pointer-events:none}
-.dl-pill{display:flex;align-items:center;gap:5px;height:26px;padding:0 10px;background:rgba(10,10,12,.85);border:1px solid rgba(255,255,255,.07);border-radius:13px;backdrop-filter:blur(16px);font-size:11px;font-weight:600;pointer-events:auto;flex-shrink:0}
+.dl-pill{display:flex;align-items:center;gap:5px;height:26px;padding:0 10px;background:rgba(10,10,12,.85);border:1px solid rgba(255,255,255,.07);border-radius:13px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);font-size:11px;font-weight:600;pointer-events:auto;flex-shrink:0}
 .dl-pill .lbl{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.8px;font-weight:700}
 .dl-pill .val{color:#fff;font-variant-numeric:tabular-nums;font-weight:800}
 .dl-pill.pot{border-color:rgba(255,220,80,.35)}
@@ -21,22 +21,13 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 @keyframes dlDP{0%,100%{filter:drop-shadow(0 0 3px rgba(255,220,80,.4))}50%{filter:drop-shadow(0 0 8px rgba(255,220,80,1)) brightness(1.15)}}
 .dl-close{margin-left:auto;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.07);background:rgba(10,10,12,.85);color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;pointer-events:auto;flex-shrink:0}
 .dl-close:active{transform:scale(.9)}
-.dl-ticker{position:absolute;top:calc(env(safe-area-inset-top,0px) + 42px);left:10px;right:10px;z-index:9;display:flex;gap:4px;overflow:hidden;pointer-events:none;mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%)}
+.dl-ticker{position:absolute;top:calc(env(safe-area-inset-top,0px) + 42px);left:10px;right:10px;z-index:9;display:flex;gap:4px;overflow:hidden;pointer-events:none;mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%)}
 .dl-ticker .chip{flex-shrink:0;background:rgba(10,10,12,.75);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:3px 9px;font-size:10px;font-weight:600;color:rgba(255,255,255,.75);white-space:nowrap;display:flex;align-items:center;gap:4px;animation:dlCI .35s ease}
 .dl-ticker .chip .amt{color:#8fe5b0;font-weight:800}
 .dl-ticker .chip img{width:11px;height:11px}
 @keyframes dlCI{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
-/* MAP CHOOSER BUTTONS (temporary) */
 .dl-mapbar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 72px);left:10px;right:10px;z-index:11;display:flex;gap:4px;justify-content:center;flex-wrap:wrap;pointer-events:none}
-.dl-mapbar button{
-  pointer-events:auto;
-  height:24px;padding:0 10px;border-radius:8px;
-  background:rgba(14,14,18,.85);border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.65);font-size:10px;font-weight:700;
-  cursor:pointer;font-family:inherit;letter-spacing:.3px;
-  transition:background .15s,color .15s,border-color .15s;
-  backdrop-filter:blur(10px);
-}
+.dl-mapbar button{pointer-events:auto;height:24px;padding:0 10px;border-radius:8px;background:rgba(14,14,18,.85);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s,color .15s,border-color .15s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .dl-mapbar button:active{transform:scale(.95)}
 .dl-mapbar button.on{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.35)}
 .dl-bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:12px;z-index:10;display:flex;gap:8px}
@@ -45,7 +36,7 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 .dl-btn:disabled{opacity:.3;pointer-events:none}
 .dl-btn-buy{background:rgba(20,20,24,.9);color:#fff;border:1px solid rgba(255,255,255,.08)}
 .dl-btn-launch{background:#f4f4f8;color:#0a0a0c}
-.dl-modal{position:absolute;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
+.dl-modal{position:absolute;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .dl-modal.show{display:flex;animation:dlF .2s}
 @keyframes dlF{from{opacity:0}to{opacity:1}}
 .dl-sheet{width:100%;max-width:440px;background:#0e0e12;border-radius:22px 22px 0 0;padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 16px);border-top:1px solid rgba(255,255,255,.06);animation:dlSU .3s cubic-bezier(.2,.9,.3,1.2)}
@@ -82,7 +73,7 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 .dl-actions button{flex:1;height:42px;border-radius:11px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
 .dl-cancel{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7)}
 .dl-confirm{background:#f4f4f8;color:#0a0a0c}
-.dl-result{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);padding:20px}
+.dl-result{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:20px}
 .dl-result.show{display:flex;animation:dlF .25s}
 .dl-result-box{width:100%;max-width:360px;background:#0e0e12;border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:26px 22px;text-align:center;animation:dlPP .35s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes dlPP{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
@@ -93,23 +84,30 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
 .dl-res-mult{font-size:22px;font-weight:800;color:#ffdd44;margin-bottom:4px;letter-spacing:-0.5px}
 .dl-res-mult.lose{color:#7a7a82}
 .dl-res-sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-bottom:18px}
-.dl-r{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 16px;background:radial-gradient(ellipse at 50% 50%,#14141a 0%,#07070a 70%,#020203 100%)}
+/* ═════ OPTIMIZED ROULETTE ═════ */
+.dl-r{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 16px;background:radial-gradient(ellipse at 50% 50%,#14141a 0%,#07070a 70%,#020203 100%);transform:translateZ(0);-webkit-transform:translateZ(0)}
 .dl-r.show{display:flex;animation:dlF .2s}
 .dl-r-title{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2.5px;text-transform:uppercase;font-weight:800;min-height:14px;text-align:center}
-.dl-r-rows{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
-.dl-r-row{position:relative;flex-shrink:0;border-radius:18px;overflow:hidden;background:radial-gradient(ellipse at 50% 100%,rgba(255,255,255,.05) 0%,transparent 65%),linear-gradient(180deg,rgba(24,24,30,.85),rgba(6,6,8,.95));border:1px solid rgba(255,255,255,.06);perspective:900px;perspective-origin:50% 50%}
-.dl-r-viewport{position:absolute;inset:0;overflow:hidden}
-.dl-r-ball{position:absolute;left:50%;top:50%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-family:-apple-system,system-ui,sans-serif;will-change:transform,opacity}
+.dl-r-rows{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;overflow:hidden;transform:translateZ(0);-webkit-transform:translateZ(0)}
+.dl-r-row{position:relative;flex-shrink:0;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(24,24,30,.85),rgba(6,6,8,.95));border:1px solid rgba(255,255,255,.06);perspective:600px;-webkit-perspective:600px;perspective-origin:50% 50%;contain:layout style paint;transform:translateZ(0);-webkit-transform:translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.dl-r-viewport{position:absolute;inset:0;overflow:hidden;transform:translateZ(0);-webkit-transform:translateZ(0)}
+.dl-r-ball{position:absolute;left:50%;top:50%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-family:-apple-system,system-ui,sans-serif;font-variant-numeric:tabular-nums;will-change:transform,opacity;transform:translate3d(0,0,0);backface-visibility:hidden;-webkit-backface-visibility:hidden;pointer-events:none;contain:strict}
 .dl-r-ball.gray{background:radial-gradient(circle at 32% 28%,#e8e8ee 0%,#8a8a92 55%,#3a3a40 100%);color:#101014}
 .dl-r-ball.silver{background:radial-gradient(circle at 32% 28%,#ffffff 0%,#d0d0dc 45%,#5a5a70 100%);color:#15151e}
 .dl-r-ball.green{background:radial-gradient(circle at 32% 28%,#e0ffe8 0%,#30c977 50%,#0a3a20 100%);color:#042a18}
 .dl-r-ball.gold{background:radial-gradient(circle at 32% 28%,#fffbd0 0%,#ffcc33 45%,#8a5a10 100%);color:#3a2000}
-.dl-r-ball.winner::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid #fff;animation:dlWR 1s ease-in-out infinite}
-@keyframes dlWR{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
-.dl-r-pointer{position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);font-size:14px;color:#fff;font-weight:900;text-shadow:0 0 14px #fff;pointer-events:none;z-index:500}
-.dl-r-amount{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;opacity:0;transform:scale(.7);transition:.3s;min-height:38px;display:flex;align-items:center;justify-content:center;gap:6px}
-.dl-r-amount img{width:26px;height:26px}
+.dl-r-ball.winner::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #fff;animation:dlWR .9s ease-in-out infinite;will-change:transform,opacity}
+@keyframes dlWR{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+.dl-r-pointer{position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);font-size:13px;color:#fff;font-weight:900;text-shadow:0 0 10px #fff;pointer-events:none;z-index:500}
+.dl-r-amount{font-size:30px;font-weight:900;color:#fff;letter-spacing:-1px;opacity:0;transform:scale(.7);transition:.3s;min-height:36px;display:flex;align-items:center;justify-content:center;gap:6px}
+.dl-r-amount img{width:24px;height:24px}
 .dl-r-amount.show{opacity:1;transform:scale(1)}
+@media (max-width: 420px){
+  .dl-r{padding:16px 10px;gap:6px}
+  .dl-r-row{border-radius:14px;perspective:500px;-webkit-perspective:500px}
+  .dl-r-title{font-size:10px;letter-spacing:2px}
+  .dl-r-pointer{font-size:11px}
+}
 </style>
 </head>
 <body>
@@ -122,13 +120,13 @@ html,body{height:100%;overflow:hidden;background:#050506;color:#eee;font-family:
     <button class="dl-close" id="dl-close">✕</button>
   </div>
   <div class="dl-ticker" id="dl-ticker"></div>
-  <!-- TEMP: MAP CHOOSER -->
   <div class="dl-mapbar" id="dl-mapbar">
     <button data-mt="classic">Classic</button>
     <button data-mt="maze">Maze</button>
     <button data-mt="puck">Puck</button>
     <button data-mt="brick">Brick</button>
     <button data-mt="dart">Darts</button>
+    <button data-mt="blade">Blade</button>
     <button data-mt="random">Random</button>
   </div>
   <div class="dl-bottom">
@@ -189,8 +187,8 @@ for (const t in TIER_CFG){
 const BALL_OUTLINE = new THREE.MeshBasicMaterial({color:0x000000,side:THREE.BackSide,transparent:true,opacity:0.55});
 const MAP_OUTLINE  = new THREE.MeshBasicMaterial({color:0x000000,side:THREE.BackSide,transparent:true,opacity:0.4});
 const ballGeoCache = new Map(), ballOutlineCache = new Map();
-function getBallGeo(r){ if (ballGeoCache.has(r)) return ballGeoCache.get(r); const g = new THREE.SphereGeometry(r,20,16); ballGeoCache.set(r,g); return g; }
-function getBallOutlineGeo(r){ const k = r+1; if (ballOutlineCache.has(k)) return ballOutlineCache.get(k); const g = new THREE.SphereGeometry(r+1,12,10); ballOutlineCache.set(k,g); return g; }
+function getBallGeo(r){ if (ballGeoCache.has(r)) return ballGeoCache.get(r); const g = new THREE.SphereGeometry(r,18,14); ballGeoCache.set(r,g); return g; }
+function getBallOutlineGeo(r){ const k = r+1; if (ballOutlineCache.has(k)) return ballOutlineCache.get(k); const g = new THREE.SphereGeometry(r+1,10,8); ballOutlineCache.set(k,g); return g; }
 function makeBallMesh(value, tier){
   const r = ballR(value);
   const mesh = new THREE.Mesh(getBallGeo(r), SHARED_MAT[tier]||SHARED_MAT.gray);
@@ -210,33 +208,32 @@ function roundedBoxGeo(w,h,d,r,bev=1){
   return geo;
 }
 
-const MAP_NAMES = { classic:'Classic', maze:'Maze', puck:'Puck Arena', brick:'Brick', dart:'Darts' };
+const MAP_NAMES = { classic:'Classic', maze:'Maze', puck:'Puck Arena', brick:'Brick', dart:'Darts', blade:'Blade Pit' };
 const MAP = { type:'classic' };
-
-// 'random' mode for the debug chooser
 let FORCED_MAP = 'random';
 
 function regenerateMap(){
   const r = Math.random();
   if (FORCED_MAP === 'random'){
-    if (r < 0.25) MAP.type = 'classic';
-    else if (r < 0.50) MAP.type = 'maze';
-    else if (r < 0.70) MAP.type = 'puck';
-    else if (r < 0.85) MAP.type = 'brick';
-    else MAP.type = 'dart';
+    if (r < 0.20) MAP.type = 'classic';
+    else if (r < 0.40) MAP.type = 'maze';
+    else if (r < 0.58) MAP.type = 'puck';
+    else if (r < 0.74) MAP.type = 'brick';
+    else if (r < 0.88) MAP.type = 'dart';
+    else MAP.type = 'blade';
   } else {
     MAP.type = FORCED_MAP;
   }
 
   MAP.spinCy = 1300; MAP.spinR = 130; MAP.spinTube = 12;
   MAP.upperTopY = 1180; MAP.upperTopHalf = 240;
-  // NOTE: upperBotY / upperBotHalf are now tuned per-map, defaults here:
   MAP.upperBotY = 380; MAP.upperBotHalf = 130;
   MAP.lowerTopY = 200; MAP.lowerTopHalf = 140;
   MAP.lowerBotY = -240; MAP.lowerBotHalf = 130;
   MAP.floorY = -240; MAP.floorOpen = 105;
   MAP.pegs = []; MAP.bars = [];
-  MAP.puckArena = null; MAP.brickWall = null; MAP.dartBox = null; MAP.dartBricks = [];
+  MAP.puckArena = null; MAP.brickWall = null; MAP.dartBox = null;
+  MAP.dartGate = null; MAP.bladeArms = null; MAP.blackhole = null;
   MAP.useTriangle = false;
 
   MAP.pegTop = 1050; MAP.pegBot = 500; MAP.pegRows = 6; MAP.pegSpan = 320; MAP.pegR = 11;
@@ -307,36 +304,61 @@ function regenerateMap(){
     MAP.useTriangle = true;
     MAP.triTipY = 100; MAP.triBaseY = 40; MAP.triHalf = 68;
     MAP.triRange = 175; MAP.triSpeed = 340 + Math.random()*80;
-  } else {
-    // DART — retuned proportions + solid floor bricks inside
+  } else if (MAP.type === 'dart'){
     buildPegs();
-    // Raise upper funnel bottom so chute has room to angle properly
     MAP.upperBotY = 500;
     MAP.upperBotHalf = 130;
 
     MAP.dartBox = {
       cx: 0, cy: 100, w: 480, h: 700, wallT: 14,
       topOpeningW: 200,
-      // Bottom openings pushed to sides — long, clear wall sections between
       bottomOpenings: [{x:-140,w:90},{x:140,w:90}],
       shootTimer: 0,
       active: null,
     };
 
-    // Solid brick floor inside the box — keeps balls bouncing, doesn't break
-    // Row spans x -100..100 just above the box bottom openings
-    const brickW = 34, brickH = 20, gap = 6;
-    const rowY = -40;    // world Y (well below the dartboard at cy=100)
-    const nBricks = 6;
-    const totalW = nBricks*brickW + (nBricks-1)*gap;
-    const startX = -totalW/2 + brickW/2;
-    for (let i = 0; i < nBricks; i++){
-      const x = startX + i*(brickW+gap);
-      MAP.dartBricks.push({
-        x, y: rowY, w: brickW, h: brickH,
-        shake: 0, mesh: null,
-      });
-    }
+    MAP.dartGate = {
+      baseY: -220,
+      apexY: -140,
+      halfW: 130,
+      maxApexGap: 100,
+      apexGap: 0,
+      openAmount: 0,
+      targetOpen: 0,
+      timer: 0,
+      leftMesh: null, rightMesh: null,
+    };
+  } else {
+    // BLADE PIT — rotating arms + blackhole room
+    buildPegs();
+    MAP.upperBotY = 500;
+    MAP.upperBotHalf = 160;
+    MAP.lowerTopY = -280;
+    MAP.lowerTopHalf = 200;
+    MAP.useTriangle = false;
+
+    MAP.bladeArms = [
+      { y: 780, length: 210, angle: 0,         speed: 0.85,  }
+      ,{ y: 500, length: 230, angle: Math.PI/2, speed: -0.65 }
+    ];
+
+    MAP.blackhole = {
+      x: 0, y: -60,
+      r: 140,
+      pullStrength: 1300,
+      holdTime: 2.4,
+      timer: 0,
+      state: 'idle',
+      held: [],
+      group: null,
+      coreMesh: null,
+      ring1: null,
+      ring2: null,
+      swirl: null,
+      glowLight: null,
+      particles: [],
+      ringPhase: 0,
+    };
   }
 
   MAP.bowl1 = { cy:-500, rimR:130, wallH:30, wallT:24, holeR:34, holes: shuffleHoles(3,3.0,1.5) };
@@ -377,7 +399,6 @@ const topL = new THREE.PointLight(0xffffff,1.4,1800); topL.position.set(0,900,50
 const goldL1 = new THREE.PointLight(0xffdd44,0,600); const goldL2 = new THREE.PointLight(0xffdd44,0,600);
 goldL1.visible = false; goldL2.visible = false; scene.add(goldL1,goldL2);
 
-// NO GIF WALL — plain dark backdrop only
 const darkBack = new THREE.Mesh(
   new THREE.PlaneGeometry(2400, 4000),
   new THREE.MeshBasicMaterial({ color: 0x090912 })
@@ -385,7 +406,6 @@ const darkBack = new THREE.Mesh(
 darkBack.position.set(0, 300, -160);
 scene.add(darkBack);
 
-// GIF loader helper (still used for triangle + gun)
 function createGifCanvas(src, initialSize){
   const img = new Image();
   img.crossOrigin = 'anonymous';
@@ -427,14 +447,15 @@ const triState = createGifCanvas(TRI_GIF, 256);
 const gunState = createGifCanvas(GUN_GIF, 256);
 
 const mapGroup = new THREE.Group(); scene.add(mapGroup);
-let WALLS = [], PEGS = [], BARS = [], BRICKS = [], DARTBRICKS = [];
+let WALLS = [], PEGS = [], BARS = [], BRICKS = [];
 let triMesh = null, gifPlane = null;
 let spinMesh = null, spinRail = null, spinInner = null;
 let puckGroup = null;
+let bladeMeshes = [];
 let currentGap = 0;
 
 const wallMat    = new THREE.MeshStandardMaterial({color:0xa8a8b0,metalness:0.88,roughness:0.28,emissive:0x24242c,emissiveIntensity:0.55});
-const pegMat     = new THREE.MeshStandardMaterial({color:0xf6f6fc,metalness:1.0,roughness:0.13,emissive:0x242430,emissiveIntensity:0.3});
+const pegMatBase = new THREE.MeshStandardMaterial({color:0xf6f6fc,metalness:1.0,roughness:0.13,emissive:0x242430,emissiveIntensity:0.3});
 const barMat     = new THREE.MeshStandardMaterial({color:0xe0e0e8,metalness:0.9,roughness:0.22,emissive:0x2a2a34,emissiveIntensity:0.5});
 const triMat     = new THREE.MeshStandardMaterial({color:0xb8b8c0,metalness:0.85,roughness:0.3,emissive:0x2a2a34,emissiveIntensity:0.6});
 const spinMat    = new THREE.MeshStandardMaterial({color:0xffffff,metalness:0.85,roughness:0.14,emissive:0x80808a,emissiveIntensity:0.75});
@@ -447,8 +468,12 @@ const arenaMat   = new THREE.MeshStandardMaterial({color:0xf0f0f6,metalness:0.9,
 const arrowMat   = new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false,side:THREE.DoubleSide});
 const BRICK_INTACT = new THREE.MeshStandardMaterial({color:0x8a4a2a, metalness:0.1, roughness:0.85, emissive:0x2a1008, emissiveIntensity:0.3});
 const BRICK_CRACKED= new THREE.MeshStandardMaterial({color:0x6a3a1a, metalness:0.1, roughness:0.9, emissive:0x1a0804, emissiveIntensity:0.4});
-const DARTBRICK_MAT= new THREE.MeshStandardMaterial({color:0x8a4a2a, metalness:0.1, roughness:0.85, emissive:0x2a1008, emissiveIntensity:0.4});
-// Dartboard — only red + white
+const GATE_MAT     = new THREE.MeshStandardMaterial({color:0xc0c0d0, metalness:0.85, roughness:0.22, emissive:0x303038, emissiveIntensity:0.6});
+const BLADE_MAT    = new THREE.MeshStandardMaterial({color:0xddddff, metalness:0.92, roughness:0.16, emissive:0x4048a0, emissiveIntensity:1.0});
+const BLADE_HUB_MAT= new THREE.MeshStandardMaterial({color:0xffffff, metalness:0.95, roughness:0.15, emissive:0xa0a8ff, emissiveIntensity:1.2});
+const BH_CORE_MAT  = new THREE.MeshBasicMaterial({color:0x000000});
+const BH_RING_MAT1 = new THREE.MeshBasicMaterial({color:0x8a2aff, transparent:true, opacity:0.85});
+const BH_RING_MAT2 = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.9});
 const DART_RED     = new THREE.MeshBasicMaterial({color:0xd93030});
 const DART_WHITE   = new THREE.MeshBasicMaterial({color:0xf0f0f0});
 const DART_BLACK   = new THREE.MeshBasicMaterial({color:0x1a1a1a});
@@ -480,10 +505,11 @@ const featured = { ball: null, arrow: null };
 
 function buildMap(){
   while (mapGroup.children.length){ const c = mapGroup.children[0]; mapGroup.remove(c); if (c.geometry) c.geometry.dispose(); }
-  WALLS = []; PEGS = []; BARS = []; BRICKS = []; DARTBRICKS = [];
+  WALLS = []; PEGS = []; BARS = []; BRICKS = [];
   triMesh = null; gifPlane = null;
   spinMesh = null; spinRail = null; spinInner = null;
   puckGroup = null;
+  bladeMeshes = [];
 
   function wall(ax,ay,bx,by){
     const dx = bx-ax, dy = by-ay, len = Math.hypot(dx,dy);
@@ -510,16 +536,17 @@ function buildMap(){
   if (MAP.dartBox){
     const D = MAP.dartBox;
     const topY = D.cy + D.h/2;
-    // Chute walls match the top opening width — clean angle
     wall(-MAP.upperBotHalf, MAP.upperBotY, -D.topOpeningW/2, topY);
     wall( MAP.upperBotHalf, MAP.upperBotY,  D.topOpeningW/2, topY);
   }
 
   MAP.pegs.forEach(p => {
-    const m = new THREE.Mesh(new THREE.SphereGeometry(p.r,18,14), pegMat);
+    // Individual material per peg for glow
+    const m = new THREE.Mesh(new THREE.SphereGeometry(p.r,16,12), pegMatBase.clone());
     m.position.set(p.x,p.y,0);
     m.userData.hit = 0;
-    m.add(new THREE.Mesh(new THREE.SphereGeometry(p.r+0.8,12,10), MAP_OUTLINE));
+    m.userData.baseColor = 0xf6f6fc;
+    m.add(new THREE.Mesh(new THREE.SphereGeometry(p.r+0.8,10,8), MAP_OUTLINE));
     mapGroup.add(m);
     PEGS.push({mesh:m,x:p.x,y:p.y,r:p.r});
   });
@@ -553,17 +580,82 @@ function buildMap(){
     });
   }
 
-  // Dart box floor bricks (indestructible)
-  if (MAP.dartBricks.length){
-    MAP.dartBricks.forEach(b => {
-      const geo = roundedBoxGeo(b.w, b.h, 24, 3, 0.6);
-      const mesh = new THREE.Mesh(geo, DARTBRICK_MAT.clone());
-      mesh.position.set(b.x, b.y, 0);
-      addOutline(mesh, 1.05);
-      mapGroup.add(mesh);
-      b.mesh = mesh;
-      DARTBRICKS.push(b);
+  if (MAP.dartGate){
+    const G = MAP.dartGate;
+    G.leftMesh = new THREE.Mesh(roundedBoxGeo(100, 12, 28, 5, 0.8), GATE_MAT);
+    addOutline(G.leftMesh, 1.06);
+    mapGroup.add(G.leftMesh);
+    G.rightMesh = new THREE.Mesh(roundedBoxGeo(100, 12, 28, 5, 0.8), GATE_MAT);
+    addOutline(G.rightMesh, 1.06);
+    mapGroup.add(G.rightMesh);
+    updateGateMeshes();
+  }
+
+  // BLADE ARMS
+  if (MAP.bladeArms){
+    MAP.bladeArms.forEach(arm => {
+      const hub = new THREE.Mesh(new THREE.SphereGeometry(16, 20, 14), BLADE_HUB_MAT);
+      hub.position.set(0, arm.y, 0);
+      mapGroup.add(hub);
+      bladeMeshes.push({ arm, mesh: hub, type:'hub' });
+
+      const bar = new THREE.Mesh(roundedBoxGeo(arm.length*2, 14, 32, 5, 1.0), BLADE_MAT);
+      addOutline(bar, 1.08);
+      mapGroup.add(bar);
+      bladeMeshes.push({ arm, mesh: bar, type:'bar' });
+
+      // Add a "cutting edge" glowing tip on each end
+      for (const sign of [-1, 1]){
+        const tip = new THREE.Mesh(new THREE.SphereGeometry(9, 14, 10), BLADE_HUB_MAT);
+        mapGroup.add(tip);
+        bladeMeshes.push({ arm, mesh: tip, type:'tip', sign });
+      }
     });
+  }
+
+  // BLACKHOLE
+  if (MAP.blackhole){
+    const BH = MAP.blackhole;
+    const g = new THREE.Group();
+    g.position.set(BH.x, BH.y, 0);
+
+    // Core: black disc with radial dark gradient look via circles
+    const core = new THREE.Mesh(new THREE.CircleGeometry(58, 48), BH_CORE_MAT);
+    core.position.z = 4;
+    g.add(core);
+
+    // Dark ring
+    const dark1 = new THREE.Mesh(new THREE.RingGeometry(58, 92, 48), new THREE.MeshBasicMaterial({color:0x0a0010, transparent:true, opacity:0.9}));
+    dark1.position.z = 3;
+    g.add(dark1);
+
+    // Purple glow ring
+    const ring1 = new THREE.Mesh(new THREE.RingGeometry(90, 104, 48), BH_RING_MAT1);
+    ring1.position.z = 2;
+    g.add(ring1);
+
+    // White highlight ring
+    const ring2 = new THREE.Mesh(new THREE.RingGeometry(104, 110, 48), BH_RING_MAT2);
+    ring2.position.z = 2;
+    g.add(ring2);
+
+    // Outer swirl
+    const swirl = new THREE.Mesh(new THREE.RingGeometry(110, 130, 40), new THREE.MeshBasicMaterial({color:0x8a2aff, transparent:true, opacity:0.25}));
+    swirl.position.z = 1;
+    g.add(swirl);
+
+    // Purple point light for glow
+    const glow = new THREE.PointLight(0xa060ff, 1.6, 500);
+    glow.position.set(BH.x, BH.y, 40);
+    scene.add(glow);
+
+    mapGroup.add(g);
+    BH.group = g;
+    BH.coreMesh = core;
+    BH.ring1 = ring1;
+    BH.ring2 = ring2;
+    BH.swirl = swirl;
+    BH.glowLight = glow;
   }
 
   if (MAP.useTriangle){
@@ -601,6 +693,31 @@ function buildMap(){
   buildBowl(MAP.bowl1);
   buildBowl(MAP.bowl2);
   buildEndZone();
+}
+
+function updateGateMeshes(){
+  const G = MAP.dartGate;
+  if (!G || !G.leftMesh || !G.rightMesh) return;
+  const halfGap = G.apexGap / 2;
+  const la = { x: -G.halfW, y: G.baseY };
+  const lb = { x: -halfGap, y: G.apexY };
+  const ldx = lb.x - la.x, ldy = lb.y - la.y;
+  const llen = Math.hypot(ldx, ldy);
+  const lang = Math.atan2(ldy, ldx);
+  G.leftMesh.geometry.dispose();
+  G.leftMesh.geometry = roundedBoxGeo(llen, 12, 28, 5, 0.8);
+  G.leftMesh.position.set((la.x+lb.x)/2, (la.y+lb.y)/2, 0);
+  G.leftMesh.rotation.z = lang;
+
+  const ra = { x: halfGap, y: G.apexY };
+  const rb = { x: G.halfW, y: G.baseY };
+  const rdx = rb.x - ra.x, rdy = rb.y - ra.y;
+  const rlen = Math.hypot(rdx, rdy);
+  const rang = Math.atan2(rdy, rdx);
+  G.rightMesh.geometry.dispose();
+  G.rightMesh.geometry = roundedBoxGeo(rlen, 12, 28, 5, 0.8);
+  G.rightMesh.position.set((ra.x+rb.x)/2, (ra.y+rb.y)/2, 0);
+  G.rightMesh.rotation.z = rang;
 }
 
 function buildPuckArena(A){
@@ -645,12 +762,12 @@ function buildPuckArena(A){
   puckGroup = new THREE.Group();
   const pR = A.puck.r;
   const ringMatP = new THREE.MeshStandardMaterial({color:0xffffff,metalness:0.9,roughness:0.15,emissive:0xa0a0b0,emissiveIntensity:0.9});
-  puckGroup.add(new THREE.Mesh(new THREE.TorusGeometry(pR, 5, 14, 40), ringMatP));
-  puckGroup.add(new THREE.Mesh(new THREE.TorusGeometry(pR - 5, 1.2, 8, 32), new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.5})));
+  puckGroup.add(new THREE.Mesh(new THREE.TorusGeometry(pR, 5, 12, 36), ringMatP));
+  puckGroup.add(new THREE.Mesh(new THREE.TorusGeometry(pR - 5, 1.2, 8, 28), new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.5})));
   const crossMat = new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.4,depthWrite:false});
   puckGroup.add(new THREE.Mesh(new THREE.BoxGeometry(pR*1.75, 4, 4), crossMat));
   puckGroup.add(new THREE.Mesh(new THREE.BoxGeometry(4, pR*1.75, 4), crossMat));
-  const glow = new THREE.Mesh(new THREE.CircleGeometry(pR*0.9, 24), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.08,depthWrite:false}));
+  const glow = new THREE.Mesh(new THREE.CircleGeometry(pR*0.9, 20), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.08,depthWrite:false}));
   glow.position.z = -1;
   puckGroup.add(glow);
   puckGroup.position.set(A.puck.x, A.puck.y, 0);
@@ -674,12 +791,8 @@ function buildDartBox(D){
     mapGroup.add(m);
     WALLS.push({x1,y1,x2,y2,thick:D.wallT/2});
   }
-
-  // TOP: opening in the middle, wall on sides
   seg(leftX, topY, -D.topOpeningW/2, topY);
   seg(D.topOpeningW/2, topY, rightX, topY);
-
-  // BOTTOM: wall / opening / long wall / opening / wall
   const bots = [...D.bottomOpenings].sort((a,b)=>a.x-b.x);
   let prevX = leftX;
   for (const o of bots){
@@ -687,12 +800,9 @@ function buildDartBox(D){
     prevX = D.cx + o.x + o.w/2;
   }
   seg(prevX, botY, rightX, botY);
-
-  // FULL sides
   seg(leftX, topY, leftX, botY);
   seg(rightX, topY, rightX, botY);
 
-  // Dartboard — alternating RED + WHITE only, deep black outer
   const R = 130;
   const layers = [
     { r: R,        mat: DART_BLACK, z: -10 },
@@ -704,20 +814,18 @@ function buildDartBox(D){
     { r: R*0.12,   mat: DART_WHITE, z: -4  },
   ];
   layers.forEach(L => {
-    const m = new THREE.Mesh(new THREE.CircleGeometry(L.r, 48), L.mat);
+    const m = new THREE.Mesh(new THREE.CircleGeometry(L.r, 40), L.mat);
     m.position.set(D.cx, D.cy, L.z);
     mapGroup.add(m);
   });
-  // Crisp black outline rings between color bands
   [R*0.94, R*0.80, R*0.62, R*0.44, R*0.28, R*0.12].forEach((rr, i) => {
     const ring = new THREE.Mesh(
-      new THREE.RingGeometry(rr - 1.5, rr + 1.5, 40),
+      new THREE.RingGeometry(rr - 1.5, rr + 1.5, 32),
       new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.75 })
     );
     ring.position.set(D.cx, D.cy, -9 + i*0.1);
     mapGroup.add(ring);
   });
-  // Small red crosshair center
   const crossX = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 1), new THREE.MeshBasicMaterial({color: 0xff2020}));
   const crossY = new THREE.Mesh(new THREE.BoxGeometry(3, 6, 1), new THREE.MeshBasicMaterial({color: 0xff2020}));
   crossX.position.set(D.cx, D.cy, -3);
@@ -950,9 +1058,8 @@ function resolveBar(b,bar){
     if (vel !== 0) b.vx += Math.sign(vel) * 80;
   }
 }
-function resolveBricks(b){
-  if (!MAP.brickWall) return false;
-  for (const br of MAP.brickWall.bricks){
+function resolveBreakableBricks(b, brickList, respawnY){
+  for (const br of brickList){
     if (br.dead) continue;
     const dx = b.x - br.x;
     const dy = b.y - br.y;
@@ -970,27 +1077,25 @@ function resolveBricks(b){
       }
       br.hits++;
       br.shake = 1.0;
-      if (br.hits === 1){ br.mesh.material = BRICK_CRACKED.clone(); }
+      if (br.hits === 1 && br.mesh){ br.mesh.material = BRICK_CRACKED.clone(); }
       else if (br.hits >= 2){
         br.dead = true;
-        br.mesh.visible = false;
-        for (let i=0;i<10;i++){
+        if (br.mesh) br.mesh.visible = false;
+        for (let i=0;i<8;i++){
           const mat = new THREE.MeshBasicMaterial({color: 0x8a4a2a, transparent:true});
           const deb = new THREE.Mesh(new THREE.BoxGeometry(5,3,3), mat);
           deb.position.set(br.x, br.y, 0);
           scene.add(deb);
           G.particles.push({
             mesh:deb,
-            vx:(Math.random()-0.5)*400,
-            vy:150+Math.random()*400,
-            vz:(Math.random()-0.5)*200,
+            vx:(Math.random()-0.5)*400, vy:150+Math.random()*400, vz:(Math.random()-0.5)*200,
             life:1.4, gravity:600,
           });
         }
       }
-      b.y = MAP.brickWall.centerY + (MAP.brickWall.rows * MAP.brickWall.brickH) + 100;
-      b.vy = -30;
-      b.vx = (Math.random()-0.5)*200;
+      if (respawnY !== undefined){
+        b.y = respawnY; b.vy = -30; b.vx = (Math.random()-0.5)*200;
+      }
       haptic();
       G.shake = Math.min(1, G.shake + 0.35);
       return true;
@@ -998,31 +1103,50 @@ function resolveBricks(b){
   }
   return false;
 }
-// Simple indestructible floor bricks inside dart box
-function resolveDartBricks(b){
-  if (!DARTBRICKS.length) return false;
-  let hit = false;
-  for (const br of DARTBRICKS){
-    const dx = b.x - br.x;
-    const dy = b.y - br.y;
-    const overlapX = (br.w/2 + b.r) - Math.abs(dx);
-    const overlapY = (br.h/2 + b.r) - Math.abs(dy);
-    if (overlapX > 0 && overlapY > 0){
-      if (overlapY < overlapX){
-        const dir = dy > 0 ? 1 : -1;
-        b.y = br.y + dir * (br.h/2 + b.r + 1);
-        if (b.vy * dir < 0) b.vy = -b.vy * 0.55;
-      } else {
-        const dir = dx > 0 ? 1 : -1;
-        b.x = br.x + dir * (br.w/2 + b.r + 1);
-        b.vx = -b.vx * 0.55;
+
+function resolveGate(b){
+  const Gt = MAP.dartGate;
+  if (!Gt) return;
+  const halfGap = Gt.apexGap / 2;
+  collideSeg(b, -Gt.halfW, Gt.baseY, -halfGap, Gt.apexY, 5, 0.6);
+  collideSeg(b, halfGap, Gt.apexY, Gt.halfW, Gt.baseY, 5, 0.6);
+}
+
+/* BLADE COLLISION */
+function resolveBlades(b){
+  if (!MAP.bladeArms) return;
+  for (const arm of MAP.bladeArms){
+    const halfLen = arm.length;
+    const ca = Math.cos(arm.angle), sa = Math.sin(arm.angle);
+    const ax = -halfLen * ca, ay = arm.y - halfLen * sa;
+    const bx =  halfLen * ca, by = arm.y + halfLen * sa;
+    const c = closestOnSeg(b.x, b.y, ax, ay, bx, by);
+    const dx = b.x - c.x, dy = b.y - c.y;
+    const dist = Math.hypot(dx, dy);
+    const minD = b.r + 9;
+    if (dist < minD){
+      const nx = dist > 0.001 ? dx/dist : 0;
+      const ny = dist > 0.001 ? dy/dist : -1;
+      b.x += nx * (minD - dist);
+      b.y += ny * (minD - dist);
+      const vn = b.vx*nx + b.vy*ny;
+      if (vn < 0){
+        b.vx -= 1.6 * vn * nx;
+        b.vy -= 1.6 * vn * ny;
       }
-      br.shake = 1.0;
+      // Tangential push from rotating arm
+      const rx = c.x - 0, ry = c.y - arm.y;
+      const rotDir = Math.sign(arm.speed) || 1;
+      const tangX = -ry * rotDir;
+      const tangY =  rx * rotDir;
+      const tLen = Math.hypot(tangX, tangY) || 1;
+      const power = 620 * Math.abs(arm.speed) + 300;
+      b.vx += (tangX / tLen) * power;
+      b.vy += (tangY / tLen) * power;
       b.squash = 0.9;
-      hit = true;
+      haptic();
     }
   }
-  return hit;
 }
 
 const GRAV = 520, AIR = 0.9992, REST_WALL = 0.42, REST_PEG = 0.55;
@@ -1043,6 +1167,7 @@ function spawnBall(value, tier, spawnDelay){
     escT:0, escFromX:0, escFromY:0, escFromZ:0, escToX:0, escToY:0, escToZ:0,
     escapedBowl2:false, slowMoDone:false,
     lastX:0, lastY:0, stuckCheckT:0, stuckCount:0,
+    bhHeld: false,
   };
   b.mesh.scale.setScalar(0.001);
   scene.add(b.mesh);
@@ -1101,7 +1226,7 @@ function updateHeld(dt){
 
 function stepFalling(b, dt){
   const spd = Math.hypot(b.vx, b.vy);
-  const SUBSTEPS = Math.min(60, Math.max(6, Math.ceil(spd*dt/3)));
+  const SUBSTEPS = Math.min(50, Math.max(5, Math.ceil(spd*dt/3)));
   const subDt = dt/SUBSTEPS;
   for (let s = 0; s < SUBSTEPS; s++){
     b.vy -= GRAV*subDt;
@@ -1110,14 +1235,17 @@ function stepFalling(b, dt){
     for (const w of WALLS) collideSeg(b,w.x1,w.y1,w.x2,w.y2,w.thick,REST_WALL);
     for (const p of PEGS){
       if (Math.abs(p.x-b.x)>40 || Math.abs(p.y-b.y)>40) continue;
-      if (collideCircle(b,p.x,p.y,p.r,REST_PEG)) p.mesh.userData.hit = Math.min(1, p.mesh.userData.hit + 0.7);
+      if (collideCircle(b,p.x,p.y,p.r,REST_PEG)){
+        p.mesh.userData.hit = Math.min(1, p.mesh.userData.hit + 0.85);
+      }
     }
     for (const bar of BARS){
       if (Math.abs(bar.y-b.y) > 30) continue;
       resolveBar(b, bar);
     }
-    if (MAP.brickWall) resolveBricks(b);
-    if (DARTBRICKS.length) resolveDartBricks(b);
+    if (MAP.brickWall) resolveBreakableBricks(b, MAP.brickWall.bricks, MAP.brickWall.centerY + MAP.brickWall.rows * MAP.brickWall.brickH + 100);
+    if (MAP.dartGate) resolveGate(b);
+    if (MAP.bladeArms) resolveBlades(b);
     if (triMesh && b.y < MAP.triTipY+50 && b.y > MAP.triBaseY-50) resolveTriangle(b);
     collideWithPuck(b);
   }
@@ -1196,6 +1324,98 @@ function collideWithPuck(b){
   }
 }
 
+/* BLACKHOLE — cinematic pull + release */
+function updateBlackhole(dt){
+  const BH = MAP.blackhole;
+  if (!BH || !BH.group) return;
+
+  // Always animate the visuals
+  BH.ringPhase += dt;
+  if (BH.ring1) BH.ring1.rotation.z = BH.ringPhase * 0.7;
+  if (BH.ring2) BH.ring2.rotation.z = -BH.ringPhase * 1.1;
+  if (BH.swirl) BH.swirl.rotation.z = BH.ringPhase * 1.8;
+  const pulse = 0.9 + 0.15 * Math.sin(BH.ringPhase * 4);
+  if (BH.ring1) BH.ring1.scale.setScalar(pulse);
+
+  const candidates = G.active.filter(b =>
+    !b.dead && b.state === 'falling' &&
+    Math.hypot(b.x - BH.x, b.y - BH.y) < BH.r
+  );
+
+  if (BH.state === 'idle'){
+    if (candidates.length > 0){
+      BH.state = 'pulling';
+      BH.timer = 0;
+      haptic();
+      G.shake = Math.min(1, G.shake + 0.3);
+    }
+  } else if (BH.state === 'pulling'){
+    BH.timer += dt;
+    // Ramp up glow
+    if (BH.glowLight) BH.glowLight.intensity = 1.2 + BH.timer * 1.2;
+    // Add new candidates
+    for (const b of candidates){
+      if (!BH.held.includes(b)){ BH.held.push(b); b.bhHeld = true; }
+    }
+    // Strong pull on all held balls
+    for (const b of BH.held){
+      if (b.dead) continue;
+      const dx = BH.x - b.x, dy = BH.y - b.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const pull = BH.pullStrength * (0.5 + BH.timer * 0.4);
+      b.vx += (dx / dist) * pull * dt;
+      b.vy += (dy / dist) * pull * dt;
+      // Swirl
+      b.vx += (-dy / dist) * 400 * dt;
+      b.vy += ( dx / dist) * 400 * dt;
+      // Clamp max speed toward center to avoid flying past
+      const spd = Math.hypot(b.vx, b.vy);
+      if (spd > 1800){ b.vx = b.vx/spd*1800; b.vy = b.vy/spd*1800; }
+      b.squash = 0.7 + Math.sin(BH.ringPhase * 8) * 0.15;
+    }
+    if (BH.timer >= BH.holdTime){
+      // RELEASE!
+      BH.state = 'releasing';
+      BH.releaseTimer = 0;
+      for (const b of BH.held){
+        if (b.dead) continue;
+        const ang = Math.random() * Math.PI * 2;
+        const power = 1500 + Math.random() * 500;
+        b.vx = Math.cos(ang) * power;
+        b.vy = Math.sin(ang) * power * 0.7 - 200;
+        b.squash = 1.1;
+        b.bhHeld = false;
+      }
+      haptic();
+      G.shake = 1;
+      // Spawn burst particles at BH center
+      for (let i = 0; i < 40; i++){
+        const col = i % 2 === 0 ? 0x8a2aff : 0xffffff;
+        const mat = new THREE.MeshBasicMaterial({color: col, transparent:true});
+        const p = new THREE.Mesh(new THREE.SphereGeometry(3.5, 6, 6), mat);
+        p.position.set(BH.x, BH.y, 10);
+        scene.add(p);
+        const ang = Math.random() * Math.PI * 2;
+        G.particles.push({
+          mesh:p,
+          vx: Math.cos(ang) * (400 + Math.random() * 700),
+          vy: Math.sin(ang) * (400 + Math.random() * 700),
+          vz:0,
+          life: 1.2, gravity: 0,
+        });
+      }
+    }
+  } else if (BH.state === 'releasing'){
+    BH.releaseTimer += dt;
+    if (BH.glowLight) BH.glowLight.intensity = Math.max(0.4, 2.4 - BH.releaseTimer * 4);
+    if (BH.releaseTimer > 0.6){
+      BH.state = 'idle';
+      BH.held = [];
+      if (BH.glowLight) BH.glowLight.intensity = 1.6;
+    }
+  }
+}
+
 function updateDartBox(dt){
   const D = MAP.dartBox;
   if (!D) return;
@@ -1216,7 +1436,7 @@ function updateDartBox(dt){
       const tb = inBox[Math.floor(Math.random() * inBox.length)];
       const targetMesh = new THREE.Group();
       const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(tb.r + 18, 3.5, 8, 28),
+        new THREE.TorusGeometry(tb.r + 18, 3.5, 8, 24),
         new THREE.MeshBasicMaterial({color: 0xff2020, transparent: true, opacity: 0.95})
       );
       targetMesh.add(ring);
@@ -1286,6 +1506,19 @@ function updateDartBox(dt){
       }
     }
   }
+}
+
+function updateDartGate(dt){
+  const Gt = MAP.dartGate;
+  if (!Gt) return;
+  Gt.timer += dt;
+  if (Gt.timer > 3.2){
+    Gt.timer = 0;
+    Gt.targetOpen = Gt.targetOpen > 0.5 ? 0 : 1;
+  }
+  Gt.openAmount += (Gt.targetOpen - Gt.openAmount) * Math.min(1, dt * 4.5);
+  Gt.apexGap = Gt.maxApexGap * Gt.openAmount;
+  updateGateMeshes();
 }
 
 function startBowlDrop(b, bowlNum){
@@ -1414,8 +1647,9 @@ function updateHoleDrop(b, dt){
   b.x = Math.cos(h.a)*h.r + Math.sin(b.holeT*24)*2;
   b.z = Math.sin(h.a)*h.r + Math.cos(b.holeT*24)*2;
   if (t >= 1){
-    if (b.bowlNum === 2){ b.state = 'endFall'; b.vy = -60; b.scale = 1; b.x = (Math.random()-0.5)*40; b.z = (Math.random()-0.5)*40; }
-    else { b.state = 'settled'; b.y = -99999; }
+    if (b.bowlNum === 2){ b.state = 'endFall'; b.vy      b.state = 'endFall'; b.vy = -60; b.scale = 1;
+      b.x = (Math.random()-0.5)*40; b.z = (Math.random()-0.5)*40;
+    } else { b.state = 'settled'; b.y = -99999; }
     spawnConfetti(0, cfg.cy-30, 0, h.red);
   }
 }
@@ -1430,7 +1664,7 @@ function updateEndRest(b, dt){
   if (b.restT > 1.2){ b.scale = Math.max(0, b.scale - dt*2.5); if (b.scale <= 0){ b.state='settled'; b.y=-99999; } }
 }
 function resolveBallBall(){
-  const f = G.active.filter(b => !b.dead && b.state === 'falling');
+  const f = G.active.filter(b => !b.dead && b.state === 'falling' && !b.bhHeld);
   for (let i = 0; i < f.length; i++){
     for (let j = i+1; j < f.length; j++){
       const a = f[i], b = f[j];
@@ -1464,6 +1698,10 @@ function spawnConfetti(x,y,z,big){
 }
 
 function pickFeaturedBall(){
+  const BH = MAP.blackhole;
+  if (BH && BH.state === 'pulling' && BH.held.length > 0){
+    return BH.held[0];
+  }
   if (MAP.dartBox && MAP.dartBox.active && MAP.dartBox.active.ball && !MAP.dartBox.active.ball.dead){
     return MAP.dartBox.active.ball;
   }
@@ -1484,7 +1722,7 @@ function updateFeaturedArrow(dt){
           depthWrite: false, side: THREE.DoubleSide,
         })
       );
-      arrow.scale.setScalar(22);   // <- smaller arrow
+      arrow.scale.setScalar(22);
       arrow.renderOrder = 500;
       scene.add(arrow);
       featured.arrow = arrow;
@@ -1511,13 +1749,25 @@ function update(dt){
     spinRail.rotation.z = -Math.PI/2 + currentGap/2 + rot;
   }
 
+  // PEG GLOW when hit — with pulsing emissive
   for (const p of PEGS){
-    if (p.mesh.userData.hit > 0){
-      p.mesh.userData.hit *= Math.pow(0.0005, dt);
-      p.mesh.scale.setScalar(1 + p.mesh.userData.hit*0.4);
+    const h = p.mesh.userData.hit;
+    if (h > 0){
+      p.mesh.userData.hit *= Math.pow(0.0008, dt);
+      const mat = p.mesh.material;
+      const glow = p.mesh.userData.hit;
+      mat.emissive.setRGB(1.0 * glow, 0.9 * glow, 0.5 * glow);
+      mat.emissiveIntensity = 0.3 + glow * 2.0;
+      p.mesh.scale.setScalar(1 + glow * 0.35);
+    } else {
+      const mat = p.mesh.material;
+      mat.emissiveIntensity = 0.3;
+      mat.emissive.setRGB(0.14, 0.14, 0.18);
+      p.mesh.scale.setScalar(1);
     }
   }
 
+  // Brick shake
   for (const br of BRICKS){
     if (br.shake > 0){
       br.shake *= Math.pow(0.001, dt);
@@ -1529,18 +1779,8 @@ function update(dt){
       }
     }
   }
-  for (const br of DARTBRICKS){
-    if (br.shake > 0){
-      br.shake *= Math.pow(0.001, dt);
-      if (br.mesh){
-        const s = br.shake;
-        br.mesh.position.x = br.x + (Math.random()-0.5)*4*s;
-        br.mesh.position.y = br.y + (Math.random()-0.5)*4*s;
-        br.mesh.scale.setScalar(1 + s*0.06);
-      }
-    }
-  }
 
+  // Bars
   for (const bar of BARS){
     bar.prevX = bar.x;
     bar.phase += dt;
@@ -1561,6 +1801,7 @@ function update(dt){
     }
   }
 
+  // Triangle slide
   if (triMesh && gifPlane && (G.phase === 'playing' || G.phase === 'ended' || G.phase === 'launching')){
     G.triX += G.triDir * MAP.triSpeed * dt;
     if (G.triX >  MAP.triRange){ G.triX =  MAP.triRange; G.triDir = -1; }
@@ -1569,8 +1810,30 @@ function update(dt){
     gifPlane.position.x = G.triX;
   }
 
+  // BLADES — rotate and position arms
+  if (MAP.bladeArms){
+    for (const arm of MAP.bladeArms){
+      arm.angle += arm.speed * dt;
+      for (const bm of bladeMeshes){
+        if (bm.arm !== arm) continue;
+        if (bm.type === 'hub'){
+          bm.mesh.position.set(0, arm.y, 0);
+          bm.mesh.rotation.z = arm.angle * 2;
+        } else if (bm.type === 'bar'){
+          bm.mesh.position.set(0, arm.y, 0);
+          bm.mesh.rotation.z = arm.angle;
+        } else if (bm.type === 'tip'){
+          const ca = Math.cos(arm.angle), sa = Math.sin(arm.angle);
+          bm.mesh.position.set(bm.sign * arm.length * ca, arm.y + bm.sign * arm.length * sa, 0);
+        }
+      }
+    }
+  }
+
   updatePuck(dt);
   updateDartBox(dt);
+  updateDartGate(dt);
+  updateBlackhole(dt);
   updateFeaturedArrow(dt);
 
   if (MAP.puckArena && MAP.puckArena.puck.group){
@@ -1744,12 +2007,10 @@ function onResize(){
 }
 addEventListener('resize', onResize);
 
-// MAP CHOOSER wiring
 document.querySelectorAll('#dl-mapbar button').forEach(btn => {
   btn.addEventListener('click', () => {
     FORCED_MAP = btn.dataset.mt;
     document.querySelectorAll('#dl-mapbar button').forEach(b => b.classList.toggle('on', b === btn));
-    // Rebuild the current map
     regenerateMap();
     buildMap();
     G.triX = 0; G.triDir = 1;
@@ -1760,7 +2021,6 @@ document.querySelectorAll('#dl-mapbar button').forEach(btn => {
     updateHud();
   });
 });
-// default 'random' selected
 document.querySelector('#dl-mapbar button[data-mt="random"]').classList.add('on');
 
 let buyTab='random', buyTier='gray';
@@ -1808,8 +2068,11 @@ document.getElementById('dl-buy-go').addEventListener('click', () => {
   else spawnAll();
 });
 
-const ROULETTE_N = 30;
+/* ═════ OPTIMIZED ROULETTE ═════ */
+const ROULETTE_N = 22;
 let spinToken = 0;
+let spinRaf = null;
+
 function spinAll(balls, done){
   spinToken++;
   const myToken = spinToken;
@@ -1818,13 +2081,17 @@ function spinAll(balls, done){
   elRAmount.classList.remove('show');
   elRAmount.innerHTML = '';
   elRRows.innerHTML = '';
+
   const n = balls.length;
-  const availH = Math.min(innerHeight*0.62, 560);
-  const gapPx = 8;
+  // Reserve space (topbar + ticker + mapbar + bottom bar)
+  const availH = Math.min(innerHeight - 260, 560);
+  const gapPx = 6;
   let rowH = Math.floor((availH - (n-1)*gapPx) / n);
-  rowH = Math.max(50, Math.min(180, rowH));
+  rowH = Math.max(44, Math.min(160, rowH));
+
   const baseAngles = [];
   for (let i=0;i<ROULETTE_N;i++) baseAngles.push((i/ROULETTE_N)*360);
+
   const rows = [];
   for (let idx=0; idx<n; idx++){
     const ball = balls[idx];
@@ -1834,14 +2101,14 @@ function spinAll(balls, done){
     const vpEl = document.createElement('div'); vpEl.className = 'dl-r-viewport';
     rowEl.appendChild(vpEl);
     const ptrEl = document.createElement('div'); ptrEl.className = 'dl-r-pointer'; ptrEl.textContent = '▲';
-    ptrEl.style.fontSize = Math.max(9, Math.min(18, rowH*0.18)) + 'px';
+    ptrEl.style.fontSize = Math.max(8, Math.min(16, rowH*0.18)) + 'px';
     rowEl.appendChild(ptrEl);
     elRRows.appendChild(rowEl);
     const items = [];
     for (let k=0;k<ROULETTE_N;k++){ const v = randomValue(); items.push({value:v, tier:tierFor(v)}); }
     const winnerIdx = Math.floor(Math.random()*ROULETTE_N);
     items[winnerIdx] = {value: ball.value, tier: ball.tier};
-    const ballSize = Math.min(88, Math.max(32, rowH-18));
+    const ballSize = Math.min(76, Math.max(28, rowH-14));
     const fontSize = Math.max(9, ballSize*0.26);
     const ballEls = [];
     items.forEach(b => {
@@ -1858,8 +2125,13 @@ function spinAll(balls, done){
     });
     rows.push({ballEls, winnerIdx, endW: -baseAngles[winnerIdx] - 360*(5+Math.floor(Math.random()*4))});
   }
+
   const vpW = elRRows.clientWidth || 380;
-  const RADIUS = Math.max(120, Math.min(240, vpW*0.52));
+  const RADIUS = Math.max(100, Math.min(220, vpW*0.5));
+
+  // Precompute per-frame transforms for perf
+  const transforms = new Array(ROULETTE_N);
+
   function applyRow(rowData, W){
     for (let i=0;i<ROULETTE_N;i++){
       const A = (W + baseAngles[i]) * Math.PI / 180;
@@ -1868,18 +2140,22 @@ function spinAll(balls, done){
       const depth = (c+1)/2;
       const scale = 0.55 + 0.45*depth;
       const el = rowData.ballEls[i];
-      el.style.transform = `translateX(${x}px) scale(${scale})`;
-      el.style.zIndex = String(Math.round(depth*1000));
-      el.style.opacity = String(0.4 + 0.6*depth);
+      el.style.transform = `translate3d(${x}px,0,0) scale(${scale})`;
+      el.style.zIndex = (depth*1000)|0;
+      el.style.opacity = (0.4 + 0.6*depth).toFixed(2);
     }
   }
+
   const eoQ = t => 1 - Math.pow(1-t, 5);
   const eoB = t => { const c1=1.4, c3=c1+1; return 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2); };
   const DURATION = FAST_SPIN ? 1100 : 2400;
   const t0 = performance.now();
   rows.forEach(r => applyRow(r, 0));
+
+  if (spinRaf) cancelAnimationFrame(spinRaf);
+
   function frame(now){
-    if (myToken !== spinToken) return;
+    if (myToken !== spinToken){ spinRaf = null; return; }
     const p = Math.min((now - t0) / DURATION, 1);
     const eased = p < 0.9 ? eoQ(p/0.9)*0.985 : 0.985 + (eoB((p-0.9)/0.1)*0.015);
     rows.forEach(r => applyRow(r, r.endW * eased));
@@ -1897,13 +2173,14 @@ function spinAll(balls, done){
         if (myToken !== spinToken) return;
         elRoulette.classList.remove('show');
         elRRows.innerHTML = '';
+        spinRaf = null;
         done();
       }, FAST_SPIN ? 1000 : 1700);
       return;
     }
-    requestAnimationFrame(frame);
+    spinRaf = requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  spinRaf = requestAnimationFrame(frame);
 }
 
 elLaunch.addEventListener('click', () => {
