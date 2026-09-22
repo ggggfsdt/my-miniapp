@@ -1,1022 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Ice Arena · Test</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-  html,body{height:100%;overflow:hidden;background:#050608;color:#e8eef8;
-    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;touch-action:manipulation}
-  body{display:flex;align-items:center;justify-content:center}
-  #app{display:flex;flex-direction:column;width:100%;max-width:440px;height:100dvh;
-    padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom);gap:10px;overflow:hidden}
-  #rink-wrap{flex:0 0 auto;display:flex;align-items:center;justify-content:center;margin-top:10px;position:relative}
-  #rink{width:100%;aspect-ratio:1/1;max-height:52dvh;border-radius:22px;display:block;box-shadow:0 18px 50px rgba(0,0,0,.6)}
-  #timer-chip{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:10px;
-    background:linear-gradient(135deg,rgba(40,50,80,.75),rgba(18,24,40,.85));border:1px solid rgba(180,210,255,.2);
-    font-family:'SF Mono',ui-monospace,monospace;font-size:12px;font-weight:800;letter-spacing:.5px;color:#8fbdff;
-    opacity:0;pointer-events:none;transition:opacity .25s ease;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-  #timer-chip.show{opacity:1}
-  #pot-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-radius:12px;
-    background:linear-gradient(135deg,rgba(40,50,80,.5),rgba(18,24,40,.7));border:1px solid rgba(255,255,255,.07);
-    font-size:11px;font-weight:700;letter-spacing:.4px;color:rgba(200,215,235,.6);text-transform:uppercase}
-  #pot-bar .pot-val{color:#f0d080;font-family:'SF Mono',ui-monospace,monospace;font-size:14px;letter-spacing:0;font-weight:800}
-  #pot-bar .win-val{color:#8fbdff;font-family:'SF Mono',ui-monospace,monospace;font-size:12px}
-  #players{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:2px 0}
-  #players::-webkit-scrollbar{width:3px}
-  #players::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px}
-  .pl{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
-    background:linear-gradient(135deg,rgba(40,50,80,.32),rgba(18,24,40,.45));
-    border:1px solid rgba(255,255,255,.06);cursor:pointer;
-    transition:transform .15s ease,background .15s ease,border-color .15s ease;position:relative}
-  .pl:active{transform:scale(.985)}
-  .pl.cheat{border-color:rgba(240,208,128,.55);background:linear-gradient(135deg,rgba(80,60,20,.4),rgba(40,30,10,.55));
-    box-shadow:0 0 0 1px rgba(240,208,128,.2),inset 0 0 20px rgba(240,208,128,.06)}
-  .pl.cheat::after{content:'CHEAT';position:absolute;top:6px;right:10px;font-size:8px;font-weight:900;letter-spacing:1.4px;color:#f0d080;opacity:.85}
-  .pl.winner{box-shadow:0 0 0 1px rgba(140,255,180,.35),0 0 20px rgba(60,200,120,.15)}
-  .pl-color{width:22px;height:22px;border-radius:7px;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
-  .pl-name{flex:1;min-width:0;font-size:13px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.1px}
-  .pl-bet{font-size:11.5px;font-weight:700;color:rgba(200,215,235,.55);font-variant-numeric:tabular-nums;font-family:'SF Mono',ui-monospace,monospace}
-  .pl-chance{font-size:12px;font-weight:800;color:#8fbdff;font-variant-numeric:tabular-nums;font-family:'SF Mono',ui-monospace,monospace;min-width:48px;text-align:right}
-  .pl.cheat .pl-chance{color:#f0d080}
-  .pl-rm{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:none;background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);
-    cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .15s ease}
-  .pl-rm:active{background:rgba(255,80,80,.25);color:#fff}
-  #empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-    color:rgba(200,215,235,.35);font-size:12.5px;font-weight:600;text-align:center;padding:30px 20px}
-  #empty .e-svg{width:44px;height:44px;opacity:.35}
-  #controls{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;padding-top:4px}
-  .row{display:flex;gap:8px}
-  .row input{padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);
-    background:rgba(255,255,255,.04);color:#fff;font-family:inherit;font-size:14px;font-weight:700;outline:none;min-width:0;
-    font-variant-numeric:tabular-nums}
-  .row input:focus{border-color:rgba(91,157,255,.5);background:rgba(91,157,255,.06)}
-  .row input::placeholder{color:rgba(200,215,235,.3);font-weight:600}
-  #nameInput{flex:1.4}
-  #betInput{flex:1;text-align:center}
-  .btn{padding:12px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.09);
-    background:linear-gradient(135deg,rgba(40,50,80,.6),rgba(18,24,40,.75));
-    color:#e8eef8;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.3px;cursor:pointer;flex:1;
-    transition:transform .12s ease,background .15s ease,box-shadow .15s ease}
-  .btn:active{transform:scale(.97)}
-  .btn.primary{background:linear-gradient(135deg,#5b9dff,#3c78e0);color:#fff;
-    box-shadow:0 6px 18px rgba(91,157,255,.35),inset 0 1px 0 rgba(255,255,255,.2);border-color:rgba(140,180,255,.4)}
-  .btn.primary:disabled{opacity:.4;box-shadow:none;pointer-events:none}
-  .btn.danger{background:linear-gradient(135deg,rgba(120,40,50,.5),rgba(60,20,26,.7));border-color:rgba(224,85,107,.3);color:#ff9fb0}
-  .btn.ghost{background:rgba(255,255,255,.04)}
-</style>
+  <meta charset="UTF-8" />
+  <title>Arena Puck Test</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+      font-family: system-ui, sans-serif;
+    }
+
+    .arena {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle at center, #222 0, #000 70%);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    }
+
+    .puck {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      /* diagonal orange/blue background like your image */
+      background: linear-gradient(135deg, #ff8a00 0%, #ff8a00 50%, #007bff 50%, #007bff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .puck:active {
+      cursor: grabbing;
+    }
+
+    .crosshair {
+      position: relative;
+      width: 60%;
+      height: 60%;
+    }
+
+    .crosshair::before,
+    .crosshair::after {
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      border-radius: 999px;
+    }
+
+    /* vertical line */
+    .crosshair::before {
+      width: 18%;
+      height: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* horizontal line */
+    .crosshair::after {
+      width: 100%;
+      height: 18%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  </style>
 </head>
 <body>
-<div id="app">
-  <div id="rink-wrap">
-    <canvas id="rink"></canvas>
-    <div id="timer-chip">—</div>
-  </div>
-  <div id="pot-bar">
-    <div>Pot&nbsp; <span class="pot-val" id="potVal">0</span></div>
-    <div id="statusLbl" class="win-val">IDLE</div>
-  </div>
-  <div id="players"></div>
-  <div id="controls">
-    <div class="row">
-      <input id="nameInput" placeholder="name" autocomplete="off" autocapitalize="off">
-      <input id="betInput" placeholder="bet" value="100" inputmode="numeric" autocomplete="off">
-    </div>
-    <div class="row">
-      <button class="btn ghost" id="addBtn">Add Player</button>
-      <button class="btn ghost" id="randBtn">+ Random Bot</button>
-    </div>
-    <div class="row">
-      <button class="btn danger" id="resetBtn">Reset</button>
-      <button class="btn primary" id="playBtn" disabled>Play Round</button>
-    </div>
-    <div class="row">
-      <button class="btn ghost" id="cheatBtn">Cheat: OFF · click a player to target</button>
+  <div class="arena" id="arena">
+    <div class="puck" id="puck">
+      <div class="crosshair"></div>
     </div>
   </div>
-</div>
 
-<script>
-(function(){
-  'use strict';
+  <script>
+    const arena = document.getElementById('arena');
+    const puck = document.getElementById('puck');
 
-  // ============================================================
-  //  CONSTANTS
-  // ============================================================
-  const ARENA = 400;
-  const CORNER_RADIUS = ARENA * 0.045;
-  const PUCK_R = 9;
-  const COLORS = ['#e74c3c','#2ecc71','#3498db','#f1c40f','#9b59b6','#e67e22','#1abc9c','#e84393','#5b9dff','#cd8a5a'];
-  const MIN_STOP = 0.06;
-
-  // Timing: 5s at constant speed, then 1s smooth decel to 0
-  const HOLD_MS = 5000;
-  const DECEL_MS = 1000;
-  const SIM_DT = 1000 / 60;      // one physics frame at 60 Hz
-
-  // ============================================================
-  //  RINK GEOMETRY — analytic (fast) collision primitives
-  // ============================================================
-  const HALF = ARENA / 2;
-  const CR = CORNER_RADIUS;
-  const ARENA_CX = HALF, ARENA_CY = HALF;
-
-  // 4 straight edges: inward normal pre-computed
-  const EDGES = [
-    { ax: CR,           ay: 0,           bx: ARENA - CR,   by: 0,           nx:  0, ny:  1 }, // top
-    { ax: ARENA,        ay: CR,          bx: ARENA,        by: ARENA - CR,  nx: -1, ny:  0 }, // right
-    { ax: ARENA - CR,   ay: ARENA,       bx: CR,           by: ARENA,       nx:  0, ny: -1 }, // bottom
-    { ax: 0,            ay: ARENA - CR,  bx: 0,            by: CR,          nx:  1, ny:  0 }  // left
-  ];
-
-  // 4 corners: qx, qy describe which quadrant of the arc center the puck must occupy
-  const CORNERS = [
-    { cx: ARENA - CR, cy: CR,           qx:  1, qy: -1 },
-    { cx: ARENA - CR, cy: ARENA - CR,   qx:  1, qy:  1 },
-    { cx: CR,         cy: ARENA - CR,   qx: -1, qy:  1 },
-    { cx: CR,         cy: CR,           qx: -1, qy: -1 }
-  ];
-
-  // Fast, robust collision. Returns null when no collision, or {x, y, nx, ny} after
-  // the puck has been pushed back inside with an inward surface normal.
-  function resolveRinkCollision(px, py){
-    const r = PUCK_R;
-    let x = px, y = py;
-    let anyHit = false;
-    let outNx = 0, outNy = 0;
-
-    for(let iter = 0; iter < 6; iter++){
-      let worst = 0, wnx = 0, wny = 0, found = false;
-
-      // Straight edges
-      for(let i = 0; i < EDGES.length; i++){
-        const e = EDGES[i];
-        const ex = e.bx - e.ax, ey = e.by - e.ay;
-        const lenSq = ex*ex + ey*ey;
-        let t = ((x - e.ax) * ex + (y - e.ay) * ey) / lenSq;
-        if(t < 0) t = 0; else if(t > 1) t = 1;
-        const nx = e.ax + t * ex;
-        const ny = e.ay + t * ey;
-        const dx = x - nx, dy = y - ny;
-        // signed distance along inward normal (positive inside)
-        const sd = dx * e.nx + dy * e.ny;
-        if(sd < r){
-          const pen = r - sd;
-          if(pen > worst){ worst = pen; wnx = e.nx; wny = e.ny; found = true; }
-        }
-      }
-
-      // Corners
-      for(let i = 0; i < CORNERS.length; i++){
-        const c = CORNERS[i];
-        const inX = c.qx > 0 ? x >= c.cx : x <= c.cx;
-        const inY = c.qy > 0 ? y >= c.cy : y <= c.cy;
-        if(!inX || !inY) continue;
-        const dx = x - c.cx;
-        const dy = y - c.cy;
-        const dist = Math.hypot(dx, dy);
-        if(dist < 0.001) continue;
-        const limit = CR - r;
-        if(dist > limit){
-          const pen = dist - limit;
-          if(pen > worst){
-            worst = pen;
-            wnx = -dx / dist;
-            wny = -dy / dist;
-            found = true;
-          }
-        }
-      }
-
-      if(!found || worst <= 0) break;
-      x += wnx * worst;
-      y += wny * worst;
-      anyHit = true;
-      outNx = wnx; outNy = wny;
+    // start puck in center
+    function centerPuck() {
+      const rect = arena.getBoundingClientRect();
+      const puckRect = puck.getBoundingClientRect();
+      puck.style.left = (rect.width / 2 - puckRect.width / 2) + 'px';
+      puck.style.top = (rect.height / 2 - puckRect.height / 2) + 'px';
     }
-
-    if(!anyHit) return null;
-    return { x, y, nx: outNx, ny: outNy };
-  }
-
-  // ============================================================
-  //  TRAJECTORY SIMULATION
-  //  Runs the whole slide ahead of time. Returns the sampled path.
-  //  Motion is pure physics — the rig for cheat is in WHICH
-  //  trajectory gets chosen, never in steering.
-  // ============================================================
-  function simulateTrajectory(sx, sy, angle, initialSpeed){
-    // Clamp spawn inside the rink so we never start outside
-    const inside = resolveRinkCollision(sx, sy);
-    if(inside){ sx = inside.x; sy = inside.y; }
-
-    let dirX = Math.cos(angle);
-    let dirY = Math.sin(angle);
-    let px = sx, py = sy;
-    let t = 0;
-
-    const path = [{ x: sx, y: sy, t: 0 }];
-    let lastSample = 0;
-
-    const MAX_ITER = 800;   // ~13s hard cap
-
-    for(let i = 0; i < MAX_ITER; i++){
-      let targetSpeed;
-      if(t < HOLD_MS){
-        targetSpeed = initialSpeed;
-      } else if(t < HOLD_MS + DECEL_MS){
-        const k = (t - HOLD_MS) / DECEL_MS;
-        const ease = k * k * (3 - 2 * k);   // smoothstep
-        targetSpeed = initialSpeed * (1 - ease);
-      } else {
-        targetSpeed = 0;
-      }
-
-      if(targetSpeed < MIN_STOP) break;
-
-      // Substep for stability
-      const SUB = 2;
-      const subDt = 1 / SUB;
-      for(let s = 0; s < SUB; s++){
-        px += dirX * targetSpeed * subDt;
-        py += dirY * targetSpeed * subDt;
-
-        const hit = resolveRinkCollision(px, py);
-        if(hit){
-          px = hit.x;
-          py = hit.y;
-          // Reflect unit direction
-          const vn = dirX * hit.nx + dirY * hit.ny;
-          if(vn < 0){
-            dirX -= 2 * vn * hit.nx;
-            dirY -= 2 * vn * hit.ny;
-          }
-        }
-      }
-
-      t += SIM_DT;
-
-      if(t - lastSample >= 40){
-        path.push({ x: px, y: py, t });
-        lastSample = t;
-      }
-    }
-
-    path.push({ x: px, y: py, t });
-
-    return { path, endX: px, endY: py, duration: t };
-  }
-
-  // ============================================================
-  //  GEOMETRY HELPERS (slice partition)
-  // ============================================================
-  function polyArea(poly){
-    let a = 0;
-    for(let i = 0; i < poly.length; i++){
-      const p1 = poly[i], p2 = poly[(i + 1) % poly.length];
-      a += p1.x * p2.y - p2.x * p1.y;
-    }
-    return Math.abs(a) * 0.5;
-  }
-  function bboxOf(poly){
-    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-    for(const v of poly){
-      if(v.x<minX)minX=v.x; if(v.y<minY)minY=v.y;
-      if(v.x>maxX)maxX=v.x; if(v.y>maxY)maxY=v.y;
-    }
-    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
-  }
-  function polyCentroid(poly){
-    let cx = 0, cy = 0;
-    for(const v of poly){ cx += v.x; cy += v.y; }
-    return { x: cx / poly.length, y: cy / poly.length };
-  }
-  function pointInPoly(px, py, poly){
-    if(!poly || poly.length < 3) return false;
-    let inside = false;
-    for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){
-      const xi = poly[i].x, yi = poly[i].y;
-      const xj = poly[j].x, yj = poly[j].y;
-      if(((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
-    }
-    return inside;
-  }
-  function splitPolyV(poly, x){
-    const A = [], B = [];
-    const n = poly.length;
-    for(let i = 0; i < n; i++){
-      const a = poly[i], b = poly[(i + 1) % n];
-      if(a.x <= x) A.push(a);
-      if(a.x >= x) B.push(a);
-      if((a.x < x && b.x > x) || (a.x > x && b.x < x)){
-        const t = (x - a.x) / (b.x - a.x);
-        const p = { x, y: a.y + (b.y - a.y) * t };
-        A.push(p); B.push(p);
-      }
-    }
-    return [A, B];
-  }
-  function splitPolyH(poly, y){
-    const A = [], B = [];
-    const n = poly.length;
-    for(let i = 0; i < n; i++){
-      const a = poly[i], b = poly[(i + 1) % n];
-      if(a.y <= y) A.push(a);
-      if(a.y >= y) B.push(a);
-      if((a.y < y && b.y > y) || (a.y > y && b.y < y)){
-        const t = (y - a.y) / (b.y - a.y);
-        const p = { x: a.x + (b.x - a.x) * t, y };
-        A.push(p); B.push(p);
-      }
-    }
-    return [A, B];
-  }
-  function splitPolyByArea(poly, ratio){
-    const box = bboxOf(poly);
-    if(box.w < 2 || box.h < 2) return null;
-    const total = polyArea(poly);
-    if(total < 1) return null;
-    const targetA = total * ratio;
-    const vertical = box.w >= box.h;
-    let lo, hi;
-    if(vertical){ lo = box.x; hi = box.x + box.w; }
-    else { lo = box.y; hi = box.y + box.h; }
-    let best = null;
-    for(let i = 0; i < 22; i++){
-      const mid = (lo + hi) / 2;
-      const pieces = vertical ? splitPolyV(poly, mid) : splitPolyH(poly, mid);
-      if(pieces[0].length < 3 || pieces[1].length < 3){
-        if(vertical){ if(mid < box.x + box.w/2) lo = mid; else hi = mid; }
-        else { if(mid < box.y + box.h/2) lo = mid; else hi = mid; }
-        continue;
-      }
-      const aA = polyArea(pieces[0]);
-      if(aA < targetA) lo = mid; else hi = mid;
-      best = pieces;
-    }
-    return best;
-  }
-  function partition(sorted, start, end, poly, depth){
-    const count = end - start;
-    if(count <= 0) return;
-    if(count === 1 || depth > 12){
-      for(let i = start; i < end; i++) sorted[i].poly = poly;
-      return;
-    }
-    const topBet = Math.max(sorted[start].bet, 1);
-    let rest = 0;
-    for(let i = start + 1; i < end; i++) rest += Math.max(sorted[i].bet, 1);
-    const ratio = Math.max(0.02, Math.min(0.98, topBet / (topBet + rest)));
-    const pieces = splitPolyByArea(poly, ratio);
-    if(!pieces){
-      for(let i = start; i < end; i++) sorted[i].poly = poly;
-      return;
-    }
-    partition(sorted, start, start + 1, pieces[0], depth + 1);
-    partition(sorted, start + 1, end, pieces[1], depth + 1);
-  }
-
-  // ============================================================
-  //  STATE
-  // ============================================================
-  const state = {
-    players: [],
-    puck: { x: ARENA / 2, y: ARENA / 2 },
-    gameState: 'idle',       // idle | sliding | finished
-    winner: null,
-    cheatTargetId: null,
-    trajectory: null,
-    roundStartTime: 0,
-    roundDuration: 0,
-    trail: []
-  };
-  let nextId = 1;
-
-  // ============================================================
-  //  DOM
-  // ============================================================
-  const canvas = document.getElementById('rink');
-  const ctx = canvas.getContext('2d');
-  const playersEl = document.getElementById('players');
-  const potValEl = document.getElementById('potVal');
-  const statusLbl = document.getElementById('statusLbl');
-  const timerChip = document.getElementById('timer-chip');
-  const nameInput = document.getElementById('nameInput');
-  const betInput = document.getElementById('betInput');
-  const addBtn = document.getElementById('addBtn');
-  const randBtn = document.getElementById('randBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const playBtn = document.getElementById('playBtn');
-  const cheatBtn = document.getElementById('cheatBtn');
-
-  let canvasSize = 0;
-
-  function resize(){
-    const wrap = canvas.parentElement;
-    const rect = wrap.getBoundingClientRect();
-    const availW = rect.width;
-    const availH = window.innerHeight * 0.52;
-    const size = Math.max(120, Math.min(availW, availH, 440));
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(size * dpr);
-    canvas.height = Math.round(size * dpr);
-    canvas.style.width = size + 'px';
-    canvas.style.height = size + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    canvasSize = size;
-    draw();
-  }
-
-  function repartition(){
-    if(state.players.length === 0) return;
-    const sorted = [...state.players].sort((a, b) => b.bet - a.bet);
-    const root = [{ x: 0, y: 0 }, { x: ARENA, y: 0 }, { x: ARENA, y: ARENA }, { x: 0, y: ARENA }];
-    partition(sorted, 0, sorted.length, root, 0);
-  }
-
-  function totalPot(){ return state.players.reduce((s, p) => s + p.bet, 0); }
-
-  function chanceOf(p){
-    if(state.players.length === 0) return 0;
-    if(state.cheatTargetId === p.id) return 100;
-    if(!p.poly) return 0;
-    const total = state.players.reduce((s, x) => s + (x.poly ? polyArea(x.poly) : 0), 0);
-    if(total <= 0) return 0;
-    return polyArea(p.poly) / total * 100;
-  }
-
-  // ============================================================
-  //  TRAJECTORY GENERATORS
-  // ============================================================
-  function makeRandomTrajectory(){
-    const a0 = Math.random() * Math.PI * 2;
-    const radius = ARENA * (0.2 + Math.random() * 0.22);
-    const sx = ARENA / 2 + Math.cos(a0) * radius;
-    const sy = ARENA / 2 + Math.sin(a0) * radius;
-    const dir = Math.random() * Math.PI * 2;
-    const speed = 6 + Math.random() * 3;
-    return simulateTrajectory(sx, sy, dir, speed);
-  }
-
-  // Brute-force selection: run many random sims, keep the first one whose
-  // NATURAL endpoint lands inside the target slice. No steering, no magnets.
-  // Aims are biased only when needed (tiny slices) so result still looks random.
-  function makeCheatTrajectory(target){
-    const targetPoly = target.poly;
-    if(!targetPoly) return makeRandomTrajectory();
-
-    const tc = polyCentroid(targetPoly);
-    const tArea = polyArea(targetPoly);
-    const tRatio = tArea / (ARENA * ARENA);
-
-    let bestFallback = null;
-    let bestFallbackDist = Infinity;
-
-    // Stage 1: fully random throws (most likely to succeed for normal-sized slices)
-    const STAGE1 = 900;
-    for(let i = 0; i < STAGE1; i++){
-      const a0 = Math.random() * Math.PI * 2;
-      const radius = ARENA * (0.15 + Math.random() * 0.3);
-      const sx = ARENA / 2 + Math.cos(a0) * radius;
-      const sy = ARENA / 2 + Math.sin(a0) * radius;
-      if(pointInPoly(sx, sy, targetPoly)) continue;
-      const dir = Math.random() * Math.PI * 2;
-      const speed = 6 + Math.random() * 4;
-      const result = simulateTrajectory(sx, sy, dir, speed);
-      if(pointInPoly(result.endX, result.endY, targetPoly)) return result;
-      const d = Math.hypot(result.endX - tc.x, result.endY - tc.y);
-      if(d < bestFallbackDist){ bestFallbackDist = d; bestFallback = result; }
-    }
-
-    // Stage 2: aim roughly at target from across the arena, with jitter
-    const STAGE2 = 700;
-    for(let i = 0; i < STAGE2; i++){
-      const awayAngle = Math.atan2(ARENA / 2 - tc.y, ARENA / 2 - tc.x) + (Math.random() - 0.5) * 1.6;
-      const radius = ARENA * (0.28 + Math.random() * 0.18);
-      const sx = ARENA / 2 + Math.cos(awayAngle) * radius;
-      const sy = ARENA / 2 + Math.sin(awayAngle) * radius;
-      if(pointInPoly(sx, sy, targetPoly)) continue;
-      const dir = Math.atan2(tc.y - sy, tc.x - sx) + (Math.random() - 0.5) * 1.4;
-      const speed = 5 + Math.random() * 5;
-      const result = simulateTrajectory(sx, sy, dir, speed);
-      if(pointInPoly(result.endX, result.endY, targetPoly)) return result;
-      const d = Math.hypot(result.endX - tc.x, result.endY - tc.y);
-      if(d < bestFallbackDist){ bestFallbackDist = d; bestFallback = result; }
-    }
-
-    // Stage 3: for tiny targets, close range with reduced speed
-    const STAGE3 = 900;
-    for(let i = 0; i < STAGE3; i++){
-      const a0 = Math.random() * Math.PI * 2;
-      const r = ARENA * (0.06 + Math.random() * 0.16);
-      const sx = tc.x + Math.cos(a0) * r;
-      const sy = tc.y + Math.sin(a0) * r;
-      if(sx < 15 || sx > ARENA - 15 || sy < 15 || sy > ARENA - 15) continue;
-      if(pointInPoly(sx, sy, targetPoly)) continue;
-      const dir = Math.atan2(tc.y - sy, tc.x - sx) + (Math.random() - 0.5) * 2.4;
-      const speed = 2 + Math.random() * 4;
-      const result = simulateTrajectory(sx, sy, dir, speed);
-      if(pointInPoly(result.endX, result.endY, targetPoly)) return result;
-      const d = Math.hypot(result.endX - tc.x, result.endY - tc.y);
-      if(d < bestFallbackDist){ bestFallbackDist = d; bestFallback = result; }
-    }
-
-    // Stage 4: last resort — very close, very slow, tight aim
-    if(tRatio < 0.03){
-      const STAGE4 = 600;
-      for(let i = 0; i < STAGE4; i++){
-        const a0 = Math.random() * Math.PI * 2;
-        const r = ARENA * (0.03 + Math.random() * 0.06);
-        const sx = tc.x + Math.cos(a0) * r;
-        const sy = tc.y + Math.sin(a0) * r;
-        if(sx < 12 || sx > ARENA - 12 || sy < 12 || sy > ARENA - 12) continue;
-        if(pointInPoly(sx, sy, targetPoly)) continue;
-        const dir = Math.atan2(tc.y - sy, tc.x - sx) + (Math.random() - 0.5) * 0.8;
-        const speed = 1.5 + Math.random() * 2;
-        const result = simulateTrajectory(sx, sy, dir, speed);
-        if(pointInPoly(result.endX, result.endY, targetPoly)) return result;
-        const d = Math.hypot(result.endX - tc.x, result.endY - tc.y);
-        if(d < bestFallbackDist){ bestFallbackDist = d; bestFallback = result; }
-      }
-    }
-
-    return bestFallback || makeRandomTrajectory();
-  }
-
-  // ============================================================
-  //  PLAYBACK
-  // ============================================================
-  function samplePath(t){
-    const path = state.trajectory ? state.trajectory.path : null;
-    if(!path || path.length === 0) return { x: ARENA / 2, y: ARENA / 2 };
-    if(t <= path[0].t) return { x: path[0].x, y: path[0].y };
-    const last = path[path.length - 1];
-    if(t >= last.t) return { x: last.x, y: last.y };
-    for(let i = 0; i < path.length - 1; i++){
-      if(t >= path[i].t && t <= path[i + 1].t){
-        const dt = path[i + 1].t - path[i].t;
-        const a = dt > 0 ? (t - path[i].t) / dt : 0;
-        return {
-          x: path[i].x + (path[i + 1].x - path[i].x) * a,
-          y: path[i].y + (path[i + 1].y - path[i].y) * a
-        };
-      }
-    }
-    return { x: last.x, y: last.y };
-  }
-
-  // ============================================================
-  //  RENDERING
-  // ============================================================
-  function draw(){
-    const w = canvasSize;
-    if(!w) return;
-    ctx.clearRect(0, 0, w, w);
-    const s = w / ARENA;
-
-    // background
-    const bg = ctx.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
-    bg.addColorStop(0, 'rgba(48,60,88,.5)');
-    bg.addColorStop(.5, 'rgba(28,38,58,.55)');
-    bg.addColorStop(1, 'rgba(8,12,20,.75)');
-    ctx.save();
-    roundRectPath(ctx, 0, 0, w, w, 22);
-    ctx.clip();
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, w, w);
-
-    // Clip everything to the rink outline so slices can't extend past corners
-    ctx.beginPath();
-    ctx.moveTo(CR * s, 0);
-    ctx.lineTo((ARENA - CR) * s, 0);
-    ctx.arcTo(ARENA * s, 0, ARENA * s, CR * s, CR * s);
-    ctx.lineTo(ARENA * s, (ARENA - CR) * s);
-    ctx.arcTo(ARENA * s, ARENA * s, (ARENA - CR) * s, ARENA * s, CR * s);
-    ctx.lineTo(CR * s, ARENA * s);
-    ctx.arcTo(0, ARENA * s, 0, (ARENA - CR) * s, CR * s);
-    ctx.lineTo(0, CR * s);
-    ctx.arcTo(0, 0, CR * s, 0, CR * s);
-    ctx.closePath();
-    ctx.clip();
-
-    // player slices
-    for(const p of state.players){
-      if(!p.poly || p.poly.length < 3) continue;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(p.poly[0].x * s, p.poly[0].y * s);
-      for(let i = 1; i < p.poly.length; i++) ctx.lineTo(p.poly[i].x * s, p.poly[i].y * s);
-      ctx.closePath();
-
-      const isCheat = state.cheatTargetId === p.id;
-      const isWinner = state.winner && state.winner.id === p.id;
-
-      const grad = ctx.createLinearGradient(0, 0, w, w);
-      grad.addColorStop(0, lighten(p.color, 30));
-      grad.addColorStop(.5, p.color);
-      grad.addColorStop(1, lighten(p.color, 15));
-      ctx.fillStyle = grad;
-      ctx.globalAlpha = isWinner ? 1 : .88;
-      ctx.fill();
-      if(isWinner){
-        ctx.globalAlpha = .35;
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-      }
-      if(isCheat){
-        ctx.globalAlpha = .15;
-        ctx.fillStyle = '#f0d080';
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      ctx.strokeStyle = isCheat ? 'rgba(240,208,128,.7)' : 'rgba(255,255,255,.15)';
-      ctx.lineWidth = isCheat ? 1.6 : 1;
-      ctx.stroke();
-      ctx.restore();
-
-      // avatar / initial
-      const c = polyCentroid(p.poly);
-      const cx = c.x * s, cy = c.y * s;
-      const bb = bboxOf(p.poly);
-      const avatarR = Math.min(28, Math.min(bb.w, bb.h) * s * 0.28);
-      if(avatarR > 6){
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, avatarR, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.fillStyle = 'rgba(0,0,0,.32)';
-        ctx.fillRect(cx - avatarR, cy - avatarR, avatarR * 2, avatarR * 2);
-        ctx.fillStyle = 'rgba(255,255,255,.95)';
-        ctx.font = 'bold ' + (avatarR * 1.15) + 'px system-ui,sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText((p.name[0] || '?').toUpperCase(), cx, cy + 1);
-        ctx.restore();
-        ctx.beginPath();
-        ctx.arc(cx, cy, avatarR, 0, Math.PI * 2);
-        ctx.strokeStyle = isCheat ? 'rgba(240,208,128,.85)' : (isWinner ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.3)');
-        ctx.lineWidth = isCheat || isWinner ? 2 : 1.2;
-        ctx.stroke();
-      }
-    }
-
-    // trail
-    if(state.gameState === 'sliding' && state.trail.length > 1){
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      const n = state.trail.length;
-      for(let i = 1; i < n; i++){
-        const a = state.trail[i - 1];
-        const b = state.trail[i];
-        const k = i / n;
-        ctx.beginPath();
-        ctx.moveTo(a.x * s, a.y * s);
-        ctx.lineTo(b.x * s, b.y * s);
-        ctx.strokeStyle = 'rgba(180,210,255,' + (k * 0.42) + ')';
-        ctx.lineWidth = 2.4 * k + 0.6;
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    // puck
-    if(state.gameState !== 'idle'){
-      drawPuck(ctx, state.puck.x * s, state.puck.y * s, PUCK_R * s);
-    }
-
-    // restore the outer clip (background)
-    ctx.restore();
-
-    // rink border on top
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(CR * s, 0);
-    ctx.lineTo((ARENA - CR) * s, 0);
-    ctx.arcTo(ARENA * s, 0, ARENA * s, CR * s, CR * s);
-    ctx.lineTo(ARENA * s, (ARENA - CR) * s);
-    ctx.arcTo(ARENA * s, ARENA * s, (ARENA - CR) * s, ARENA * s, CR * s);
-    ctx.lineTo(CR * s, ARENA * s);
-    ctx.arcTo(0, ARENA * s, 0, (ARENA - CR) * s, CR * s);
-    ctx.lineTo(0, CR * s);
-    ctx.arcTo(0, 0, CR * s, 0, CR * s);
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(180,210,255,.55)';
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
-    ctx.shadowColor = 'rgba(140,180,255,.6)';
-    ctx.shadowBlur = 14;
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  function roundRectPath(c, x, y, w, h, r){
-    c.beginPath();
-    c.moveTo(x + r, y);
-    c.lineTo(x + w - r, y);
-    c.quadraticCurveTo(x + w, y, x + w, y + r);
-    c.lineTo(x + w, y + h - r);
-    c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    c.lineTo(x + r, y + h);
-    c.quadraticCurveTo(x, y + h, x, y + h - r);
-    c.lineTo(x, y + r);
-    c.quadraticCurveTo(x, y, x + r, y);
-    c.closePath();
-  }
-
-  function drawPuck(c, x, y, r){
-    c.save();
-    c.beginPath();
-    c.arc(x, y, r, 0, Math.PI * 2);
-    const g = c.createRadialGradient(x - r * .3, y - r * .3, 1, x, y, r);
-    g.addColorStop(0, '#ffffff');
-    g.addColorStop(.6, '#dfe8f5');
-    g.addColorStop(1, '#a8b8d0');
-    c.fillStyle = g;
-    c.shadowColor = 'rgba(180,210,255,.85)';
-    c.shadowBlur = 14;
-    c.fill();
-    c.shadowBlur = 0;
-    c.lineWidth = Math.max(1.2, r * .22);
-    c.strokeStyle = 'rgba(255,255,255,.85)';
-    c.stroke();
-    c.beginPath();
-    c.arc(x, y, r * .55, 0, Math.PI * 2);
-    c.strokeStyle = 'rgba(120,160,220,.5)';
-    c.lineWidth = Math.max(.8, r * .1);
-    c.stroke();
-    c.restore();
-  }
-
-  function lighten(hex, amt){
-    let r = parseInt(hex.slice(1, 3), 16);
-    let g = parseInt(hex.slice(3, 5), 16);
-    let b = parseInt(hex.slice(5, 7), 16);
-    r = Math.min(255, r + amt);
-    g = Math.min(255, g + amt);
-    b = Math.min(255, b + amt);
-    return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
-  }
-
-  // ============================================================
-  //  ROUND CONTROL
-  // ============================================================
-  function startRound(){
-    if(state.players.length === 0 || state.gameState === 'sliding') return;
-
-    let traj;
-    if(state.cheatTargetId !== null){
-      const tp = state.players.find(p => p.id === state.cheatTargetId);
-      traj = tp ? makeCheatTrajectory(tp) : makeRandomTrajectory();
-    } else {
-      traj = makeRandomTrajectory();
-    }
-
-    state.trajectory = traj;
-    state.roundStartTime = performance.now();
-    state.roundDuration = traj.duration;
-    state.puck.x = traj.path[0].x;
-    state.puck.y = traj.path[0].y;
-    state.trail = [];
-    state.gameState = 'sliding';
-    state.winner = null;
-
-    statusLbl.textContent = 'SLIDING';
-    statusLbl.style.color = '#8fbdff';
-    timerChip.classList.add('show');
-
-    renderPlayers();
-    draw();
-    updatePlayBtn();
-  }
-
-  function finalizeRound(){
-    if(state.trajectory){
-      state.puck.x = state.trajectory.endX;
-      state.puck.y = state.trajectory.endY;
-      state.winner = findOwner(state.trajectory.endX, state.trajectory.endY);
-    }
-    state.gameState = 'finished';
-    statusLbl.textContent = state.winner ? (state.winner.name + ' WINS') : 'NO WINNER';
-    statusLbl.style.color = '#7de3a3';
-    timerChip.classList.remove('show');
-    renderPlayers();
-    draw();
-    updatePlayBtn();
-  }
-
-  function findOwner(x, y){
-    for(const p of state.players){
-      if(p.poly && pointInPoly(x, y, p.poly)) return p;
-    }
-    let best = null, bd = Infinity;
-    for(const p of state.players){
-      if(!p.poly) continue;
-      const c = polyCentroid(p.poly);
-      const d = Math.hypot(x - c.x, y - c.y);
-      if(d < bd){ bd = d; best = p; }
-    }
-    return best;
-  }
-
-  // ============================================================
-  //  PLAYER MANAGEMENT
-  // ============================================================
-  function addPlayer(name, bet){
-    name = (name || '').trim() || ('Bot ' + (state.players.length + 1));
-    bet = Math.max(1, Math.floor(Number(bet) || 10));
-    const color = COLORS[state.players.length % COLORS.length];
-    const player = { id: nextId++, name, bet, color, poly: null };
-    state.players.push(player);
-    repartition();
-    renderPlayers();
-    draw();
-    updatePlayBtn();
-  }
-
-  function removePlayer(id){
-    state.players = state.players.filter(p => p.id !== id);
-    if(state.cheatTargetId === id){
-      state.cheatTargetId = null;
-      updateCheatBtn();
-    }
-    repartition();
-    renderPlayers();
-    draw();
-    updatePlayBtn();
-  }
-
-  function updatePlayBtn(){
-    playBtn.disabled = state.players.length === 0 || state.gameState === 'sliding';
-  }
-
-  function renderPlayers(){
-    potValEl.textContent = totalPot().toLocaleString();
-    playersEl.innerHTML = '';
-
-    if(state.players.length === 0){
-      const e = document.createElement('div');
-      e.id = 'empty';
-      e.innerHTML =
-        '<svg class="e-svg" viewBox="0 0 24 24" fill="none" stroke="rgba(200,215,235,.5)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">' +
-          '<line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/>' +
-          '<line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="4.9" y2="19.1"/>' +
-        '</svg>' +
-        '<div>No players yet</div>' +
-        '<div style="font-size:11px;opacity:.6">Add a player or a random bot to begin</div>';
-      playersEl.appendChild(e);
-      return;
-    }
-
-    const sorted = [...state.players].sort((a, b) => b.bet - a.bet);
-    for(const p of sorted){
-      const row = document.createElement('div');
-      row.className = 'pl';
-      if(state.cheatTargetId === p.id) row.classList.add('cheat');
-      if(state.winner && state.winner.id === p.id) row.classList.add('winner');
-
-      const colorEl = document.createElement('div');
-      colorEl.className = 'pl-color';
-      colorEl.style.background = p.color;
-
-      const nameEl = document.createElement('div');
-      nameEl.className = 'pl-name';
-      nameEl.textContent = p.name;
-
-      const betEl = document.createElement('div');
-      betEl.className = 'pl-bet';
-      betEl.textContent = p.bet;
-
-      const chEl = document.createElement('div');
-      chEl.className = 'pl-chance';
-      chEl.textContent = chanceOf(p).toFixed(1) + '%';
-
-      const rmBtn = document.createElement('button');
-      rmBtn.className = 'pl-rm';
-      rmBtn.type = 'button';
-      rmBtn.textContent = '✕';
-      rmBtn.addEventListener('click', e => { e.stopPropagation(); removePlayer(p.id); });
-
-      row.appendChild(colorEl);
-      row.appendChild(nameEl);
-      row.appendChild(betEl);
-      row.appendChild(chEl);
-      row.appendChild(rmBtn);
-
-      row.addEventListener('click', () => {
-        if(state.gameState === 'sliding') return;
-        state.cheatTargetId = (state.cheatTargetId === p.id) ? null : p.id;
-        updateCheatBtn();
-        renderPlayers();
-        draw();
-      });
-
-      playersEl.appendChild(row);
-    }
-  }
-
-  function updateCheatBtn(){
-    if(state.cheatTargetId === null){
-      cheatBtn.textContent = 'Cheat: OFF · click a player to target';
-      cheatBtn.style.color = '';
-    } else {
-      const tp = state.players.find(p => p.id === state.cheatTargetId);
-      cheatBtn.textContent = 'Cheat: ' + (tp ? tp.name : '?') + ' · 100%';
-      cheatBtn.style.color = '#f0d080';
-    }
-  }
-
-  // ============================================================
-  //  MAIN LOOP
-  // ============================================================
-  function loop(){
-    requestAnimationFrame(loop);
-
-    if(state.gameState === 'sliding'){
-      const elapsed = performance.now() - state.roundStartTime;
-      const pos = samplePath(elapsed);
-      state.puck.x = pos.x;
-      state.puck.y = pos.y;
-
-      const trail = state.trail;
-      const last = trail[trail.length - 1];
-      if(!last || Math.hypot(pos.x - last.x, pos.y - last.y) > 1.2){
-        trail.push({ x: pos.x, y: pos.y });
-        if(trail.length > 40) trail.shift();
-      }
-
-      const remain = Math.max(0, state.roundDuration - elapsed);
-      timerChip.textContent = (remain / 1000).toFixed(1) + 's';
-
-      if(elapsed >= state.roundDuration){
-        finalizeRound();
-      } else {
-        draw();
-      }
-    }
-  }
-
-  // ============================================================
-  //  EVENTS
-  // ============================================================
-  addBtn.addEventListener('click', () => {
-    addPlayer(nameInput.value, betInput.value);
-    nameInput.value = '';
-    nameInput.focus();
-  });
-  randBtn.addEventListener('click', () => {
-    const bet = 20 + Math.floor(Math.random() * 480);
-    addPlayer('', bet);
-  });
-  resetBtn.addEventListener('click', () => {
-    state.players = [];
-    state.gameState = 'idle';
-    state.winner = null;
-    state.cheatTargetId = null;
-    state.trajectory = null;
-    state.trail = [];
-    state.puck.x = ARENA / 2;
-    state.puck.y = ARENA / 2;
-    statusLbl.textContent = 'IDLE';
-    statusLbl.style.color = '#8fbdff';
-    timerChip.classList.remove('show');
-    updateCheatBtn();
-    renderPlayers();
-    updatePlayBtn();
-    draw();
-  });
-  playBtn.addEventListener('click', startRound);
-  cheatBtn.addEventListener('click', () => {
-    if(state.cheatTargetId !== null){
-      state.cheatTargetId = null;
-      updateCheatBtn();
-      renderPlayers();
-      draw();
-    }
-  });
-
-  nameInput.addEventListener('keydown', e => { if(e.key === 'Enter') addBtn.click(); });
-  betInput.addEventListener('keydown', e => { if(e.key === 'Enter') addBtn.click(); });
-
-  window.addEventListener('resize', resize);
-  window.addEventListener('orientationchange', () => setTimeout(resize, 120));
-
-  // ============================================================
-  //  BOOT
-  // ============================================================
-  resize();
-  addPlayer('Alice', 100);
-  addPlayer('Bob', 60);
-  addPlayer('Cara', 30);
-  updateCheatBtn();
-  requestAnimationFrame(loop);
-
-  window.__test = { state, addPlayer, removePlayer, startRound, repartition, draw };
-})();
-</script>
+    centerPuck();
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    puck.addEventListener('mousedown', (e) => {
+      dragging = true;
+      const puckRect = puck.getBoundingClientRect();
+      offsetX = e.clientX - puckRect.left;
+      offsetY = e.clientY - puckRect.top;
+    });
+
+    document.addEventListener('mouseup', () => {
+      dragging = false;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+
+      const arenaRect = arena.getBoundingClientRect();
+      const puckRect = puck.getBoundingClientRect();
+
+      let x = e.clientX - arenaRect.left - offsetX;
+      let y = e.clientY - arenaRect.top - offsetY;
+
+      // clamp inside arena
+      x = Math.max(0, Math.min(arenaRect.width - puckRect.width, x));
+      y = Math.max(0, Math.min(arenaRect.height - puckRect.height, y));
+
+      puck.style.left = x + 'px';
+      puck.style.top = y + 'px';
+    });
+
+    // touch support
+    puck.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      dragging = true;
+      const puckRect = puck.getBoundingClientRect();
+      offsetX = touch.clientX - puckRect.left;
+      offsetY = touch.clientY - puckRect.top;
+    });
+
+    document.addEventListener('touchend', () => {
+      dragging = false;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!dragging) return;
+      const touch = e.touches[0];
+
+      const arenaRect = arena.getBoundingClientRect();
+      const puckRect = puck.getBoundingClientRect();
+
+      let x = touch.clientX - arenaRect.left - offsetX;
+      let y = touch.clientY - arenaRect.top - offsetY;
+
+      x = Math.max(0, Math.min(arenaRect.width - puckRect.width, x));
+      y = Math.max(0, Math.min(arenaRect.height - puckRect.height, y));
+
+      puck.style.left = x + 'px';
+      puck.style.top = y + 'px';
+    });
+  </script>
 </body>
 </html>
