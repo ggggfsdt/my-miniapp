@@ -45,16 +45,18 @@
 
   #top{
     display:flex;align-items:center;justify-content:space-between;
-    padding:calc(14px + var(--safe-t)) 16px 8px;flex-shrink:0;
+    padding:calc(14px + var(--safe-t)) 14px 8px;flex-shrink:0;
+    gap:8px;
   }
   #brand{
     font-size:13px;font-weight:900;letter-spacing:2.8px;text-transform:uppercase;
     color:var(--text);text-shadow:0 1px 6px rgba(0,0,0,.6);
+    flex-shrink:0;
   }
   #brand span{color:var(--blue);text-shadow:0 0 14px rgba(91,157,255,.6)}
-  #topRight{display:flex;align-items:center;gap:9px}
+  #topRight{display:flex;align-items:center;gap:8px;flex-shrink:0}
 
-  #cheatBtn{
+  .circle-btn{
     width:34px;height:34px;border-radius:50%;
     border:.5px solid var(--border);
     background:var(--panel2);
@@ -65,9 +67,10 @@
                box-shadow .3s ease,border-color .22s ease;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
   }
-  #cheatBtn svg{width:15px;height:15px;display:block;fill:none;stroke:currentColor;
+  .circle-btn svg{width:15px;height:15px;display:block;fill:none;stroke:currentColor;
     stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--spring)}
-  #cheatBtn:active{transform:scale(.9)}
+  .circle-btn:active{transform:scale(.9)}
+
   #cheatBtn.on{
     color:#0a0a0a;
     background:linear-gradient(135deg,#f6dd9a,#d4b46a);
@@ -76,6 +79,15 @@
                inset 0 1px 0 rgba(255,255,255,.55);
   }
   #cheatBtn.on svg{transform:scale(1.12) rotate(-6deg)}
+
+  #settingsBtn.open{
+    color:#fff;
+    background:rgba(91,157,255,.20);
+    border-color:rgba(140,180,255,.5);
+    box-shadow:0 0 18px rgba(91,157,255,.35),
+               inset 0 1px 0 rgba(255,255,255,.15);
+  }
+  #settingsBtn.open svg{transform:rotate(35deg)}
 
   #balChip{
     display:flex;align-items:center;gap:7px;
@@ -88,6 +100,92 @@
   @keyframes glowD{0%,100%{filter:drop-shadow(0 0 5px rgba(200,168,78,.35))}
                    50%{filter:drop-shadow(0 0 18px rgba(200,168,78,.75)) brightness(1.15)}}
   #balOut{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+
+  /* ---------- settings panel ---------- */
+  #settingsPanel{
+    position:absolute;
+    top:calc(54px + var(--safe-t));
+    right:14px;
+    width:236px;
+    background:linear-gradient(180deg, rgba(28,32,44,.97), rgba(14,16,22,.98));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:16px;
+    padding:8px;
+    z-index:60;
+    box-shadow:0 24px 60px rgba(0,0,0,.75),
+               inset 0 1px 0 rgba(255,255,255,.06);
+    -webkit-backdrop-filter:blur(20px) saturate(150%);
+    backdrop-filter:blur(20px) saturate(150%);
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-8px) scale(.94);
+    transform-origin:top right;
+    transition:opacity .18s ease, visibility 0s .22s,
+               transform .28s cubic-bezier(.34,1.56,.64,1);
+  }
+  #settingsPanel.open{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0) scale(1);
+    transition:opacity .18s ease, visibility 0s,
+               transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .settings-title{
+    font-size:9.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;
+    color:var(--text3);
+    padding:5px 10px 8px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .settings-title::after{
+    content:'';flex:1;height:1px;
+    background:linear-gradient(90deg,rgba(255,255,255,.10),transparent);
+  }
+  .setting-row{
+    display:flex;align-items:center;gap:10px;
+    width:100%;
+    padding:9px 10px;
+    border:none;
+    background:transparent;
+    color:var(--text);
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.1px;
+    cursor:pointer;
+    border-radius:10px;
+    transition:background .18s ease;
+    text-align:left;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .setting-row:hover{background:rgba(255,255,255,.04)}
+  .setting-row:active{background:rgba(255,255,255,.07)}
+  .setting-label{
+    flex:1;min-width:0;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .switch-sm{
+    width:34px;height:20px;border-radius:999px;
+    background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.12);
+    position:relative;flex-shrink:0;
+    transition:background .25s ease,border-color .25s ease,box-shadow .25s ease;
+  }
+  .switch-sm .knob{
+    position:absolute;top:2px;left:2px;
+    width:14px;height:14px;border-radius:50%;
+    background:linear-gradient(180deg,#fff,#c8d2e2);
+    box-shadow:0 2px 6px rgba(0,0,0,.45);
+    transition:transform .28s cubic-bezier(.34,1.56,.64,1);
+  }
+  .setting-row.active .switch-sm{
+    background:linear-gradient(135deg,#6da9ff,#4a86e8);
+    border-color:rgba(140,180,255,.55);
+    box-shadow:0 0 12px rgba(91,157,255,.35);
+  }
+  .setting-row.active .switch-sm .knob{
+    transform:translateX(14px);
+  }
+  .setting-row.active{color:#fff}
 
   #stage{
     flex:1;position:relative;display:flex;align-items:center;justify-content:center;
@@ -303,14 +401,48 @@
   <div id="top">
     <div id="brand">dllump <span>ice</span></div>
     <div id="topRight">
-      <button id="cheatBtn" type="button" aria-label="Cheat mode">
+      <button id="cheatBtn" class="circle-btn" type="button" aria-label="Cheat mode">
         <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </button>
+      <button id="settingsBtn" class="circle-btn" type="button" aria-label="Settings">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
       </button>
       <div id="balChip">
         <img src="https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif" alt="">
         <span id="balOut">1000</span>
       </div>
     </div>
+  </div>
+
+  <div id="settingsPanel" aria-hidden="true">
+    <div class="settings-title">Settings</div>
+    <button class="setting-row" data-key="bounce" type="button">
+      <span class="setting-label">Bounce physics</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
+    <button class="setting-row" data-key="zoom" type="button">
+      <span class="setting-label">Zoom on stop</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
+    <button class="setting-row" data-key="pop" type="button">
+      <span class="setting-label">Stop pop</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
+    <button class="setting-row" data-key="outline" type="button">
+      <span class="setting-label">Field outlines</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
+    <button class="setting-row" data-key="arrow" type="button">
+      <span class="setting-label">Spin arrow</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
+    <button class="setting-row" data-key="glow" type="button">
+      <span class="setting-label">Glow &amp; shadows</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
   </div>
 
   <div id="stage">
@@ -359,7 +491,7 @@
    ========================================================================== */
 const S          = 400;
 const R          = 24;
-const PUCK_R     = 26;
+const PUCK_R     = 24;
 const HOUSE      = 0.03;
 const MIN_CHANCE = 0.05;
 const MAX_CHANCE = 95;
@@ -367,6 +499,32 @@ const MAX_CHANCE = 95;
 const EMPTY_GIF_URL = 'https://i.postimg.cc/DfYMRbty/ezgif-3ae2db2f22c213a2.gif';
 const EMPTY_GIF = new Image();
 EMPTY_GIF.src = EMPTY_GIF_URL;
+
+/* ==========================================================================
+   SETTINGS
+   ========================================================================== */
+const DEFAULT_SETTINGS = {
+  bounce:   false,   // OFF by default
+  zoom:     true,
+  pop:      true,
+  outline:  true,
+  arrow:    true,
+  glow:     true,
+};
+const settings = Object.assign({}, DEFAULT_SETTINGS);
+try {
+  const raw = localStorage.getItem('dllump_ice_settings');
+  if (raw) Object.assign(settings, JSON.parse(raw));
+} catch (_) {}
+
+function saveSettings(){
+  try { localStorage.setItem('dllump_ice_settings', JSON.stringify(settings)); } catch(_) {}
+}
+
+function setGlow(c, blur, color){
+  if (settings.glow){ c.shadowBlur = blur; c.shadowColor = color; }
+  else { c.shadowBlur = 0; c.shadowColor = 'transparent'; }
+}
 
 /* ==========================================================================
    RINK PERIMETER
@@ -410,6 +568,7 @@ function buildPerimeter(size, r, N){
 }
 
 const PERIM = buildPerimeter(S, R, 240);
+const N_PERIM = PERIM.length;
 
 const RINK_PATH = (function(){
   const p = new Path2D();
@@ -432,6 +591,110 @@ const INNER_PATH = (function(){
   p.closePath();
   return p;
 })();
+
+/* ==========================================================================
+   BOUNCE PHYSICS
+   --------------------------------------------------------------------------
+   Localized "rubber wall" bounce:
+     • Each wall hit spawns a small pulse at the impact point
+     • The pulse starts at max outward displacement, then oscillates in
+       place with a damped spring (cos wave), fading quickly
+     • Spatial falloff is tight (only ~15 perimeter points reach), so it
+       reads as a dent, not a traveling wave
+     • Fast phase hits are strong, slow phase hits are gentle
+   ========================================================================== */
+const BOUNCE_OMEGA   = 18;      // oscillation speed (rad/s) — 3–4 quick wobbles
+const BOUNCE_TAU     = 5.5;     // temporal decay — snappy (~0.7s total)
+const BOUNCE_SIGMA   = 0.20;    // spatial decay — very localized (~15 pts)
+const BOUNCE_MAX_T   = 0.9;     // lifetime cap
+
+const jiggleDisp = new Float32Array(N_PERIM);
+const jiggles = [];
+const PERIM_RADIAL = new Float32Array(N_PERIM * 2);
+
+(function precomputeRadial(){
+  const cx = S/2, cy = S/2;
+  for (let i = 0; i < N_PERIM; i++){
+    const p = PERIM[i];
+    const dx = p.x - cx, dy = p.y - cy;
+    const len = Math.hypot(dx, dy) || 1;
+    PERIM_RADIAL[i*2]   = dx / len;
+    PERIM_RADIAL[i*2+1] = dy / len;
+  }
+})();
+
+function spawnJiggle(idx, intensity){
+  if (!settings.bounce) return;
+  if (idx < 0 || idx >= N_PERIM) return;
+  if (jiggles.length >= 10) jiggles.shift();
+
+  const dists = new Float32Array(N_PERIM);
+  for (let i = 0; i < N_PERIM; i++){
+    let d = Math.abs(i - idx);
+    d = Math.min(d, N_PERIM - d);
+    dists[i] = d;
+  }
+  jiggles.push({
+    dists,
+    intensity,
+    startTime: performance.now() / 1000,
+  });
+}
+
+function updateJiggles(nowSec){
+  if (!settings.bounce) return;
+  if (jiggles.length === 0){
+    let any = false;
+    for (let i = 0; i < N_PERIM; i++){ if (jiggleDisp[i] !== 0){ any = true; break; } }
+    if (!any) return;
+  }
+
+  jiggleDisp.fill(0);
+
+  for (let k = jiggles.length - 1; k >= 0; k--){
+    const j = jiggles[k];
+    const t = nowSec - j.startTime;
+    if (t > BOUNCE_MAX_T){ jiggles.splice(k, 1); continue; }
+
+    const amp   = j.intensity * Math.exp(-t * BOUNCE_TAU);
+    const wave  = Math.cos(t * BOUNCE_OMEGA);
+    const dists = j.dists;
+
+    for (let i = 0; i < N_PERIM; i++){
+      const sf = Math.exp(-dists[i] * BOUNCE_SIGMA);
+      if (sf < 0.02) continue;
+      jiggleDisp[i] += amp * wave * sf;
+    }
+  }
+}
+
+function findNearestPerimIdx(x, y){
+  let bestIdx = 0, bestD = Infinity;
+  for (let i = 0; i < N_PERIM; i++){
+    const p = PERIM[i];
+    const dx = p.x - x, dy = p.y - y;
+    const d = dx*dx + dy*dy;
+    if (d < bestD){ bestD = d; bestIdx = i; }
+  }
+  return bestIdx;
+}
+
+function buildJigglePath(scaleFactor){
+  const cx = S/2, cy = S/2;
+  const path = new Path2D();
+  for (let i = 0; i < N_PERIM; i++){
+    const p = PERIM[i];
+    const nx = PERIM_RADIAL[i*2];
+    const ny = PERIM_RADIAL[i*2+1];
+    const disp = jiggleDisp[i];
+    const x = cx + (p.x + nx * disp - cx) * scaleFactor;
+    const y = cy + (p.y + ny * disp - cy) * scaleFactor;
+    if (i === 0) path.moveTo(x, y);
+    else path.lineTo(x, y);
+  }
+  path.closePath();
+  return path;
+}
 
 /* ==========================================================================
    POLY MATH
@@ -489,14 +752,30 @@ function distToEdges(px, py, poly){
   return min;
 }
 
-function labelCenter(poly){
+function computeLabelCenter(poly){
+  if (!poly || poly.length < 3) return { x: S/2, y: S/2 };
+
   const bb = bboxOf(poly);
   const bcx = (bb.x0 + bb.x1) / 2;
   const bcy = (bb.y0 + bb.y1) / 2;
   if (pointInPoly(bcx, bcy, poly)) return { x: bcx, y: bcy };
-  const c = centroidOf(poly);
-  if (pointInPoly(c.x, c.y, poly)) return c;
-  return { x: bcx, y: bcy };
+
+  const w = bb.x1 - bb.x0, h = bb.y1 - bb.y0;
+  if (w > 1 && h > 1){
+    let best = null, bestD = -1;
+    const N = 28;
+    for (let iy = 1; iy < N; iy++){
+      for (let ix = 1; ix < N; ix++){
+        const x = bb.x0 + (ix / N) * w;
+        const y = bb.y0 + (iy / N) * h;
+        if (!pointInPoly(x, y, poly)) continue;
+        const d = distToEdges(x, y, poly);
+        if (d > bestD){ bestD = d; best = { x, y }; }
+      }
+    }
+    if (best) return best;
+  }
+  return centroidOf(poly);
 }
 
 function polyToPath(poly){
@@ -566,7 +845,6 @@ function findBboxCorners(poly){
   return [tl, tr, bl, br];
 }
 
-/* ---------- easing helpers ---------- */
 function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
 function easeInOutCubic(t){
   return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
@@ -665,6 +943,10 @@ const G = {
 
   winPoly: null,
   losePoly: null,
+  winCenter: null,
+  loseCenter: null,
+  winBB: null,
+  loseBB: null,
 
   state: 'idle',
   puck: { x: S/2, y: S/2 },
@@ -681,8 +963,10 @@ const G = {
 
   rollStart: 0,
   duration: 10,
+  rollSegIdx: 0,
+  lastJiggleIdx: -1,
+  lastJiggleTime: 0,
 
-  // zoom
   zoom: 1,
   zoomCenterX: S/2,
   zoomCenterY: S/2,
@@ -730,20 +1014,16 @@ function resize(){
    ========================================================================== */
 const FAST_DURATION  = 2.4;
 const SLOW_DURATION  = 6.5;
-const TOTAL_DURATION = FAST_DURATION + SLOW_DURATION;   // 8.9 s
+const TOTAL_DURATION = FAST_DURATION + SLOW_DURATION;
 const FAST_FRAC      = 0.55;
 const U1             = FAST_DURATION / TOTAL_DURATION;
 const SLOW_EXP       = (FAST_FRAC / U1) * (1 - U1) / (1 - FAST_FRAC);
 
 const SPEED_MULT = { slow: 1.5, normal: 1.0, fast: 0.5 };
 
-/* ---------- zoom timing ----------
-   zoom begins ZOOM_LEAD seconds before the puck stops,
-   then eases in over ZOOM_IN_DURATION, then on stop it holds for
-   ZOOM_OUT_DELAY and eases out smoothly over ZOOM_OUT_DURATION.      */
 const ZOOM_MAX           = 1.85;
-const ZOOM_LEAD          = 0.5;
-const ZOOM_IN_DURATION   = 0.45;
+const ZOOM_LEAD          = 1.5;
+const ZOOM_IN_DURATION   = 0.9;
 const ZOOM_OUT_DELAY     = 0.35;
 const ZOOM_OUT_DURATION  = 1.0;
 
@@ -786,8 +1066,12 @@ function recomputeField(){
   const target = Math.max(0.0003, Math.min(0.9997, G.shown));
   const cut = pickCut(PERIM, G.cutAngle, target);
   if (cut){
-    G.winPoly  = cut.win;
-    G.losePoly = cut.lose;
+    G.winPoly    = cut.win;
+    G.losePoly   = cut.lose;
+    G.winBB      = bboxOf(G.winPoly);
+    G.loseBB     = bboxOf(G.losePoly);
+    G.winCenter  = computeLabelCenter(G.winPoly);
+    G.loseCenter = computeLabelCenter(G.losePoly);
   }
   G.lastShown = G.shown;
 }
@@ -934,7 +1218,6 @@ function buildBilliardPath(start, target){
 
   if (bestValid) return bestValid;
 
-  // Forced fallback with a long unfolded target
   {
     const angle = Math.random() * Math.PI * 2;
     const d = LEN_MIN + Math.random() * (LEN_MAX - LEN_MIN) * 0.5;
@@ -1010,6 +1293,9 @@ const multOut   = document.getElementById('multOut');
 const payoutOut = document.getElementById('payoutOut');
 const banner    = document.getElementById('banner');
 const cheatBtn  = document.getElementById('cheatBtn');
+const settingsBtn   = document.getElementById('settingsBtn');
+const settingsPanel = document.getElementById('settingsPanel');
+const settingRows   = Array.prototype.slice.call(settingsPanel.querySelectorAll('.setting-row'));
 const sliderBox = document.getElementById('sliderBox');
 const speedRow  = document.getElementById('speedRow');
 const betBox    = document.getElementById('betBox');
@@ -1128,6 +1414,54 @@ cheatBtn.addEventListener('click', function(){
 applyCheat();
 
 /* ==========================================================================
+   SETTINGS PANEL
+   ========================================================================== */
+function refreshSettingRows(){
+  settingRows.forEach(function(row){
+    const key = row.dataset.key;
+    row.classList.toggle('active', !!settings[key]);
+  });
+}
+refreshSettingRows();
+
+settingRows.forEach(function(row){
+  row.addEventListener('click', function(e){
+    e.stopPropagation();
+    const key = row.dataset.key;
+    settings[key] = !settings[key];
+    saveSettings();
+    refreshSettingRows();
+    // clear any active bounce pulses when the feature is turned off
+    if (key === 'bounce' && !settings.bounce){
+      jiggles.length = 0;
+      jiggleDisp.fill(0);
+    }
+  });
+});
+
+function openSettings(){
+  settingsPanel.classList.add('open');
+  settingsBtn.classList.add('open');
+  settingsPanel.setAttribute('aria-hidden', 'false');
+}
+function closeSettings(){
+  settingsPanel.classList.remove('open');
+  settingsBtn.classList.remove('open');
+  settingsPanel.setAttribute('aria-hidden', 'true');
+}
+settingsBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  if (settingsPanel.classList.contains('open')) closeSettings();
+  else openSettings();
+});
+document.addEventListener('click', function(e){
+  if (!settingsPanel.classList.contains('open')) return;
+  if (settingsPanel.contains(e.target)) return;
+  if (settingsBtn.contains(e.target)) return;
+  closeSettings();
+});
+
+/* ==========================================================================
    ROLL
    ========================================================================== */
 function showBanner(text, win){
@@ -1141,6 +1475,7 @@ function showBanner(text, win){
 
 function startRoll(){
   if (G.state !== 'idle') return;
+  closeSettings();
 
   G.shown = G.chance;
   G.shownVel = 0;
@@ -1178,6 +1513,12 @@ function startRoll(){
   G.puckScale = 0.55;
   G.puckAlpha = 1;
   G.stopPopStart = 0;
+
+  jiggles.length = 0;
+  jiggleDisp.fill(0);
+  G.rollSegIdx = 0;
+  G.lastJiggleIdx = -1;
+  G.lastJiggleTime = 0;
 
   G.zoom = 1;
   G.zoomCenterX = S/2;
@@ -1236,7 +1577,7 @@ function finishRoll(){
 playBtn.addEventListener('click', startRoll);
 
 /* ==========================================================================
-   PUCK POP ANIMATION
+   PUCK POP
    ========================================================================== */
 function puckPopScale(t){
   if (t <= 0) return 1;
@@ -1363,7 +1704,7 @@ function drawPuck(c, x, y, r){
 function drawSpinArrow(c){
   const cx = S/2, cy = S/2;
   const puckR = PUCK_R * G.puckScale;
-  const orbit = puckR + 4;
+  const orbit = puckR + 5;
   const triSize = Math.min(S * 0.035, 10);
   const tipOffset = triSize * 0.4;
 
@@ -1379,8 +1720,7 @@ function drawSpinArrow(c){
   c.closePath();
 
   c.fillStyle = '#e8f4ff';
-  c.shadowColor = 'rgba(180,210,255,.9)';
-  c.shadowBlur = 14;
+  setGlow(c, 14, 'rgba(180,210,255,.9)');
   c.fill();
   c.shadowBlur = 0;
 
@@ -1400,8 +1740,7 @@ function drawEmptyCross(c, x, y, size){
   c.strokeStyle = 'rgba(255,255,255,0.52)';
   c.lineWidth = Math.max(1.4, size * 0.13);
   c.lineCap = 'round';
-  c.shadowColor = 'rgba(200,220,255,0.5)';
-  c.shadowBlur = size * 0.45;
+  setGlow(c, size * 0.45, 'rgba(200,220,255,0.5)');
   c.beginPath();
   c.moveTo(x - size * 0.30, y - size * 0.30);
   c.lineTo(x + size * 0.30, y + size * 0.30);
@@ -1428,7 +1767,7 @@ function draw(now){
   const m = multiplierFor(G.chance);
   const fieldHex = chanceToHex(G.shown);
 
-  const zoomActive = G.zoom > 1.002;
+  const zoomActive = settings.zoom && G.zoom > 1.002;
   if (zoomActive){
     c.save();
     c.translate(S/2, S/2);
@@ -1436,11 +1775,13 @@ function draw(now){
     c.translate(-G.zoomCenterX, -G.zoomCenterY);
   }
 
+  /* rink fill */
   c.save();
   c.fillStyle = '#070b14';
   c.fill(RINK_PATH);
   c.restore();
 
+  /* clipped interior */
   c.save();
   c.clip(RINK_PATH);
 
@@ -1451,11 +1792,12 @@ function draw(now){
   c.fillStyle = bg;
   c.fillRect(0, 0, S, S);
 
-  /* ---- EMPTY region ---- */
-  if (G.losePoly && G.losePoly.length >= 3){
+  /* EMPTY region */
+  if (G.losePoly && G.losePoly.length >= 3 && G.loseBB && G.loseCenter){
     const lp = polyToPath(G.losePoly);
-    const lbb = bboxOf(G.losePoly);
+    const lbb = G.loseBB;
     const lw = lbb.x1 - lbb.x0, lh = lbb.y1 - lbb.y0;
+    const lc = G.loseCenter;
 
     const lg = c.createLinearGradient(lbb.x0, lbb.y0, lbb.x1, lbb.y1);
     lg.addColorStop(0,   '#10131c');
@@ -1469,33 +1811,42 @@ function draw(now){
     c.lineJoin = 'round';
     c.stroke(lp);
 
-    const lc = labelCenter(G.losePoly);
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
 
     if (lw > 90 && lh > 90){
       const crossSize = Math.min(18, Math.min(lw, lh) * 0.14);
-      drawEmptyCross(c, lc.x, lc.y - lh * 0.22, crossSize);
+      const gs = Math.min(46, lh * 0.28, lw * 0.28);
+      const labelH = 14;
+      const gap1 = 9;
+      const gap2 = 6;
+      const totalH = crossSize + gap1 + labelH + gap2 + gs;
+      const topY = lc.y - totalH / 2;
 
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
+      drawEmptyCross(c, lc.x, topY + crossSize / 2, crossSize);
+
       c.fillStyle = 'rgba(230,240,255,0.72)';
       c.font = '800 10.5px -apple-system,system-ui,sans-serif';
-      c.fillText('E M P T Y', lc.x, lc.y - lh * 0.02);
+      c.fillText('E M P T Y', lc.x, topY + crossSize + gap1 + labelH / 2);
 
       if (EMPTY_GIF.complete && EMPTY_GIF.naturalWidth > 0){
-        const gs = Math.min(46, lh * 0.28, lw * 0.28);
         c.save();
         c.globalAlpha = 0.92;
-        c.drawImage(EMPTY_GIF, lc.x - gs * 0.5, lc.y + lh * 0.06, gs, gs);
+        c.drawImage(EMPTY_GIF, lc.x - gs / 2,
+          topY + crossSize + gap1 + labelH + gap2, gs, gs);
         c.restore();
       }
     } else if (lw > 50 && lh > 50){
       const crossSize = Math.min(14, Math.min(lw, lh) * 0.18);
-      drawEmptyCross(c, lc.x, lc.y - lh * 0.10, crossSize);
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
+      const labelH = 12;
+      const gap = 6;
+      const totalH = crossSize + gap + labelH;
+      const topY = lc.y - totalH / 2;
+
+      drawEmptyCross(c, lc.x, topY + crossSize / 2, crossSize);
       c.fillStyle = 'rgba(230,240,255,0.65)';
       c.font = '800 8.5px -apple-system,system-ui,sans-serif';
-      c.fillText('EMPTY', lc.x, lc.y + lh * 0.14);
+      c.fillText('EMPTY', lc.x, topY + crossSize + gap + labelH / 2);
     } else if (lw > 30 && lh > 30){
       const crossSize = Math.min(12, Math.min(lw, lh) * 0.28);
       drawEmptyCross(c, lc.x, lc.y, crossSize);
@@ -1505,10 +1856,12 @@ function draw(now){
     }
   }
 
-  /* ---- WIN region ---- */
-  if (G.winPoly && G.winPoly.length >= 3){
+  /* WIN region */
+  if (G.winPoly && G.winPoly.length >= 3 && G.winBB && G.winCenter){
     const wp = polyToPath(G.winPoly);
-    const wbb = bboxOf(G.winPoly);
+    const wbb = G.winBB;
+    const wc = G.winCenter;
+    const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
 
     const wg = c.createLinearGradient(wbb.x0, wbb.y0, wbb.x1, wbb.y1);
     wg.addColorStop(0,   lighten(fieldHex, 42));
@@ -1517,45 +1870,50 @@ function draw(now){
     c.fillStyle = wg;
     c.fill(wp);
 
-    c.save();
-    if (G.state !== 'rolling' && G.state !== 'spinning'){
-      c.shadowColor = 'rgba(180,215,255,0.55)';
-      c.shadowBlur = 12;
-    }
-    c.strokeStyle = 'rgba(255,255,255,0.88)';
-    c.lineWidth = 2;
-    c.lineJoin = 'round';
-    c.stroke(wp);
-    c.restore();
+    if (settings.outline){
+      c.save();
+      if (G.state !== 'rolling' && G.state !== 'spinning'){
+        setGlow(c, 12, 'rgba(180,215,255,0.55)');
+      }
+      c.strokeStyle = 'rgba(255,255,255,0.88)';
+      c.lineWidth = 2;
+      c.lineJoin = 'round';
+      c.stroke(wp);
+      c.restore();
 
-    const corners = findBboxCorners(G.winPoly);
-    for (const corner of corners){
-      if (!corner) continue;
-      const br = Math.min(30, Math.min(wbb.x1-wbb.x0, wbb.y1-wbb.y0) * 0.28);
-      if (br <= 1) continue;
-      const rg = c.createRadialGradient(corner.x, corner.y, 0, corner.x, corner.y, br);
-      rg.addColorStop(0,    'rgba(255,255,255,0.46)');
-      rg.addColorStop(0.45, 'rgba(255,255,255,0.13)');
-      rg.addColorStop(1,    'rgba(255,255,255,0)');
-      c.fillStyle = rg;
-      c.beginPath();
-      c.arc(corner.x, corner.y, br, 0, Math.PI*2);
-      c.fill();
+      const corners = findBboxCorners(G.winPoly);
+      for (const corner of corners){
+        if (!corner) continue;
+        const br = Math.min(30, Math.min(ww, wh) * 0.28);
+        if (br <= 1) continue;
+        const rg = c.createRadialGradient(corner.x, corner.y, 0, corner.x, corner.y, br);
+        rg.addColorStop(0,    'rgba(255,255,255,0.46)');
+        rg.addColorStop(0.45, 'rgba(255,255,255,0.13)');
+        rg.addColorStop(1,    'rgba(255,255,255,0)');
+        c.fillStyle = rg;
+        c.beginPath();
+        c.arc(corner.x, corner.y, br, 0, Math.PI*2);
+        c.fill();
+      }
     }
-
-    const wc = labelCenter(G.winPoly);
-    const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
 
     c.textAlign = 'center';
     c.textBaseline = 'middle';
 
     if (ww > 80 && wh > 60){
+      const labelH = 12;
+      const multH = 26;
+      const gap = 2;
+      const totalH = labelH + gap + multH;
+      const topY = wc.y - totalH / 2;
+
       c.fillStyle = 'rgba(255,255,255,0.92)';
       c.font = '800 10.5px -apple-system,system-ui,sans-serif';
-      c.fillText('W I N', wc.x, wc.y - 15);
+      c.fillText('W I N', wc.x, topY + labelH / 2);
+
       c.fillStyle = 'rgba(255,255,255,1)';
       c.font = '900 24px -apple-system,system-ui,sans-serif';
-      c.fillText('×' + m.toFixed(2), wc.x, wc.y + 11);
+      c.fillText('×' + m.toFixed(2), wc.x, topY + labelH + gap + multH / 2);
     } else if (ww > 46 && wh > 30){
       c.fillStyle = 'rgba(255,255,255,1)';
       c.font = '900 15px -apple-system,system-ui,sans-serif';
@@ -1578,57 +1936,62 @@ function draw(now){
     }
   }
 
-  c.restore();
+  c.restore(); /* unclip */
 
-  /* ---- rink border ---- */
+  /* rink border (with optional bounce path) */
+  let bp = RINK_PATH, ip = INNER_PATH;
+  if (settings.bounce && jiggles.length > 0){
+    bp = buildJigglePath(1.0);
+    ip = buildJigglePath(0.965);
+  }
+
   c.save();
-  c.shadowColor = 'rgba(140,180,255,0.55)';
-  c.shadowBlur  = 38;
+  setGlow(c, 38, 'rgba(140,180,255,0.55)');
   c.strokeStyle = 'rgba(180,210,255,0.15)';
-  c.lineWidth   = 22;
-  c.lineJoin    = 'round';
-  c.stroke(RINK_PATH);
+  c.lineWidth = 22;
+  c.lineJoin = 'round';
+  c.stroke(bp);
   c.restore();
 
   c.save();
-  c.shadowColor = 'rgba(120,170,255,0.55)';
-  c.shadowBlur  = 20;
+  setGlow(c, 20, 'rgba(120,170,255,0.55)');
   c.strokeStyle = 'rgba(150,190,255,0.42)';
-  c.lineWidth   = 10;
-  c.lineJoin    = 'round';
-  c.stroke(RINK_PATH);
+  c.lineWidth = 10;
+  c.lineJoin = 'round';
+  c.stroke(bp);
   c.restore();
 
   c.save();
-  c.shadowColor = 'rgba(255,255,255,0.95)';
-  c.shadowBlur  = 14;
+  setGlow(c, 14, 'rgba(255,255,255,0.95)');
   c.strokeStyle = 'rgba(255,255,255,0.95)';
-  c.lineWidth   = 3.2;
-  c.lineJoin    = 'round';
-  c.stroke(RINK_PATH);
+  c.lineWidth = 3.2;
+  c.lineJoin = 'round';
+  c.stroke(bp);
   c.restore();
 
-  c.save();
-  c.strokeStyle = 'rgba(255,255,255,0.28)';
-  c.lineWidth   = 1.2;
-  c.lineJoin    = 'round';
-  c.stroke(INNER_PATH);
-  c.restore();
+  if (settings.outline){
+    c.save();
+    c.strokeStyle = 'rgba(255,255,255,0.28)';
+    c.lineWidth = 1.2;
+    c.lineJoin = 'round';
+    c.stroke(ip);
+    c.restore();
 
-  c.save();
-  c.strokeStyle = 'rgba(140,180,255,0.10)';
-  c.lineWidth   = 6;
-  c.lineJoin    = 'round';
-  c.stroke(INNER_PATH);
-  c.restore();
+    c.save();
+    c.strokeStyle = 'rgba(140,180,255,0.10)';
+    c.lineWidth = 6;
+    c.lineJoin = 'round';
+    c.stroke(ip);
+    c.restore();
+  }
 
-  if (G.state === 'spinning'){
+  if (settings.arrow && G.state === 'spinning'){
     drawSpinArrow(c);
   }
 
   if (G.puckAlpha > 0.01){
     let popScale = 1;
-    if (G.state === 'done' && G.stopPopStart > 0){
+    if (settings.pop && G.state === 'done' && G.stopPopStart > 0){
       const age = (now - G.stopPopStart) / 1000;
       const t = Math.min(1, age / G.stopPopDuration);
       popScale = puckPopScale(t);
@@ -1657,6 +2020,7 @@ function frame(now){
 
   const dt = Math.min(0.05, (now - lastT) / 1000 || 0.016);
   lastT = now;
+  const nowSec = now / 1000;
 
   if (G.state === 'idle'){
     const before = G.shown;
@@ -1666,7 +2030,7 @@ function frame(now){
       syncFieldColorUI();
     }
 
-    if (Math.abs(G.shown - G.lastShown) > 0.0008){
+    if (Math.abs(G.shown - G.lastShown) > 0.0025){
       recomputeField();
     }
   }
@@ -1702,38 +2066,67 @@ function frame(now){
 
     if (G.puckScale < 1) G.puckScale = Math.min(1, G.puckScale + dt * 3.4);
 
-    /* -------- ZOOM IN: starts ZOOM_LEAD seconds before puck stops -------- */
-    const zoomStartAt = Math.max(0, G.duration - ZOOM_LEAD);
-    if (elapsed >= zoomStartAt){
-      const zp = Math.min(1, (elapsed - zoomStartAt) / ZOOM_IN_DURATION);
-      const ze = easeOutCubic(zp);
-      G.zoom = 1 + (ZOOM_MAX - 1) * ze;
-    } else {
-      G.zoom = 1;
+    /* -------- BOUNCE: spawn a pulse at each wall hit -------- */
+    if (settings.bounce){
+      let segIdx = 0;
+      const pts = G.path.pts;
+      while (segIdx < G.path.cum.length - 2 && G.path.cum[segIdx + 1] <= dist) segIdx++;
+      if (segIdx > G.rollSegIdx){
+        for (let s = G.rollSegIdx + 1; s <= segIdx; s++){
+          if (s <= 0 || s >= pts.length - 1) continue;
+          const bp = pts[s];
+          if (!bp) continue;
+          const idx = findNearestPerimIdx(bp.x, bp.y);
+          if (idx === G.lastJiggleIdx) continue;
+          G.lastJiggleIdx = idx;
+          // Intensity scales with phase — strong during fast, gentle during slow
+          const phase = u <= U1 ? 1 : (1 - ((u - U1) / (1 - U1)) * 0.7);
+          const intensity = (4 + Math.random() * 3) * phase;
+          spawnJiggle(idx, intensity);
+        }
+        G.rollSegIdx = segIdx;
+      } else if (segIdx < G.rollSegIdx){
+        G.rollSegIdx = segIdx;
+      }
     }
 
-    if (G.zoom > 1.002){
-      const followRate = Math.min(1, dt * 9);
-      G.zoomCenterX += (G.puck.x - G.zoomCenterX) * followRate;
-      G.zoomCenterY += (G.puck.y - G.zoomCenterY) * followRate;
+    /* -------- ZOOM IN -------- */
+    if (settings.zoom){
+      const zoomStartAt = Math.max(0, G.duration - ZOOM_LEAD);
+      if (elapsed >= zoomStartAt){
+        const zp = Math.min(1, (elapsed - zoomStartAt) / ZOOM_IN_DURATION);
+        const ze = easeOutCubic(zp);
+        G.zoom = 1 + (ZOOM_MAX - 1) * ze;
+      } else {
+        G.zoom = 1;
+      }
+      if (G.zoom > 1.002){
+        const followRate = Math.min(1, dt * 9);
+        G.zoomCenterX += (G.puck.x - G.zoomCenterX) * followRate;
+        G.zoomCenterY += (G.puck.y - G.zoomCenterY) * followRate;
+      }
+    } else {
+      G.zoom = 1;
     }
   }
 
   if (G.state === 'done'){
-    /* -------- ZOOM OUT: hold briefly, then ease smoothly back to 1 -------- */
-    const sinceStop = (now - G.stopPopStart) / 1000;
-    if (sinceStop < ZOOM_OUT_DELAY){
-      G.zoom = G.zoomAtStop;
+    if (settings.zoom){
+      const sinceStop = (now - G.stopPopStart) / 1000;
+      if (sinceStop < ZOOM_OUT_DELAY){
+        G.zoom = G.zoomAtStop;
+      } else {
+        const t = Math.min(1, (sinceStop - ZOOM_OUT_DELAY) / ZOOM_OUT_DURATION);
+        const e = easeInOutCubic(t);
+        G.zoom = G.zoomAtStop - (G.zoomAtStop - 1) * e;
+      }
+      if (G.zoom > 1.002){
+        const followRate = Math.min(1, dt * 9);
+        G.zoomCenterX += (G.puck.x - G.zoomCenterX) * followRate;
+        G.zoomCenterY += (G.puck.y - G.zoomCenterY) * followRate;
+      }
     } else {
-      const t = Math.min(1, (sinceStop - ZOOM_OUT_DELAY) / ZOOM_OUT_DURATION);
-      const e = easeInOutCubic(t);
-      G.zoom = G.zoomAtStop - (G.zoomAtStop - 1) * e;
-    }
-
-    if (G.zoom > 1.002){
-      const followRate = Math.min(1, dt * 9);
-      G.zoomCenterX += (G.puck.x - G.zoomCenterX) * followRate;
-      G.zoomCenterY += (G.puck.y - G.zoomCenterY) * followRate;
+      G.zoom = 1;
     }
   }
 
@@ -1744,6 +2137,8 @@ function frame(now){
     G.puck.y += (S/2 - G.puck.y) * Math.min(1, dt * 12);
     G.zoom = 1;
   }
+
+  updateJiggles(nowSec);
 
   draw(now);
 }
