@@ -20,7 +20,6 @@
     --gold:#f0d080;
     --green:#4ade80;
     --red:#ff6b7f;
-    --accent:#5b9dff;
     --spring:cubic-bezier(.34,1.56,.64,1);
     --safe-b:env(safe-area-inset-bottom,0px);
     --safe-t:env(safe-area-inset-top,0px);
@@ -37,7 +36,6 @@
     display:flex;flex-direction:column;height:100%;max-width:440px;margin:0 auto;
     position:relative;overflow:hidden;isolation:isolate;
     background:radial-gradient(ellipse at 50% -10%, #16203a 0%, #0a0e18 45%, #06070c 100%);
-    transition:--accent .4s ease;
   }
   #app::after{
     content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
@@ -45,7 +43,6 @@
   }
   #app > *{position:relative;z-index:1}
 
-  /* ---------- top bar ---------- */
   #top{
     display:flex;align-items:center;justify-content:space-between;
     padding:calc(14px + var(--safe-t)) 16px 8px;flex-shrink:0;
@@ -92,7 +89,6 @@
                    50%{filter:drop-shadow(0 0 18px rgba(200,168,78,.75)) brightness(1.15)}}
   #balOut{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
 
-  /* ---------- stage ---------- */
   #stage{
     flex:1;position:relative;display:flex;align-items:center;justify-content:center;
     padding:8px;min-height:0;
@@ -111,11 +107,10 @@
   #banner.win{color:#bfe0ff;text-shadow:0 0 36px rgba(91,157,255,.95),0 4px 24px rgba(0,0,0,.9)}
   #banner.lose{color:#ff9aa8;text-shadow:0 0 32px rgba(224,85,107,.8),0 4px 24px rgba(0,0,0,.9)}
 
-  /* ---------- panel ---------- */
   #panel{
     flex-shrink:0;
-    padding:12px 16px calc(16px + var(--safe-b));
-    display:flex;flex-direction:column;gap:12px;
+    padding:10px 16px calc(16px + var(--safe-b));
+    display:flex;flex-direction:column;gap:10px;
     position:relative;
   }
   #panel::before{
@@ -129,7 +124,7 @@
     background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
     border:.5px solid var(--border);
     border-radius:15px;
-    padding:10px 8px 9px;text-align:center;position:relative;overflow:hidden;
+    padding:9px 8px 8px;text-align:center;position:relative;overflow:hidden;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.25);
   }
   .stat::before{
@@ -142,24 +137,22 @@
   }
   .stat .val{
     display:block;font-size:17px;font-weight:800;letter-spacing:-.5px;
-    font-variant-numeric:tabular-nums;color:var(--text);transition:color .3s ease;
+    font-variant-numeric:tabular-nums;color:var(--text);
   }
   .stat .val.gold{color:var(--gold);text-shadow:0 0 18px rgba(240,208,128,.4)}
-  .stat .val.blue{color:#9cc6ff}
-  .stat .val.accent{transition:color .35s ease}
+  .stat .val.accent{transition:color .2s ease, text-shadow .2s ease}
 
-  /* slider */
   .slider-box{
     background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
     border:.5px solid var(--border);
     border-radius:17px;
-    padding:12px 16px 8px;
+    padding:11px 16px 7px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.25);
     transition:opacity .25s ease;
   }
   .slider-box.locked{opacity:.4;pointer-events:none}
   input[type=range]{
-    -webkit-appearance:none;appearance:none;width:100%;height:32px;
+    -webkit-appearance:none;appearance:none;width:100%;height:34px;
     background:transparent;cursor:pointer;display:block;
   }
   input[type=range]::-webkit-slider-runnable-track{
@@ -168,25 +161,37 @@
     box-shadow:inset 0 1px 2px rgba(0,0,0,.45);
   }
   input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:28px;height:28px;border-radius:50%;
-    margin-top:-9px;border:none;
-    background:linear-gradient(180deg,#ffffff,#c0cee0);
-    box-shadow:0 4px 14px rgba(0,0,0,.7),
-               0 0 0 4px var(--thumb-glow, rgba(91,157,255,.18)),
-               inset 0 1px 0 rgba(255,255,255,.9);
+    -webkit-appearance:none;appearance:none;
+    width:48px;height:24px;
+    border-radius:14px;
+    margin-top:-7px;
+    border:none;
+    background:linear-gradient(180deg,#ffffff 0%,#dbe4f0 45%,#b8c4d4 100%);
+    box-shadow:0 4px 14px rgba(0,0,0,.65),
+               0 0 0 3px var(--thumb-glow, rgba(91,157,255,.18)),
+               inset 0 1px 0 rgba(255,255,255,.95),
+               inset 0 -1px 0 rgba(0,0,0,.12);
     transition:transform .15s var(--spring), box-shadow .3s ease;
+    position:relative;
   }
-  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.14)}
+  input[type=range]::-webkit-slider-thumb::after{
+    content:'';
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:24px;height:3px;border-radius:2px;
+    background:rgba(120,140,170,.35);
+  }
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.06)}
   input[type=range]::-moz-range-track{
     height:10px;border-radius:99px;border:none;
     background:var(--track, rgba(255,255,255,.08));
     box-shadow:inset 0 1px 2px rgba(0,0,0,.45);
   }
   input[type=range]::-moz-range-thumb{
-    width:26px;height:26px;border-radius:50%;border:none;
-    background:linear-gradient(180deg,#ffffff,#c0cee0);
-    box-shadow:0 4px 14px rgba(0,0,0,.7),
-               0 0 0 4px var(--thumb-glow, rgba(91,157,255,.18));
+    width:46px;height:22px;border-radius:12px;border:none;
+    background:linear-gradient(180deg,#ffffff 0%,#dbe4f0 45%,#b8c4d4 100%);
+    box-shadow:0 4px 14px rgba(0,0,0,.65),
+               0 0 0 3px var(--thumb-glow, rgba(91,157,255,.18));
   }
   .slider-labels{
     display:flex;justify-content:space-between;
@@ -194,7 +199,43 @@
     margin-top:-2px;padding:0 2px;
   }
 
-  /* bet row */
+  .speed-row{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
+    transition:opacity .25s ease;
+  }
+  .speed-row.locked{opacity:.4;pointer-events:none}
+  .speed-pill{
+    padding:9px 0;
+    border-radius:14px;
+    border:.5px solid var(--border);
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
+    color:var(--text3);
+    font-family:inherit;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:transform .16s var(--spring),color .22s ease,background .25s ease,
+               border-color .22s ease,box-shadow .25s ease;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 3px 8px rgba(0,0,0,.2);
+    position:relative;
+    overflow:hidden;
+  }
+  .speed-pill:active{transform:scale(.95)}
+  .speed-pill.active{
+    color:#fff;
+    border-color:rgba(140,180,255,.5);
+    background:linear-gradient(180deg,rgba(91,157,255,.20),rgba(91,157,255,.06));
+    box-shadow:0 0 16px rgba(91,157,255,.22),
+               inset 0 1px 0 rgba(255,255,255,.15);
+    text-shadow:0 0 12px rgba(140,180,255,.55);
+  }
+  .speed-pill.active::before{
+    content:'';position:absolute;top:0;left:24%;right:24%;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+  }
+
   .bet-box{display:flex;gap:7px;align-items:stretch}
   .bet-field{
     flex:1;display:flex;align-items:center;gap:9px;padding:0 14px;
@@ -251,7 +292,8 @@
     .stat .val{font-size:15px}
     #playBtn{height:52px;font-size:14px}
     .bet-field input{height:42px;font-size:16px}
-    #panel{gap:10px}
+    #panel{gap:8px;padding-top:8px}
+    .speed-pill{padding:7px 0;font-size:9.5px}
   }
 </style>
 </head>
@@ -284,8 +326,14 @@
     </div>
 
     <div class="slider-box" id="sliderBox">
-      <input id="slider" type="range" min="2" max="95" step="1" value="45">
-      <div class="slider-labels"><span>2%</span><span>RISK</span><span>95%</span></div>
+      <input id="slider" type="range" min="0.05" max="95" step="0.05" value="45">
+      <div class="slider-labels"><span>0.05%</span><span>RISK</span><span>95%</span></div>
+    </div>
+
+    <div class="speed-row" id="speedRow">
+      <button class="speed-pill" data-speed="slow" type="button">Slow</button>
+      <button class="speed-pill active" data-speed="normal" type="button">Normal</button>
+      <button class="speed-pill" data-speed="fast" type="button">Fast</button>
     </div>
 
     <div class="bet-box" id="betBox">
@@ -309,12 +357,16 @@
 /* ==========================================================================
    CONFIG
    ========================================================================== */
-const S          = 400;      // logical arena size
-const R          = 24;       // corner radius — matches main index style
-const PUCK_R     = 26;       // bigger puck
+const S          = 400;
+const R          = 24;
+const PUCK_R     = 26;
 const HOUSE      = 0.03;
-const MIN_CHANCE = 2;
+const MIN_CHANCE = 0.05;
 const MAX_CHANCE = 95;
+
+const EMPTY_GIF_URL = 'https://i.postimg.cc/DfYMRbty/ezgif-3ae2db2f22c213a2.gif';
+const EMPTY_GIF = new Image();
+EMPTY_GIF.src = EMPTY_GIF_URL;
 
 /* ==========================================================================
    RINK PERIMETER
@@ -367,7 +419,6 @@ const RINK_PATH = (function(){
   return p;
 })();
 
-// inner path for main-index style inner ring
 const INNER_PATH = (function(){
   const p = new Path2D();
   const c = S/2;
@@ -438,6 +489,16 @@ function distToEdges(px, py, poly){
   return min;
 }
 
+function labelCenter(poly){
+  const bb = bboxOf(poly);
+  const bcx = (bb.x0 + bb.x1) / 2;
+  const bcy = (bb.y0 + bb.y1) / 2;
+  if (pointInPoly(bcx, bcy, poly)) return { x: bcx, y: bcy };
+  const c = centroidOf(poly);
+  if (pointInPoly(c.x, c.y, poly)) return c;
+  return { x: bcx, y: bcy };
+}
+
 function polyToPath(poly){
   const p = new Path2D();
   if (!poly || poly.length < 3) return p;
@@ -480,7 +541,6 @@ function lighten(hex, amt){
   return rgbToHex(r, g, b);
 }
 
-/* Chance → hue:  0.02 red  →  0.5 orange  →  0.95 green */
 function chanceToHue(chance){
   const c = Math.max(0, Math.min(1, chance));
   if (c <= 0.5) return (c / 0.5) * 35;
@@ -504,6 +564,12 @@ function findBboxCorners(poly){
     if (b < blS){ blS = b; bl = v; }
   }
   return [tl, tr, bl, br];
+}
+
+/* ---------- easing helpers ---------- */
+function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+function easeInOutCubic(t){
+  return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
 }
 
 /* ==========================================================================
@@ -541,13 +607,13 @@ function pickCut(poly, angle, targetRatio){
   const dirX = Math.cos(angle), dirY = Math.sin(angle);
   const perpX = -dirY, perpY = dirX;
   const totalArea = polyArea(poly);
-  const minArea = totalArea * 0.003;
+  const minArea = totalArea * Math.min(0.003, targetRatio * 0.4);
 
   let lo = -range * 1.2;
   let hi =  range * 1.2;
   let best = null, bestErr = Infinity;
 
-  for (let i = 0; i < 26; i++){
+  for (let i = 0; i < 30; i++){
     const mid = (lo + hi) / 2;
     const px = cx + perpX * mid;
     const py = cy + perpY * mid;
@@ -579,7 +645,7 @@ function pickCut(poly, angle, targetRatio){
     if (ratio > targetRatio) lo = mid;
     else                     hi = mid;
 
-    if (bestErr < 0.003) break;
+    if (bestErr < 0.0005) break;
   }
   return best;
 }
@@ -593,6 +659,7 @@ const G = {
 
   chance: 0.45,
   shown: 0.45,
+  shownVel: 0,
   lastShown: -1,
   cutAngle: 0,
 
@@ -613,19 +680,22 @@ const G = {
   spinExtraTurns: 4,
 
   rollStart: 0,
-  duration: 6.0,
+  duration: 10,
 
+  // zoom
   zoom: 1,
   zoomCenterX: S/2,
   zoomCenterY: S/2,
+  zoomAtStop: 1,
 
-  // pop animation when puck stops
   stopPopStart: 0,
-  stopPopDuration: 0.75,
+  stopPopDuration: 0.7,
 
   outcome: false,
   rollMult: 2,
   rollBet: 10,
+
+  speedMode: 'normal',
 
   flashT: 0,
   bannerTimer: null,
@@ -657,23 +727,25 @@ function resize(){
 
 /* ==========================================================================
    MOTION PROFILE
-   --------------------------------------------------------------------------
-   Fast phase: 2.6 s at constant top speed
-   Slow phase: 3.4 s smooth deceleration  (way longer now)
-   Total:      6.0 s every round
    ========================================================================== */
-const FAST_DURATION  = 2.6;
-const SLOW_DURATION  = 3.4;
-const TOTAL_DURATION = FAST_DURATION + SLOW_DURATION;   // 6.0 s
-const FAST_FRAC      = 0.82;                            // 82% of path in fast phase
-const U1             = FAST_DURATION / TOTAL_DURATION;  // ≈ 0.4333
-const SLOW_EXP       = (FAST_FRAC / U1) * (1 - U1) / (1 - FAST_FRAC); // ≈ 5.96
+const FAST_DURATION  = 2.4;
+const SLOW_DURATION  = 6.5;
+const TOTAL_DURATION = FAST_DURATION + SLOW_DURATION;   // 8.9 s
+const FAST_FRAC      = 0.55;
+const U1             = FAST_DURATION / TOTAL_DURATION;
+const SLOW_EXP       = (FAST_FRAC / U1) * (1 - U1) / (1 - FAST_FRAC);
 
-// camera zoom
-const ZOOM_DELAY    = 0.3;    // seconds into slow phase before zoom starts
-const ZOOM_MAX      = 1.85;
-const ZOOM_IN_RATE  = 3.0;
-const ZOOM_OUT_RATE = 2.2;
+const SPEED_MULT = { slow: 1.5, normal: 1.0, fast: 0.5 };
+
+/* ---------- zoom timing ----------
+   zoom begins ZOOM_LEAD seconds before the puck stops,
+   then eases in over ZOOM_IN_DURATION, then on stop it holds for
+   ZOOM_OUT_DELAY and eases out smoothly over ZOOM_OUT_DURATION.      */
+const ZOOM_MAX           = 1.85;
+const ZOOM_LEAD          = 0.5;
+const ZOOM_IN_DURATION   = 0.45;
+const ZOOM_OUT_DELAY     = 0.35;
+const ZOOM_OUT_DURATION  = 1.0;
 
 function distFrac(u){
   if (u <= U1) return (u / U1) * FAST_FRAC;
@@ -682,17 +754,36 @@ function distFrac(u){
 }
 
 /* ==========================================================================
+   FIELD SPRING
+   ========================================================================== */
+const FIELD_OMEGA = 6.0;
+const FIELD_ZETA  = 0.62;
+
+function stepFieldSpring(dt){
+  const diff = G.chance - G.shown;
+  const accel = FIELD_OMEGA * FIELD_OMEGA * diff
+              - 2 * FIELD_ZETA * FIELD_OMEGA * G.shownVel;
+  G.shownVel += accel * dt;
+  G.shown    += G.shownVel * dt;
+
+  if (G.shown < 0.0002){ G.shown = 0.0002; if (G.shownVel < 0) G.shownVel = 0; }
+  if (G.shown > 0.999){  G.shown = 0.999;  if (G.shownVel > 0) G.shownVel = 0; }
+
+  if (Math.abs(diff) < 0.0003 && Math.abs(G.shownVel) < 0.0003){
+    G.shown = G.chance;
+    G.shownVel = 0;
+  }
+}
+
+/* ==========================================================================
    FIELD RECOMPUTE
    ========================================================================== */
 function randomizeAngle(){
-  const BASE = [0, Math.PI/2, Math.PI/4, -Math.PI/4,
-                Math.PI/6, -Math.PI/6, Math.PI/3, -Math.PI/3];
-  G.cutAngle = BASE[Math.floor(Math.random() * BASE.length)]
-             + (Math.random() - 0.5) * 0.34;
+  G.cutAngle = Math.random() * Math.PI * 2;
 }
 
 function recomputeField(){
-  const target = Math.max(0.008, Math.min(0.992, G.shown));
+  const target = Math.max(0.0003, Math.min(0.9997, G.shown));
   const cut = pickCut(PERIM, G.cutAngle, target);
   if (cut){
     G.winPoly  = cut.win;
@@ -716,12 +807,13 @@ function pickTargetPoint(poly){
     Math.min(10, h * 0.21, w * 0.21),
     Math.min(6,  h * 0.15, w * 0.15),
     Math.min(3,  h * 0.10, w * 0.10),
-    1.2
+    Math.min(1.2, h * 0.06, w * 0.06),
+    0.4
   ];
 
   for (const m of margins){
     if (m <= 0) continue;
-    for (let i = 0; i < 240; i++){
+    for (let i = 0; i < 260; i++){
       const x = bb.x0 + Math.random() * w;
       const y = bb.y0 + Math.random() * h;
       if (pointInPoly(x, y, poly) && distToEdges(x, y, poly) >= m){
@@ -733,12 +825,14 @@ function pickTargetPoint(poly){
   const c = centroidOf(poly);
   if (pointInPoly(c.x, c.y, poly)) return c;
 
-  for (let i = 0; i < 700; i++){
+  for (let i = 0; i < 4000; i++){
     const x = bb.x0 + Math.random() * w;
     const y = bb.y0 + Math.random() * h;
     if (pointInPoly(x, y, poly)) return { x, y };
   }
-  return { x: S/2, y: S/2 };
+  const cx = poly.reduce((s,v)=>s+v.x, 0) / poly.length;
+  const cy = poly.reduce((s,v)=>s+v.y, 0) / poly.length;
+  return { x: cx, y: cy };
 }
 
 /* ==========================================================================
@@ -750,16 +844,16 @@ function foldAxis(v){
 }
 
 const TARGET_LEN = 5200;
-const LEN_MIN    = 4900;
-const LEN_MAX    = 5500;
+const LEN_MIN    = 4800;
+const LEN_MAX    = 5600;
 
 function buildBilliardPath(start, target){
-  let best = null;
-  let bestDelta = Infinity;
+  let bestValid = null;
+  let bestValidDelta = Infinity;
 
-  for (let attempt = 0; attempt < 3000; attempt++){
-    const ix = Math.floor(Math.random() * 36) - 18;
-    const iy = Math.floor(Math.random() * 36) - 18;
+  for (let attempt = 0; attempt < 20000; attempt++){
+    const ix = Math.floor(Math.random() * 60) - 30;
+    const iy = Math.floor(Math.random() * 60) - 30;
     if (ix === 0 && iy === 0) continue;
 
     const sx = Math.random() < 0.5 ? -1 : 1;
@@ -820,28 +914,74 @@ function buildBilliardPath(start, target){
       const d = Math.hypot(pts[i].x - pts[i-1].x, pts[i].y - pts[i-1].y);
       if (d < minSeg) minSeg = d;
     }
-    if (minSeg < 28) continue;
+    if (minSeg < 26) continue;
 
     const cum = [0];
     for (let i = 1; i < pts.length; i++){
       cum.push(cum[i-1] + Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y));
     }
     const total = cum[cum.length - 1];
-    const delta = Math.abs(total - TARGET_LEN);
+    if (total < LEN_MIN) continue;
 
-    if (delta < bestDelta){
-      bestDelta = delta;
-      best = { pts, cum, total };
+    const delta = Math.abs(total - TARGET_LEN);
+    if (delta < bestValidDelta){
+      bestValidDelta = delta;
+      bestValid = { pts, cum, total };
     }
 
-    if (bestDelta < 50) break;
+    if (bestValidDelta < 50) break;
   }
 
-  if (best) return best;
+  if (bestValid) return bestValid;
 
-  const pts = [{x:start.x, y:start.y}, {x:target.x, y:target.y}];
-  const d = Math.hypot(target.x-start.x, target.y-start.y);
-  return { pts, cum:[0,d], total:d };
+  // Forced fallback with a long unfolded target
+  {
+    const angle = Math.random() * Math.PI * 2;
+    const d = LEN_MIN + Math.random() * (LEN_MAX - LEN_MIN) * 0.5;
+    const uxIdeal = start.x + d * Math.cos(angle);
+    const uyIdeal = start.y + d * Math.sin(angle);
+    const sx = Math.random() < 0.5 ? -1 : 1;
+    const sy = Math.random() < 0.5 ? -1 : 1;
+    const ix = Math.round((uxIdeal - sx * target.x) / (2 * S));
+    const iy = Math.round((uyIdeal - sy * target.y) / (2 * S));
+    const U = { x: sx*target.x + 2*S*ix, y: sy*target.y + 2*S*iy };
+    const dx = U.x - start.x;
+    const dy = U.y - start.y;
+
+    const cuts = [];
+    if (Math.abs(dx) > 1e-6){
+      const k0 = Math.ceil(Math.min(start.x, U.x) / S);
+      const k1 = Math.floor(Math.max(start.x, U.x) / S);
+      for (let k = k0; k <= k1; k++){
+        const t = (k*S - start.x) / dx;
+        if (t > 1e-4 && t < 1 - 1e-4) cuts.push({ t });
+      }
+    }
+    if (Math.abs(dy) > 1e-6){
+      const k0 = Math.ceil(Math.min(start.y, U.y) / S);
+      const k1 = Math.floor(Math.max(start.y, U.y) / S);
+      for (let k = k0; k <= k1; k++){
+        const t = (k*S - start.y) / dy;
+        if (t > 1e-4 && t < 1 - 1e-4) cuts.push({ t });
+      }
+    }
+
+    cuts.sort((a,b) => a.t - b.t);
+
+    const pts = [{ x: start.x, y: start.y }];
+    for (const c of cuts){
+      const ux = start.x + dx * c.t;
+      const uy = start.y + dy * c.t;
+      pts.push({ x: foldAxis(ux), y: foldAxis(uy) });
+    }
+    pts.push({ x: target.x, y: target.y });
+
+    const cum = [0];
+    for (let i = 1; i < pts.length; i++){
+      cum.push(cum[i-1] + Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y));
+    }
+    return { pts, cum, total: cum[cum.length-1] };
+  }
 }
 
 function pointAtPath(p, d){
@@ -871,17 +1011,24 @@ const payoutOut = document.getElementById('payoutOut');
 const banner    = document.getElementById('banner');
 const cheatBtn  = document.getElementById('cheatBtn');
 const sliderBox = document.getElementById('sliderBox');
+const speedRow  = document.getElementById('speedRow');
 const betBox    = document.getElementById('betBox');
 const betField  = document.getElementById('betField');
 const miniBtns  = Array.prototype.slice.call(document.querySelectorAll('.mini'));
+const speedPills = Array.prototype.slice.call(document.querySelectorAll('.speed-pill'));
 
 function multiplierFor(c){ return (1 - HOUSE) / c; }
+
+function formatChance(percent){
+  if (percent < 1) return percent.toFixed(2) + '%';
+  if (percent < 10) return percent.toFixed(1) + '%';
+  return Math.round(percent) + '%';
+}
 
 function syncSliderFill(){
   const min = +slider.min, max = +slider.max, v = +slider.value;
   const pct = ((v - min) / (max - min)) * 100;
 
-  // gradient uses the live chance color for the filled portion
   const hue = chanceToHue(G.shown);
   const [r,g,b] = hslToRgb(hue, 70, 55);
   const fill = 'rgb(' + r + ',' + g + ',' + b + ')';
@@ -891,28 +1038,30 @@ function syncSliderFill(){
     'linear-gradient(90deg,' + fill + ' 0%,' + fillLight + ' ' + pct.toFixed(1) + '%,' +
     'rgba(255,255,255,.075) ' + pct.toFixed(1) + '%,rgba(255,255,255,.075) 100%)');
 
-  // thumb glow uses the chance color too
   slider.style.setProperty('--thumb-glow',
     'rgba(' + r + ',' + g + ',' + b + ',.35)');
+}
+
+function syncFieldColorUI(){
+  const hue = chanceToHue(G.shown);
+  const [r,g,b] = hslToRgb(hue, 68, 62);
+  chanceOut.style.color = 'rgb(' + r + ',' + g + ',' + b + ')';
+  chanceOut.style.textShadow = '0 0 16px rgba(' + r + ',' + g + ',' + b + ',.45)';
+  syncSliderFill();
 }
 
 function syncUI(){
   const m = multiplierFor(G.chance);
   balOut.textContent    = Math.floor(G.balance).toLocaleString();
-  chanceOut.textContent = Math.round(G.chance * 100) + '%';
+  chanceOut.textContent = formatChance(G.chance * 100);
   multOut.textContent   = m.toFixed(2) + '×';
   payoutOut.textContent = Math.floor(G.bet * m).toLocaleString();
 
-  // accent the chance stat with the field color
-  const hue = chanceToHue(G.shown);
-  const [r,g,b] = hslToRgb(hue, 68, 62);
-  chanceOut.style.color = 'rgb(' + r + ',' + g + ',' + b + ')';
-  chanceOut.style.textShadow = '0 0 16px rgba(' + r + ',' + g + ',' + b + ',.45)';
-
-  syncSliderFill();
+  syncFieldColorUI();
 
   const locked = (G.state !== 'idle');
   sliderBox.classList.toggle('locked', locked);
+  speedRow.classList.toggle('locked', locked);
   betBox.classList.toggle('locked', locked);
   betField.classList.toggle('locked', locked);
   miniBtns.forEach(b => b.classList.toggle('locked', locked));
@@ -922,7 +1071,10 @@ function syncUI(){
 slider.addEventListener('input', function(){
   const v = Math.max(MIN_CHANCE, Math.min(MAX_CHANCE, +slider.value));
   G.chance = v / 100;
-  syncUI();
+  const m = multiplierFor(G.chance);
+  chanceOut.textContent = formatChance(G.chance * 100);
+  multOut.textContent   = m.toFixed(2) + '×';
+  payoutOut.textContent = Math.floor(G.bet * m).toLocaleString();
 });
 
 betInput.addEventListener('input', function(){
@@ -949,6 +1101,22 @@ miniBtns.forEach(function(btn){
   });
 });
 
+speedPills.forEach(function(pill){
+  pill.addEventListener('click', function(){
+    if (G.state !== 'idle') return;
+    G.speedMode = pill.dataset.speed;
+    speedPills.forEach(p => p.classList.toggle('active', p === pill));
+    try { localStorage.setItem('dllump_ice_speed', G.speedMode); } catch(_){}
+  });
+});
+try {
+  const savedSpeed = localStorage.getItem('dllump_ice_speed');
+  if (savedSpeed && SPEED_MULT[savedSpeed]){
+    G.speedMode = savedSpeed;
+    speedPills.forEach(p => p.classList.toggle('active', p.dataset.speed === savedSpeed));
+  }
+} catch(_){}
+
 let cheatOn = false;
 try { cheatOn = localStorage.getItem('dllump_ice_cheat') === '1'; } catch(_){}
 function applyCheat(){ cheatBtn.classList.toggle('on', cheatOn); }
@@ -974,11 +1142,9 @@ function showBanner(text, win){
 function startRoll(){
   if (G.state !== 'idle') return;
 
-  if (Math.abs(G.chance - G.shown) > 0.0006){
-    G.chance = G.shown;
-    slider.value = Math.round(G.chance * 100);
-    syncUI();
-  }
+  G.shown = G.chance;
+  G.shownVel = 0;
+  recomputeField();
 
   if (G.bet < 1){ G.bet = 10; betInput.value = 10; syncUI(); return; }
   if (G.bet > G.balance) return;
@@ -995,15 +1161,15 @@ function startRoll(){
   const path   = buildBilliardPath({ x: S/2, y: S/2 }, target);
   G.path       = path;
 
-  G.duration = TOTAL_DURATION;
+  G.duration = TOTAL_DURATION * (SPEED_MULT[G.speedMode] || 1);
 
   const dx = path.pts[1].x - path.pts[0].x;
   const dy = path.pts[1].y - path.pts[0].y;
   G.spinFinalAngle = Math.atan2(dy, dx);
-  G.spinExtraTurns = 4;
+  G.spinExtraTurns = 3 + Math.floor(Math.random() * 4);
   G.spinArrowAngle = G.spinFinalAngle - G.spinExtraTurns * 2 * Math.PI;
   G.spinStart      = performance.now();
-  G.spinDuration   = 1.9;
+  G.spinDuration   = 1.7 + Math.random() * 0.5;
 
   G.rollStart = 0;
   G.state     = 'spinning';
@@ -1016,6 +1182,7 @@ function startRoll(){
   G.zoom = 1;
   G.zoomCenterX = S/2;
   G.zoomCenterY = S/2;
+  G.zoomAtStop = 1;
 
   playBtn.disabled = true;
   banner.classList.remove('show');
@@ -1027,6 +1194,7 @@ function finishRoll(){
   G.state = 'done';
   G.flashT = performance.now();
   G.stopPopStart = performance.now();
+  G.zoomAtStop = G.zoom;
 
   if (G.outcome){
     const payout = Math.floor(G.rollBet * G.rollMult);
@@ -1048,6 +1216,9 @@ function finishRoll(){
     G.puckAlpha = 0;
     G.puckScale = 0.55;
     G.stopPopStart = 0;
+    G.zoom = 1;
+    G.zoomCenterX = S/2;
+    G.zoomCenterY = S/2;
 
     playBtn.disabled = false;
 
@@ -1065,25 +1236,22 @@ function finishRoll(){
 playBtn.addEventListener('click', startRoll);
 
 /* ==========================================================================
-   PUCK POP ANIMATION (when the puck stops)
+   PUCK POP ANIMATION
    ========================================================================== */
 function puckPopScale(t){
-  // t = 0 → 1 over G.stopPopDuration
   if (t <= 0) return 1;
   if (t >= 1) return 1;
   if (t < 0.28){
-    // quick expansion 1 → 1.55
     const k = t / 0.28;
     return 1 + 0.58 * (1 - Math.pow(1 - k, 2));
   }
-  // elastic settle back to 1
   const k = (t - 0.28) / 0.72;
   const decay = Math.pow(1 - k, 2.1);
   return 1 + 0.58 * decay * Math.cos(k * Math.PI * 2.3);
 }
 
 /* ==========================================================================
-   PUCK DRAW — liquid glass
+   PUCK DRAW
    ========================================================================== */
 const PUCK_OPTS = {
   rimRatio: 0.44, outerRatio: 0.32,
@@ -1194,53 +1362,52 @@ function drawPuck(c, x, y, r){
    ========================================================================== */
 function drawSpinArrow(c){
   const cx = S/2, cy = S/2;
-  const ang = G.spinArrowAngle;
-
-  const TRAIL = 16;
-  c.save();
-  c.lineCap = 'round';
-  for (let i = TRAIL; i >= 1; i--){
-    const a = ang - i * 0.13;
-    const alpha = (1 - i / TRAIL) * 0.18;
-    c.strokeStyle = 'rgba(180,215,255,' + alpha.toFixed(3) + ')';
-    c.lineWidth = 8 * (1 - i / TRAIL) + 1;
-    c.beginPath();
-    c.moveTo(cx + Math.cos(a) * 26, cy + Math.sin(a) * 26);
-    c.lineTo(cx + Math.cos(a) * 96, cy + Math.sin(a) * 96);
-    c.stroke();
-  }
-  c.restore();
+  const puckR = PUCK_R * G.puckScale;
+  const orbit = puckR + 4;
+  const triSize = Math.min(S * 0.035, 10);
+  const tipOffset = triSize * 0.4;
 
   c.save();
   c.translate(cx, cy);
-  c.rotate(ang);
+  c.rotate(G.spinArrowAngle);
+  c.translate(orbit, 0);
 
-  c.shadowColor = 'rgba(180,215,255,0.95)';
-  c.shadowBlur = 18;
-  c.strokeStyle = 'rgba(255,255,255,0.94)';
-  c.lineWidth = 4.6;
-  c.lineCap = 'round';
   c.beginPath();
-  c.moveTo(24, 0);
-  c.lineTo(88, 0);
+  c.moveTo(tipOffset, 0);
+  c.lineTo(-tipOffset * 0.3, -triSize * 0.5);
+  c.lineTo(-tipOffset * 0.3,  triSize * 0.5);
+  c.closePath();
+
+  c.fillStyle = '#e8f4ff';
+  c.shadowColor = 'rgba(180,210,255,.9)';
+  c.shadowBlur = 14;
+  c.fill();
+  c.shadowBlur = 0;
+
+  c.strokeStyle = 'rgba(180,210,255,.45)';
+  c.lineWidth = 1;
   c.stroke();
 
-  c.fillStyle = '#ffffff';
-  c.beginPath();
-  c.moveTo(112, 0);
-  c.lineTo(88, -11);
-  c.lineTo(88, 11);
-  c.closePath();
-  c.fill();
   c.restore();
+}
 
+/* ==========================================================================
+   EMPTY REGION CROSS
+   ========================================================================== */
+function drawEmptyCross(c, x, y, size){
+  if (size < 4) return;
   c.save();
-  c.fillStyle = 'rgba(255,255,255,0.92)';
-  c.shadowColor = 'rgba(180,215,255,0.9)';
-  c.shadowBlur = 12;
+  c.strokeStyle = 'rgba(255,255,255,0.52)';
+  c.lineWidth = Math.max(1.4, size * 0.13);
+  c.lineCap = 'round';
+  c.shadowColor = 'rgba(200,220,255,0.5)';
+  c.shadowBlur = size * 0.45;
   c.beginPath();
-  c.arc(cx, cy, 5.5, 0, Math.PI*2);
-  c.fill();
+  c.moveTo(x - size * 0.30, y - size * 0.30);
+  c.lineTo(x + size * 0.30, y + size * 0.30);
+  c.moveTo(x + size * 0.30, y - size * 0.30);
+  c.lineTo(x - size * 0.30, y + size * 0.30);
+  c.stroke();
   c.restore();
 }
 
@@ -1269,13 +1436,11 @@ function draw(now){
     c.translate(-G.zoomCenterX, -G.zoomCenterY);
   }
 
-  /* ---- rink base fill ---- */
   c.save();
   c.fillStyle = '#070b14';
   c.fill(RINK_PATH);
   c.restore();
 
-  /* ---- clipped interior ---- */
   c.save();
   c.clip(RINK_PATH);
 
@@ -1286,10 +1451,11 @@ function draw(now){
   c.fillStyle = bg;
   c.fillRect(0, 0, S, S);
 
-  /* ---- LOSE region (empty space) ---- */
+  /* ---- EMPTY region ---- */
   if (G.losePoly && G.losePoly.length >= 3){
     const lp = polyToPath(G.losePoly);
     const lbb = bboxOf(G.losePoly);
+    const lw = lbb.x1 - lbb.x0, lh = lbb.y1 - lbb.y0;
 
     const lg = c.createLinearGradient(lbb.x0, lbb.y0, lbb.x1, lbb.y1);
     lg.addColorStop(0,   '#10131c');
@@ -1298,23 +1464,48 @@ function draw(now){
     c.fillStyle = lg;
     c.fill(lp);
 
-    c.strokeStyle = 'rgba(255,140,155,0.18)';
+    c.strokeStyle = 'rgba(255,255,255,0.10)';
     c.lineWidth = 1.2;
     c.lineJoin = 'round';
     c.stroke(lp);
 
-    const lw = lbb.x1 - lbb.x0, lh = lbb.y1 - lbb.y0;
-    if (lw > 80 && lh > 46){
-      const lc = centroidOf(G.losePoly);
+    const lc = labelCenter(G.losePoly);
+
+    if (lw > 90 && lh > 90){
+      const crossSize = Math.min(18, Math.min(lw, lh) * 0.14);
+      drawEmptyCross(c, lc.x, lc.y - lh * 0.22, crossSize);
+
       c.textAlign = 'center';
       c.textBaseline = 'middle';
-      c.fillStyle = 'rgba(255,140,155,0.42)';
-      c.font = '800 11px -apple-system,system-ui,sans-serif';
-      c.fillText('L O S E', lc.x, lc.y);
+      c.fillStyle = 'rgba(230,240,255,0.72)';
+      c.font = '800 10.5px -apple-system,system-ui,sans-serif';
+      c.fillText('E M P T Y', lc.x, lc.y - lh * 0.02);
+
+      if (EMPTY_GIF.complete && EMPTY_GIF.naturalWidth > 0){
+        const gs = Math.min(46, lh * 0.28, lw * 0.28);
+        c.save();
+        c.globalAlpha = 0.92;
+        c.drawImage(EMPTY_GIF, lc.x - gs * 0.5, lc.y + lh * 0.06, gs, gs);
+        c.restore();
+      }
+    } else if (lw > 50 && lh > 50){
+      const crossSize = Math.min(14, Math.min(lw, lh) * 0.18);
+      drawEmptyCross(c, lc.x, lc.y - lh * 0.10, crossSize);
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillStyle = 'rgba(230,240,255,0.65)';
+      c.font = '800 8.5px -apple-system,system-ui,sans-serif';
+      c.fillText('EMPTY', lc.x, lc.y + lh * 0.14);
+    } else if (lw > 30 && lh > 30){
+      const crossSize = Math.min(12, Math.min(lw, lh) * 0.28);
+      drawEmptyCross(c, lc.x, lc.y, crossSize);
+    } else {
+      const crossSize = Math.min(9, Math.min(lw, lh) * 0.35);
+      drawEmptyCross(c, lc.x, lc.y, crossSize);
     }
   }
 
-  /* ---- WIN region (color reflects chance) ---- */
+  /* ---- WIN region ---- */
   if (G.winPoly && G.winPoly.length >= 3){
     const wp = polyToPath(G.winPoly);
     const wbb = bboxOf(G.winPoly);
@@ -1341,6 +1532,7 @@ function draw(now){
     for (const corner of corners){
       if (!corner) continue;
       const br = Math.min(30, Math.min(wbb.x1-wbb.x0, wbb.y1-wbb.y0) * 0.28);
+      if (br <= 1) continue;
       const rg = c.createRadialGradient(corner.x, corner.y, 0, corner.x, corner.y, br);
       rg.addColorStop(0,    'rgba(255,255,255,0.46)');
       rg.addColorStop(0.45, 'rgba(255,255,255,0.13)');
@@ -1351,11 +1543,13 @@ function draw(now){
       c.fill();
     }
 
+    const wc = labelCenter(G.winPoly);
     const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
+
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+
     if (ww > 80 && wh > 60){
-      const wc = centroidOf(G.winPoly);
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
       c.fillStyle = 'rgba(255,255,255,0.92)';
       c.font = '800 10.5px -apple-system,system-ui,sans-serif';
       c.fillText('W I N', wc.x, wc.y - 15);
@@ -1363,16 +1557,16 @@ function draw(now){
       c.font = '900 24px -apple-system,system-ui,sans-serif';
       c.fillText('×' + m.toFixed(2), wc.x, wc.y + 11);
     } else if (ww > 46 && wh > 30){
-      const wc = centroidOf(G.winPoly);
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
       c.fillStyle = 'rgba(255,255,255,1)';
       c.font = '900 15px -apple-system,system-ui,sans-serif';
       c.fillText('×' + m.toFixed(2), wc.x, wc.y);
+    } else if (ww > 26 && wh > 18){
+      c.fillStyle = 'rgba(255,255,255,0.95)';
+      c.font = '900 10px -apple-system,system-ui,sans-serif';
+      c.fillText('×' + m.toFixed(1), wc.x, wc.y);
     }
   }
 
-  /* ---- result flash ---- */
   if (G.state === 'done'){
     const age = (now - G.flashT) / 1000;
     if (age < 1.0){
@@ -1384,16 +1578,9 @@ function draw(now){
     }
   }
 
-  c.restore(); /* unclip */
+  c.restore();
 
-  /* ============================================================
-     RINK BORDER — exact main index style:
-       - 22px soft blue glow
-       - 10px mid blue ring
-       - 3.2px bright white edge
-       - inner ring (offset 96.5%): 1.2px white + 6px faint blue
-     ============================================================ */
-  // 1. thick soft blue glow
+  /* ---- rink border ---- */
   c.save();
   c.shadowColor = 'rgba(140,180,255,0.55)';
   c.shadowBlur  = 38;
@@ -1403,7 +1590,6 @@ function draw(now){
   c.stroke(RINK_PATH);
   c.restore();
 
-  // 2. mid blue ring
   c.save();
   c.shadowColor = 'rgba(120,170,255,0.55)';
   c.shadowBlur  = 20;
@@ -1413,7 +1599,6 @@ function draw(now){
   c.stroke(RINK_PATH);
   c.restore();
 
-  // 3. bright white edge
   c.save();
   c.shadowColor = 'rgba(255,255,255,0.95)';
   c.shadowBlur  = 14;
@@ -1423,7 +1608,6 @@ function draw(now){
   c.stroke(RINK_PATH);
   c.restore();
 
-  // 4. inner rings
   c.save();
   c.strokeStyle = 'rgba(255,255,255,0.28)';
   c.lineWidth   = 1.2;
@@ -1438,47 +1622,22 @@ function draw(now){
   c.stroke(INNER_PATH);
   c.restore();
 
-  /* ---- spin arrow ---- */
   if (G.state === 'spinning'){
     drawSpinArrow(c);
   }
 
-  /* ---- puck + stop pop ---- */
   if (G.puckAlpha > 0.01){
     let popScale = 1;
-    let ringAlpha = 0;
-    let ringR = 0;
-
     if (G.state === 'done' && G.stopPopStart > 0){
       const age = (now - G.stopPopStart) / 1000;
       const t = Math.min(1, age / G.stopPopDuration);
       popScale = puckPopScale(t);
-
-      // expanding ring after stop
-      const rAge = age / 0.8;
-      if (rAge < 1){
-        ringAlpha = (1 - rAge) * 0.65;
-        ringR = PUCK_R * G.puckScale * popScale * (1 + rAge * 4.5);
-      }
     }
 
     c.save();
     c.globalAlpha = G.puckAlpha;
     drawPuck(c, G.puck.x, G.puck.y, PUCK_R * G.puckScale * popScale);
     c.restore();
-
-    // expanding ring drawn on top
-    if (ringAlpha > 0.001){
-      c.save();
-      c.strokeStyle = 'rgba(200,225,255,' + ringAlpha.toFixed(3) + ')';
-      c.lineWidth = 3.2 * (1 - ringAlpha/0.65) + 0.5;
-      c.shadowColor = 'rgba(180,215,255,' + ringAlpha.toFixed(3) + ')';
-      c.shadowBlur = 14;
-      c.beginPath();
-      c.arc(G.puck.x, G.puck.y, ringR, 0, Math.PI*2);
-      c.stroke();
-      c.restore();
-    }
   }
 
   if (zoomActive){
@@ -1500,16 +1659,16 @@ function frame(now){
   lastT = now;
 
   if (G.state === 'idle'){
-    const d = G.chance - G.shown;
-    if (Math.abs(d) > 0.00008){
-      G.shown += d * (1 - Math.exp(-dt * 14));
-      if (Math.abs(G.chance - G.shown) < 0.00008) G.shown = G.chance;
-      syncSliderFill();
-    }
-  }
+    const before = G.shown;
+    stepFieldSpring(dt);
 
-  if (Math.abs(G.shown - G.lastShown) > 0.0012){
-    recomputeField();
+    if (Math.abs(G.shown - before) > 0.00005){
+      syncFieldColorUI();
+    }
+
+    if (Math.abs(G.shown - G.lastShown) > 0.0008){
+      recomputeField();
+    }
   }
 
   if (G.state === 'spinning'){
@@ -1543,13 +1702,14 @@ function frame(now){
 
     if (G.puckScale < 1) G.puckScale = Math.min(1, G.puckScale + dt * 3.4);
 
-    // camera zoom: engage after FAST_DURATION + ZOOM_DELAY
-    const zoomEngageAt = FAST_DURATION + ZOOM_DELAY;
-    const zoomTarget   = (elapsed > zoomEngageAt) ? ZOOM_MAX : 1;
-    if (zoomTarget > G.zoom){
-      G.zoom += (zoomTarget - G.zoom) * Math.min(1, dt * ZOOM_IN_RATE);
-    } else if (zoomTarget < G.zoom){
-      G.zoom += (zoomTarget - G.zoom) * Math.min(1, dt * ZOOM_OUT_RATE);
+    /* -------- ZOOM IN: starts ZOOM_LEAD seconds before puck stops -------- */
+    const zoomStartAt = Math.max(0, G.duration - ZOOM_LEAD);
+    if (elapsed >= zoomStartAt){
+      const zp = Math.min(1, (elapsed - zoomStartAt) / ZOOM_IN_DURATION);
+      const ze = easeOutCubic(zp);
+      G.zoom = 1 + (ZOOM_MAX - 1) * ze;
+    } else {
+      G.zoom = 1;
     }
 
     if (G.zoom > 1.002){
@@ -1560,9 +1720,20 @@ function frame(now){
   }
 
   if (G.state === 'done'){
+    /* -------- ZOOM OUT: hold briefly, then ease smoothly back to 1 -------- */
+    const sinceStop = (now - G.stopPopStart) / 1000;
+    if (sinceStop < ZOOM_OUT_DELAY){
+      G.zoom = G.zoomAtStop;
+    } else {
+      const t = Math.min(1, (sinceStop - ZOOM_OUT_DELAY) / ZOOM_OUT_DURATION);
+      const e = easeInOutCubic(t);
+      G.zoom = G.zoomAtStop - (G.zoomAtStop - 1) * e;
+    }
+
     if (G.zoom > 1.002){
-      G.zoom += (1 - G.zoom) * Math.min(1, dt * ZOOM_OUT_RATE);
-      if (G.zoom < 1.002) G.zoom = 1;
+      const followRate = Math.min(1, dt * 9);
+      G.zoomCenterX += (G.puck.x - G.zoomCenterX) * followRate;
+      G.zoomCenterY += (G.puck.y - G.zoomCenterY) * followRate;
     }
   }
 
@@ -1571,11 +1742,7 @@ function frame(now){
     if (G.puckAlpha < 1) G.puckAlpha = Math.min(1, G.puckAlpha + dt * 3.4);
     G.puck.x += (S/2 - G.puck.x) * Math.min(1, dt * 12);
     G.puck.y += (S/2 - G.puck.y) * Math.min(1, dt * 12);
-
-    if (G.zoom > 1.002){
-      G.zoom += (1 - G.zoom) * Math.min(1, dt * ZOOM_OUT_RATE);
-      if (G.zoom < 1.002) G.zoom = 1;
-    }
+    G.zoom = 1;
   }
 
   draw(now);
