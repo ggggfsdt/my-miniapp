@@ -43,7 +43,6 @@
   }
   #app > *{position:relative;z-index:1}
 
-  /* ---------- top bar ---------- */
   #top{
     display:flex;align-items:center;justify-content:space-between;
     padding:calc(14px + var(--safe-t)) 14px 6px;flex-shrink:0;
@@ -90,14 +89,12 @@
                    50%{filter:drop-shadow(0 0 18px rgba(200,168,78,.75)) brightness(1.15)}}
   #balOut{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
 
-  /* ---------- stage ---------- */
   #stage{
     flex:1;position:relative;display:flex;align-items:center;justify-content:center;
     padding:6px;min-height:0;
   }
   #cv{display:block;border-radius:26px;touch-action:none}
 
-  /* ---------- result banner ---------- */
   #banner{
     position:absolute;left:50%;top:50%;z-index:6;pointer-events:none;
     transform:translate(-50%,-50%) scale(.6);opacity:0;
@@ -110,7 +107,6 @@
   #banner.win{color:#bfe0ff;text-shadow:0 0 34px rgba(91,157,255,.9),0 4px 24px rgba(0,0,0,.9)}
   #banner.lose{color:#ff9aa8;text-shadow:0 0 30px rgba(224,85,107,.75),0 4px 24px rgba(0,0,0,.9)}
 
-  /* ---------- panel ---------- */
   #panel{
     flex-shrink:0;padding:4px 14px calc(14px + var(--safe-b));
     display:flex;flex-direction:column;gap:10px;
@@ -133,7 +129,6 @@
   .stat .val.gold{color:var(--gold);text-shadow:0 0 16px rgba(240,208,128,.35)}
   .stat .val.blue{color:#9cc6ff}
 
-  /* slider */
   .slider-box{
     background:var(--panel);border:.5px solid var(--border);border-radius:16px;
     padding:10px 14px 6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
@@ -170,7 +165,6 @@
     font-size:8.5px;font-weight:800;letter-spacing:1.2px;color:var(--text3);
     margin-top:-2px;padding:0 2px}
 
-  /* bet row */
   .bet-box{display:flex;gap:6px;align-items:stretch}
   .bet-field{
     flex:1;display:flex;align-items:center;gap:8px;padding:0 12px;
@@ -278,14 +272,14 @@
    CONFIG
    ========================================================================== */
 const S          = 400;      // logical arena size
-const R          = 32;       // corner radius — proper rounded square
+const R          = 32;       // corner radius — rounded square
 const PUCK_R     = 22;       // liquid-glass puck radius
 const HOUSE      = 0.03;
 const MIN_CHANCE = 2;
 const MAX_CHANCE = 95;
 
 /* ==========================================================================
-   RINK PERIMETER (rounded square)
+   RINK PERIMETER
    ========================================================================== */
 function buildPerimeter(size, r, N){
   const segs = [];
@@ -433,16 +427,12 @@ function lighten(hex, amt){
   return rgbToHex(r, g, b);
 }
 
-/* ---------- chance → color ----------------------------------------------
-   Lower chance (risky)  → red
-   Mid chance            → orange
-   Higher chance (safe)  → green
-   ------------------------------------------------------------------------ */
+/* Chance → hue:  0.02 red  →  0.5 orange  →  0.95 green */
 function chanceToHex(chance){
   const c = Math.max(0, Math.min(1, chance));
   let hue;
-  if (c <= 0.5) hue = (c / 0.5) * 35;                 // 0 (red)  → 35 (orange)
-  else          hue = 35 + ((c - 0.5) / 0.5) * 95;    // 35 (orange) → 130 (green)
+  if (c <= 0.5) hue = (c / 0.5) * 35;                // red → orange
+  else          hue = 35 + ((c - 0.5) / 0.5) * 95;   // orange → green
   const [r,g,b] = hslToRgb(hue, 62, 52);
   return rgbToHex(r, g, b);
 }
@@ -462,7 +452,7 @@ function findBboxCorners(poly){
 }
 
 /* ==========================================================================
-   POLYGON SPLIT — organic angled cut
+   POLYGON SPLIT
    ========================================================================== */
 function splitPolygon(poly, ax, ay, bx, by){
   const dx = bx - ax, dy = by - ay;
@@ -531,7 +521,6 @@ function pickCut(poly, angle, targetRatio){
       best = { win: A, lose: B };
     }
 
-    // mid ↑  →  A shrinks (ratio ↓)
     if (ratio > targetRatio) lo = mid;
     else                     hi = mid;
 
@@ -569,7 +558,7 @@ const G = {
   spinExtraTurns: 4,
 
   rollStart: 0,
-  duration: 4,             // computed from path length + fixed peak speed
+  duration: 5.0,           // ALWAYS 5 seconds (4 fast + 1 slow)
 
   outcome: false,
   rollMult: 2,
@@ -601,6 +590,29 @@ function resize(){
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
+}
+
+/* ==========================================================================
+   MOTION PROFILE
+   --------------------------------------------------------------------------
+   FIXED every round:
+     - 4.0 s at constant top speed (puck launches instantly at full speed)
+     - 1.0 s decelerating smoothly to a full stop
+     - total 5.0 s
+   The fast phase covers 90% of the path; the slow phase covers the last 10%.
+   The velocity is continuous at the phase boundary (no visible jump).
+   ========================================================================== */
+const FAST_DURATION  = 4.0;
+const SLOW_DURATION  = 1.0;
+const TOTAL_DURATION = FAST_DURATION + SLOW_DURATION;   // 5.0
+const FAST_FRAC      = 0.90;                            // 90% of path in fast phase
+const SLOW_EXP       = 2.25;                            // (1-FAST_FRAC)/(1-FAST_DURATION/TOTAL_DURATION) tuned for smooth handoff
+
+function distFrac(u){
+  const u1 = FAST_DURATION / TOTAL_DURATION;             // 0.8
+  if (u <= u1) return (u / u1) * FAST_FRAC;              // straight line — constant velocity
+  const t = (u - u1) / (1 - u1);
+  return FAST_FRAC + (1 - FAST_FRAC) * (1 - Math.pow(1 - t, SLOW_EXP));
 }
 
 /* ==========================================================================
@@ -854,20 +866,6 @@ cheatBtn.addEventListener('click', function(){
 applyCheat();
 
 /* ==========================================================================
-   MOTION PROFILE — same peak speed and same decel curve every round
-   ========================================================================== */
-const V_PEAK = 420;                       // constant linear speed during hold phase
-const U1     = 0.50;                       // 50% of time in fast phase
-const Q      = 1.55;                       // decel curve exponent
-const DENOM  = U1 + (1 - U1) / (Q + 1);    // normalization so distFrac(1) = 1
-
-function distFrac(u){
-  if (u <= U1) return u / DENOM;
-  const w = (u - U1) / (1 - U1);
-  return (U1 + (1 - U1) * (1 - Math.pow(1 - w, Q + 1)) / (Q + 1)) / DENOM;
-}
-
-/* ==========================================================================
    ROLL
    ========================================================================== */
 function showBanner(text, win){
@@ -892,7 +890,6 @@ function startRoll(){
   if (G.bet > G.balance) return;
   if (!G.winPoly || !G.losePoly) return;
 
-  // --- outcome ---
   G.outcome  = cheatOn ? true : (Math.random() < G.chance);
   G.rollMult = multiplierFor(G.chance);
   G.rollBet  = Math.min(G.bet, Math.floor(G.balance));
@@ -904,10 +901,9 @@ function startRoll(){
   const path   = buildBilliardPath({ x: S/2, y: S/2 }, target);
   G.path       = path;
 
-  // same peak speed → duration scales with path length only
-  G.duration = path.total / (V_PEAK * DENOM);
+  // duration is FIXED — always 5 seconds (4 fast + 1 slow)
+  G.duration = TOTAL_DURATION;
 
-  // spin arrow direction matches the first segment of the path
   const dx = path.pts[1].x - path.pts[0].x;
   const dy = path.pts[1].y - path.pts[0].y;
   G.spinFinalAngle = Math.atan2(dy, dx);
@@ -955,7 +951,6 @@ function finishRoll(){
 
     playBtn.disabled = false;
 
-    // new organic cut direction for the next round
     randomizeAngle();
     recomputeField();
 
@@ -970,7 +965,7 @@ function finishRoll(){
 playBtn.addEventListener('click', startRoll);
 
 /* ==========================================================================
-   PUCK DRAW — liquid-glass puck (no neon glow)
+   PUCK DRAW — liquid glass
    ========================================================================== */
 const PUCK_OPTS = {
   rimRatio: 0.44, outerRatio: 0.32,
@@ -1143,8 +1138,6 @@ function draw(now){
   c.scale(scale, scale);
 
   const m = multiplierFor(G.chance);
-
-  // field color follows the *shown* chance so it morphs with the slider
   const fieldHex = chanceToHex(G.shown);
 
   /* ---- rink base ---- */
@@ -1166,7 +1159,7 @@ function draw(now){
   c.fillStyle = bg;
   c.fillRect(0, 0, S, S);
 
-  /* ---- LOSE region (empty space) ---- */
+  /* ---- LOSE region ---- */
   if (G.losePoly && G.losePoly.length >= 3){
     const lp = polyToPath(G.losePoly);
     const lbb = bboxOf(G.losePoly);
@@ -1194,7 +1187,7 @@ function draw(now){
     }
   }
 
-  /* ---- WIN region (color reflects chance) ---- */
+  /* ---- WIN region ---- */
   if (G.winPoly && G.winPoly.length >= 3){
     const wp = polyToPath(G.winPoly);
     const wbb = bboxOf(G.winPoly);
@@ -1217,7 +1210,6 @@ function draw(now){
     c.stroke(wp);
     c.restore();
 
-    // corner highlights
     const corners = findBboxCorners(G.winPoly);
     for (const corner of corners){
       if (!corner) continue;
@@ -1232,7 +1224,6 @@ function draw(now){
       c.fill();
     }
 
-    // label
     const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
     if (ww > 80 && wh > 60){
       const wc = centroidOf(G.winPoly);
@@ -1254,7 +1245,6 @@ function draw(now){
     }
   }
 
-  /* ---- result flash ---- */
   if (G.state === 'done'){
     const age = (now - G.flashT) / 1000;
     if (age < 1.0){
@@ -1278,12 +1268,10 @@ function draw(now){
   c.stroke(RINK_PATH);
   c.restore();
 
-  /* ---- spin arrow ---- */
   if (G.state === 'spinning'){
     drawSpinArrow(c);
   }
 
-  /* ---- puck ---- */
   if (G.puckAlpha > 0.01){
     c.save();
     c.globalAlpha = G.puckAlpha;
