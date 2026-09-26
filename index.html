@@ -101,12 +101,13 @@
                    50%{filter:drop-shadow(0 0 18px rgba(200,168,78,.75)) brightness(1.15)}}
   #balOut{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
 
-  /* ---------- settings panel ---------- */
   #settingsPanel{
     position:absolute;
     top:calc(54px + var(--safe-t));
     right:14px;
     width:236px;
+    max-height: 70vh;
+    overflow-y: auto;
     background:linear-gradient(180deg, rgba(28,32,44,.97), rgba(14,16,22,.98));
     border:1px solid rgba(255,255,255,.10);
     border-radius:16px;
@@ -190,6 +191,7 @@
   #stage{
     flex:1;position:relative;display:flex;align-items:center;justify-content:center;
     padding:8px;min-height:0;
+    transition:padding .3s ease;
   }
   #cv{display:block;border-radius:26px;touch-action:none}
 
@@ -205,16 +207,71 @@
   #banner.win{color:#bfe0ff;text-shadow:0 0 36px rgba(91,157,255,.95),0 4px 24px rgba(0,0,0,.9)}
   #banner.lose{color:#ff9aa8;text-shadow:0 0 32px rgba(224,85,107,.8),0 4px 24px rgba(0,0,0,.9)}
 
+  /* ---------- panel (with toggle + collapsible) ---------- */
   #panel{
     flex-shrink:0;
-    padding:10px 16px calc(16px + var(--safe-b));
-    display:flex;flex-direction:column;gap:10px;
+    padding:24px 16px calc(16px + var(--safe-b));
+    display:flex;flex-direction:column;
     position:relative;
+    transition:padding .45s cubic-bezier(.34,1.56,.64,1);
+    will-change:padding;
+  }
+  #panel.hidden{
+    padding-top:24px;
+    padding-bottom:6px;
   }
   #panel::before{
     content:'';position:absolute;left:0;right:0;top:0;height:14px;
     background:linear-gradient(180deg,rgba(6,7,12,.75),transparent);
     pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  #panel.hidden::before{opacity:0}
+
+  #panelToggle{
+    position:absolute;
+    top:0;left:50%;
+    transform:translateX(-50%);
+    width:64px;height:20px;
+    border:none;
+    border-radius:0 0 12px 12px;
+    background:linear-gradient(180deg, rgba(28,32,44,.9), rgba(14,16,22,.96));
+    color:var(--text3);
+    cursor:pointer;
+    z-index:5;
+    display:flex;align-items:center;justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+    transition:color .2s ease, background .2s ease, box-shadow .25s ease;
+    box-shadow:0 4px 12px rgba(0,0,0,.35);
+  }
+  #panelToggle:active{
+    color:var(--text);
+    background:linear-gradient(180deg, rgba(40,46,60,.96), rgba(20,24,32,.98));
+  }
+  #panelToggle svg{
+    width:14px;height:14px;
+    stroke:currentColor;fill:none;
+    stroke-width:2.5;
+    stroke-linecap:round;stroke-linejoin:round;
+    transition:transform .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  #panel.hidden #panelToggle svg{
+    transform:rotate(180deg);
+  }
+  #panelContent{
+    display:flex;flex-direction:column;gap:10px;
+    max-height: 800px;
+    opacity: 1;
+    overflow: hidden;
+    transition:max-height .45s cubic-bezier(.34,1.56,.64,1),
+               opacity .28s ease .04s;
+  }
+  #panel.hidden #panelContent{
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition:max-height .45s cubic-bezier(.34,1.56,.64,1),
+               opacity .18s ease;
   }
 
   .row-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
@@ -390,7 +447,8 @@
     .stat .val{font-size:15px}
     #playBtn{height:52px;font-size:14px}
     .bet-field input{height:42px;font-size:16px}
-    #panel{gap:8px;padding-top:8px}
+    #panelContent{gap:8px}
+    #panel{padding-top:22px}
     .speed-pill{padding:7px 0;font-size:9.5px}
   }
 </style>
@@ -443,6 +501,10 @@
       <span class="setting-label">Glow &amp; shadows</span>
       <span class="switch-sm"><span class="knob"></span></span>
     </button>
+    <button class="setting-row" data-key="bgGifs" type="button">
+      <span class="setting-label">Background GIFs</span>
+      <span class="switch-sm"><span class="knob"></span></span>
+    </button>
   </div>
 
   <div id="stage">
@@ -451,34 +513,39 @@
   </div>
 
   <div id="panel">
-    <div class="row-stats">
-      <div class="stat"><span class="lbl">Chance</span><span class="val accent" id="chanceOut">45%</span></div>
-      <div class="stat"><span class="lbl">Multiplier</span><span class="val gold" id="multOut">2.16×</span></div>
-      <div class="stat"><span class="lbl">Payout</span><span class="val" id="payoutOut">21</span></div>
-    </div>
-
-    <div class="slider-box" id="sliderBox">
-      <input id="slider" type="range" min="0.05" max="95" step="0.05" value="45">
-      <div class="slider-labels"><span>0.05%</span><span>RISK</span><span>95%</span></div>
-    </div>
-
-    <div class="speed-row" id="speedRow">
-      <button class="speed-pill" data-speed="slow" type="button">Slow</button>
-      <button class="speed-pill active" data-speed="normal" type="button">Normal</button>
-      <button class="speed-pill" data-speed="fast" type="button">Fast</button>
-    </div>
-
-    <div class="bet-box" id="betBox">
-      <div class="bet-field" id="betField">
-        <img src="https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif" alt="">
-        <input id="betInput" type="text" inputmode="numeric" autocomplete="off" value="10">
+    <button id="panelToggle" type="button" aria-label="Toggle panel">
+      <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div id="panelContent">
+      <div class="row-stats">
+        <div class="stat"><span class="lbl">Chance</span><span class="val accent" id="chanceOut">45%</span></div>
+        <div class="stat"><span class="lbl">Multiplier</span><span class="val gold" id="multOut">2.16×</span></div>
+        <div class="stat"><span class="lbl">Payout</span><span class="val" id="payoutOut">21</span></div>
       </div>
-      <button class="mini" data-act="half" type="button">½</button>
-      <button class="mini" data-act="double" type="button">2×</button>
-      <button class="mini" data-act="max" type="button">MAX</button>
-    </div>
 
-    <button id="playBtn" type="button">Upgrade</button>
+      <div class="slider-box" id="sliderBox">
+        <input id="slider" type="range" min="0.05" max="95" step="0.05" value="45">
+        <div class="slider-labels"><span>0.05%</span><span>RISK</span><span>95%</span></div>
+      </div>
+
+      <div class="speed-row" id="speedRow">
+        <button class="speed-pill" data-speed="slow" type="button">Slow</button>
+        <button class="speed-pill active" data-speed="normal" type="button">Normal</button>
+        <button class="speed-pill" data-speed="fast" type="button">Fast</button>
+      </div>
+
+      <div class="bet-box" id="betBox">
+        <div class="bet-field" id="betField">
+          <img src="https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif" alt="">
+          <input id="betInput" type="text" inputmode="numeric" autocomplete="off" value="10">
+        </div>
+        <button class="mini" data-act="half" type="button">½</button>
+        <button class="mini" data-act="double" type="button">2×</button>
+        <button class="mini" data-act="max" type="button">MAX</button>
+      </div>
+
+      <button id="playBtn" type="button">Upgrade</button>
+    </div>
   </div>
 </div>
 
@@ -500,16 +567,25 @@ const EMPTY_GIF_URL = 'https://i.postimg.cc/DfYMRbty/ezgif-3ae2db2f22c213a2.gif'
 const EMPTY_GIF = new Image();
 EMPTY_GIF.src = EMPTY_GIF_URL;
 
+/* Background gifs (shown during slow phase of the roll) */
+const BG_WIN_GIF_URL  = 'https://i.postimg.cc/BQNRcBgH/ezgif-3cacf477150edf7a.gif';
+const BG_LOSE_GIF_URL = 'https://i.postimg.cc/d3jpf2cX/ezgif-33e4bfba5fa5f0a3.gif';
+const BG_WIN_GIF  = new Image();
+const BG_LOSE_GIF = new Image();
+BG_WIN_GIF.src  = BG_WIN_GIF_URL;
+BG_LOSE_GIF.src = BG_LOSE_GIF_URL;
+
 /* ==========================================================================
    SETTINGS
    ========================================================================== */
 const DEFAULT_SETTINGS = {
-  bounce:   false,   // OFF by default
-  zoom:     true,
-  pop:      true,
-  outline:  true,
-  arrow:    true,
-  glow:     true,
+  bounce:  false,
+  zoom:    true,
+  pop:     true,
+  outline: true,
+  arrow:   true,
+  glow:    true,
+  bgGifs:  false,
 };
 const settings = Object.assign({}, DEFAULT_SETTINGS);
 try {
@@ -594,19 +670,11 @@ const INNER_PATH = (function(){
 
 /* ==========================================================================
    BOUNCE PHYSICS
-   --------------------------------------------------------------------------
-   Localized "rubber wall" bounce:
-     • Each wall hit spawns a small pulse at the impact point
-     • The pulse starts at max outward displacement, then oscillates in
-       place with a damped spring (cos wave), fading quickly
-     • Spatial falloff is tight (only ~15 perimeter points reach), so it
-       reads as a dent, not a traveling wave
-     • Fast phase hits are strong, slow phase hits are gentle
    ========================================================================== */
-const BOUNCE_OMEGA   = 18;      // oscillation speed (rad/s) — 3–4 quick wobbles
-const BOUNCE_TAU     = 5.5;     // temporal decay — snappy (~0.7s total)
-const BOUNCE_SIGMA   = 0.20;    // spatial decay — very localized (~15 pts)
-const BOUNCE_MAX_T   = 0.9;     // lifetime cap
+const BOUNCE_OMEGA   = 18;
+const BOUNCE_TAU     = 5.5;
+const BOUNCE_SIGMA   = 0.20;
+const BOUNCE_MAX_T   = 0.9;
 
 const jiggleDisp = new Float32Array(N_PERIM);
 const jiggles = [];
@@ -752,6 +820,8 @@ function distToEdges(px, py, poly){
   return min;
 }
 
+/* Compute a stable visual center for a polygon. Prefers bbox center when
+   it lies inside (most visually centered), otherwise centroid. */
 function computeLabelCenter(poly){
   if (!poly || poly.length < 3) return { x: S/2, y: S/2 };
 
@@ -760,22 +830,9 @@ function computeLabelCenter(poly){
   const bcy = (bb.y0 + bb.y1) / 2;
   if (pointInPoly(bcx, bcy, poly)) return { x: bcx, y: bcy };
 
-  const w = bb.x1 - bb.x0, h = bb.y1 - bb.y0;
-  if (w > 1 && h > 1){
-    let best = null, bestD = -1;
-    const N = 28;
-    for (let iy = 1; iy < N; iy++){
-      for (let ix = 1; ix < N; ix++){
-        const x = bb.x0 + (ix / N) * w;
-        const y = bb.y0 + (iy / N) * h;
-        if (!pointInPoly(x, y, poly)) continue;
-        const d = distToEdges(x, y, poly);
-        if (d > bestD){ bestD = d; best = { x, y }; }
-      }
-    }
-    if (best) return best;
-  }
-  return centroidOf(poly);
+  const c = centroidOf(poly);
+  if (pointInPoly(c.x, c.y, poly)) return c;
+  return { x: bcx, y: bcy };
 }
 
 function polyToPath(poly){
@@ -948,10 +1005,16 @@ const G = {
   winBB: null,
   loseBB: null,
 
+  // smoothed label positions & font sizes (prevents jitter during morph)
+  winLabel: { x: S/2, y: S/4 },
+  loseLabel: { x: S/2, y: S*0.75 },
+  winFontPx: 24,
+  loseFontPx: 24,
+
   state: 'idle',
   puck: { x: S/2, y: S/2 },
-  puckScale: 1,
-  puckAlpha: 1,
+  puckScale: 0.55,
+  puckAlpha: 0,
 
   path: null,
 
@@ -978,6 +1041,9 @@ const G = {
   outcome: false,
   rollMult: 2,
   rollBet: 10,
+
+  bgGifWinOpacity: 0,
+  bgGifLoseOpacity: 0,
 
   speedMode: 'normal',
 
@@ -1007,6 +1073,14 @@ function resize(){
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
+}
+
+/* Auto-resize the canvas whenever the stage element's size changes
+   (window resize, orientation change, panel open/close, etc.) */
+if (typeof ResizeObserver !== 'undefined'){
+  const stageEl = document.getElementById('stage');
+  const ro = new ResizeObserver(function(){ resize(); });
+  ro.observe(stageEl);
 }
 
 /* ==========================================================================
@@ -1303,6 +1377,9 @@ const betField  = document.getElementById('betField');
 const miniBtns  = Array.prototype.slice.call(document.querySelectorAll('.mini'));
 const speedPills = Array.prototype.slice.call(document.querySelectorAll('.speed-pill'));
 
+const panel = document.getElementById('panel');
+const panelToggle = document.getElementById('panelToggle');
+
 function multiplierFor(c){ return (1 - HOUSE) / c; }
 
 function formatChance(percent){
@@ -1431,10 +1508,13 @@ settingRows.forEach(function(row){
     settings[key] = !settings[key];
     saveSettings();
     refreshSettingRows();
-    // clear any active bounce pulses when the feature is turned off
     if (key === 'bounce' && !settings.bounce){
       jiggles.length = 0;
       jiggleDisp.fill(0);
+    }
+    if (key === 'bgGifs' && !settings.bgGifs){
+      G.bgGifWinOpacity = 0;
+      G.bgGifLoseOpacity = 0;
     }
   });
 });
@@ -1462,6 +1542,85 @@ document.addEventListener('click', function(e){
 });
 
 /* ==========================================================================
+   PANEL TOGGLE
+   ========================================================================== */
+panelToggle.addEventListener('click', function(e){
+  e.stopPropagation();
+  panel.classList.toggle('hidden');
+  closeSettings();
+  // ResizeObserver on #stage will fire automatically and call resize()
+  // just in case, schedule an extra call after the transition
+  setTimeout(resize, 500);
+});
+
+/* ==========================================================================
+   BACKGROUND GIF LOGIC
+   ========================================================================== */
+function updateBgGifs(now, dt){
+  let targetWin = false, targetLose = false;
+
+  if (settings.bgGifs){
+    const state = G.state;
+    if (state === 'rolling' || state === 'done'){
+      let show = false;
+      if (state === 'rolling'){
+        const elapsed = (now - G.rollStart) / 1000;
+        const u = elapsed / G.duration;
+        if (u > U1) show = true;
+      } else if (state === 'done'){
+        const age = (now - G.stopPopStart) / 1000;
+        if (age < 2.4) show = true;
+      }
+
+      if (show && G.winPoly && G.losePoly){
+        const px = G.puck.x, py = G.puck.y;
+        const inWin  = pointInPoly(px, py, G.winPoly);
+        const inLose = !inWin && pointInPoly(px, py, G.losePoly);
+        if (inWin) targetWin = true;
+        else if (inLose) targetLose = true;
+      }
+    }
+  }
+
+  const rateIn  = 1.8 * dt;
+  const rateOut = 2.5 * dt;
+
+  if (targetWin){
+    G.bgGifWinOpacity = Math.min(1, G.bgGifWinOpacity + rateIn);
+  } else {
+    G.bgGifWinOpacity = Math.max(0, G.bgGifWinOpacity - rateOut);
+  }
+  if (targetLose){
+    G.bgGifLoseOpacity = Math.min(1, G.bgGifLoseOpacity + rateIn);
+  } else {
+    G.bgGifLoseOpacity = Math.max(0, G.bgGifLoseOpacity - rateOut);
+  }
+
+  if (G.bgGifWinOpacity < 0.005)  G.bgGifWinOpacity = 0;
+  if (G.bgGifLoseOpacity < 0.005) G.bgGifLoseOpacity = 0;
+}
+
+/* Draw a GIF centered at (cx, cy) at a small fixed fraction of arena
+   size. The GIF itself animates frame-by-frame automatically. */
+function drawBgGif(c, img, opacity, cx, cy){
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+  if (opacity < 0.01) return;
+
+  c.save();
+  c.globalAlpha = Math.min(1, opacity) * 0.55;
+
+  const iw = img.naturalWidth;
+  const ih = img.naturalHeight;
+  const targetSize = S * 0.30;      // 30% of arena size — small
+  const scaleFit = Math.min(targetSize / iw, targetSize / ih);
+  const dw = iw * scaleFit;
+  const dh = ih * scaleFit;
+
+  c.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+  c.restore();
+}
+
+/* ==========================================================================
    ROLL
    ========================================================================== */
 function showBanner(text, win){
@@ -1480,6 +1639,11 @@ function startRoll(){
   G.shown = G.chance;
   G.shownVel = 0;
   recomputeField();
+
+  // Snap smoothed labels to the freshly computed centers so we don't
+  // get a slow lerp from the previous field layout.
+  if (G.winCenter)  { G.winLabel.x = G.winCenter.x;  G.winLabel.y = G.winCenter.y;  }
+  if (G.loseCenter) { G.loseLabel.x = G.loseCenter.x; G.loseLabel.y = G.loseCenter.y; }
 
   if (G.bet < 1){ G.bet = 10; betInput.value = 10; syncUI(); return; }
   if (G.bet > G.balance) return;
@@ -1793,11 +1957,11 @@ function draw(now){
   c.fillRect(0, 0, S, S);
 
   /* EMPTY region */
-  if (G.losePoly && G.losePoly.length >= 3 && G.loseBB && G.loseCenter){
+  if (G.losePoly && G.losePoly.length >= 3 && G.loseBB){
     const lp = polyToPath(G.losePoly);
     const lbb = G.loseBB;
     const lw = lbb.x1 - lbb.x0, lh = lbb.y1 - lbb.y0;
-    const lc = G.loseCenter;
+    const lc = G.loseLabel;
 
     const lg = c.createLinearGradient(lbb.x0, lbb.y0, lbb.x1, lbb.y1);
     lg.addColorStop(0,   '#10131c');
@@ -1857,10 +2021,10 @@ function draw(now){
   }
 
   /* WIN region */
-  if (G.winPoly && G.winPoly.length >= 3 && G.winBB && G.winCenter){
+  if (G.winPoly && G.winPoly.length >= 3 && G.winBB){
     const wp = polyToPath(G.winPoly);
     const wbb = G.winBB;
-    const wc = G.winCenter;
+    const wc = G.winLabel;
     const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
 
     const wg = c.createLinearGradient(wbb.x0, wbb.y0, wbb.x1, wbb.y1);
@@ -1900,31 +2064,38 @@ function draw(now){
     c.textAlign = 'center';
     c.textBaseline = 'middle';
 
-    if (ww > 80 && wh > 60){
-      const labelH = 12;
-      const multH = 26;
+    // Use smoothed font size to avoid jitter while field morphs
+    const baseMultPx = G.winFontPx;
+    const baseLabelPx = Math.max(9, baseMultPx * 0.42);
+
+    if (ww > 60 && wh > 55){
+      const labelH = baseLabelPx + 2;
+      const multH = baseMultPx + 4;
       const gap = 2;
       const totalH = labelH + gap + multH;
       const topY = wc.y - totalH / 2;
 
       c.fillStyle = 'rgba(255,255,255,0.92)';
-      c.font = '800 10.5px -apple-system,system-ui,sans-serif';
+      c.font = '800 ' + baseLabelPx.toFixed(1) + 'px -apple-system,system-ui,sans-serif';
       c.fillText('W I N', wc.x, topY + labelH / 2);
 
       c.fillStyle = 'rgba(255,255,255,1)';
-      c.font = '900 24px -apple-system,system-ui,sans-serif';
+      c.font = '900 ' + baseMultPx.toFixed(1) + 'px -apple-system,system-ui,sans-serif';
       c.fillText('×' + m.toFixed(2), wc.x, topY + labelH + gap + multH / 2);
-    } else if (ww > 46 && wh > 30){
+    } else if (ww > 40 && wh > 26){
+      const multPx = Math.max(11, baseMultPx * 0.65);
       c.fillStyle = 'rgba(255,255,255,1)';
-      c.font = '900 15px -apple-system,system-ui,sans-serif';
+      c.font = '900 ' + multPx.toFixed(1) + 'px -apple-system,system-ui,sans-serif';
       c.fillText('×' + m.toFixed(2), wc.x, wc.y);
-    } else if (ww > 26 && wh > 18){
+    } else if (ww > 24 && wh > 16){
+      const multPx = Math.max(9, baseMultPx * 0.45);
       c.fillStyle = 'rgba(255,255,255,0.95)';
-      c.font = '900 10px -apple-system,system-ui,sans-serif';
+      c.font = '900 ' + multPx.toFixed(1) + 'px -apple-system,system-ui,sans-serif';
       c.fillText('×' + m.toFixed(1), wc.x, wc.y);
     }
   }
 
+  /* result flash */
   if (G.state === 'done'){
     const age = (now - G.flashT) / 1000;
     if (age < 1.0){
@@ -1933,6 +2104,16 @@ function draw(now){
         ? 'rgba(120,190,255,' + a + ')'
         : 'rgba(224,85,107,' + (a * 0.85) + ')';
       c.fillRect(0, 0, S, S);
+    }
+  }
+
+  /* Background GIFs — small, at field centers */
+  if (settings.bgGifs){
+    if (G.bgGifLoseOpacity > 0.01){
+      drawBgGif(c, BG_LOSE_GIF, G.bgGifLoseOpacity, G.loseLabel.x, G.loseLabel.y);
+    }
+    if (G.bgGifWinOpacity > 0.01){
+      drawBgGif(c, BG_WIN_GIF, G.bgGifWinOpacity, G.winLabel.x, G.winLabel.y);
     }
   }
 
@@ -2033,6 +2214,35 @@ function frame(now){
     if (Math.abs(G.shown - G.lastShown) > 0.0025){
       recomputeField();
     }
+
+    G.puckAlpha = 0;
+    G.puckScale = 0.55;
+    G.puck.x = S/2;
+    G.puck.y = S/2;
+    G.zoom = 1;
+  }
+
+  /* Smooth label positions & font sizes — this is what fixes the text
+     "glitching" during field morph. We lerp the drawn position towards
+     the target each frame, and also lerp the font size based on the
+     current field's bbox. */
+  if (G.winCenter){
+    const k = Math.min(1, dt * 12);
+    G.winLabel.x += (G.winCenter.x - G.winLabel.x) * k;
+    G.winLabel.y += (G.winCenter.y - G.winLabel.y) * k;
+  }
+  if (G.loseCenter){
+    const k = Math.min(1, dt * 12);
+    G.loseLabel.x += (G.loseCenter.x - G.loseLabel.x) * k;
+    G.loseLabel.y += (G.loseCenter.y - G.loseLabel.y) * k;
+  }
+  if (G.winBB){
+    const ww = G.winBB.x1 - G.winBB.x0;
+    const wh = G.winBB.y1 - G.winBB.y0;
+    const fieldSize = Math.min(ww, wh);
+    const targetMult = Math.max(11, Math.min(26, fieldSize * 0.14));
+    const k = Math.min(1, dt * 8);
+    G.winFontPx += (targetMult - G.winFontPx) * k;
   }
 
   if (G.state === 'spinning'){
@@ -2066,7 +2276,6 @@ function frame(now){
 
     if (G.puckScale < 1) G.puckScale = Math.min(1, G.puckScale + dt * 3.4);
 
-    /* -------- BOUNCE: spawn a pulse at each wall hit -------- */
     if (settings.bounce){
       let segIdx = 0;
       const pts = G.path.pts;
@@ -2079,7 +2288,6 @@ function frame(now){
           const idx = findNearestPerimIdx(bp.x, bp.y);
           if (idx === G.lastJiggleIdx) continue;
           G.lastJiggleIdx = idx;
-          // Intensity scales with phase — strong during fast, gentle during slow
           const phase = u <= U1 ? 1 : (1 - ((u - U1) / (1 - U1)) * 0.7);
           const intensity = (4 + Math.random() * 3) * phase;
           spawnJiggle(idx, intensity);
@@ -2090,7 +2298,6 @@ function frame(now){
       }
     }
 
-    /* -------- ZOOM IN -------- */
     if (settings.zoom){
       const zoomStartAt = Math.max(0, G.duration - ZOOM_LEAD);
       if (elapsed >= zoomStartAt){
@@ -2130,15 +2337,8 @@ function frame(now){
     }
   }
 
-  if (G.state === 'idle'){
-    if (G.puckScale < 1) G.puckScale = Math.min(1, G.puckScale + dt * 2.6);
-    if (G.puckAlpha < 1) G.puckAlpha = Math.min(1, G.puckAlpha + dt * 3.4);
-    G.puck.x += (S/2 - G.puck.x) * Math.min(1, dt * 12);
-    G.puck.y += (S/2 - G.puck.y) * Math.min(1, dt * 12);
-    G.zoom = 1;
-  }
-
   updateJiggles(nowSec);
+  updateBgGifs(now, dt);
 
   draw(now);
 }
@@ -2150,6 +2350,9 @@ function boot(){
   resize();
   randomizeAngle();
   recomputeField();
+  // Snap smoothed labels to freshly computed centers
+  if (G.winCenter)  { G.winLabel.x = G.winCenter.x;  G.winLabel.y = G.winCenter.y;  }
+  if (G.loseCenter) { G.loseLabel.x = G.loseCenter.x; G.loseLabel.y = G.loseCenter.y; }
   syncUI();
   requestAnimationFrame(function(t){
     lastT = t;
