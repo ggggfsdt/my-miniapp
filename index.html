@@ -1004,6 +1004,11 @@ const G = {
   loseLabel: { x: S/2, y: S*0.75 },
   winFontPx: 24,
 
+  // canvas CSS size spring
+  targetCssSize: 0,
+  currentCssSize: 0,
+  cssSizeVel: 0,
+
   state: 'idle',
   puck: { x: S/2, y: S/2 },
   puckScale: 0.55,
@@ -1045,66 +1050,81 @@ const G = {
 };
 
 /* ==========================================================================
-   CANVAS + RESIZE (debounced)
+   CANVAS — internal buffer size + CSS size are decoupled.
+   Internal buffer matches the TARGET size (crisp).
+   CSS size is animated with a spring toward the target (smooth bounce).
    ========================================================================== */
 const cv  = document.getElementById('cv');
 const ctx = cv.getContext('2d');
-let cssSize = 340, scale = 0.85, dpr = 1;
+let scale = 1, dpr = 2;
+let appliedSize = 0;   // last size applied to the internal pixel buffer
 
-function resize(){
-  const stage = document.getElementById('stage');
-  const rect = stage.getBoundingClientRect();
-  const size = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
-  cssSize = size;
-  dpr = Math.min(window.devicePixelRatio || 1, 2);  // cap at 2 for perf
+/* Spring params for the CSS size bounce. Low zeta = more bounce. */
+const CSS_SIZE_OMEGA = 14;
+const CSS_SIZE_ZETA  = 0.62;
+
+function applyInternalSize(size){
+  size = Math.max(160, Math.floor(size));
+  if (Math.abs(size - appliedSize) < 1) return;
+  appliedSize = size;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width  = Math.round(size * dpr);
   cv.height = Math.round(size * dpr);
-  cv.style.width  = size + 'px';
-  cv.style.height = size + 'px';
+  // don't set CSS width/height here — that's animated by the spring
   scale = size / S;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 }
 
-/* Debounced resize — only fires after the layout settles, and only when
-   the game is idle. This is what fixes the "square glitches/disappears"
-   problem during the panel transition. */
-let pendingResizeTimer = null;
-let lastResizeAttempt = 0;
-
-function scheduleResize(delayMs){
-  if (pendingResizeTimer) clearTimeout(pendingResizeTimer);
-  pendingResizeTimer = setTimeout(attemptResize, delayMs || 200);
+function setTargetSize(size){
+  size = Math.max(160, Math.floor(size));
+  if (Math.abs(size - G.targetCssSize) < 1) return;
+  G.targetCssSize = size;
+  // Apply immediately if idle; defer to finishRoll if mid-round.
+  if (G.state === 'idle'){
+    applyInternalSize(size);
+  }
 }
 
-function attemptResize(){
-  pendingResizeTimer = null;
-  // Never resize mid-round — would cause the puck to jump.
-  if (G.state !== 'idle'){
-    pendingResizeTimer = setTimeout(attemptResize, 400);
+function stepCssSizeSpring(dt){
+  const diff = G.targetCssSize - G.currentCssSize;
+  // Already settled
+  if (Math.abs(diff) < 0.05 && Math.abs(G.cssSizeVel) < 0.05){
+    if (G.currentCssSize !== G.targetCssSize){
+      G.currentCssSize = G.targetCssSize;
+      G.cssSizeVel = 0;
+      cv.style.width  = G.targetCssSize + 'px';
+      cv.style.height = G.targetCssSize + 'px';
+    }
     return;
   }
-  const stage = document.getElementById('stage');
-  const rect = stage.getBoundingClientRect();
-  const size = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
-  // Skip no-op resizes.
-  if (Math.abs(size - cssSize) < 4) return;
-  lastResizeAttempt = performance.now();
-  resize();
+  const accel = CSS_SIZE_OMEGA * CSS_SIZE_OMEGA * diff
+              - 2 * CSS_SIZE_ZETA * CSS_SIZE_OMEGA * G.cssSizeVel;
+  G.cssSizeVel += accel * dt;
+  G.currentCssSize += G.cssSizeVel * dt;
+  if (G.currentCssSize < 80) G.currentCssSize = 80;
+  cv.style.width  = G.currentCssSize.toFixed(2) + 'px';
+  cv.style.height = G.currentCssSize.toFixed(2) + 'px';
 }
 
+/* Observe stage size changes. Every fire we just update the target; the
+   spring takes care of the smooth animation toward it. */
 if (typeof ResizeObserver !== 'undefined'){
   const stageEl = document.getElementById('stage');
   const ro = new ResizeObserver(function(){
-    // Debounce — collapses many events during the panel transition into one.
-    scheduleResize(200);
+    const rect = stageEl.getBoundingClientRect();
+    const size = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
+    setTargetSize(size);
   });
   ro.observe(stageEl);
 }
-
-window.addEventListener('resize', function(){ scheduleResize(180); });
-window.addEventListener('orientationchange', function(){ scheduleResize(300); });
+window.addEventListener('resize', function(){
+  const stageEl = document.getElementById('stage');
+  const rect = stageEl.getBoundingClientRect();
+  const size = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
+  setTargetSize(size);
+});
 
 /* ==========================================================================
    MOTION PROFILE
@@ -1570,10 +1590,8 @@ panelToggle.addEventListener('click', function(e){
   e.stopPropagation();
   panel.classList.toggle('hidden');
   closeSettings();
-  // Schedule one resize after the transition fully completes.
-  // The ResizeObserver will also fire, but we debounce so only one actual
-  // resize happens.
-  scheduleResize(500);
+  // The ResizeObserver on #stage will fire automatically and update the
+  // target size. The CSS spring will animate the canvas smoothly.
 });
 
 /* ==========================================================================
@@ -1623,8 +1641,6 @@ function updateBgGifs(now, dt){
   if (G.bgGifLoseOpacity < 0.005) G.bgGifLoseOpacity = 0;
 }
 
-/* Draw a GIF centered at (cx, cy) at a small fixed fraction of arena size.
-   The GIF animates natively because the browser keeps the frame advancing. */
 function drawBgGif(c, img, opacity, cx, cy){
   if (!img || !img.complete || img.naturalWidth === 0) return;
   if (opacity < 0.01) return;
@@ -1634,7 +1650,7 @@ function drawBgGif(c, img, opacity, cx, cy){
 
   const iw = img.naturalWidth;
   const ih = img.naturalHeight;
-  const targetSize = S * 0.22;   // 22% of arena — small & subtle
+  const targetSize = S * 0.22;
   const scaleFit = Math.min(targetSize / iw, targetSize / ih);
   const dw = iw * scaleFit;
   const dh = ih * scaleFit;
@@ -1756,12 +1772,9 @@ function finishRoll(){
     }
     syncUI();
 
-    // If a resize was deferred while we were rolling, do it now.
-    if (pendingResizeTimer){
-      clearTimeout(pendingResizeTimer);
-      pendingResizeTimer = null;
-    }
-    scheduleResize(150);
+    // If a size change was queued while rolling, apply the internal buffer
+    // now and let the spring animate the CSS size smoothly.
+    applyInternalSize(G.targetCssSize);
   }, 2400);
 }
 
@@ -1947,7 +1960,7 @@ function drawEmptyCross(c, x, y, size){
 function draw(now){
   const c = ctx;
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
-  c.clearRect(0, 0, cssSize, cssSize);
+  c.clearRect(0, 0, appliedSize, appliedSize);
 
   c.save();
   c.scale(scale, scale);
@@ -1984,7 +1997,7 @@ function draw(now){
   c.fillStyle = bg;
   c.fillRect(0, 0, S, S);
 
-  /* ---- STEP 1: fill both poly regions ---- */
+  /* ---- STEP 1: field fills ---- */
   if (G.losePoly && G.losePoly.length >= 3 && G.loseBB){
     const lp = polyToPath(G.losePoly);
     const lbb = G.loseBB;
@@ -2046,7 +2059,7 @@ function draw(now){
     }
   }
 
-  /* ---- STEP 3: bg gifs (over field fills, under labels) ---- */
+  /* ---- STEP 3: bg gifs ---- */
   if (settings.bgGifs){
     if (G.bgGifLoseOpacity > 0.01){
       drawBgGif(c, BG_LOSE_GIF, G.bgGifLoseOpacity, G.loseLabel.x, G.loseLabel.y);
@@ -2244,6 +2257,9 @@ function frame(now){
   lastT = now;
   const nowSec = now / 1000;
 
+  /* ---- CSS size spring (smooth arena resize with bounce) ---- */
+  stepCssSizeSpring(dt);
+
   if (G.state === 'idle'){
     const before = G.shown;
     stepFieldSpring(dt);
@@ -2252,8 +2268,7 @@ function frame(now){
       syncFieldColorUI();
     }
 
-    // Rate-limit field rebuilds — collapsing many small changes into one
-    // recalculation every ~45 ms. This is a big perf win.
+    // Rate-limit field rebuilds
     if (Math.abs(G.shown - G.lastShown) > 0.003 && now - lastFieldRecomputeAt > 45){
       lastFieldRecomputeAt = now;
       recomputeField();
@@ -2388,7 +2403,16 @@ function frame(now){
    BOOT
    ========================================================================== */
 function boot(){
-  resize();
+  const stage = document.getElementById('stage');
+  const rect = stage.getBoundingClientRect();
+  const initialSize = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
+  G.targetCssSize = initialSize;
+  G.currentCssSize = initialSize;
+  G.cssSizeVel = 0;
+  applyInternalSize(initialSize);
+  cv.style.width  = initialSize + 'px';
+  cv.style.height = initialSize + 'px';
+
   randomizeAngle();
   recomputeField();
   if (G.winCenter)  { G.winLabel.x = G.winCenter.x;  G.winLabel.y = G.winCenter.y;  }
