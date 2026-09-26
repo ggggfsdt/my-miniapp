@@ -191,7 +191,6 @@
   #stage{
     flex:1;position:relative;display:flex;align-items:center;justify-content:center;
     padding:8px;min-height:0;
-    transition:padding .3s ease;
   }
   #cv{display:block;border-radius:26px;touch-action:none}
 
@@ -207,13 +206,12 @@
   #banner.win{color:#bfe0ff;text-shadow:0 0 36px rgba(91,157,255,.95),0 4px 24px rgba(0,0,0,.9)}
   #banner.lose{color:#ff9aa8;text-shadow:0 0 32px rgba(224,85,107,.8),0 4px 24px rgba(0,0,0,.9)}
 
-  /* ---------- panel (with toggle + collapsible) ---------- */
   #panel{
     flex-shrink:0;
     padding:24px 16px calc(16px + var(--safe-b));
     display:flex;flex-direction:column;
     position:relative;
-    transition:padding .45s cubic-bezier(.34,1.56,.64,1);
+    transition:padding .35s cubic-bezier(.4,0,.2,1);
     will-change:padding;
   }
   #panel.hidden{
@@ -253,25 +251,25 @@
     stroke:currentColor;fill:none;
     stroke-width:2.5;
     stroke-linecap:round;stroke-linejoin:round;
-    transition:transform .45s cubic-bezier(.34,1.56,.64,1);
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1);
   }
   #panel.hidden #panelToggle svg{
     transform:rotate(180deg);
   }
   #panelContent{
     display:flex;flex-direction:column;gap:10px;
-    max-height: 800px;
+    max-height: 900px;
     opacity: 1;
     overflow: hidden;
-    transition:max-height .45s cubic-bezier(.34,1.56,.64,1),
-               opacity .28s ease .04s;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1),
+               opacity .25s ease .05s;
   }
   #panel.hidden #panelContent{
     max-height: 0;
     opacity: 0;
     pointer-events: none;
-    transition:max-height .45s cubic-bezier(.34,1.56,.64,1),
-               opacity .18s ease;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1),
+               opacity .15s ease;
   }
 
   .row-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
@@ -567,7 +565,6 @@ const EMPTY_GIF_URL = 'https://i.postimg.cc/DfYMRbty/ezgif-3ae2db2f22c213a2.gif'
 const EMPTY_GIF = new Image();
 EMPTY_GIF.src = EMPTY_GIF_URL;
 
-/* Background gifs (shown during slow phase of the roll) */
 const BG_WIN_GIF_URL  = 'https://i.postimg.cc/BQNRcBgH/ezgif-3cacf477150edf7a.gif';
 const BG_LOSE_GIF_URL = 'https://i.postimg.cc/d3jpf2cX/ezgif-33e4bfba5fa5f0a3.gif';
 const BG_WIN_GIF  = new Image();
@@ -820,8 +817,6 @@ function distToEdges(px, py, poly){
   return min;
 }
 
-/* Compute a stable visual center for a polygon. Prefers bbox center when
-   it lies inside (most visually centered), otherwise centroid. */
 function computeLabelCenter(poly){
   if (!poly || poly.length < 3) return { x: S/2, y: S/2 };
 
@@ -1005,11 +1000,9 @@ const G = {
   winBB: null,
   loseBB: null,
 
-  // smoothed label positions & font sizes (prevents jitter during morph)
   winLabel: { x: S/2, y: S/4 },
   loseLabel: { x: S/2, y: S*0.75 },
   winFontPx: 24,
-  loseFontPx: 24,
 
   state: 'idle',
   puck: { x: S/2, y: S/2 },
@@ -1028,7 +1021,6 @@ const G = {
   duration: 10,
   rollSegIdx: 0,
   lastJiggleIdx: -1,
-  lastJiggleTime: 0,
 
   zoom: 1,
   zoomCenterX: S/2,
@@ -1053,7 +1045,7 @@ const G = {
 };
 
 /* ==========================================================================
-   CANVAS
+   CANVAS + RESIZE (debounced)
    ========================================================================== */
 const cv  = document.getElementById('cv');
 const ctx = cv.getContext('2d');
@@ -1064,7 +1056,7 @@ function resize(){
   const rect = stage.getBoundingClientRect();
   const size = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
   cssSize = size;
-  dpr = Math.min(window.devicePixelRatio || 1, 3);
+  dpr = Math.min(window.devicePixelRatio || 1, 2);  // cap at 2 for perf
   cv.width  = Math.round(size * dpr);
   cv.height = Math.round(size * dpr);
   cv.style.width  = size + 'px';
@@ -1075,13 +1067,44 @@ function resize(){
   ctx.imageSmoothingQuality = 'high';
 }
 
-/* Auto-resize the canvas whenever the stage element's size changes
-   (window resize, orientation change, panel open/close, etc.) */
+/* Debounced resize — only fires after the layout settles, and only when
+   the game is idle. This is what fixes the "square glitches/disappears"
+   problem during the panel transition. */
+let pendingResizeTimer = null;
+let lastResizeAttempt = 0;
+
+function scheduleResize(delayMs){
+  if (pendingResizeTimer) clearTimeout(pendingResizeTimer);
+  pendingResizeTimer = setTimeout(attemptResize, delayMs || 200);
+}
+
+function attemptResize(){
+  pendingResizeTimer = null;
+  // Never resize mid-round — would cause the puck to jump.
+  if (G.state !== 'idle'){
+    pendingResizeTimer = setTimeout(attemptResize, 400);
+    return;
+  }
+  const stage = document.getElementById('stage');
+  const rect = stage.getBoundingClientRect();
+  const size = Math.max(160, Math.floor(Math.min(rect.width, rect.height)) - 16);
+  // Skip no-op resizes.
+  if (Math.abs(size - cssSize) < 4) return;
+  lastResizeAttempt = performance.now();
+  resize();
+}
+
 if (typeof ResizeObserver !== 'undefined'){
   const stageEl = document.getElementById('stage');
-  const ro = new ResizeObserver(function(){ resize(); });
+  const ro = new ResizeObserver(function(){
+    // Debounce — collapses many events during the panel transition into one.
+    scheduleResize(200);
+  });
   ro.observe(stageEl);
 }
+
+window.addEventListener('resize', function(){ scheduleResize(180); });
+window.addEventListener('orientationchange', function(){ scheduleResize(300); });
 
 /* ==========================================================================
    MOTION PROFILE
@@ -1376,7 +1399,6 @@ const betBox    = document.getElementById('betBox');
 const betField  = document.getElementById('betField');
 const miniBtns  = Array.prototype.slice.call(document.querySelectorAll('.mini'));
 const speedPills = Array.prototype.slice.call(document.querySelectorAll('.speed-pill'));
-
 const panel = document.getElementById('panel');
 const panelToggle = document.getElementById('panelToggle');
 
@@ -1548,9 +1570,10 @@ panelToggle.addEventListener('click', function(e){
   e.stopPropagation();
   panel.classList.toggle('hidden');
   closeSettings();
-  // ResizeObserver on #stage will fire automatically and call resize()
-  // just in case, schedule an extra call after the transition
-  setTimeout(resize, 500);
+  // Schedule one resize after the transition fully completes.
+  // The ResizeObserver will also fire, but we debounce so only one actual
+  // resize happens.
+  scheduleResize(500);
 });
 
 /* ==========================================================================
@@ -1600,8 +1623,8 @@ function updateBgGifs(now, dt){
   if (G.bgGifLoseOpacity < 0.005) G.bgGifLoseOpacity = 0;
 }
 
-/* Draw a GIF centered at (cx, cy) at a small fixed fraction of arena
-   size. The GIF itself animates frame-by-frame automatically. */
+/* Draw a GIF centered at (cx, cy) at a small fixed fraction of arena size.
+   The GIF animates natively because the browser keeps the frame advancing. */
 function drawBgGif(c, img, opacity, cx, cy){
   if (!img || !img.complete || img.naturalWidth === 0) return;
   if (opacity < 0.01) return;
@@ -1611,7 +1634,7 @@ function drawBgGif(c, img, opacity, cx, cy){
 
   const iw = img.naturalWidth;
   const ih = img.naturalHeight;
-  const targetSize = S * 0.30;      // 30% of arena size — small
+  const targetSize = S * 0.22;   // 22% of arena — small & subtle
   const scaleFit = Math.min(targetSize / iw, targetSize / ih);
   const dw = iw * scaleFit;
   const dh = ih * scaleFit;
@@ -1640,8 +1663,6 @@ function startRoll(){
   G.shownVel = 0;
   recomputeField();
 
-  // Snap smoothed labels to the freshly computed centers so we don't
-  // get a slow lerp from the previous field layout.
   if (G.winCenter)  { G.winLabel.x = G.winCenter.x;  G.winLabel.y = G.winCenter.y;  }
   if (G.loseCenter) { G.loseLabel.x = G.loseCenter.x; G.loseLabel.y = G.loseCenter.y; }
 
@@ -1682,7 +1703,6 @@ function startRoll(){
   jiggleDisp.fill(0);
   G.rollSegIdx = 0;
   G.lastJiggleIdx = -1;
-  G.lastJiggleTime = 0;
 
   G.zoom = 1;
   G.zoomCenterX = S/2;
@@ -1735,6 +1755,13 @@ function finishRoll(){
       betInput.value = G.bet;
     }
     syncUI();
+
+    // If a resize was deferred while we were rolling, do it now.
+    if (pendingResizeTimer){
+      clearTimeout(pendingResizeTimer);
+      pendingResizeTimer = null;
+    }
+    scheduleResize(150);
   }, 2400);
 }
 
@@ -1949,6 +1976,7 @@ function draw(now){
   c.save();
   c.clip(RINK_PATH);
 
+  /* bg gradient */
   const bg = c.createRadialGradient(S/2, S*0.34, 20, S/2, S/2, S*0.80);
   bg.addColorStop(0,   'rgba(52,70,108,0.55)');
   bg.addColorStop(0.5, 'rgba(22,32,52,0.62)');
@@ -1956,25 +1984,83 @@ function draw(now){
   c.fillStyle = bg;
   c.fillRect(0, 0, S, S);
 
-  /* EMPTY region */
+  /* ---- STEP 1: fill both poly regions ---- */
   if (G.losePoly && G.losePoly.length >= 3 && G.loseBB){
     const lp = polyToPath(G.losePoly);
     const lbb = G.loseBB;
-    const lw = lbb.x1 - lbb.x0, lh = lbb.y1 - lbb.y0;
-    const lc = G.loseLabel;
-
     const lg = c.createLinearGradient(lbb.x0, lbb.y0, lbb.x1, lbb.y1);
     lg.addColorStop(0,   '#10131c');
     lg.addColorStop(0.5, '#181c28');
     lg.addColorStop(1,   '#0d1018');
     c.fillStyle = lg;
     c.fill(lp);
+  }
+  if (G.winPoly && G.winPoly.length >= 3 && G.winBB){
+    const wp = polyToPath(G.winPoly);
+    const wbb = G.winBB;
+    const wg = c.createLinearGradient(wbb.x0, wbb.y0, wbb.x1, wbb.y1);
+    wg.addColorStop(0,   lighten(fieldHex, 42));
+    wg.addColorStop(0.5, fieldHex);
+    wg.addColorStop(1,   lighten(fieldHex, 18));
+    c.fillStyle = wg;
+    c.fill(wp);
+  }
 
+  /* ---- STEP 2: outlines ---- */
+  if (G.losePoly && G.losePoly.length >= 3){
+    const lp = polyToPath(G.losePoly);
     c.strokeStyle = 'rgba(255,255,255,0.10)';
     c.lineWidth = 1.2;
     c.lineJoin = 'round';
     c.stroke(lp);
+  }
+  if (G.winPoly && G.winPoly.length >= 3 && G.winBB){
+    const wp = polyToPath(G.winPoly);
+    const wbb = G.winBB;
+    const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
+    if (settings.outline){
+      c.save();
+      if (G.state !== 'rolling' && G.state !== 'spinning'){
+        setGlow(c, 12, 'rgba(180,215,255,0.55)');
+      }
+      c.strokeStyle = 'rgba(255,255,255,0.88)';
+      c.lineWidth = 2;
+      c.lineJoin = 'round';
+      c.stroke(wp);
+      c.restore();
 
+      const corners = findBboxCorners(G.winPoly);
+      for (const corner of corners){
+        if (!corner) continue;
+        const br = Math.min(30, Math.min(ww, wh) * 0.28);
+        if (br <= 1) continue;
+        const rg = c.createRadialGradient(corner.x, corner.y, 0, corner.x, corner.y, br);
+        rg.addColorStop(0,    'rgba(255,255,255,0.46)');
+        rg.addColorStop(0.45, 'rgba(255,255,255,0.13)');
+        rg.addColorStop(1,    'rgba(255,255,255,0)');
+        c.fillStyle = rg;
+        c.beginPath();
+        c.arc(corner.x, corner.y, br, 0, Math.PI*2);
+        c.fill();
+      }
+    }
+  }
+
+  /* ---- STEP 3: bg gifs (over field fills, under labels) ---- */
+  if (settings.bgGifs){
+    if (G.bgGifLoseOpacity > 0.01){
+      drawBgGif(c, BG_LOSE_GIF, G.bgGifLoseOpacity, G.loseLabel.x, G.loseLabel.y);
+    }
+    if (G.bgGifWinOpacity > 0.01){
+      drawBgGif(c, BG_WIN_GIF, G.bgGifWinOpacity, G.winLabel.x, G.winLabel.y);
+    }
+  }
+
+  /* ---- STEP 4: empty region labels ---- */
+  if (G.losePoly && G.losePoly.length >= 3 && G.loseBB){
+    const lbb = G.loseBB;
+    const lw = lbb.x1 - lbb.x0, lh = lbb.y1 - lbb.y0;
+    const lc = G.loseLabel;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
 
@@ -2020,51 +2106,15 @@ function draw(now){
     }
   }
 
-  /* WIN region */
+  /* ---- STEP 5: win region labels ---- */
   if (G.winPoly && G.winPoly.length >= 3 && G.winBB){
-    const wp = polyToPath(G.winPoly);
     const wbb = G.winBB;
     const wc = G.winLabel;
     const ww = wbb.x1 - wbb.x0, wh = wbb.y1 - wbb.y0;
 
-    const wg = c.createLinearGradient(wbb.x0, wbb.y0, wbb.x1, wbb.y1);
-    wg.addColorStop(0,   lighten(fieldHex, 42));
-    wg.addColorStop(0.5, fieldHex);
-    wg.addColorStop(1,   lighten(fieldHex, 18));
-    c.fillStyle = wg;
-    c.fill(wp);
-
-    if (settings.outline){
-      c.save();
-      if (G.state !== 'rolling' && G.state !== 'spinning'){
-        setGlow(c, 12, 'rgba(180,215,255,0.55)');
-      }
-      c.strokeStyle = 'rgba(255,255,255,0.88)';
-      c.lineWidth = 2;
-      c.lineJoin = 'round';
-      c.stroke(wp);
-      c.restore();
-
-      const corners = findBboxCorners(G.winPoly);
-      for (const corner of corners){
-        if (!corner) continue;
-        const br = Math.min(30, Math.min(ww, wh) * 0.28);
-        if (br <= 1) continue;
-        const rg = c.createRadialGradient(corner.x, corner.y, 0, corner.x, corner.y, br);
-        rg.addColorStop(0,    'rgba(255,255,255,0.46)');
-        rg.addColorStop(0.45, 'rgba(255,255,255,0.13)');
-        rg.addColorStop(1,    'rgba(255,255,255,0)');
-        c.fillStyle = rg;
-        c.beginPath();
-        c.arc(corner.x, corner.y, br, 0, Math.PI*2);
-        c.fill();
-      }
-    }
-
     c.textAlign = 'center';
     c.textBaseline = 'middle';
 
-    // Use smoothed font size to avoid jitter while field morphs
     const baseMultPx = G.winFontPx;
     const baseLabelPx = Math.max(9, baseMultPx * 0.42);
 
@@ -2107,19 +2157,9 @@ function draw(now){
     }
   }
 
-  /* Background GIFs — small, at field centers */
-  if (settings.bgGifs){
-    if (G.bgGifLoseOpacity > 0.01){
-      drawBgGif(c, BG_LOSE_GIF, G.bgGifLoseOpacity, G.loseLabel.x, G.loseLabel.y);
-    }
-    if (G.bgGifWinOpacity > 0.01){
-      drawBgGif(c, BG_WIN_GIF, G.bgGifWinOpacity, G.winLabel.x, G.winLabel.y);
-    }
-  }
-
   c.restore(); /* unclip */
 
-  /* rink border (with optional bounce path) */
+  /* rink border */
   let bp = RINK_PATH, ip = INNER_PATH;
   if (settings.bounce && jiggles.length > 0){
     bp = buildJigglePath(1.0);
@@ -2195,6 +2235,7 @@ function draw(now){
    LOOP
    ========================================================================== */
 let lastT = 0;
+let lastFieldRecomputeAt = 0;
 
 function frame(now){
   requestAnimationFrame(frame);
@@ -2211,7 +2252,10 @@ function frame(now){
       syncFieldColorUI();
     }
 
-    if (Math.abs(G.shown - G.lastShown) > 0.0025){
+    // Rate-limit field rebuilds — collapsing many small changes into one
+    // recalculation every ~45 ms. This is a big perf win.
+    if (Math.abs(G.shown - G.lastShown) > 0.003 && now - lastFieldRecomputeAt > 45){
+      lastFieldRecomputeAt = now;
       recomputeField();
     }
 
@@ -2222,10 +2266,7 @@ function frame(now){
     G.zoom = 1;
   }
 
-  /* Smooth label positions & font sizes — this is what fixes the text
-     "glitching" during field morph. We lerp the drawn position towards
-     the target each frame, and also lerp the font size based on the
-     current field's bbox. */
+  /* Smooth label positions & font size */
   if (G.winCenter){
     const k = Math.min(1, dt * 12);
     G.winLabel.x += (G.winCenter.x - G.winLabel.x) * k;
@@ -2350,7 +2391,6 @@ function boot(){
   resize();
   randomizeAngle();
   recomputeField();
-  // Snap smoothed labels to freshly computed centers
   if (G.winCenter)  { G.winLabel.x = G.winCenter.x;  G.winLabel.y = G.winCenter.y;  }
   if (G.loseCenter) { G.loseLabel.x = G.loseCenter.x; G.loseLabel.y = G.loseCenter.y; }
   syncUI();
@@ -2359,9 +2399,6 @@ function boot(){
     requestAnimationFrame(frame);
   });
 }
-
-window.addEventListener('resize', resize);
-window.addEventListener('orientationchange', function(){ setTimeout(resize, 260); });
 
 if (document.readyState === 'complete' || document.readyState === 'interactive'){
   setTimeout(boot, 30);
