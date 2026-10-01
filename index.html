@@ -11,8 +11,8 @@
     --bg:#000;
     --card-1:#0d0d0d;
     --card-2:#060606;
-    --border:#181818;
-    --border-2:#242424;
+    --border:#141414;
+    --border-2:#1f1f1f;
     --text:#f2f2f2;
     --text-2:#8a8a8a;
     --text-3:#4a4a4a;
@@ -39,11 +39,72 @@
     display:flex;flex-direction:column;gap:12px;
   }
 
+  /* ========== CORNER GLOW BORDER (base + soft corner highlights) ========== */
   .card{
+    position:relative;
     background:linear-gradient(180deg,var(--card-1) 0%,var(--card-2) 100%);
     border:1px solid var(--border);
-    border-radius:14px;
+    border-radius:18px;
   }
+  .card::before{
+    content:'';
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    padding:1px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.34) 0%, transparent 22%) top left / 100% 100% no-repeat,
+      linear-gradient(315deg, rgba(255,255,255,.22) 0%, transparent 22%) bottom right / 100% 100% no-repeat;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events:none;
+    opacity:.9;
+  }
+
+  /* ========== BUTTON CORNER GLOW (used by every button) ========== */
+  .glow-btn{
+    position:relative;
+    border:1px solid var(--border-2);
+    background:linear-gradient(180deg,#0f0f0f,#080808);
+    color:var(--text);
+    border-radius:999px;
+    font-family:inherit;
+    cursor:pointer;
+    overflow:hidden;
+    transition:transform .18s var(--ease), background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+  }
+  .glow-btn::before{
+    content:'';
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    padding:1px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.30) 0%, transparent 30%) top left / 100% 100% no-repeat,
+      linear-gradient(315deg, rgba(255,255,255,.18) 0%, transparent 30%) bottom right / 100% 100% no-repeat;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events:none;
+  }
+  .glow-btn:active{transform:scale(.98)}
+  .glow-btn:disabled{opacity:.3;pointer-events:none}
+  .glow-btn.solid{
+    background:#f2f2f2;
+    color:#000;
+    border-color:#f2f2f2;
+  }
+  .glow-btn.solid::before{
+    background:
+      linear-gradient(135deg, rgba(0,0,0,.20) 0%, transparent 30%) top left / 100% 100% no-repeat,
+      linear-gradient(315deg, rgba(0,0,0,.12) 0%, transparent 30%) bottom right / 100% 100% no-repeat;
+  }
+  .glow-btn.solid:active{background:#c8c8c8}
 
   /* ========== PROFILE ========== */
   .profile{
@@ -63,23 +124,78 @@
     text-align:center;
     max-width:100%;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-    margin-bottom:6px;
+    margin-bottom:14px;
   }
-  .profile .rank-line{
-    display:flex;align-items:center;gap:7px;
-    font-size:12px;font-weight:700;color:var(--text-2);
-    letter-spacing:.1px;
-    margin-bottom:18px;
+
+  .rank-track{
+    width:100%;
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;
+    background:#080808;
+    border:1px solid var(--border);
+    border-radius:14px;
+    margin-bottom:16px;
+    position:relative;
   }
-  .profile .rank-line .rk-dot{
-    width:3px;height:3px;border-radius:50%;background:var(--text-3);
+  .rank-track::before{
+    content:'';
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    padding:1px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.16) 0%, transparent 30%) top left / 100% 100% no-repeat,
+      linear-gradient(315deg, rgba(255,255,255,.10) 0%, transparent 30%) bottom right / 100% 100% no-repeat;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events:none;
   }
-  .profile .rank-line .rk-pct{
-    color:var(--green);
-    font-weight:900;
-    font-variant-numeric:tabular-nums;
+
+  .rank-track .rk-slot{
+    position:relative;
+    width:34px;height:34px;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
   }
-  .profile .rank-line.locked .rk-pct{color:var(--text-3)}
+  .rank-track .rk-slot img{
+    position:absolute;inset:0;
+    width:100%;height:100%;object-fit:contain;
+    transition:opacity .3s ease;
+  }
+  .rank-track .rk-slot .lock{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    color:var(--text-3);
+    stroke-width:1.6;
+    display:none;
+  }
+  .rank-track .rk-slot.locked img{opacity:0}
+  .rank-track .rk-slot.locked .lock{display:block}
+
+  .rank-track .rk-info{
+    flex:1;min-width:0;
+    display:flex;flex-direction:column;gap:2px;
+  }
+  .rank-track .rk-name{
+    font-size:12.5px;font-weight:800;color:var(--text);
+    letter-spacing:-.1px;
+  }
+  .rank-track .rk-name.locked{color:var(--text-3)}
+  .rank-track .rk-sub{
+    font-size:10px;font-weight:700;color:var(--text-3);
+    letter-spacing:.2px;
+  }
+  .rank-track .rk-arrow{
+    width:20px;height:8px;
+    color:var(--text-3);
+    flex-shrink:0;
+  }
+  .rank-track .rk-arrow svg{width:100%;height:100%;display:block;stroke:currentColor;fill:none;stroke-width:1.4}
+  .rank-track .rk-slot.next{opacity:.55}
+  .rank-track .rk-slot.next.max{opacity:.25}
 
   .profile .progress-head{
     width:100%;
@@ -118,12 +234,12 @@
 
   /* ========== CLAIM ========== */
   .claim{
-    padding:13px 14px 12px;
+    padding:14px 14px 13px;
   }
   .claim .row-1{
     display:flex;align-items:center;justify-content:space-between;
     gap:10px;
-    margin-bottom:9px;
+    margin-bottom:10px;
   }
   .claim .left-meta{
     display:flex;align-items:center;gap:9px;
@@ -140,20 +256,38 @@
     white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;
   }
-  .claim .pct{
-    font-size:15px;font-weight:900;color:var(--green);
-    letter-spacing:-.3px;
+
+  /* solid green pill — white text */
+  .claim .pct-pill{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:5px 12px;
+    background:var(--green);
+    border:1px solid var(--green);
+    border-radius:999px;
+    color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,.18);
+    font-size:12px;font-weight:900;
+    letter-spacing:-.2px;
     font-variant-numeric:tabular-nums;
     flex-shrink:0;
+    white-space:nowrap;
+    box-shadow:0 4px 14px rgba(76,195,138,.25);
+    transition:background .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease;
   }
-  .claim .pct.locked{color:var(--text-3)}
+  .claim .pct-pill.locked{
+    background:#0f0f0f;
+    border-color:var(--border-2);
+    color:var(--text-3);
+    text-shadow:none;
+    box-shadow:none;
+  }
 
   .claim .amount{
     display:flex;align-items:center;gap:8px;
     font-size:24px;font-weight:900;color:var(--text);
     letter-spacing:-1px;line-height:1;
     font-variant-numeric:tabular-nums;
-    margin-bottom:11px;
+    margin-bottom:12px;
   }
   .claim .amount img{
     width:17px;height:17px;object-fit:contain;
@@ -161,154 +295,84 @@
   }
 
   .claim .btns{
-    display:flex;gap:7px;
+    display:flex;gap:8px;
   }
   .claim .btns button{
     flex:1;
-    padding:10px 8px;
-    border-radius:9px;
-    font-family:inherit;font-size:12px;font-weight:800;
+    padding:12px 10px;
+    font-size:12.5px;font-weight:800;
     letter-spacing:.3px;
-    cursor:pointer;
-    transition:transform .18s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
-    border:1px solid var(--border-2);
-    background:transparent;
-    color:var(--text);
-  }
-  .claim .btns button:active{transform:scale(.98)}
-  .claim .btns .btn-solid{
-    background:var(--accent);
-    color:#000;
-    border-color:var(--accent);
-  }
-  .claim .btns .btn-solid:active{background:#c8c8c8}
-  .claim .btns button:disabled{
-    opacity:.3;pointer-events:none;
   }
 
   .stake-row{
     display:none;
-    margin-top:9px;
-    padding-top:10px;
+    margin-top:11px;
+    padding-top:11px;
     border-top:1px solid var(--border);
-    gap:7px;
+    gap:8px;
   }
   .stake-row.open{display:flex}
   .stake-row button{
     flex:1;
-    padding:9px 4px;
-    border-radius:8px;
-    border:1px solid var(--border-2);
-    background:transparent;
-    color:var(--text-2);
-    font-family:inherit;font-size:11px;font-weight:800;
+    padding:11px 6px;
+    font-size:11px;font-weight:800;
     letter-spacing:.3px;
-    cursor:pointer;
-    transition:border-color .2s var(--ease), color .2s var(--ease), background .2s var(--ease);
+    color:var(--text-2);
   }
-  .stake-row button:active{background:rgba(255,255,255,.05)}
-  .stake-row button span{display:block;font-size:9.5px;color:var(--text-3);font-weight:700;margin-top:2px}
+  .stake-row button:active{background:rgba(255,255,255,.05);color:#fff}
+  .stake-row button span{display:block;font-size:9.5px;color:var(--text-3);font-weight:700;margin-top:3px}
 
-  /* ========== WHEEL (no card, no border, just floating) ========== */
-  .wheel-zone{
-    padding:26px 0 14px;
-  }
+  /* ========== WHEEL ========== */
+  .wheel-zone{padding:26px 0 14px}
 
   .wheel-area{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:0px;
-    cursor:grab;
-    touch-action:none;
+    display:flex;align-items:center;justify-content:center;
+    gap:0;cursor:grab;touch-action:none;
   }
   .wheel-area:active{cursor:grabbing}
 
-  /* vertical slot reel */
   .reel-window{
     position:relative;
-    width:150px;
-    height:150px;
-    overflow:hidden;
-    flex-shrink:0;
+    width:150px;height:150px;overflow:hidden;flex-shrink:0;
     -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
     mask-image:linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
   }
   .reel-strip{
-    position:absolute;
-    left:0;right:0;top:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+    position:absolute;left:0;right:0;top:0;
+    display:flex;flex-direction:column;align-items:center;
     transition:transform .5s cubic-bezier(.22,.9,.24,1);
     will-change:transform;
   }
   .reel-strip.dragging{transition:none}
 
   .reel-item{
-    width:150px;
-    height:150px;
-    flex-shrink:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:150px;height:150px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
   }
   .reel-item img{
-    width:128px;
-    height:128px;
-    object-fit:contain;
-    display:block;
-    pointer-events:none;
+    width:128px;height:128px;object-fit:contain;display:block;pointer-events:none;
   }
 
-  /* vertical arc immediately beside the reel */
-  .arc-wrap{
-    width:46px;
-    height:170px;
-    flex-shrink:0;
-    margin-left:-6px;
-    pointer-events:none;
-  }
-  .arc{
-    width:100%;
-    height:100%;
-    display:block;
-    overflow:visible;
-  }
-  .arc-base{
-    stroke:#1c1c1c;
-    stroke-width:4;
-    fill:none;
-    stroke-linecap:round;
-  }
+  .arc-wrap{width:46px;height:170px;flex-shrink:0;margin-left:-6px;pointer-events:none}
+  .arc{width:100%;height:100%;display:block;overflow:visible}
+  .arc-base{stroke:#1c1c1c;stroke-width:4;fill:none;stroke-linecap:round}
   .arc-fill{
-    stroke:#e8e8e8;
-    stroke-width:4;
-    fill:none;
-    stroke-linecap:round;
+    stroke:#e8e8e8;stroke-width:4;fill:none;stroke-linecap:round;
     filter:drop-shadow(0 0 6px rgba(255,255,255,.35));
     transition:stroke-dashoffset .5s cubic-bezier(.22,.9,.24,1);
   }
   .arc-fill.dragging{transition:none}
 
-  .wheel-caption{
-    text-align:center;
-    padding-top:14px;
-  }
-  .wheel-caption .wn{
-    font-size:14px;font-weight:800;color:var(--text);
-    letter-spacing:-.2px;
-  }
+  .wheel-caption{text-align:center;padding-top:14px}
+  .wheel-caption .wn{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px}
   .wheel-caption .wp{
     font-size:12px;font-weight:900;color:var(--green);
-    letter-spacing:.2px;
-    font-variant-numeric:tabular-nums;
-    margin-top:3px;
+    letter-spacing:.2px;font-variant-numeric:tabular-nums;margin-top:3px;
   }
 
   /* ========== DEMO ========== */
   .demo{
-    padding:12px 14px;
+    padding:14px;
     display:flex;flex-direction:column;gap:10px;
   }
   .demo .lbl{
@@ -335,14 +399,10 @@
   .demo-btns{display:flex;gap:6px;flex-wrap:wrap}
   .demo-btns button{
     flex:1;min-width:0;
-    padding:8px 6px;
-    border-radius:8px;
-    border:1px solid var(--border-2);
-    background:transparent;
+    padding:9px 6px;
+    font-size:10.5px;font-weight:800;
+    letter-spacing:.3px;
     color:var(--text-2);
-    font-family:inherit;font-size:10.5px;font-weight:800;
-    letter-spacing:.3px;cursor:pointer;
-    transition:background .2s var(--ease), color .2s var(--ease);
   }
   .demo-btns button:active{background:#141414;color:#fff}
 
@@ -353,7 +413,7 @@
     padding:11px 18px;
     background:#0e0e0e;
     border:1px solid var(--border-2);
-    border-radius:10px;
+    border-radius:999px;
     color:var(--text);font-size:12.5px;font-weight:800;letter-spacing:.2px;
     box-shadow:0 12px 40px rgba(0,0,0,.75);
     opacity:0;pointer-events:none;
@@ -368,15 +428,28 @@
 
 <div class="stack">
 
-  <!-- PROFILE -->
   <div class="card profile">
     <img class="pfp" src="https://i.pravatar.cc/150?img=12" alt="">
     <div class="nick">Player</div>
 
-    <div class="rank-line" id="rank-line">
-      <span class="rk-name" id="rk-name">Unranked</span>
-      <span class="rk-dot"></span>
-      <span class="rk-pct" id="rk-pct">0.0%</span>
+    <div class="rank-track">
+      <div class="rk-slot locked" id="rk-slot-cur">
+        <img id="rk-cur-img" src="" alt="">
+        <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="11" width="14" height="9" rx="2"/>
+          <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+        </svg>
+      </div>
+      <div class="rk-info">
+        <div class="rk-name locked" id="rk-name">Unranked</div>
+        <div class="rk-sub" id="rk-sub">0.0% cashback</div>
+      </div>
+      <div class="rk-arrow">
+        <svg viewBox="0 0 24 10"><path d="M0 5h20"/><path d="M15 1l5 4-5 4"/></svg>
+      </div>
+      <div class="rk-slot next" id="rk-slot-next">
+        <img id="rk-next-img" src="" alt="">
+      </div>
     </div>
 
     <div class="progress-head">
@@ -391,31 +464,29 @@
     </div>
   </div>
 
-  <!-- CLAIM -->
   <div class="card claim">
     <div class="row-1">
       <div class="left-meta">
         <img class="claim-icon locked" id="claim-icon" src="" alt="">
         <div class="label">Available to claim</div>
       </div>
-      <div class="pct locked" id="claim-pct">0.0%</div>
+      <div class="pct-pill locked" id="claim-pct">0.0%</div>
     </div>
     <div class="amount">
       <img src="https://i.postimg.cc/vHKQ9y9q/diamond-elegant.gif" alt="">
       <span id="claim-value">0</span>
     </div>
     <div class="btns">
-      <button id="btn-stake" type="button">Stake</button>
-      <button class="btn-solid" id="btn-claim" type="button" disabled>Claim</button>
+      <button class="glow-btn" id="btn-stake" type="button">Stake</button>
+      <button class="glow-btn solid" id="btn-claim" type="button" disabled>Claim</button>
     </div>
     <div class="stake-row" id="stake-row">
-      <button data-days="2" type="button">2d <span>+25%</span></button>
-      <button data-days="4" type="button">4d <span>+50%</span></button>
-      <button data-days="7" type="button">7d <span>+100%</span></button>
+      <button class="glow-btn" data-days="2" type="button">2d <span>+25%</span></button>
+      <button class="glow-btn" data-days="4" type="button">4d <span>+50%</span></button>
+      <button class="glow-btn" data-days="7" type="button">7d <span>+100%</span></button>
     </div>
   </div>
 
-  <!-- WHEEL (no card, floating) -->
   <div class="wheel-zone">
     <div class="wheel-area" id="wheel">
       <div class="reel-window">
@@ -423,8 +494,8 @@
       </div>
       <div class="arc-wrap">
         <svg class="arc" viewBox="0 0 44 170" preserveAspectRatio="none">
-          <path class="arc-base" d="M 8 8 Q 36 85 8 162" />
-          <path class="arc-fill" id="arc-fill" d="M 8 8 Q 36 85 8 162" />
+          <path class="arc-base" d="M 8 162 Q 36 85 8 8" />
+          <path class="arc-fill" id="arc-fill" d="M 8 162 Q 36 85 8 8" />
         </svg>
       </div>
     </div>
@@ -434,7 +505,6 @@
     </div>
   </div>
 
-  <!-- DEMO -->
   <div class="card demo">
     <div class="lbl">
       <span>Test wagered</span>
@@ -442,18 +512,18 @@
     </div>
     <input id="demo-range" type="range" min="0" max="1600000" step="100" value="0">
     <div class="demo-btns">
-      <button data-w="0">Reset</button>
-      <button data-w="7500">R1</button>
-      <button data-w="25000">R2</button>
-      <button data-w="75000">R3</button>
-      <button data-w="200000">R4</button>
-      <button data-w="500000">R5</button>
-      <button data-w="1500000">R6</button>
+      <button class="glow-btn" data-w="0">Reset</button>
+      <button class="glow-btn" data-w="7500">R1</button>
+      <button class="glow-btn" data-w="25000">R2</button>
+      <button class="glow-btn" data-w="75000">R3</button>
+      <button class="glow-btn" data-w="200000">R4</button>
+      <button class="glow-btn" data-w="500000">R5</button>
+      <button class="glow-btn" data-w="1500000">R6</button>
     </div>
     <div class="demo-btns">
-      <button data-earn="250">+250 cb</button>
-      <button data-earn="800">+800 cb</button>
-      <button data-earn="2500">+2500 cb</button>
+      <button class="glow-btn" data-earn="250">+250 cb</button>
+      <button class="glow-btn" data-earn="800">+800 cb</button>
+      <button class="glow-btn" data-earn="2500">+2500 cb</button>
     </div>
   </div>
 
@@ -465,9 +535,6 @@
 (function(){
   'use strict';
 
-  /* ============================================================
-     CONFIG
-     ============================================================ */
   const RANKS = [
     { rank: 1, threshold: 7500,    pct: 1.5, img: 'https://i.postimg.cc/LXwm8NP4/jq06s-removebg-preview.png' },
     { rank: 2, threshold: 25000,   pct: 2.0, img: 'https://i.postimg.cc/CKMhPZYB/o-Tz-Q4-removebg-preview.png' },
@@ -477,11 +544,8 @@
     { rank: 6, threshold: 1500000, pct: 4.0, img: 'https://i.postimg.cc/fRcQhM59/Oa-Uf-D-removebg-preview.png' },
   ];
 
-  const ITEM_H = 150;   /* reel row height in px */
+  const ITEM_H = 150;
 
-  /* ============================================================
-     STATE
-     ============================================================ */
   const state = {
     wagered: 0,
     rank: 0,
@@ -490,9 +554,6 @@
     wheelIdx: 0,
   };
 
-  /* ============================================================
-     HELPERS
-     ============================================================ */
   function fmt(n){ return Math.floor(n).toLocaleString('en-US'); }
   function haptic(s){ try{ if(navigator.vibrate) navigator.vibrate(s==='heavy'?24:8); }catch(_){} }
 
@@ -505,23 +566,35 @@
     return { rank, pct };
   }
 
-  /* ============================================================
-     PROFILE RENDER
-     ============================================================ */
   function renderProfile(){
-    const lineEl = document.getElementById('rank-line');
-    const nameEl = document.getElementById('rk-name');
-    const pctEl  = document.getElementById('rk-pct');
+    const slotCur  = document.getElementById('rk-slot-cur');
+    const curImg   = document.getElementById('rk-cur-img');
+    const nameEl   = document.getElementById('rk-name');
+    const subEl    = document.getElementById('rk-sub');
+    const slotNext = document.getElementById('rk-slot-next');
+    const nextImg  = document.getElementById('rk-next-img');
 
     if(state.rank === 0){
-      lineEl.classList.add('locked');
+      slotCur.classList.add('locked');
+      curImg.src = RANKS[0].img;
       nameEl.textContent = 'Unranked';
-      pctEl.textContent = '0.0%';
+      nameEl.classList.add('locked');
+      subEl.textContent = '0.0% cashback';
     } else {
       const r = RANKS[state.rank - 1];
-      lineEl.classList.remove('locked');
+      slotCur.classList.remove('locked');
+      curImg.src = r.img;
+      nameEl.classList.remove('locked');
       nameEl.textContent = 'Rank ' + r.rank + (r.rank === RANKS.length ? ' · Max' : '');
-      pctEl.textContent = r.pct.toFixed(1) + '%';
+      subEl.textContent = r.pct.toFixed(1) + '% cashback';
+    }
+
+    if(state.rank >= RANKS.length){
+      slotNext.classList.add('max');
+      nextImg.src = RANKS[RANKS.length - 1].img;
+    } else {
+      slotNext.classList.remove('max');
+      nextImg.src = RANKS[state.rank].img;
     }
 
     const left = document.getElementById('prog-left');
@@ -551,9 +624,6 @@
     arrow.style.left = (progress * 100) + '%';
   }
 
-  /* ============================================================
-     CLAIM RENDER
-     ============================================================ */
   function renderClaim(){
     const iconEl = document.getElementById('claim-icon');
     const pctEl  = document.getElementById('claim-pct');
@@ -580,9 +650,6 @@
     btnS.disabled = state.pending <= 0;
   }
 
-  /* ============================================================
-     REEL BUILD + POSITION
-     ============================================================ */
   function buildReel(){
     const strip = document.getElementById('reel-strip');
     strip.innerHTML = RANKS.map(r =>
@@ -598,29 +665,13 @@
     strip.style.transform = 'translateY(' + (-clamped * ITEM_H) + 'px)';
   }
 
-  /* ============================================================
-     ARC (stroke-dashoffset reveal, grows bottom-up)
-     Path starts at TOP (M 8 8) → BOTTOM (8 162).
-     Wait — we want fill to grow from bottom as rank rises.
-     So we reveal from END of path. Use negative dashoffset trick:
-     stroke-dasharray = len ; stroke-dashoffset = len - fraction*len
-     To grow from bottom, reverse the direction by swapping stroke-dashoffset sign.
-     Simplest: draw from bottom. Path: M 8 162 Q 36 85 8 8.
-     ============================================================ */
   let ARC_LEN = 0;
-
   function initArc(){
-    const base = document.querySelector('.arc-base');
     const fill = document.getElementById('arc-fill');
-    /* redraw paths from bottom to top so fill grows upward */
-    const dFromBottom = 'M 8 162 Q 36 85 8 8';
-    base.setAttribute('d', dFromBottom);
-    fill.setAttribute('d', dFromBottom);
     ARC_LEN = fill.getTotalLength();
     fill.style.strokeDasharray = ARC_LEN;
     fill.style.strokeDashoffset = ARC_LEN;
   }
-
   function setArcFraction(fraction, animate){
     const fill = document.getElementById('arc-fill');
     if(!animate) fill.classList.add('dragging');
@@ -628,9 +679,6 @@
     fill.style.strokeDashoffset = ARC_LEN * (1 - fraction);
   }
 
-  /* ============================================================
-     WHEEL STATE APPLY
-     ============================================================ */
   function applyWheelIndex(idx, animate){
     idx = Math.max(0, Math.min(RANKS.length - 1, idx));
     state.wheelIdx = idx;
@@ -643,9 +691,6 @@
     setArcFraction((idx + 1) / RANKS.length, animate);
   }
 
-  /* ============================================================
-     DRAG INTERACTION
-     ============================================================ */
   (function initWheel(){
     const wheel = document.getElementById('wheel');
     let dragging = false;
@@ -663,12 +708,11 @@
 
     wheel.addEventListener('pointermove', function(e){
       if(!dragging) return;
-      const dy = startY - e.clientY;              /* drag up = positive */
-      const delta = dy / 60;                       /* pixels per rank step */
+      const dy = startY - e.clientY;
+      const delta = dy / 60;
       let target = startIdx + delta;
       target = Math.max(0, Math.min(RANKS.length - 1, target));
 
-      /* live update — no animation classes, just raw position */
       const r = RANKS[Math.round(target)];
       document.getElementById('wn').textContent = 'Rank ' + r.rank;
       document.getElementById('wp').textContent = r.pct.toFixed(1) + '%';
@@ -698,9 +742,6 @@
     }, { passive: false });
   })();
 
-  /* ============================================================
-     CLAIM / STAKE / TOAST
-     ============================================================ */
   let toastTimer = null;
   function showToast(msg){
     const t = document.getElementById('toast');
@@ -737,9 +778,6 @@
     });
   });
 
-  /* ============================================================
-     DEMO CONTROLS
-     ============================================================ */
   const range = document.getElementById('demo-range');
   const rangeVal = document.getElementById('demo-val');
 
@@ -774,9 +812,6 @@
     });
   });
 
-  /* ============================================================
-     BOOT
-     ============================================================ */
   buildReel();
   initArc();
   applyWheelIndex(0, false);
