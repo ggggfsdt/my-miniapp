@@ -45,7 +45,7 @@
     border-radius:14px;
   }
 
-  /* ========== PROFILE (big centered card) ========== */
+  /* ========== PROFILE ========== */
   .profile{
     padding:22px 20px 18px;
     display:flex;flex-direction:column;align-items:center;
@@ -71,7 +71,6 @@
     letter-spacing:.1px;
     margin-bottom:18px;
   }
-  .profile .rank-line .rk-name{color:var(--text-2)}
   .profile .rank-line .rk-dot{
     width:3px;height:3px;border-radius:50%;background:var(--text-3);
   }
@@ -96,14 +95,14 @@
   .profile .progress-track{
     position:relative;
     width:100%;
-    height:4px;
+    height:5px;
     background:#141414;
-    border-radius:4px;
+    border-radius:5px;
   }
   .profile .progress-fill{
     position:absolute;left:0;top:0;bottom:0;width:0%;
     background:var(--accent);
-    border-radius:4px;
+    border-radius:5px;
     transition:width .55s cubic-bezier(.4,0,.2,1);
   }
   .profile .progress-arrow{
@@ -117,7 +116,7 @@
   }
   .profile .progress-arrow svg{width:100%;height:100%;display:block;fill:currentColor}
 
-  /* ========== CLAIM (compact) ========== */
+  /* ========== CLAIM ========== */
   .claim{
     padding:13px 14px 12px;
   }
@@ -132,10 +131,9 @@
   }
   .claim .claim-icon{
     width:26px;height:26px;object-fit:contain;flex-shrink:0;
-    filter:grayscale(1) brightness(1.15);
-    transition:opacity .3s ease, filter .3s ease;
+    transition:opacity .3s ease;
   }
-  .claim .claim-icon.locked{filter:grayscale(1) brightness(.3);opacity:.5}
+  .claim .claim-icon.locked{opacity:.35}
   .claim .label{
     font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
     color:var(--text-3);
@@ -211,74 +209,101 @@
   .stake-row button:active{background:rgba(255,255,255,.05)}
   .stake-row button span{display:block;font-size:9.5px;color:var(--text-3);font-weight:700;margin-top:2px}
 
-  /* ========== WHEEL ========== */
-  .wheel{
-    padding:18px 16px 16px;
-    display:flex;gap:14px;
-    align-items:stretch;
+  /* ========== WHEEL (no card, no border, just floating) ========== */
+  .wheel-zone{
+    padding:26px 0 14px;
+  }
+
+  .wheel-area{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0px;
     cursor:grab;
     touch-action:none;
-    min-height:170px;
   }
-  .wheel:active{cursor:grabbing}
+  .wheel-area:active{cursor:grabbing}
 
-  /* left: big icon in a floaty area */
-  .wheel .left{
-    flex:1;
-    display:flex;align-items:center;justify-content:center;
-    min-width:0;
+  /* vertical slot reel */
+  .reel-window{
     position:relative;
-  }
-  .wheel .big-icon{
-    width:100px;height:100px;object-fit:contain;
-    filter:grayscale(1) brightness(1.1);
-    transform-origin:50% 50%;
-    backface-visibility:hidden;
-    will-change:transform,opacity;
-  }
-
-  /* right: vertical curved line */
-  .wheel .right{
-    width:44px;
-    position:relative;
-    display:flex;align-items:center;justify-content:center;
+    width:150px;
+    height:150px;
+    overflow:hidden;
     flex-shrink:0;
+    -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+    mask-image:linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
   }
-  .wheel .arc{
+  .reel-strip{
     position:absolute;
-    inset:0;
-    width:100%;height:100%;
+    left:0;right:0;top:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transition:transform .5s cubic-bezier(.22,.9,.24,1);
+    will-change:transform;
+  }
+  .reel-strip.dragging{transition:none}
+
+  .reel-item{
+    width:150px;
+    height:150px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .reel-item img{
+    width:128px;
+    height:128px;
+    object-fit:contain;
+    display:block;
     pointer-events:none;
   }
 
-  /* roll animations */
-  @keyframes rollOut{
-    0%   {transform:rotateX(0deg)   scale(1)   translateY(0);   opacity:1;}
-    100% {transform:rotateX(-82deg) scale(.78) translateY(26%); opacity:0;}
+  /* vertical arc immediately beside the reel */
+  .arc-wrap{
+    width:46px;
+    height:170px;
+    flex-shrink:0;
+    margin-left:-6px;
+    pointer-events:none;
   }
-  @keyframes rollIn{
-    0%   {transform:rotateX(82deg)  scale(.78) translateY(-26%); opacity:0;}
-    100% {transform:rotateX(0deg)   scale(1)   translateY(0);   opacity:1;}
+  .arc{
+    width:100%;
+    height:100%;
+    display:block;
+    overflow:visible;
   }
-  .big-icon.rolling-out{animation:rollOut .4s cubic-bezier(.4,0,.2,1) forwards}
-  .big-icon.rolling-in{animation:rollIn .4s cubic-bezier(.4,0,.2,1) forwards}
+  .arc-base{
+    stroke:#1c1c1c;
+    stroke-width:4;
+    fill:none;
+    stroke-linecap:round;
+  }
+  .arc-fill{
+    stroke:#e8e8e8;
+    stroke-width:4;
+    fill:none;
+    stroke-linecap:round;
+    filter:drop-shadow(0 0 6px rgba(255,255,255,.35));
+    transition:stroke-dashoffset .5s cubic-bezier(.22,.9,.24,1);
+  }
+  .arc-fill.dragging{transition:none}
 
-  .wheel .caption{
-    position:absolute;
-    left:0;right:44px;
-    bottom:0;
+  .wheel-caption{
     text-align:center;
-    pointer-events:none;
+    padding-top:14px;
   }
-  .wheel .caption .wn{
-    font-size:12px;font-weight:800;color:var(--text-2);
-    letter-spacing:-.1px;
+  .wheel-caption .wn{
+    font-size:14px;font-weight:800;color:var(--text);
+    letter-spacing:-.2px;
   }
-  .wheel .caption .wp{
-    font-size:11px;font-weight:900;color:var(--green);
+  .wheel-caption .wp{
+    font-size:12px;font-weight:900;color:var(--green);
     letter-spacing:.2px;
     font-variant-numeric:tabular-nums;
-    margin-top:1px;
+    margin-top:3px;
   }
 
   /* ========== DEMO ========== */
@@ -343,7 +368,7 @@
 
 <div class="stack">
 
-  <!-- ========== PROFILE (all-in-one) ========== -->
+  <!-- PROFILE -->
   <div class="card profile">
     <img class="pfp" src="https://i.pravatar.cc/150?img=12" alt="">
     <div class="nick">Player</div>
@@ -366,7 +391,7 @@
     </div>
   </div>
 
-  <!-- ========== CLAIM (compact) ========== -->
+  <!-- CLAIM -->
   <div class="card claim">
     <div class="row-1">
       <div class="left-meta">
@@ -390,26 +415,26 @@
     </div>
   </div>
 
-  <!-- ========== WHEEL (icon left, arc right) ========== -->
-  <div class="card wheel" id="wheel">
-    <div class="left">
-      <img class="big-icon" id="big-icon" src="" alt="">
-      <div class="caption">
-        <div class="wn" id="wn">Rank 1</div>
-        <div class="wp" id="wp">1.5%</div>
+  <!-- WHEEL (no card, floating) -->
+  <div class="wheel-zone">
+    <div class="wheel-area" id="wheel">
+      <div class="reel-window">
+        <div class="reel-strip" id="reel-strip"></div>
+      </div>
+      <div class="arc-wrap">
+        <svg class="arc" viewBox="0 0 44 170" preserveAspectRatio="none">
+          <path class="arc-base" d="M 8 8 Q 36 85 8 162" />
+          <path class="arc-fill" id="arc-fill" d="M 8 8 Q 36 85 8 162" />
+        </svg>
       </div>
     </div>
-    <div class="right">
-      <svg class="arc" viewBox="0 0 24 100" preserveAspectRatio="none">
-        <path d="M 6 5 Q 20 50 6 95" stroke="#1a1a1a" stroke-width="1.4" fill="none"
-              stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-        <path id="arc-fill" d="M 6 5" stroke="#e8e8e8" stroke-width="1.4" fill="none"
-              stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-      </svg>
+    <div class="wheel-caption">
+      <div class="wn" id="wn">Rank 1</div>
+      <div class="wp" id="wp">1.5%</div>
     </div>
   </div>
 
-  <!-- ========== DEMO ========== -->
+  <!-- DEMO -->
   <div class="card demo">
     <div class="lbl">
       <span>Test wagered</span>
@@ -452,6 +477,8 @@
     { rank: 6, threshold: 1500000, pct: 4.0, img: 'https://i.postimg.cc/fRcQhM59/Oa-Uf-D-removebg-preview.png' },
   ];
 
+  const ITEM_H = 150;   /* reel row height in px */
+
   /* ============================================================
      STATE
      ============================================================ */
@@ -461,7 +488,6 @@
     pct: 0,
     pending: 0,
     wheelIdx: 0,
-    rolling: false,
   };
 
   /* ============================================================
@@ -479,22 +505,8 @@
     return { rank, pct };
   }
 
-  /* sub-path of the arc up to fraction T (0..1)
-     curve: M 6 5 Q 20 50 6 95
-     P0=(6,5)  P1=(20,50)  P2=(6,95) */
-  function subArc(T){
-    if(T <= 0.001) return 'M 6 5';
-    if(T >= 0.999) return 'M 6 5 Q 20 50 6 95';
-    const P0 = [6,5], P1 = [20,50], P2 = [6,95];
-    const c1x = P0[0] + T * (P1[0] - P0[0]);
-    const c1y = P0[1] + T * (P1[1] - P0[1]);
-    const ex = (1-T)*(1-T)*P0[0] + 2*(1-T)*T*P1[0] + T*T*P2[0];
-    const ey = (1-T)*(1-T)*P0[1] + 2*(1-T)*T*P1[1] + T*T*P2[1];
-    return 'M ' + P0[0] + ' ' + P0[1] + ' Q ' + c1x + ' ' + c1y + ' ' + ex + ' ' + ey;
-  }
-
   /* ============================================================
-     RENDER · PROFILE
+     PROFILE RENDER
      ============================================================ */
   function renderProfile(){
     const lineEl = document.getElementById('rank-line');
@@ -512,7 +524,6 @@
       pctEl.textContent = r.pct.toFixed(1) + '%';
     }
 
-    /* progress */
     const left = document.getElementById('prog-left');
     const right = document.getElementById('prog-right');
     const fill = document.getElementById('prog-fill');
@@ -541,7 +552,7 @@
   }
 
   /* ============================================================
-     RENDER · CLAIM
+     CLAIM RENDER
      ============================================================ */
   function renderClaim(){
     const iconEl = document.getElementById('claim-icon');
@@ -570,81 +581,120 @@
   }
 
   /* ============================================================
-     RENDER · WHEEL
+     REEL BUILD + POSITION
      ============================================================ */
-  function renderWheel(){
-    const idx = state.wheelIdx;
-    const r = RANKS[idx];
-
-    document.getElementById('big-icon').src = r.img;
-    document.getElementById('wn').textContent = 'Rank ' + r.rank;
-    document.getElementById('wp').textContent = r.pct.toFixed(1) + '%';
-
-    const T = idx / (RANKS.length - 1);
-    document.getElementById('arc-fill').setAttribute('d', subArc(T));
+  function buildReel(){
+    const strip = document.getElementById('reel-strip');
+    strip.innerHTML = RANKS.map(r =>
+      '<div class="reel-item"><img src="' + r.img + '" alt="" draggable="false"></div>'
+    ).join('');
   }
 
-  function rollTo(newIdx){
-    if(state.rolling || newIdx === state.wheelIdx) return;
-    if(newIdx < 0 || newIdx >= RANKS.length) return;
-
-    state.rolling = true;
-    const icon = document.getElementById('big-icon');
-    icon.classList.add('rolling-out');
-
-    setTimeout(function(){
-      state.wheelIdx = newIdx;
-      renderWheel();
-      icon.classList.remove('rolling-out');
-      icon.classList.add('rolling-in');
-      setTimeout(function(){
-        icon.classList.remove('rolling-in');
-        state.rolling = false;
-      }, 400);
-    }, 400);
+  function setReelPosition(continuousIdx, animate){
+    const strip = document.getElementById('reel-strip');
+    const clamped = Math.max(0, Math.min(RANKS.length - 1, continuousIdx));
+    if(!animate) strip.classList.add('dragging');
+    else         strip.classList.remove('dragging');
+    strip.style.transform = 'translateY(' + (-clamped * ITEM_H) + 'px)';
   }
 
   /* ============================================================
-     WHEEL INTERACTION (drag vertically / mouse wheel)
+     ARC (stroke-dashoffset reveal, grows bottom-up)
+     Path starts at TOP (M 8 8) → BOTTOM (8 162).
+     Wait — we want fill to grow from bottom as rank rises.
+     So we reveal from END of path. Use negative dashoffset trick:
+     stroke-dasharray = len ; stroke-dashoffset = len - fraction*len
+     To grow from bottom, reverse the direction by swapping stroke-dashoffset sign.
+     Simplest: draw from bottom. Path: M 8 162 Q 36 85 8 8.
+     ============================================================ */
+  let ARC_LEN = 0;
+
+  function initArc(){
+    const base = document.querySelector('.arc-base');
+    const fill = document.getElementById('arc-fill');
+    /* redraw paths from bottom to top so fill grows upward */
+    const dFromBottom = 'M 8 162 Q 36 85 8 8';
+    base.setAttribute('d', dFromBottom);
+    fill.setAttribute('d', dFromBottom);
+    ARC_LEN = fill.getTotalLength();
+    fill.style.strokeDasharray = ARC_LEN;
+    fill.style.strokeDashoffset = ARC_LEN;
+  }
+
+  function setArcFraction(fraction, animate){
+    const fill = document.getElementById('arc-fill');
+    if(!animate) fill.classList.add('dragging');
+    else         fill.classList.remove('dragging');
+    fill.style.strokeDashoffset = ARC_LEN * (1 - fraction);
+  }
+
+  /* ============================================================
+     WHEEL STATE APPLY
+     ============================================================ */
+  function applyWheelIndex(idx, animate){
+    idx = Math.max(0, Math.min(RANKS.length - 1, idx));
+    state.wheelIdx = idx;
+
+    const r = RANKS[idx];
+    document.getElementById('wn').textContent = 'Rank ' + r.rank;
+    document.getElementById('wp').textContent = r.pct.toFixed(1) + '%';
+
+    setReelPosition(idx, animate);
+    setArcFraction((idx + 1) / RANKS.length, animate);
+  }
+
+  /* ============================================================
+     DRAG INTERACTION
      ============================================================ */
   (function initWheel(){
     const wheel = document.getElementById('wheel');
     let dragging = false;
     let startY = 0;
     let startIdx = 0;
-    let accumulated = 0;
+    let lastApplied = 0;
 
     wheel.addEventListener('pointerdown', function(e){
-      if(state.rolling) return;
       dragging = true;
       startY = e.clientY;
       startIdx = state.wheelIdx;
-      accumulated = 0;
+      lastApplied = startIdx;
       try { wheel.setPointerCapture(e.pointerId); } catch(_) {}
     });
 
     wheel.addEventListener('pointermove', function(e){
       if(!dragging) return;
-      accumulated = startY - e.clientY; /* drag up = positive */
-      const step = Math.round(accumulated / 40);
-      const target = Math.max(0, Math.min(RANKS.length - 1, startIdx + step));
-      if(target !== state.wheelIdx) rollTo(target);
+      const dy = startY - e.clientY;              /* drag up = positive */
+      const delta = dy / 60;                       /* pixels per rank step */
+      let target = startIdx + delta;
+      target = Math.max(0, Math.min(RANKS.length - 1, target));
+
+      /* live update — no animation classes, just raw position */
+      const r = RANKS[Math.round(target)];
+      document.getElementById('wn').textContent = 'Rank ' + r.rank;
+      document.getElementById('wp').textContent = r.pct.toFixed(1) + '%';
+
+      setReelPosition(target, false);
+      setArcFraction((target + 1) / RANKS.length, false);
+
+      lastApplied = target;
     });
 
-    function endDrag(e){
+    function snap(e){
       if(!dragging) return;
       dragging = false;
       try { wheel.releasePointerCapture(e.pointerId); } catch(_) {}
+      const snapped = Math.round(lastApplied);
+      applyWheelIndex(snapped, true);
     }
-    wheel.addEventListener('pointerup', endDrag);
-    wheel.addEventListener('pointercancel', endDrag);
+    wheel.addEventListener('pointerup', snap);
+    wheel.addEventListener('pointercancel', snap);
+    wheel.addEventListener('pointerleave', snap);
 
     wheel.addEventListener('wheel', function(e){
       e.preventDefault();
-      if(state.rolling) return;
       const dir = e.deltaY > 0 ? 1 : -1;
       const target = Math.max(0, Math.min(RANKS.length - 1, state.wheelIdx + dir));
-      rollTo(target);
+      if(target !== state.wheelIdx) applyWheelIndex(target, true);
     }, { passive: false });
   })();
 
@@ -727,7 +777,9 @@
   /* ============================================================
      BOOT
      ============================================================ */
-  renderWheel();
+  buildReel();
+  initArc();
+  applyWheelIndex(0, false);
   setWagered(0);
   state.pending = 320;
   renderClaim();
