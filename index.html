@@ -194,10 +194,11 @@
       0 3px 5px rgba(0,0,0,.35);
   }
 
-  /* GIFT IMAGE — original colors, only gradient fade applied */
+  /* GIFT IMAGE — forced white (brightness boost + grayscale), gradient fade */
   .gift-ic{
     width:62%;height:62%;display:block;
     object-fit:contain;
+    filter:grayscale(1) brightness(2.6) contrast(1.15);
     -webkit-mask-image:linear-gradient(180deg,
       #000 0%,
       #000 32%,
@@ -262,9 +263,15 @@
     transition:opacity .25s ease,transform .35s ease !important;
   }
 
-  .tile.dimmed{opacity:.32;transition:opacity .5s ease}
+  .tile.dimmed{opacity:.55;transition:opacity .5s ease}
   .tile.dimmed .tile-front{opacity:0;pointer-events:none}
   .tile.dimmed .tile-back{opacity:1;transform:scale(1)}
+
+  /* Revealed-mine after cashout — slightly muted so player's picks stand out */
+  .tile.post-reveal-mine .tile-back{
+    opacity:.85;
+    filter:saturate(.7) brightness(.85);
+  }
 
   .special-gif{
     position:absolute;top:10%;left:10%;width:80%;height:80%;
@@ -1245,7 +1252,23 @@
     haptic('heavy');
 
     const tiles = gridEl.querySelectorAll('.tile');
-    tiles.forEach(t => { if (!t.classList.contains('revealed')) t.classList.add('dimmed'); });
+
+    // Flip all unrevealed tiles: mines get revealed as muted mines, safe spots as dimmed
+    const mineIdx = [...state.mineSet].sort((a, b) => a - b);
+    mineIdx.forEach((idx, k) => {
+      const t = tiles[idx];
+      if (!t || t.classList.contains('revealed')) return;
+      setTimeout(() => {
+        t.classList.add('revealed', 'mine', 'post-reveal-mine', 'dimmed');
+      }, 60 + k * 55);
+    });
+
+    // Dim all remaining unrevealed safe tiles
+    tiles.forEach((t, idx) => {
+      if (t.classList.contains('revealed')) return;
+      if (state.mineSet.has(idx)) return;
+      setTimeout(() => t.classList.add('dimmed'), 240);
+    });
 
     Sound.cashout();
     spawnConfetti(perfect ? 60 : 40);
