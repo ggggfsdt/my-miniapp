@@ -17,6 +17,7 @@
     --ease-spring:cubic-bezier(.34,1.56,.64,1);
     --safe-bottom:env(safe-area-inset-bottom,0px);
     --safe-top:env(safe-area-inset-top,0px);
+    --r-sm:14px;--r-md:16px;--r-lg:20px;--r-xl:22px;--r-pill:99px;
   }
   html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg-base);color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',Roboto,sans-serif;
@@ -36,7 +37,7 @@
   /* ============== TOPBAR ============== */
   #topbar{display:flex;align-items:center;gap:8px;
     padding:calc(14px + var(--safe-top)) 12px 10px;flex-shrink:0}
-  .back-btn{width:38px;height:38px;border-radius:14px;border:.5px solid var(--border);
+  .back-btn{width:38px;height:38px;border-radius:var(--r-sm);border:.5px solid var(--border);
     background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;
     cursor:pointer;flex-shrink:0;transition:transform .18s var(--ease-spring),background .2s;
     -webkit-appearance:none;appearance:none;outline:none}
@@ -48,17 +49,17 @@
   #topbar .title .caret{display:inline-block;width:1.5px;height:14px;background:#8fb8ff;
     margin-left:2px;vertical-align:-2px;animation:caretBlink 1s steps(1,end) infinite;border-radius:2px}
   @keyframes caretBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
-  .balance-pill{display:flex;align-items:center;gap:6px;padding:8px 14px 8px 10px;border-radius:99px;
+  .balance-pill{display:flex;align-items:center;gap:6px;padding:8px 14px 8px 10px;border-radius:var(--r-pill);
     background:var(--surface2);border:.5px solid var(--border);flex-shrink:0}
   .balance-pill img{width:18px;height:18px;display:block;object-fit:contain}
   .balance-pill span{font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums}
 
   /* ============== MULTIPLIER BAR ============== */
-  #mult-bar-wrap{flex-shrink:0;margin-bottom:6px;position:relative;
+  #mult-bar-outer{flex-shrink:0;margin-bottom:6px;display:flex;align-items:center;gap:8px;padding:0 12px 0 0}
+  #mult-bar-wrap{flex:1;min-width:0;position:relative;
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);
     mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%)}
-  #mult-bar{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth}
+  #mult-bar{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
   #mult-bar::-webkit-scrollbar{display:none}
   .mult-inner{display:flex;gap:8px;padding:10px 24px;position:relative;width:max-content}
 
@@ -90,6 +91,42 @@
   .mult-item.active{color:#fff !important;transform:scale(1.08);text-shadow:0 1px 4px rgba(0,0,0,.4)}
   .mult-item.done{opacity:.68}
 
+  /* Max multiplier box — same pill shape & feel as the slider indicator */
+  #mult-max{
+    position:relative;overflow:hidden;
+    flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:70px;padding:8px 14px;border-radius:18px;
+    background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+    border:none;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.16),
+      inset 0 -1px 0 rgba(0,0,0,.4),
+      0 4px 14px rgba(0,0,0,.3);
+    transition:box-shadow .4s ease}
+  /* Green fill slider — matches indicator style */
+  #mult-max .mm-fill{
+    position:absolute;left:0;top:0;bottom:0;width:0%;
+    background:linear-gradient(180deg,#4CC38A,#2fa86f);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
+    transition:width .55s var(--ease-spring),background .4s ease;
+    z-index:0;pointer-events:none}
+  #mult-max.tier-blue .mm-fill{background:linear-gradient(180deg,#6db3ff,#3a7fd4)}
+  #mult-max.tier-purple .mm-fill{background:linear-gradient(180deg,#c193ff,#8b5ddc)}
+  #mult-max.tier-yellow .mm-fill{background:linear-gradient(180deg,#ffe68a,#d4b02e)}
+  #mult-max.tier-orange .mm-fill{background:linear-gradient(180deg,#ffb877,#e07c1e)}
+
+  #mult-max .mm-label{position:relative;z-index:1;
+    font-size:8px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;
+    color:rgba(255,255,255,.55);line-height:1;margin-bottom:3px;
+    transition:color .4s ease}
+  #mult-max .mm-value{position:relative;z-index:1;
+    font-size:14px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;
+    letter-spacing:-.3px;line-height:1;
+    text-shadow:0 1px 4px rgba(0,0,0,.65),0 0 8px rgba(0,0,0,.35);
+    transition:color .4s ease,text-shadow .4s ease}
+  #mult-max.pulse .mm-value{animation:mmPulse .55s var(--ease-spring)}
+  @keyframes mmPulse{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
+
   #next-2x-hint{
     position:absolute;top:-8px;
     width:34px;height:34px;object-fit:contain;
@@ -109,17 +146,25 @@
   /* ============== GRID ============== */
   #grid-stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;
     padding:0 12px;position:relative;overflow:hidden}
-  #mines-grid{display:grid;position:relative;will-change:transform,opacity;
-    transition:transform .45s var(--ease-spring),opacity .3s ease}
-  #mines-grid.exiting{transform:scale(.55) rotate(-8deg);opacity:0;
+
+  #grid-frame{
+    position:relative;padding:12px;border-radius:24px;
+    background:linear-gradient(180deg,#252a34 0%,#171b22 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      inset 0 -4px 0 rgba(0,0,0,.55),
+      0 10px 30px rgba(0,0,0,.5);
+    transition:transform .45s var(--ease-spring),opacity .3s ease;
+    z-index:1}
+  #grid-frame.exiting{transform:scale(.55) rotate(-8deg);opacity:0;
     transition:transform .26s cubic-bezier(.5,0,.75,0),opacity .22s ease}
-  #mines-grid.swapping{animation:gridSwapIn .58s var(--ease-spring)}
+  #grid-frame.swapping{animation:gridSwapIn .58s var(--ease-spring)}
   @keyframes gridSwapIn{
     0%{transform:scale(.86);opacity:.4}
     55%{transform:scale(1.03);opacity:1}
     100%{transform:scale(1);opacity:1}
   }
-  #mines-grid.shaking{animation:gridShake .5s cubic-bezier(.36,.07,.19,.97)}
+  #grid-frame.shaking{animation:gridShake .5s cubic-bezier(.36,.07,.19,.97)}
   @keyframes gridShake{
     0%,100%{transform:translate(0,0)}
     15%{transform:translate(-8px,3px)}
@@ -130,55 +175,37 @@
     90%{transform:translate(2px,0)}
   }
 
+  #mines-grid{display:grid;position:relative}
   .tile{
-    position:relative;
-    aspect-ratio:1/1;
-    padding:0;
-    cursor:pointer;
-    border:0;
-    background:none;
-    outline:0;
-    -webkit-appearance:none;
-    appearance:none;
-    -webkit-tap-highlight-color:transparent;
+    position:relative;aspect-ratio:1/1;padding:0;cursor:pointer;
+    border:0;background:none;outline:0;
+    -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;
     font-family:inherit;
     animation:tileSlideUp .62s cubic-bezier(.22,.9,.28,1.05) backwards;
   }
-  .tile:focus,
-  .tile:focus-visible,
-  .tile:active,
-  .tile::-moz-focus-inner{outline:0 !important;border:0 !important}
-
+  .tile.no-anim{animation:none!important}
+  .tile:focus,.tile:focus-visible,.tile:active,.tile::-moz-focus-inner{outline:0!important;border:0!important}
   @keyframes tileSlideUp{
     0%{opacity:0;transform:translateY(60px) scale(.86)}
     55%{opacity:1;transform:translateY(-4px) scale(1.03)}
     78%{transform:translateY(2px) scale(.99)}
     100%{opacity:1;transform:translateY(0) scale(1)}
   }
-
   .tile.milestone{animation:milestoneShake .62s cubic-bezier(.36,.07,.19,.97)}
   @keyframes milestoneShake{
-    0%{transform:translate(0,0) scale(1)}
-    10%{transform:translate(-2px,1px) scale(1.04)}
-    20%{transform:translate(3px,-2px) scale(1.02)}
-    30%{transform:translate(-3px,2px) scale(1.05)}
-    40%{transform:translate(3px,-1px) scale(1.02)}
-    50%{transform:translate(-2px,2px) scale(1.04)}
-    60%{transform:translate(2px,-2px) scale(1.02)}
-    70%{transform:translate(-2px,1px) scale(1.03)}
-    80%{transform:translate(1px,-1px) scale(1.01)}
-    100%{transform:translate(0,0) scale(1)}
+    0%{transform:translate(0,0) scale(1)}10%{transform:translate(-2px,1px) scale(1.04)}
+    20%{transform:translate(3px,-2px) scale(1.02)}30%{transform:translate(-3px,2px) scale(1.05)}
+    40%{transform:translate(3px,-1px) scale(1.02)}50%{transform:translate(-2px,2px) scale(1.04)}
+    60%{transform:translate(2px,-2px) scale(1.02)}70%{transform:translate(-2px,1px) scale(1.03)}
+    80%{transform:translate(1px,-1px) scale(1.01)}100%{transform:translate(0,0) scale(1)}
   }
 
   .tile-face{
-    position:absolute;inset:0;
-    border-radius:var(--tile-radius,14px);
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden;border:0;outline:0;
+    position:absolute;inset:0;border-radius:var(--tile-radius,14px);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    border:0;outline:0;
     transition:opacity .32s ease,transform .38s var(--ease-spring);
-    will-change:opacity,transform;
-    backface-visibility:visible;
-  }
+    will-change:opacity,transform}
 
   .tile-front{
     background:linear-gradient(180deg,#3a3e46 0%,#2a2d34 100%);
@@ -189,67 +216,40 @@
   }
   .tile:not(.revealed):active .tile-front{
     transform:translateY(3px) scale(.99);
-    box-shadow:
-      0 2px 0 0 #101216,
-      0 3px 5px rgba(0,0,0,.35);
+    box-shadow:0 2px 0 0 #101216,0 3px 5px rgba(0,0,0,.35);
   }
 
-  /* GIFT IMAGE — forced white (brightness boost + grayscale), gradient fade */
+  /* GIFT ICON — soft light gray with gradient fade */
   .gift-ic{
-    width:62%;height:62%;display:block;
-    object-fit:contain;
-    filter:grayscale(1) brightness(2.6) contrast(1.15);
-    -webkit-mask-image:linear-gradient(180deg,
-      #000 0%,
-      #000 32%,
-      rgba(0,0,0,.78) 55%,
-      rgba(0,0,0,.42) 78%,
-      rgba(0,0,0,.12) 100%);
-    mask-image:linear-gradient(180deg,
-      #000 0%,
-      #000 32%,
-      rgba(0,0,0,.78) 55%,
-      rgba(0,0,0,.42) 78%,
-      rgba(0,0,0,.12) 100%);
-    pointer-events:none;
-    transition:transform .3s var(--ease-spring);
+    width:62%;height:62%;display:block;object-fit:contain;
+    filter:brightness(0) invert(.72) drop-shadow(0 2px 3px rgba(0,0,0,.45));
+    opacity:.9;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 32%,rgba(0,0,0,.78) 55%,rgba(0,0,0,.42) 78%,rgba(0,0,0,.12) 100%);
+    mask-image:linear-gradient(180deg,#000 0%,#000 32%,rgba(0,0,0,.78) 55%,rgba(0,0,0,.42) 78%,rgba(0,0,0,.12) 100%);
+    pointer-events:none;transition:transform .3s var(--ease-spring);
   }
   .tile:not(.revealed):active .gift-ic{transform:scale(.9)}
 
-  .tile.revealed .tile-front{
-    opacity:0;transform:scale(.82);pointer-events:none;
-  }
-
-  .tile-back{
-    background:#1c1f25;opacity:0;transform:scale(.82);z-index:1;
-    transition-delay:.06s;
-  }
+  .tile.revealed .tile-front{opacity:0;transform:scale(.82);pointer-events:none}
+  .tile-back{background:#1c1f25;opacity:0;transform:scale(.82);z-index:1;transition-delay:.06s}
   .tile.revealed .tile-back{opacity:1;transform:scale(1)}
-
-  .tile.gem .tile-back{
-    background:linear-gradient(180deg,#1a4432,#0c2018);
-    box-shadow:0 5px 0 0 #061008,0 0 22px rgba(76,195,138,.4);
-  }
-  .tile.mine .tile-back{
-    background:linear-gradient(180deg,#4a1524,#20060c);
-    box-shadow:0 5px 0 0 #140307,0 0 24px rgba(224,85,107,.5);
-  }
+  .tile.gem .tile-back{background:linear-gradient(180deg,#1a4432,#0c2018);
+    box-shadow:0 5px 0 0 #061008,0 0 22px rgba(76,195,138,.4)}
+  .tile.mine .tile-back{background:linear-gradient(180deg,#4a1524,#20060c);
+    box-shadow:0 5px 0 0 #140307,0 0 24px rgba(224,85,107,.5)}
   .tile.mine.revealed .tile-back{animation:minePulse .6s ease}
   @keyframes minePulse{
     0%{box-shadow:0 5px 0 0 #140307,0 0 0 rgba(224,85,107,0)}
     40%{box-shadow:0 5px 0 0 #140307,0 0 55px rgba(224,85,107,.9)}
     100%{box-shadow:0 5px 0 0 #140307,0 0 24px rgba(224,85,107,.5)}
   }
-
   .tile-back .ic{
-    position:absolute;top:20%;left:20%;width:60%;height:60%;
-    object-fit:contain;display:block;
+    position:absolute;top:20%;left:20%;width:60%;height:60%;object-fit:contain;display:block;
     opacity:0;transform:scale(.35);
     transition:opacity .35s ease .12s,transform .45s var(--ease-spring) .12s;
     pointer-events:none;
   }
-  .tile.gem .ic-gem,
-  .tile.mine .ic-mine{opacity:1;transform:scale(1)}
+  .tile.gem .ic-gem,.tile.mine .ic-mine{opacity:1;transform:scale(1)}
   .tile.mine .ic-mine{animation:minePop .6s var(--ease-spring) .12s both}
   @keyframes minePop{
     0%{transform:scale(.15) rotate(-35deg);opacity:0}
@@ -257,28 +257,17 @@
     75%{transform:scale(.92) rotate(-3deg)}
     100%{transform:scale(1) rotate(0);opacity:1}
   }
-
-  .tile.hide-gem .ic-gem{
-    opacity:0 !important;transform:scale(.4) !important;
-    transition:opacity .25s ease,transform .35s ease !important;
-  }
-
-  .tile.dimmed{opacity:.55;transition:opacity .5s ease}
+  .tile.hide-gem .ic-gem{opacity:0!important;transform:scale(.4)!important;
+    transition:opacity .25s ease,transform .35s ease!important}
+  .tile.dimmed{opacity:.32;transition:opacity .5s ease}
   .tile.dimmed .tile-front{opacity:0;pointer-events:none}
   .tile.dimmed .tile-back{opacity:1;transform:scale(1)}
-
-  /* Revealed-mine after cashout — slightly muted so player's picks stand out */
-  .tile.post-reveal-mine .tile-back{
-    opacity:.85;
-    filter:saturate(.7) brightness(.85);
-  }
+  .tile.post-reveal-mine .tile-back{opacity:.85;filter:saturate(.7) brightness(.85)}
 
   .special-gif{
-    position:absolute;top:10%;left:10%;width:80%;height:80%;
-    object-fit:contain;pointer-events:none;z-index:10;
-    opacity:0;transform:scale(.4);
-    transition:opacity .3s ease,transform .55s var(--ease-spring);
-  }
+    position:absolute;top:10%;left:10%;width:80%;height:80%;object-fit:contain;
+    pointer-events:none;z-index:10;opacity:0;transform:scale(.4);
+    transition:opacity .3s ease,transform .55s var(--ease-spring)}
   .special-gif.show{opacity:1;transform:scale(1)}
 
   /* ============== CONTROLS ============== */
@@ -287,7 +276,7 @@
 
   #opts-row{display:flex;gap:8px;position:relative}
   .opt-wrap{flex:1;position:relative}
-  .opt-btn{width:100%;height:54px;border-radius:22px;
+  .opt-btn{width:100%;height:54px;border-radius:var(--r-xl);
     border:1px solid rgba(255,255,255,.07);
     background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
     color:#fff;display:flex;align-items:center;justify-content:space-between;
@@ -296,8 +285,8 @@
     transition:transform .18s var(--ease-spring),background .2s,border-color .2s;
     -webkit-appearance:none;appearance:none;outline:none}
   .opt-btn:active{transform:scale(.97);background:rgba(255,255,255,.08)}
-  .opt-btn.open{border-color:rgba(140,180,255,.45);
-    background:linear-gradient(180deg, rgba(91,157,255,.15), rgba(91,157,255,.05))}
+  .opt-btn.open{border-color:rgba(255,255,255,.22);
+    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03))}
   .opt-content{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;pointer-events:none}
   .opt-label{font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;
     color:rgba(255,255,255,.4);font-weight:900}
@@ -314,11 +303,12 @@
     transition:transform .35s var(--ease-spring),stroke .2s;pointer-events:none}
   .opt-btn.open .opt-chev{transform:rotate(180deg);stroke:#fff}
 
+  /* Popup — near-black theme */
   .popup{position:absolute;bottom:calc(100% + 10px);left:0;right:0;
     padding:10px;border-radius:24px;
-    background:linear-gradient(180deg, rgba(32,40,62,.98), rgba(16,22,36,.99));
-    border:1px solid rgba(180,210,255,.2);
-    box-shadow:0 20px 50px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08);
+    background:linear-gradient(180deg, rgba(22,22,24,.98), rgba(10,10,12,.99));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 20px 50px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
     opacity:0;transform:translateY(12px) scale(.94);
@@ -328,7 +318,7 @@
   .popup.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
   .popup button{padding:14px 6px;border-radius:18px;
     border:1px solid rgba(255,255,255,.07);
-    background:rgba(255,255,255,.04);
+    background:rgba(255,255,255,.03);
     color:rgba(255,255,255,.85);
     font-family:inherit;font-size:13.5px;font-weight:800;
     letter-spacing:.2px;cursor:pointer;
@@ -349,19 +339,19 @@
   }
   .popup button:active{transform:scale(.93)}
   .popup button.active{
-    background:linear-gradient(180deg, rgba(91,157,255,.42), rgba(74,134,232,.2));
-    border-color:rgba(140,180,255,.6);color:#fff;
-    box-shadow:0 0 16px rgba(91,157,255,.4),inset 0 1px 0 rgba(255,255,255,.2)}
+    background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.07));
+    border-color:rgba(255,255,255,.45);color:#fff;
+    box-shadow:0 0 14px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.28)}
   .popup button.pick{animation:chipPick .46s var(--ease-spring)}
   @keyframes chipPick{
     0%{transform:scale(1)}
-    35%{transform:scale(1.18);box-shadow:0 0 22px rgba(140,180,255,.65)}
+    35%{transform:scale(1.18);box-shadow:0 0 22px rgba(255,255,255,.5)}
     70%{transform:scale(.95)}
     100%{transform:scale(1)}
   }
 
   .bet-row{display:flex;gap:8px}
-  #bet-input{flex:1;height:54px;padding:0 18px;border-radius:22px;
+  #bet-input{flex:1;height:54px;padding:0 18px;border-radius:var(--r-xl);
     border:1px solid rgba(255,255,255,.09);
     background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
     color:#fff;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;
@@ -371,7 +361,7 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 3px rgba(91,157,255,.14)}
   #bet-input:disabled{opacity:.45}
 
-  #allin-btn{height:54px;padding:0 22px;border-radius:22px;
+  #allin-btn{height:54px;padding:0 22px;border-radius:var(--r-xl);
     border:1px solid rgba(140,180,255,.4);
     background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;
     font-family:inherit;font-weight:900;font-size:12px;letter-spacing:.7px;
@@ -382,7 +372,7 @@
   #allin-btn:active{transform:scale(.95)}
   #allin-btn:disabled{opacity:.35;pointer-events:none}
 
-  #action-btn{height:60px;border-radius:24px;border:none;width:100%;
+  #action-btn{height:60px;border-radius:var(--r-xl);border:none;width:100%;
     font-family:inherit;font-size:15px;font-weight:900;letter-spacing:.6px;
     cursor:pointer;position:relative;overflow:hidden;
     background:linear-gradient(180deg,#6da9ff 0%,#4a86e8 100%);color:#fff;
@@ -427,7 +417,7 @@
   .result-sub .amt{font-size:15px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
   #result-panel.win .result-sub .amt{color:#8ef0b8}
   #result-panel.lose .result-sub .amt{color:#ff8a9a}
-  #result-continue{width:100%;height:52px;border-radius:22px;border:none;margin-top:8px;
+  #result-continue{width:100%;height:52px;border-radius:var(--r-xl);border:none;margin-top:8px;
     background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;
     font-family:inherit;font-size:14.5px;font-weight:900;letter-spacing:.5px;cursor:pointer;
     box-shadow:0 8px 22px rgba(91,157,255,.35),inset 0 1px 0 rgba(255,255,255,.24);
@@ -471,17 +461,26 @@
     </div>
   </div>
 
-  <div id="mult-bar-wrap">
-    <div id="mult-bar">
-      <div class="mult-inner" id="mult-inner">
-        <div id="mult-indicator"></div>
-        <img id="next-2x-hint" alt="" draggable="false">
+  <div id="mult-bar-outer">
+    <div id="mult-bar-wrap">
+      <div id="mult-bar">
+        <div class="mult-inner" id="mult-inner">
+          <div id="mult-indicator"></div>
+          <img id="next-2x-hint" alt="" draggable="false">
+        </div>
       </div>
+    </div>
+    <div id="mult-max">
+      <div class="mm-fill" id="mult-max-fill"></div>
+      <div class="mm-label">Max</div>
+      <div class="mm-value" id="mult-max-value">x2.83</div>
     </div>
   </div>
 
   <div id="grid-stage">
-    <div id="mines-grid"></div>
+    <div id="grid-frame">
+      <div id="mines-grid"></div>
+    </div>
   </div>
 
   <div id="controls">
@@ -563,141 +562,67 @@
     'https://i.postimg.cc/kM0svwgT/ezgif-518e555f632c11bf.gif'
   ];
 
-  /* ============ AUDIO ENGINE ============ */
+  /* ============ AUDIO ============ */
   const Sound = (function(){
-    let ctx = null;
-    let unlocked = false;
-    let masterGain = null;
-
+    let ctx=null,unlocked=false,master=null;
     function ensure(){
-      if (!ctx){
-        try {
-          const AC = window.AudioContext || window.webkitAudioContext;
-          if (AC) {
-            ctx = new AC();
-            masterGain = ctx.createGain();
-            masterGain.gain.value = 0.35;
-            masterGain.connect(ctx.destination);
-          }
-        } catch(_){}
-      }
-      if (ctx && ctx.state === 'suspended'){
-        ctx.resume().catch(()=>{});
-      }
+      if(!ctx){ try{ const AC=window.AudioContext||window.webkitAudioContext;
+        if(AC){ ctx=new AC(); master=ctx.createGain(); master.gain.value=.35; master.connect(ctx.destination);} }catch(_){} }
+      if(ctx&&ctx.state==='suspended') ctx.resume().catch(()=>{});
       return ctx;
     }
-
-    function unlock(){
-      if (unlocked) return;
-      const c = ensure();
-      if (!c) return;
-      unlocked = true;
+    function unlock(){ if(unlocked)return; const c=ensure(); if(!c)return; unlocked=true; }
+    ['pointerdown','touchstart','keydown'].forEach(e=>document.addEventListener(e,unlock,{once:true,passive:true}));
+    function tone(freq,dur,type,vol,when,sweepTo){
+      const c=ensure(); if(!c||!unlocked)return;
+      const t0=when||c.currentTime, o=c.createOscillator(), g=c.createGain();
+      o.type=type||'sine'; o.frequency.setValueAtTime(freq,t0);
+      if(sweepTo) o.frequency.exponentialRampToValueAtTime(Math.max(1,sweepTo),t0+dur);
+      const v=vol==null?.22:vol;
+      g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(v,t0+.008);
+      g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+      o.connect(g); g.connect(master); o.start(t0); o.stop(t0+dur+.03);
     }
-
-    ['pointerdown','touchstart','keydown'].forEach(evt => {
-      document.addEventListener(evt, unlock, { once: true, passive: true });
-    });
-
-    function tone(freq, dur, type, vol, when, sweepTo){
-      const c = ensure();
-      if (!c || !unlocked) return;
-      const t0 = (when || c.currentTime);
-      const osc = c.createOscillator();
-      const g = c.createGain();
-      osc.type = type || 'sine';
-      osc.frequency.setValueAtTime(freq, t0);
-      if (sweepTo){
-        osc.frequency.exponentialRampToValueAtTime(Math.max(1, sweepTo), t0 + dur);
-      }
-      const v = vol == null ? 0.22 : vol;
-      g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(v, t0 + 0.008);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-      osc.connect(g); g.connect(masterGain);
-      osc.start(t0); osc.stop(t0 + dur + 0.03);
+    function noise(dur,vol,when,ff){
+      const c=ensure(); if(!c||!unlocked)return;
+      const t0=when||c.currentTime, len=Math.max(1,Math.floor(c.sampleRate*dur));
+      const buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+      const s=c.createBufferSource(); s.buffer=buf;
+      const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=ff||1200;
+      const g=c.createGain(); g.gain.value=vol==null?.22:vol;
+      s.connect(f); f.connect(g); g.connect(master); s.start(t0); s.stop(t0+dur+.03);
     }
-
-    function noise(dur, vol, when, filterFreq){
-      const c = ensure();
-      if (!c || !unlocked) return;
-      const t0 = (when || c.currentTime);
-      const len = Math.max(1, Math.floor(c.sampleRate * dur));
-      const buf = c.createBuffer(1, len, c.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < len; i++){
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
-      }
-      const src = c.createBufferSource();
-      src.buffer = buf;
-      const filt = c.createBiquadFilter();
-      filt.type = 'lowpass';
-      filt.frequency.value = filterFreq || 1200;
-      const g = c.createGain();
-      g.gain.value = vol == null ? 0.22 : vol;
-      src.connect(filt); filt.connect(g); g.connect(masterGain);
-      src.start(t0); src.stop(t0 + dur + 0.03);
-    }
-
     return {
-      unlock,
-      click(){ tone(720, 0.035, 'sine', 0.11, null, 520); },
-      reveal(){
-        const c = ensure(); if (!c || !unlocked) return;
-        const t = c.currentTime;
-        tone(620, 0.10, 'sine', 0.16, t, 900);
-        tone(950, 0.14, 'sine', 0.11, t + 0.045, 1250);
-      },
-      mine(){
-        const c = ensure(); if (!c || !unlocked) return;
-        const t = c.currentTime;
-        tone(120, 0.35, 'sawtooth', 0.32, t, 45);
-        tone(80, 0.5, 'triangle', 0.22, t + 0.02, 30);
-        noise(0.35, 0.24, t, 900);
-        tone(280, 0.25, 'square', 0.09, t + 0.05, 90);
-      },
-      milestone(){
-        const c = ensure(); if (!c || !unlocked) return;
-        const t = c.currentTime;
-        tone(900, 0.35, 'sine', 0.18, t, 2400);
-        tone(1350, 0.4, 'triangle', 0.14, t + 0.05, 3000);
-        tone(1800, 0.6, 'sine', 0.12, t + 0.12);
-        tone(2400, 0.55, 'sine', 0.09, t + 0.15);
-      },
-      cashout(){
-        const c = ensure(); if (!c || !unlocked) return;
-        const t = c.currentTime;
-        const seq = [523.25, 659.25, 783.99, 1046.5];
-        seq.forEach((f, i) => {
-          tone(f, 0.28, 'triangle', 0.16, t + i * 0.06);
-          tone(f * 2, 0.22, 'sine', 0.06, t + i * 0.06 + 0.01);
-        });
-        tone(1567.98, 0.55, 'sine', 0.12, t + 0.28, 2100);
-      },
-      lose(){
-        const c = ensure(); if (!c || !unlocked) return;
-        const t = c.currentTime;
-        tone(400, 0.35, 'triangle', 0.18, t, 180);
-        tone(220, 0.5, 'sine', 0.14, t + 0.12, 90);
-      },
-      start(){
-        const c = ensure(); if (!c || !unlocked) return;
-        const t = c.currentTime;
-        tone(440, 0.1, 'sine', 0.15, t, 660);
-        tone(660, 0.14, 'sine', 0.13, t + 0.06, 990);
-      }
+      unlock, click(){ tone(720,.035,'sine',.11,null,520); },
+      reveal(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
+        tone(620,.10,'sine',.16,t,900); tone(950,.14,'sine',.11,t+.045,1250); },
+      mine(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
+        tone(120,.35,'sawtooth',.32,t,45); tone(80,.5,'triangle',.22,t+.02,30);
+        noise(.35,.24,t,900); tone(280,.25,'square',.09,t+.05,90); },
+      milestone(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
+        tone(900,.35,'sine',.18,t,2400); tone(1350,.4,'triangle',.14,t+.05,3000);
+        tone(1800,.6,'sine',.12,t+.12); tone(2400,.55,'sine',.09,t+.15); },
+      cashout(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
+        [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
+          tone(f,.28,'triangle',.16,t+i*.06); tone(f*2,.22,'sine',.06,t+i*.06+.01); });
+        tone(1567.98,.55,'sine',.12,t+.28,2100); },
+      lose(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
+        tone(400,.35,'triangle',.18,t,180); tone(220,.5,'sine',.14,t+.12,90); },
+      start(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
+        tone(440,.1,'sine',.15,t,660); tone(660,.14,'sine',.13,t+.06,990); }
     };
   })();
 
   /* ============ CONFIG ============ */
   const HOUSE_EDGE = 0.01;
-  const MIN_BET    = 10;
+  const MIN_BET = 10;
+  const GRID_OPTIONS = [3, 4, 5];
 
   const MINE_PRESETS = {
-    3: [1, 2, 3, 4, 6, 8],
-    4: [1, 2, 4, 6, 10, 14],
-    5: [1, 3, 5, 10, 15, 24],
-    6: [1, 3, 6, 12, 20, 35],
-    7: [1, 4, 8, 16, 28, 48],
+    3: [1, 2, 3, 4],
+    4: [1, 2, 4, 6],
+    5: [1, 3, 5, 10],
   };
 
   /* ============ STATE ============ */
@@ -725,10 +650,15 @@
 
   /* ============ DOM ============ */
   const gridEl        = $('#mines-grid');
-  const stageEl       = $('#grid-stage');
+  const gridFrame     = $('#grid-frame');
+  const gridStage     = $('#grid-stage');
+  const stageEl       = gridStage;
   const multBar       = $('#mult-bar');
   const multInner     = $('#mult-inner');
   const multIndicator = $('#mult-indicator');
+  const multMaxEl     = $('#mult-max');
+  const multMaxVal    = $('#mult-max-value');
+  const multMaxFill   = $('#mult-max-fill');
   const next2xHint    = $('#next-2x-hint');
   const balanceEl     = $('#balance-val');
   const topbarTitle   = $('#topbar-title');
@@ -784,7 +714,6 @@
     const caret = document.createElement('span');
     caret.className = 'caret';
     el.appendChild(caret);
-
     let i = 0;
     function step(){
       if (i >= text.length){
@@ -792,13 +721,11 @@
         setTimeout(() => { if (caret.parentNode) caret.remove(); }, 700);
         return;
       }
-      const ch = text.charAt(i++);
-      el.insertBefore(document.createTextNode(ch), caret);
+      el.insertBefore(document.createTextNode(text.charAt(i++)), caret);
       el._typeTimer = setTimeout(step, speed || 55);
     }
     step();
   }
-
   function animateValue(el, newText){
     if (el.textContent === newText) return;
     el.textContent = newText;
@@ -814,7 +741,6 @@
     clearTimeout(toastEl._t);
     toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 2200);
   }
-
   function updateBalance(animate){
     const target = Math.floor(state.balance);
     if (animate){
@@ -857,6 +783,7 @@
     void multIndicator.offsetWidth;
     multIndicator.style.transition = '';
     updateNext2xHint();
+    updateMaxMultiplierDisplay();
   }
 
   function applyIndicatorTier(){
@@ -913,20 +840,43 @@
     });
     moveIndicator(true);
     updateNext2xHint();
+    updateMaxFill();
+  }
+
+  function updateMaxFill(){
+    const totalCells = state.gridSize * state.gridSize;
+    const minesForCalc = state.mines || 3;
+    const mults = computeMultipliers(totalCells, Math.min(minesForCalc, totalCells - 1));
+    const maxMult = mults[mults.length - 1] || 1;
+    const curMult = state.playing ? (state.multipliers[state.revealed] ?? 1) : 1;
+    const pct = Math.max(0, Math.min(1, curMult / maxMult)) * 100;
+    if (multMaxFill) multMaxFill.style.width = pct + '%';
+  }
+
+  function updateMaxMultiplierDisplay(){
+    const totalCells = state.gridSize * state.gridSize;
+    const minesForCalc = state.mines || 3;
+    const mults = computeMultipliers(totalCells, Math.min(minesForCalc, totalCells - 1));
+    const maxMult = mults[mults.length - 1] || 1;
+    multMaxVal.textContent = fmtMult(maxMult);
+    multMaxEl.classList.remove('tier-blue','tier-purple','tier-yellow','tier-orange');
+    const tier = getTierClass(maxMult);
+    if (tier) multMaxEl.classList.add(tier);
+    multMaxEl.classList.remove('pulse');
+    void multMaxEl.offsetWidth;
+    multMaxEl.classList.add('pulse');
+    updateMaxFill();
   }
 
   /* ============ POPUPS ============ */
   function renderGridChips(){
     gridPopup.innerHTML = '';
-    [3,4,5,6,7].forEach(n => {
+    GRID_OPTIONS.forEach(n => {
       const b = document.createElement('button');
       b.type = 'button';
       b.textContent = n + '×' + n;
       if (n === state.gridSize) b.classList.add('active');
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectGrid(n, b);
-      });
+      b.addEventListener('click', (e) => { e.stopPropagation(); selectGrid(n, b); });
       gridPopup.appendChild(b);
     });
   }
@@ -942,10 +892,7 @@
       b.type = 'button';
       b.textContent = m;
       if (m === state.mines) b.classList.add('active');
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectMines(m, b);
-      });
+      b.addEventListener('click', (e) => { e.stopPropagation(); selectMines(m, b); });
       minesPopup.appendChild(b);
     });
   }
@@ -961,9 +908,7 @@
   function selectGrid(n, btn){
     if (state.playing || state.busy || state.rebuilding) { closePopups(); return; }
     if (n === state.gridSize) { pulseChip(btn); closePopups(); return; }
-    haptic('light');
-    Sound.click();
-    pulseChip(btn);
+    haptic('light'); Sound.click(); pulseChip(btn);
     state.gridSize = n;
     animateValue(gridVal, n + ' × ' + n);
     state.multipliers = computeMultipliers(n * n, state.mines);
@@ -981,9 +926,7 @@
   function selectMines(m, btn){
     if (state.playing || state.busy || state.rebuilding) { closePopups(); return; }
     if (m === state.mines) { pulseChip(btn); closePopups(); return; }
-    haptic('light');
-    Sound.click();
-    pulseChip(btn);
+    haptic('light'); Sound.click(); pulseChip(btn);
     state.mines = m;
     animateValue(minesVal, String(m));
     state.multipliers = computeMultipliers(state.gridSize * state.gridSize, m);
@@ -1035,13 +978,13 @@
   function renderGrid(animate){
     if (animate && gridEl.children.length > 0){
       state.rebuilding = true;
-      gridEl.classList.add('exiting');
+      gridFrame.classList.add('exiting');
       setTimeout(() => {
         _doRenderGrid();
-        void gridEl.offsetWidth;
-        gridEl.classList.remove('exiting');
-        gridEl.classList.add('swapping');
-        setTimeout(() => gridEl.classList.remove('swapping'), 620);
+        void gridFrame.offsetWidth;
+        gridFrame.classList.remove('exiting');
+        gridFrame.classList.add('swapping');
+        setTimeout(() => gridFrame.classList.remove('swapping'), 620);
         setTimeout(() => { state.rebuilding = false; }, 620);
       }, 240);
     } else {
@@ -1085,7 +1028,7 @@
 
   function sizeGrid(){
     const rect = stageEl.getBoundingClientRect();
-    const size = Math.max(120, Math.floor(Math.min(rect.width, rect.height) - 6));
+    const size = Math.max(120, Math.floor(Math.min(rect.width, rect.height) - 40));
     gridEl.style.width  = size + 'px';
     gridEl.style.height = size + 'px';
   }
@@ -1100,7 +1043,8 @@
 
   function updateActionButton(){
     if (state.playing){
-      const cash = state.bet * (state.multipliers[state.revealed] ?? 1);
+      const mult = state.multipliers[state.revealed] ?? 1;
+      const cash = state.bet * mult;
       actionBtn.classList.add('cashout');
       actionBtn.innerHTML = 'Cashout <span class="co-amount">· ' + fmtMoney(cash) + '</span>';
       actionBtn.disabled = state.revealed === 0 || state.busy;
@@ -1111,13 +1055,13 @@
     }
   }
 
-  function startGame(){
-    if (state.busy || state.rebuilding) return;
+  function startGame(rebuildGrid){
+    if (state.busy || state.rebuilding) return false;
     const bet = Math.max(MIN_BET, Math.floor(state.bet));
     if (bet > state.balance){
       showToast('Insufficient balance');
       haptic('light');
-      return;
+      return false;
     }
 
     state.busy = true;
@@ -1132,7 +1076,7 @@
     state.revealed = 0;
     state.shown2xGif = false;
 
-    renderGrid();
+    if (rebuildGrid !== false) renderGrid();
     buildMultBar();
 
     betInput.disabled = true;
@@ -1146,11 +1090,27 @@
     updateActionButton();
 
     setTimeout(() => { state.busy = false; updateActionButton(); }, 320);
+    return true;
   }
 
   function onTileClick(i, el){
+    if (!state.playing && !state.busy && !state.rebuilding){
+      const ok = startGame(false);
+      if (ok){
+        setTimeout(() => {
+          const tiles = gridEl.querySelectorAll('.tile');
+          const target = tiles[i];
+          if (target) revealTile(i, target);
+        }, 240);
+      }
+      return;
+    }
     if (!state.playing || state.busy) return;
-    if (el.classList.contains('revealed')) return;
+    revealTile(i, el);
+  }
+
+  function revealTile(i, el){
+    if (!el || el.classList.contains('revealed')) return;
 
     if (state.mineSet.has(i)){
       el.classList.add('revealed', 'mine');
@@ -1159,7 +1119,6 @@
       loseGame();
       return;
     }
-
     el.classList.add('revealed', 'gem');
     state.revealed++;
     haptic('light');
@@ -1172,7 +1131,6 @@
       state.shown2xGif = true;
       show2xGif(el);
     }
-
     updateMultBar();
     updateActionButton();
 
@@ -1196,7 +1154,6 @@
     el.appendChild(gif);
 
     requestAnimationFrame(() => requestAnimationFrame(() => gif.classList.add('show')));
-
     haptic('heavy');
     Sound.milestone();
 
@@ -1212,20 +1169,16 @@
 
   function loseGame(){
     state.busy = true;
-    gridEl.classList.add('shaking');
-    setTimeout(() => gridEl.classList.remove('shaking'), 520);
+    gridFrame.classList.add('shaking');
+    setTimeout(() => gridFrame.classList.remove('shaking'), 520);
 
     const tiles = gridEl.querySelectorAll('.tile');
     const mineIdx = [...state.mineSet].sort((a, b) => a - b);
     mineIdx.forEach((idx, k) => {
       const t = tiles[idx];
       if (!t || t.classList.contains('revealed')) return;
-      setTimeout(() => {
-        t.classList.add('revealed', 'mine');
-        Sound.mine();
-      }, 90 + k * 55);
+      setTimeout(() => { t.classList.add('revealed', 'mine'); Sound.mine(); }, 90 + k * 55);
     });
-
     tiles.forEach((t, idx) => {
       if (state.mineSet.has(idx)) return;
       setTimeout(() => t.classList.add('dimmed'), 280);
@@ -1252,8 +1205,6 @@
     haptic('heavy');
 
     const tiles = gridEl.querySelectorAll('.tile');
-
-    // Flip all unrevealed tiles: mines get revealed as muted mines, safe spots as dimmed
     const mineIdx = [...state.mineSet].sort((a, b) => a - b);
     mineIdx.forEach((idx, k) => {
       const t = tiles[idx];
@@ -1262,8 +1213,6 @@
         t.classList.add('revealed', 'mine', 'post-reveal-mine', 'dimmed');
       }, 60 + k * 55);
     });
-
-    // Dim all remaining unrevealed safe tiles
     tiles.forEach((t, idx) => {
       if (t.classList.contains('revealed')) return;
       if (state.mineSet.has(idx)) return;
@@ -1296,9 +1245,11 @@
     state.shown2xGif = false;
     resultPanel.classList.remove('show', 'win', 'lose');
     unlockControls();
+    state.multipliers = computeMultipliers(state.gridSize * state.gridSize, state.mines);
     renderGrid(true);
     buildMultBar();
     updateActionButton();
+    updateMaxFill();
   }
 
   /* ============ RESULT ============ */
@@ -1393,7 +1344,7 @@
       if (state.revealed === 0) return;
       cashout(false);
     } else {
-      startGame();
+      startGame(true);
     }
   });
 
@@ -1431,6 +1382,7 @@
     requestAnimationFrame(() => requestAnimationFrame(() => {
       sizeGrid();
       moveIndicator(false);
+      updateMaxFill();
     }));
   }
 
