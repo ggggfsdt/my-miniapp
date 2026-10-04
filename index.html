@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>dllump · mines</title>
+<title>dllump · mineshaft</title>
 <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
@@ -34,9 +34,8 @@
     background:radial-gradient(circle at 30% 20%, rgba(0,0,0,.25), rgba(0,0,0,.7) 70%);pointer-events:none}
   #app > *{position:relative;z-index:1}
 
-  /* ============== TOPBAR ============== */
   #topbar{display:flex;align-items:center;gap:8px;
-    padding:calc(14px + var(--safe-top)) 12px 10px;flex-shrink:0}
+    padding:calc(14px + var(--safe-top)) 12px 8px;flex-shrink:0}
   .back-btn{width:38px;height:38px;border-radius:var(--r-sm);border:.5px solid var(--border);
     background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;
     cursor:pointer;flex-shrink:0;transition:transform .18s var(--ease-spring),background .2s;
@@ -50,317 +49,265 @@
     margin-left:2px;vertical-align:-2px;animation:caretBlink 1s steps(1,end) infinite;border-radius:2px}
   @keyframes caretBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
   .balance-pill{display:flex;align-items:center;gap:6px;padding:8px 14px 8px 10px;border-radius:var(--r-pill);
-    background:var(--surface2);border:.5px solid var(--border);flex-shrink:0}
+    background:var(--surface2);border:.5px solid var(--border);flex-shrink:0;
+    transition:transform .2s var(--ease-spring)}
+  .balance-pill.bump{transform:scale(1.09)}
   .balance-pill img{width:18px;height:18px;display:block;object-fit:contain}
   .balance-pill span{font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums}
 
-  /* ============== MULTIPLIER BAR ============== */
-  #mult-bar-outer{flex-shrink:0;margin-bottom:6px;display:flex;align-items:center;gap:8px;padding:0 12px 0 0}
-  #mult-bar-wrap{flex:1;min-width:0;position:relative;
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);
-    mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%)}
-  #mult-bar{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
-  #mult-bar::-webkit-scrollbar{display:none}
-  .mult-inner{display:flex;gap:8px;padding:10px 24px;position:relative;width:max-content}
-
-  #mult-indicator{position:absolute;top:10px;bottom:10px;left:0;width:0;
-    border-radius:18px;
-    background:linear-gradient(180deg,#4CC38A,#2fa86f);
-    box-shadow:0 6px 18px rgba(76,195,138,.32),inset 0 1px 0 rgba(255,255,255,.25);
-    transition:left .5s var(--ease-spring),width .5s var(--ease-spring),
-               background .45s ease,box-shadow .45s ease;
-    z-index:0;pointer-events:none}
-  #mult-indicator.tier-blue{background:linear-gradient(180deg,#6db3ff,#3a7fd4);
-    box-shadow:0 6px 20px rgba(91,157,255,.5),inset 0 1px 0 rgba(255,255,255,.3)}
-  #mult-indicator.tier-purple{background:linear-gradient(180deg,#c193ff,#8b5ddc);
-    box-shadow:0 6px 22px rgba(180,122,255,.55),inset 0 1px 0 rgba(255,255,255,.3)}
-  #mult-indicator.tier-yellow{background:linear-gradient(180deg,#ffe68a,#d4b02e);
-    box-shadow:0 6px 24px rgba(245,215,110,.55),inset 0 1px 0 rgba(255,255,255,.35)}
-  #mult-indicator.tier-orange{background:linear-gradient(180deg,#ffb877,#e07c1e);
-    box-shadow:0 6px 26px rgba(255,157,77,.6),inset 0 1px 0 rgba(255,255,255,.32)}
-
-  .mult-item{position:relative;z-index:1;padding:10px 16px;border-radius:18px;
-    color:rgba(255,255,255,.4);
-    font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.1px;
-    white-space:nowrap;
-    transition:color .4s ease,transform .4s var(--ease-spring),opacity .3s ease}
-  .mult-item.tier-blue{color:#5b9dff}
-  .mult-item.tier-purple{color:#b47aff}
-  .mult-item.tier-yellow{color:#f5d76e}
-  .mult-item.tier-orange{color:#ff9d4d}
-  .mult-item.active{color:#fff !important;transform:scale(1.08);text-shadow:0 1px 4px rgba(0,0,0,.4)}
-  .mult-item.done{opacity:.68}
-
-  /* Max multiplier box — same pill shape & feel as the slider indicator */
-  #mult-max{
-    position:relative;overflow:hidden;
-    flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    min-width:70px;padding:8px 14px;border-radius:18px;
-    background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
-    border:none;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.16),
-      inset 0 -1px 0 rgba(0,0,0,.4),
-      0 4px 14px rgba(0,0,0,.3);
-    transition:box-shadow .4s ease}
-  /* Green fill slider — matches indicator style */
-  #mult-max .mm-fill{
-    position:absolute;left:0;top:0;bottom:0;width:0%;
-    background:linear-gradient(180deg,#4CC38A,#2fa86f);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
-    transition:width .55s var(--ease-spring),background .4s ease;
-    z-index:0;pointer-events:none}
-  #mult-max.tier-blue .mm-fill{background:linear-gradient(180deg,#6db3ff,#3a7fd4)}
-  #mult-max.tier-purple .mm-fill{background:linear-gradient(180deg,#c193ff,#8b5ddc)}
-  #mult-max.tier-yellow .mm-fill{background:linear-gradient(180deg,#ffe68a,#d4b02e)}
-  #mult-max.tier-orange .mm-fill{background:linear-gradient(180deg,#ffb877,#e07c1e)}
-
-  #mult-max .mm-label{position:relative;z-index:1;
-    font-size:8px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;
-    color:rgba(255,255,255,.55);line-height:1;margin-bottom:3px;
-    transition:color .4s ease}
-  #mult-max .mm-value{position:relative;z-index:1;
-    font-size:14px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;
-    letter-spacing:-.3px;line-height:1;
-    text-shadow:0 1px 4px rgba(0,0,0,.65),0 0 8px rgba(0,0,0,.35);
-    transition:color .4s ease,text-shadow .4s ease}
-  #mult-max.pulse .mm-value{animation:mmPulse .55s var(--ease-spring)}
-  @keyframes mmPulse{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
-
-  #next-2x-hint{
-    position:absolute;top:-8px;
-    width:34px;height:34px;object-fit:contain;
-    transform:translateX(-50%) translateY(-100%) scale(.4);
-    opacity:0;pointer-events:none;
-    transition:opacity .35s ease,transform .5s var(--ease-spring);
-    filter:drop-shadow(0 4px 10px rgba(91,157,255,.55));
-    z-index:5;
-  }
-  #next-2x-hint.show{opacity:1;transform:translateX(-50%) translateY(-100%) scale(1);
-    animation:nextHintBounce 1.4s ease-in-out infinite}
-  @keyframes nextHintBounce{
-    0%,100%{transform:translateX(-50%) translateY(-100%) scale(1)}
-    50%{transform:translateX(-50%) translateY(calc(-100% - 5px)) scale(1.1)}
-  }
-
-  /* ============== GRID ============== */
-  #grid-stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;
-    padding:0 12px;position:relative;overflow:hidden}
-
-  #grid-frame{
-    position:relative;padding:12px;border-radius:24px;
-    background:linear-gradient(180deg,#252a34 0%,#171b22 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.08),
-      inset 0 -4px 0 rgba(0,0,0,.55),
-      0 10px 30px rgba(0,0,0,.5);
-    transition:transform .45s var(--ease-spring),opacity .3s ease;
-    z-index:1}
-  #grid-frame.exiting{transform:scale(.55) rotate(-8deg);opacity:0;
-    transition:transform .26s cubic-bezier(.5,0,.75,0),opacity .22s ease}
-  #grid-frame.swapping{animation:gridSwapIn .58s var(--ease-spring)}
-  @keyframes gridSwapIn{
-    0%{transform:scale(.86);opacity:.4}
-    55%{transform:scale(1.03);opacity:1}
-    100%{transform:scale(1);opacity:1}
-  }
-  #grid-frame.shaking{animation:gridShake .5s cubic-bezier(.36,.07,.19,.97)}
-  @keyframes gridShake{
-    0%,100%{transform:translate(0,0)}
-    15%{transform:translate(-8px,3px)}
-    30%{transform:translate(7px,-3px)}
-    45%{transform:translate(-6px,2px)}
-    60%{transform:translate(5px,-2px)}
-    75%{transform:translate(-3px,1px)}
-    90%{transform:translate(2px,0)}
-  }
-
-  #mines-grid{display:grid;position:relative}
-  .tile{
-    position:relative;aspect-ratio:1/1;padding:0;cursor:pointer;
-    border:0;background:none;outline:0;
-    -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;
-    font-family:inherit;
-    animation:tileSlideUp .62s cubic-bezier(.22,.9,.28,1.05) backwards;
-  }
-  .tile.no-anim{animation:none!important}
-  .tile:focus,.tile:focus-visible,.tile:active,.tile::-moz-focus-inner{outline:0!important;border:0!important}
-  @keyframes tileSlideUp{
-    0%{opacity:0;transform:translateY(60px) scale(.86)}
-    55%{opacity:1;transform:translateY(-4px) scale(1.03)}
-    78%{transform:translateY(2px) scale(.99)}
-    100%{opacity:1;transform:translateY(0) scale(1)}
-  }
-  .tile.milestone{animation:milestoneShake .62s cubic-bezier(.36,.07,.19,.97)}
-  @keyframes milestoneShake{
-    0%{transform:translate(0,0) scale(1)}10%{transform:translate(-2px,1px) scale(1.04)}
-    20%{transform:translate(3px,-2px) scale(1.02)}30%{transform:translate(-3px,2px) scale(1.05)}
-    40%{transform:translate(3px,-1px) scale(1.02)}50%{transform:translate(-2px,2px) scale(1.04)}
-    60%{transform:translate(2px,-2px) scale(1.02)}70%{transform:translate(-2px,1px) scale(1.03)}
-    80%{transform:translate(1px,-1px) scale(1.01)}100%{transform:translate(0,0) scale(1)}
-  }
-
-  .tile-face{
-    position:absolute;inset:0;border-radius:var(--tile-radius,14px);
-    display:flex;align-items:center;justify-content:center;overflow:hidden;
-    border:0;outline:0;
-    transition:opacity .32s ease,transform .38s var(--ease-spring);
-    will-change:opacity,transform}
-
-  .tile-front{
-    background:linear-gradient(180deg,#3a3e46 0%,#2a2d34 100%);
-    box-shadow:
-      0 5px 0 0 #101216,
-      0 7px 10px rgba(0,0,0,.4);
-    opacity:1;transform:scale(1);z-index:2;
-  }
-  .tile:not(.revealed):active .tile-front{
-    transform:translateY(3px) scale(.99);
-    box-shadow:0 2px 0 0 #101216,0 3px 5px rgba(0,0,0,.35);
-  }
-
-  /* GIFT ICON — soft light gray with gradient fade */
-  .gift-ic{
-    width:62%;height:62%;display:block;object-fit:contain;
-    filter:brightness(0) invert(.72) drop-shadow(0 2px 3px rgba(0,0,0,.45));
-    opacity:.9;
-    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 32%,rgba(0,0,0,.78) 55%,rgba(0,0,0,.42) 78%,rgba(0,0,0,.12) 100%);
-    mask-image:linear-gradient(180deg,#000 0%,#000 32%,rgba(0,0,0,.78) 55%,rgba(0,0,0,.42) 78%,rgba(0,0,0,.12) 100%);
-    pointer-events:none;transition:transform .3s var(--ease-spring);
-  }
-  .tile:not(.revealed):active .gift-ic{transform:scale(.9)}
-
-  .tile.revealed .tile-front{opacity:0;transform:scale(.82);pointer-events:none}
-  .tile-back{background:#1c1f25;opacity:0;transform:scale(.82);z-index:1;transition-delay:.06s}
-  .tile.revealed .tile-back{opacity:1;transform:scale(1)}
-  .tile.gem .tile-back{background:linear-gradient(180deg,#1a4432,#0c2018);
-    box-shadow:0 5px 0 0 #061008,0 0 22px rgba(76,195,138,.4)}
-  .tile.mine .tile-back{background:linear-gradient(180deg,#4a1524,#20060c);
-    box-shadow:0 5px 0 0 #140307,0 0 24px rgba(224,85,107,.5)}
-  .tile.mine.revealed .tile-back{animation:minePulse .6s ease}
-  @keyframes minePulse{
-    0%{box-shadow:0 5px 0 0 #140307,0 0 0 rgba(224,85,107,0)}
-    40%{box-shadow:0 5px 0 0 #140307,0 0 55px rgba(224,85,107,.9)}
-    100%{box-shadow:0 5px 0 0 #140307,0 0 24px rgba(224,85,107,.5)}
-  }
-  .tile-back .ic{
-    position:absolute;top:20%;left:20%;width:60%;height:60%;object-fit:contain;display:block;
-    opacity:0;transform:scale(.35);
-    transition:opacity .35s ease .12s,transform .45s var(--ease-spring) .12s;
-    pointer-events:none;
-  }
-  .tile.gem .ic-gem,.tile.mine .ic-mine{opacity:1;transform:scale(1)}
-  .tile.mine .ic-mine{animation:minePop .6s var(--ease-spring) .12s both}
-  @keyframes minePop{
-    0%{transform:scale(.15) rotate(-35deg);opacity:0}
-    50%{transform:scale(1.25) rotate(8deg);opacity:1}
-    75%{transform:scale(.92) rotate(-3deg)}
-    100%{transform:scale(1) rotate(0);opacity:1}
-  }
-  .tile.hide-gem .ic-gem{opacity:0!important;transform:scale(.4)!important;
-    transition:opacity .25s ease,transform .35s ease!important}
-  .tile.dimmed{opacity:.32;transition:opacity .5s ease}
-  .tile.dimmed .tile-front{opacity:0;pointer-events:none}
-  .tile.dimmed .tile-back{opacity:1;transform:scale(1)}
-  .tile.post-reveal-mine .tile-back{opacity:.85;filter:saturate(.7) brightness(.85)}
-
-  .special-gif{
-    position:absolute;top:10%;left:10%;width:80%;height:80%;object-fit:contain;
-    pointer-events:none;z-index:10;opacity:0;transform:scale(.4);
-    transition:opacity .3s ease,transform .55s var(--ease-spring)}
-  .special-gif.show{opacity:1;transform:scale(1)}
-
-  /* ============== CONTROLS ============== */
-  #controls{flex-shrink:0;padding:8px 12px calc(14px + var(--safe-bottom));
-    display:flex;flex-direction:column;gap:10px;position:relative}
-
-  #opts-row{display:flex;gap:8px;position:relative}
-  .opt-wrap{flex:1;position:relative}
-  .opt-btn{width:100%;height:54px;border-radius:var(--r-xl);
-    border:1px solid rgba(255,255,255,.07);
-    background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
-    color:#fff;display:flex;align-items:center;justify-content:space-between;
-    padding:0 18px;font-family:inherit;cursor:pointer;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.25);
-    transition:transform .18s var(--ease-spring),background .2s,border-color .2s;
-    -webkit-appearance:none;appearance:none;outline:none}
-  .opt-btn:active{transform:scale(.97);background:rgba(255,255,255,.08)}
-  .opt-btn.open{border-color:rgba(255,255,255,.22);
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03))}
-  .opt-content{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;pointer-events:none}
-  .opt-label{font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;
-    color:rgba(255,255,255,.4);font-weight:900}
-  .opt-value{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px;
-    transition:transform .3s var(--ease-spring),opacity .25s ease}
-  .opt-value.changing{animation:valSwap .42s var(--ease-spring)}
-  @keyframes valSwap{
-    0%{transform:translateY(-8px) scale(.85);opacity:0}
-    60%{transform:translateY(2px) scale(1.06);opacity:1}
-    100%{transform:translateY(0) scale(1);opacity:1}
-  }
-  .opt-chev{width:13px;height:13px;stroke:rgba(255,255,255,.5);fill:none;
-    stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;
-    transition:transform .35s var(--ease-spring),stroke .2s;pointer-events:none}
-  .opt-btn.open .opt-chev{transform:rotate(180deg);stroke:#fff}
-
-  /* Popup — near-black theme */
-  .popup{position:absolute;bottom:calc(100% + 10px);left:0;right:0;
-    padding:10px;border-radius:24px;
-    background:linear-gradient(180deg, rgba(22,22,24,.98), rgba(10,10,12,.99));
+  #hero{position:relative;margin:4px 12px 8px;padding:10px 14px;border-radius:18px;flex-shrink:0;
+    background:linear-gradient(135deg,rgba(40,50,80,.55),rgba(18,24,40,.72));
+    backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
+    border:1px solid rgba(180,210,255,.16);
+    box-shadow:0 12px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.14);
+    display:flex;align-items:center;gap:12px}
+  #pick-icon{
+    width:48px;height:48px;flex-shrink:0;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.14);
+    transition:background .4s ease,border-color .4s ease,opacity .3s ease}
+  #pick-icon svg{width:32px;height:38px;display:block}
+  #hero-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+  #hero-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  #hero-name{font-size:13px;font-weight:900;letter-spacing:.3px;color:#fff;transition:color .3s ease}
+  #hero-name.tier-wood{color:#c9a072}
+  #hero-name.tier-stone{color:#c8c8c8}
+  #hero-name.tier-iron{color:#f0f0f0}
+  #hero-name.tier-gold{color:#f0d080}
+  #hero-name.tier-diamond{color:#8ef0f0}
+  #hero-earned{font-size:11px;font-weight:800;color:#8ef0b8;font-variant-numeric:tabular-nums;
+    transition:transform .25s var(--ease-spring)}
+  #hero-earned.bump{transform:scale(1.14)}
+  #dura-track{position:relative;height:10px;border-radius:5px;
+    background:rgba(20,10,12,.7);overflow:hidden;
     border:1px solid rgba(255,255,255,.08);
-    box-shadow:0 20px 50px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-    opacity:0;transform:translateY(12px) scale(.94);
-    pointer-events:none;transform-origin:bottom center;
-    transition:opacity .28s ease,transform .35s var(--ease-spring);
-    z-index:200}
-  .popup.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-  .popup button{padding:14px 6px;border-radius:18px;
-    border:1px solid rgba(255,255,255,.07);
-    background:rgba(255,255,255,.03);
-    color:rgba(255,255,255,.85);
-    font-family:inherit;font-size:13.5px;font-weight:800;
-    letter-spacing:.2px;cursor:pointer;
-    transition:transform .16s var(--ease-spring),background .2s,border-color .2s,color .2s;
-    -webkit-appearance:none;appearance:none;outline:none;
-    opacity:0;transform:translateY(14px) scale(.86)}
-  .popup.open button{animation:popupBtnIn .42s var(--ease-spring) forwards}
-  .popup.open button:nth-child(1){animation-delay:40ms}
-  .popup.open button:nth-child(2){animation-delay:75ms}
-  .popup.open button:nth-child(3){animation-delay:110ms}
-  .popup.open button:nth-child(4){animation-delay:145ms}
-  .popup.open button:nth-child(5){animation-delay:180ms}
-  .popup.open button:nth-child(6){animation-delay:215ms}
-  @keyframes popupBtnIn{
-    0%{opacity:0;transform:translateY(14px) scale(.86)}
-    65%{opacity:1;transform:translateY(-2px) scale(1.03)}
-    100%{opacity:1;transform:translateY(0) scale(1)}
-  }
-  .popup button:active{transform:scale(.93)}
-  .popup button.active{
-    background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.07));
-    border-color:rgba(255,255,255,.45);color:#fff;
-    box-shadow:0 0 14px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.28)}
-  .popup button.pick{animation:chipPick .46s var(--ease-spring)}
-  @keyframes chipPick{
-    0%{transform:scale(1)}
-    35%{transform:scale(1.18);box-shadow:0 0 22px rgba(255,255,255,.5)}
-    70%{transform:scale(.95)}
-    100%{transform:scale(1)}
-  }
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+  #dura-fill{position:absolute;left:0;top:0;bottom:0;width:100%;
+    background:linear-gradient(90deg,#7a1a24,#e02838,#ff5060);
+    border-radius:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+    transition:width .3s var(--ease-spring)}
+  #dura-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:900;color:#fff;
+    text-shadow:0 1px 3px rgba(0,0,0,.95);font-variant-numeric:tabular-nums;line-height:1;
+    letter-spacing:.3px}
 
+  #stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;
+    padding:0 12px;position:relative}
+  #frame{
+    position:relative;
+    width:100%;max-width:420px;
+    aspect-ratio:1 / 1.15;
+    max-height:100%;
+    border-radius:24px;
+    background:linear-gradient(180deg,#1c2028 0%,#0f1216 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 -4px 0 rgba(0,0,0,.6),
+      0 10px 30px rgba(0,0,0,.55);
+    overflow:hidden}
+  #game-canvas{width:100%;height:100%;display:block}
+
+  #turbo-indicator{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.5);
+    padding:12px 22px;border-radius:16px;
+    background:linear-gradient(135deg, rgba(255,157,77,.9), rgba(224,85,60,.9));
+    border:2px solid rgba(255,220,150,.6);
+    box-shadow:0 10px 40px rgba(255,157,77,.7), inset 0 2px 0 rgba(255,255,255,.4);
+    color:#fff;font-size:16px;font-weight:900;letter-spacing:2px;
+    text-transform:uppercase;pointer-events:none;z-index:8;
+    opacity:0;transition:opacity .25s ease, transform .35s var(--ease-spring);
+    text-shadow:0 2px 6px rgba(0,0,0,.7)}
+  #turbo-indicator.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+  #streak-badge{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.4);
+    font-size:34px;font-weight:900;letter-spacing:-1px;
+    color:#fff;
+    text-shadow:
+      0 0 18px rgba(255,200,100,.9),
+      0 0 34px rgba(255,157,77,.7),
+      0 4px 12px rgba(0,0,0,.9);
+    pointer-events:none;z-index:9;
+    opacity:0;transition:opacity .35s ease, transform .45s var(--ease-spring);
+    font-variant-numeric:tabular-nums}
+  #streak-badge.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #streak-badge.fade{opacity:0;transform:translate(-50%,-70%) scale(.8)}
+
+  #floats{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+
+  .money-ball{
+    position:absolute;
+    width:50px;height:50px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:900;
+    letter-spacing:-.5px;
+    font-variant-numeric:tabular-nums;
+    color:#fff;
+    pointer-events:none;
+    transform:translate(-50%,-50%) scale(0);
+    box-shadow:
+      0 6px 20px rgba(0,0,0,.7),
+      0 0 24px rgba(255,255,255,.35),
+      inset 0 3px 0 rgba(255,255,255,.55),
+      inset 0 -4px 0 rgba(0,0,0,.45);
+    animation:ballPop 1.6s cubic-bezier(.34,1.56,.64,1) forwards;
+    will-change:transform,opacity;
+    text-shadow:0 2px 4px rgba(0,0,0,.9);
+    border:2.5px solid rgba(255,255,255,.65);
+    z-index:100}
+  @keyframes ballPop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.1) rotate(-45deg)}
+    12%{opacity:1;transform:translate(-50%,-75%) scale(1.4) rotate(12deg)}
+    22%{transform:translate(-50%,-95%) scale(1) rotate(0deg)}
+    50%{transform:translate(-50%,-115%) scale(1.05)}
+    80%{transform:translate(-50%,-150%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-240%) scale(.6)}}
+  .money-ball.green{background:radial-gradient(circle at 35% 28%, #b8ffd0 0%, #4CC38A 45%, #1a7a52 100%)}
+  .money-ball.gold{background:radial-gradient(circle at 35% 28%, #fff3c0 0%, #f5d76e 45%, #b88a20 100%)}
+  .money-ball.purple{background:radial-gradient(circle at 35% 28%, #f0d8ff 0%, #b47aff 45%, #5a2ab8 100%)}
+  .money-ball.cyan{background:radial-gradient(circle at 35% 28%, #e0ffff 0%, #5ce0e0 45%, #0a8080 100%)}
+  .money-ball.emerald{background:radial-gradient(circle at 35% 28%, #c8ffd8 0%, #17dd62 45%, #0a8020 100%)}
+  .money-ball.diamond{width:58px;height:58px;font-size:15px}
+  .money-ball.emerald-lg{width:64px;height:64px;font-size:17px}
+
+  .debris{position:absolute;pointer-events:none;z-index:3;will-change:transform,opacity}
+
+  #status-bar{
+    position:absolute;top:10px;left:10px;right:10px;
+    display:flex;justify-content:space-between;align-items:center;gap:6px;
+    pointer-events:none;z-index:4}
+  .stat-pill{
+    padding:5px 11px;border-radius:12px;
+    background:rgba(10,12,20,.72);
+    border:1px solid rgba(180,210,255,.14);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    font-size:10px;font-weight:900;letter-spacing:1.1px;
+    text-transform:uppercase;
+    font-variant-numeric:tabular-nums;
+    display:flex;align-items:center;gap:5px}
+  .stat-pill .sp-label{color:rgba(200,215,235,.55)}
+  .stat-pill .sp-val{color:#fff}
+  .stat-pill.green .sp-val{color:#8ef0b8}
+  .stat-pill.turbo{background:linear-gradient(135deg,rgba(255,157,77,.6),rgba(224,85,60,.6));
+    border-color:rgba(255,220,150,.5);display:none}
+  .stat-pill.turbo.on{display:flex}
+  .stat-pill.turbo .sp-label,.stat-pill.turbo .sp-val{color:#fff}
+
+  #start-hint{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:flex-end;padding-bottom:40px;gap:14px;
+    pointer-events:none;z-index:5;opacity:0;transition:opacity .35s ease}
+  #start-hint.show{opacity:1}
+  #start-hint .sh-icon{width:72px;height:72px;display:flex;align-items:center;justify-content:center;
+    animation:hintFloat 2.6s ease-in-out infinite}
+  #start-hint .sh-icon svg{width:100%;height:100%;display:block;
+    filter:drop-shadow(0 6px 18px rgba(91,157,255,.45))}
+  @keyframes hintFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  #start-hint .sh-text{font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;
+    color:rgba(200,220,250,.9);text-shadow:0 2px 8px rgba(0,0,0,.95)}
+
+  #end-hint{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);
+    padding:16px 24px;border-radius:18px;
+    background:rgba(10,12,20,.92);
+    border:1px solid rgba(180,210,255,.22);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:0 20px 60px rgba(0,0,0,.8);
+    text-align:center;pointer-events:none;z-index:6;
+    opacity:0;transition:opacity .35s ease,transform .4s var(--ease-spring)}
+  #end-hint.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #end-hint .eh-title{font-size:10px;font-weight:900;letter-spacing:2.4px;text-transform:uppercase;
+    color:rgba(200,215,235,.55);margin-bottom:6px}
+  #end-hint .eh-amount{font-size:28px;font-weight:900;letter-spacing:-.8px;
+    font-variant-numeric:tabular-nums;line-height:1}
+  #end-hint.win .eh-amount{color:#8ef0b8;text-shadow:0 0 24px rgba(76,195,138,.6)}
+  #end-hint.lose .eh-amount{color:#ff8a9a;text-shadow:0 0 24px rgba(224,85,107,.5)}
+
+  #spin-overlay{
+    position:absolute;inset:0;z-index:10;
+    background:rgba(5,6,10,.94);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;opacity:0;pointer-events:none;
+    transition:opacity .35s ease}
+  #spin-overlay.show{opacity:1;pointer-events:auto}
+  #spin-title{font-size:11px;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+    color:rgba(200,215,235,.6)}
+  #spin-window{
+    position:relative;width:120px;height:140px;
+    border-radius:22px;overflow:hidden;
+    background:linear-gradient(180deg,#2a2f3a,#171b22);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.10),
+      inset 0 -3px 0 rgba(0,0,0,.5),
+      0 10px 30px rgba(0,0,0,.5);
+    border:1px solid rgba(255,255,255,.10)}
+  #spin-window::before,
+  #spin-window::after{
+    content:'';position:absolute;left:0;right:0;height:32px;z-index:2;pointer-events:none}
+  #spin-window::before{top:0;background:linear-gradient(180deg,rgba(10,12,20,.98),transparent)}
+  #spin-window::after{bottom:0;background:linear-gradient(0deg,rgba(10,12,20,.98),transparent)}
+  #spin-reel{
+    position:absolute;left:0;top:0;right:0;
+    display:flex;flex-direction:column;
+    will-change:transform}
+  .spin-item{
+    width:120px;height:140px;flex-shrink:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    position:relative}
+  .spin-item svg{width:64px;height:76px;display:block;
+    filter:drop-shadow(0 4px 12px rgba(0,0,0,.6))}
+  .spin-item .si-name{
+    font-size:9px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;
+    opacity:.85;text-align:center;line-height:1}
+  #spin-highlight{
+    position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+    height:140px;z-index:1;pointer-events:none;
+    border-top:2px solid rgba(140,180,255,.5);
+    border-bottom:2px solid rgba(140,180,255,.5);
+    box-shadow:0 0 30px rgba(91,157,255,.35) inset}
+  #spin-result{
+    font-size:13px;font-weight:900;letter-spacing:.5px;
+    color:#fff;opacity:0;transform:translateY(6px);
+    transition:opacity .35s ease,transform .4s var(--ease-spring);
+    text-align:center}
+  #spin-result.show{opacity:1;transform:translateY(0)}
+
+  #history-row{flex-shrink:0;padding:0 12px;margin-top:4px;margin-bottom:4px}
+  #history-strip{
+    display:flex;gap:5px;overflow-x:auto;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    padding:4px 0;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%)}
+  #history-strip::-webkit-scrollbar{display:none}
+  .history-pill{
+    flex-shrink:0;padding:5px 10px;border-radius:11px;
+    font-size:10.5px;font-weight:900;font-variant-numeric:tabular-nums;
+    letter-spacing:-.2px;animation:pillIn .38s var(--ease-spring);
+    box-shadow:0 3px 0 0 rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.1)}
+  @keyframes pillIn{
+    0%{opacity:0;transform:scale(.5) translateY(-6px)}
+    60%{opacity:1;transform:scale(1.08) translateY(0)}
+    100%{transform:scale(1)}}
+  .history-empty{font-size:11px;color:var(--text3);padding:6px 2px;letter-spacing:.3px;font-weight:600}
+
+  #controls{flex-shrink:0;padding:4px 12px calc(14px + var(--safe-bottom));
+    display:flex;flex-direction:column;gap:10px}
   .bet-row{display:flex;gap:8px}
   #bet-input{flex:1;height:54px;padding:0 18px;border-radius:var(--r-xl);
     border:1px solid rgba(255,255,255,.09);
     background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
     color:#fff;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;
     outline:none;font-family:inherit;text-align:center;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    transition:border-color .2s ease,box-shadow .2s ease}
   #bet-input:focus{border-color:rgba(140,180,255,.55);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 3px rgba(91,157,255,.14)}
   #bet-input:disabled{opacity:.45}
-
   #allin-btn{height:54px;padding:0 22px;border-radius:var(--r-xl);
     border:1px solid rgba(140,180,255,.4);
     background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;
@@ -381,58 +328,7 @@
     display:flex;align-items:center;justify-content:center;gap:8px;
     -webkit-appearance:none;appearance:none;outline:none}
   #action-btn:active{transform:scale(.975)}
-  #action-btn.cashout{background:linear-gradient(180deg,#4ade80,#22c55e);
-    box-shadow:0 10px 28px rgba(34,197,94,.42),inset 0 1px 0 rgba(255,255,255,.3)}
   #action-btn:disabled{opacity:.4;pointer-events:none}
-  #action-btn .co-amount{font-variant-numeric:tabular-nums;opacity:.9;font-weight:800}
-
-  /* ============== RESULT ============== */
-  #result-overlay{position:absolute;inset:0;z-index:50;pointer-events:none;
-    display:flex;align-items:flex-end;justify-content:center;
-    padding:0 12px calc(12px + var(--safe-bottom))}
-  #result-panel{width:100%;max-width:400px;border-radius:26px;padding:24px 20px 16px;
-    background:linear-gradient(180deg, rgba(40,50,80,.95), rgba(18,24,40,.97));
-    backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
-    border:1px solid rgba(180,210,255,.22);
-    box-shadow:0 24px 60px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.14);
-    transform:translateY(130%);opacity:0;pointer-events:none;
-    transition:transform .55s var(--ease-spring),opacity .3s ease}
-  #result-panel.show{transform:translateY(0);opacity:1;pointer-events:auto}
-  #result-panel.win{border-color:rgba(76,195,138,.45);
-    box-shadow:0 24px 60px rgba(0,0,0,.75),0 0 60px rgba(76,195,138,.22),inset 0 1px 0 rgba(255,255,255,.16)}
-  #result-panel.lose{border-color:rgba(224,85,107,.45);
-    box-shadow:0 24px 60px rgba(0,0,0,.75),0 0 60px rgba(224,85,107,.2),inset 0 1px 0 rgba(255,255,255,.12)}
-  .result-head{text-align:center;margin-bottom:14px}
-  .result-title{font-size:11px;font-weight:900;letter-spacing:2.6px;text-transform:uppercase;
-    color:rgba(200,220,250,.6);margin-bottom:8px;min-height:14px}
-  .result-title .caret{display:inline-block;width:1.5px;height:11px;background:#8fb8ff;
-    margin-left:2px;vertical-align:-1px;animation:caretBlink 1s steps(1,end) infinite;border-radius:2px}
-  .result-mult{font-size:38px;font-weight:900;letter-spacing:-1.6px;line-height:1;
-    font-variant-numeric:tabular-nums;color:#fff;margin-bottom:6px}
-  #result-panel.win .result-mult{color:#8ef0b8;text-shadow:0 0 28px rgba(76,195,138,.6)}
-  #result-panel.lose .result-mult{color:#ff8a9a;text-shadow:0 0 28px rgba(224,85,107,.5)}
-  .result-sub{font-size:13px;font-weight:700;color:var(--text2);
-    display:flex;align-items:center;justify-content:center;gap:6px}
-  .result-sub img{width:15px;height:15px;object-fit:contain}
-  .result-sub .amt{font-size:15px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
-  #result-panel.win .result-sub .amt{color:#8ef0b8}
-  #result-panel.lose .result-sub .amt{color:#ff8a9a}
-  #result-continue{width:100%;height:52px;border-radius:var(--r-xl);border:none;margin-top:8px;
-    background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;
-    font-family:inherit;font-size:14.5px;font-weight:900;letter-spacing:.5px;cursor:pointer;
-    box-shadow:0 8px 22px rgba(91,157,255,.35),inset 0 1px 0 rgba(255,255,255,.24);
-    transition:transform .18s var(--ease-spring);
-    -webkit-appearance:none;appearance:none;outline:none}
-  #result-continue:active{transform:scale(.97)}
-  #result-panel.win #result-continue{background:linear-gradient(180deg,#4ade80,#22c55e);
-    box-shadow:0 8px 22px rgba(34,197,94,.35),inset 0 1px 0 rgba(255,255,255,.28)}
-
-  .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:9999;
-    animation:confettiFly 1.2s cubic-bezier(.2,.7,.4,1) forwards}
-  @keyframes confettiFly{
-    0%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1}
-    100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.2) rotate(var(--rot));opacity:0}
-  }
 
   #toast{position:fixed;top:calc(14px + var(--safe-top));left:50%;
     transform:translate(-50%,-140%) scale(.86);
@@ -444,6 +340,11 @@
     opacity:0;pointer-events:none;max-width:90vw;text-align:center;
     transition:transform .42s var(--ease-spring),opacity .25s ease}
   #toast.show{transform:translate(-50%,0) scale(1);opacity:1}
+
+  #tnt-flash{position:absolute;inset:0;pointer-events:none;z-index:7;opacity:0;
+    background:radial-gradient(circle at 50% 50%, rgba(255,220,120,.9), rgba(255,80,20,0) 60%);
+    transition:opacity .15s ease}
+  #tnt-flash.on{opacity:1}
 </style>
 </head>
 <body>
@@ -455,78 +356,67 @@
       <svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
     </button>
     <div class="title" id="topbar-title"></div>
-    <div class="balance-pill">
+    <div class="balance-pill" id="balance-pill">
       <img src="https://i.postimg.cc/fRj0QRKq/diamond-elegant.gif" alt="">
       <span id="balance-val">1,000</span>
     </div>
   </div>
 
-  <div id="mult-bar-outer">
-    <div id="mult-bar-wrap">
-      <div id="mult-bar">
-        <div class="mult-inner" id="mult-inner">
-          <div id="mult-indicator"></div>
-          <img id="next-2x-hint" alt="" draggable="false">
-        </div>
+  <div id="hero">
+    <div id="pick-icon"></div>
+    <div id="hero-info">
+      <div id="hero-top">
+        <div id="hero-name">No pickaxe</div>
+        <div id="hero-earned">+0.00 ◆</div>
       </div>
-    </div>
-    <div id="mult-max">
-      <div class="mm-fill" id="mult-max-fill"></div>
-      <div class="mm-label">Max</div>
-      <div class="mm-value" id="mult-max-value">x2.83</div>
+      <div id="dura-track">
+        <div id="dura-fill"></div>
+        <div id="dura-text">— / —</div>
+      </div>
     </div>
   </div>
 
-  <div id="grid-stage">
-    <div id="grid-frame">
-      <div id="mines-grid"></div>
+  <div id="stage">
+    <div id="frame">
+      <canvas id="game-canvas"></canvas>
+      <div id="floats"></div>
+      <div id="tnt-flash"></div>
+      <div id="turbo-indicator">⚡ TURBO ⚡</div>
+      <div id="streak-badge">x2</div>
+      <div id="status-bar">
+        <div class="stat-pill"><span class="sp-label">Depth</span><span class="sp-val" id="sp-depth">0</span></div>
+        <div class="stat-pill turbo" id="sp-turbo"><span class="sp-label">⚡ Turbo</span></div>
+        <div class="stat-pill green"><span class="sp-label">Earned</span><span class="sp-val" id="sp-earned">+0.00</span></div>
+      </div>
+      <div id="start-hint">
+        <div class="sh-icon" id="start-hint-icon"></div>
+        <div class="sh-text">Place bet & Start</div>
+      </div>
+      <div id="end-hint">
+        <div class="eh-title" id="end-title">Mined</div>
+        <div class="eh-amount" id="end-amount">+0.00</div>
+      </div>
+      <div id="spin-overlay">
+        <div id="spin-title">Rolling pickaxe</div>
+        <div id="spin-window">
+          <div id="spin-highlight"></div>
+          <div id="spin-reel"></div>
+        </div>
+        <div id="spin-result">—</div>
+      </div>
     </div>
+  </div>
+
+  <div id="history-row">
+    <div id="history-strip"><div class="history-empty">No runs yet — place a bet to start mining</div></div>
   </div>
 
   <div id="controls">
-    <div id="opts-row">
-      <div class="opt-wrap">
-        <button id="grid-btn" class="opt-btn" type="button">
-          <div class="opt-content">
-            <span class="opt-label">Grid</span>
-            <span class="opt-value" id="grid-val">5 × 5</span>
-          </div>
-          <svg class="opt-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div id="grid-popup" class="popup"></div>
-      </div>
-      <div class="opt-wrap">
-        <button id="mines-btn" class="opt-btn" type="button">
-          <div class="opt-content">
-            <span class="opt-label">Mines</span>
-            <span class="opt-value" id="mines-val">3</span>
-          </div>
-          <svg class="opt-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div id="mines-popup" class="popup"></div>
-      </div>
-    </div>
-
     <div class="bet-row">
       <input id="bet-input" type="text" inputmode="numeric" enterkeyhint="done" value="10" autocomplete="off">
       <button id="allin-btn" type="button">ALL IN</button>
     </div>
-
-    <button id="action-btn" type="button">Start</button>
-  </div>
-
-  <div id="result-overlay">
-    <div id="result-panel">
-      <div class="result-head">
-        <div class="result-title" id="result-title"></div>
-        <div class="result-mult" id="result-mult">x1.43</div>
-        <div class="result-sub">
-          <img src="https://i.postimg.cc/fRj0QRKq/diamond-elegant.gif" alt="">
-          <span class="amt" id="result-amt">14.3</span>
-        </div>
-      </div>
-      <button id="result-continue" type="button">Continue</button>
-    </div>
+    <button id="action-btn" type="button">Place bet & Start</button>
   </div>
 
 </div>
@@ -550,166 +440,1714 @@
       else if (navigator.vibrate) navigator.vibrate(style === 'heavy' ? 30 : 12);
     } catch(_){}
   }
-
   const $ = s => document.querySelector(s);
 
-  /* ============ ASSETS ============ */
-  const GIF_DIAMOND = 'https://i.postimg.cc/fRj0QRKq/diamond-elegant.gif';
-  const GIF_BOMB    = 'https://i.postimg.cc/J7GYqGck/bomb-bomba.gif';
-  const GIF_GIFT    = 'https://i.postimg.cc/SsNS5WNq/better-gift-box.png';
-  const GIF_2X      = [
-    'https://i.postimg.cc/RFqdXDtD/ezgif-2655c04bfa645c12.gif',
-    'https://i.postimg.cc/kM0svwgT/ezgif-518e555f632c11bf.gif'
-  ];
-
-  /* ============ AUDIO ============ */
   const Sound = (function(){
-    let ctx=null,unlocked=false,master=null;
+    let ctx=null, unlocked=false, master=null;
     function ensure(){
-      if(!ctx){ try{ const AC=window.AudioContext||window.webkitAudioContext;
-        if(AC){ ctx=new AC(); master=ctx.createGain(); master.gain.value=.35; master.connect(ctx.destination);} }catch(_){} }
-      if(ctx&&ctx.state==='suspended') ctx.resume().catch(()=>{});
+      if (!ctx){ try{ const AC = window.AudioContext || window.webkitAudioContext;
+        if(AC){ ctx = new AC(); master = ctx.createGain(); master.gain.value = .3; master.connect(ctx.destination);} }catch(_){} }
+      if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
       return ctx;
     }
-    function unlock(){ if(unlocked)return; const c=ensure(); if(!c)return; unlocked=true; }
-    ['pointerdown','touchstart','keydown'].forEach(e=>document.addEventListener(e,unlock,{once:true,passive:true}));
-    function tone(freq,dur,type,vol,when,sweepTo){
-      const c=ensure(); if(!c||!unlocked)return;
-      const t0=when||c.currentTime, o=c.createOscillator(), g=c.createGain();
-      o.type=type||'sine'; o.frequency.setValueAtTime(freq,t0);
-      if(sweepTo) o.frequency.exponentialRampToValueAtTime(Math.max(1,sweepTo),t0+dur);
-      const v=vol==null?.22:vol;
-      g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(v,t0+.008);
-      g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
-      o.connect(g); g.connect(master); o.start(t0); o.stop(t0+dur+.03);
+    function unlock(){ if (unlocked) return; const c = ensure(); if (!c) return; unlocked = true; }
+    ['pointerdown','touchstart','keydown'].forEach(e => document.addEventListener(e, unlock, { once: true, passive: true }));
+    function tone(freq, dur, type, vol, when, sweepTo){
+      const c = ensure(); if (!c || !unlocked) return;
+      const t0 = when || c.currentTime, o = c.createOscillator(), g = c.createGain();
+      o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t0);
+      if (sweepTo) o.frequency.exponentialRampToValueAtTime(Math.max(1, sweepTo), t0 + dur);
+      const v = vol == null ? .2 : vol;
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(v, t0 + .008);
+      g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+      o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + .03);
     }
-    function noise(dur,vol,when,ff){
-      const c=ensure(); if(!c||!unlocked)return;
-      const t0=when||c.currentTime, len=Math.max(1,Math.floor(c.sampleRate*dur));
-      const buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
-      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
-      const s=c.createBufferSource(); s.buffer=buf;
-      const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=ff||1200;
-      const g=c.createGain(); g.gain.value=vol==null?.22:vol;
-      s.connect(f); f.connect(g); g.connect(master); s.start(t0); s.stop(t0+dur+.03);
+    function noise(dur, vol, when, ff, ftype){
+      const c = ensure(); if (!c || !unlocked) return;
+      const t0 = when || c.currentTime, len = Math.max(1, Math.floor(c.sampleRate * dur));
+      const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 1.6);
+      const s = c.createBufferSource(); s.buffer = buf;
+      const f = c.createBiquadFilter(); f.type = ftype || 'bandpass';
+      f.frequency.value = ff || 1200; f.Q.value = 1.5;
+      const g = c.createGain(); g.gain.value = vol == null ? .2 : vol;
+      s.connect(f); f.connect(g); g.connect(master); s.start(t0); s.stop(t0 + dur + .03);
     }
     return {
-      unlock, click(){ tone(720,.035,'sine',.11,null,520); },
-      reveal(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
-        tone(620,.10,'sine',.16,t,900); tone(950,.14,'sine',.11,t+.045,1250); },
-      mine(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
-        tone(120,.35,'sawtooth',.32,t,45); tone(80,.5,'triangle',.22,t+.02,30);
-        noise(.35,.24,t,900); tone(280,.25,'square',.09,t+.05,90); },
-      milestone(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
-        tone(900,.35,'sine',.18,t,2400); tone(1350,.4,'triangle',.14,t+.05,3000);
-        tone(1800,.6,'sine',.12,t+.12); tone(2400,.55,'sine',.09,t+.15); },
-      cashout(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
-        [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
-          tone(f,.28,'triangle',.16,t+i*.06); tone(f*2,.22,'sine',.06,t+i*.06+.01); });
-        tone(1567.98,.55,'sine',.12,t+.28,2100); },
-      lose(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
-        tone(400,.35,'triangle',.18,t,180); tone(220,.5,'sine',.14,t+.12,90); },
-      start(){ const c=ensure(); if(!c||!unlocked)return; const t=c.currentTime;
-        tone(440,.1,'sine',.15,t,660); tone(660,.14,'sine',.13,t+.06,990); }
+      unlock,
+      click(){ tone(720, .035, 'sine', .09, null, 520); },
+      reelTick(){ tone(1400 + Math.random()*400, .015, 'triangle', .04); },
+      reelLand(i){ tone(500 + i * 110, .3, 'sine', .17, null, 900); tone(1000 + i * 200, .25, 'triangle', .08, null, 1400); },
+      rock(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(160, .06, 'square', .14, t, 60);
+        noise(.07, .18, t, 800, 'bandpass');
+      },
+      break(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(110, .18, 'square', .16, t, 45);
+        noise(.2, .18, t, 900, 'bandpass');
+      },
+      bigBreak(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(90, .35, 'square', .22, t, 30);
+        tone(150, .25, 'sawtooth', .16, t + .02, 60);
+        noise(.35, .26, t, 700, 'lowpass');
+      },
+      crit(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(1200, .08, 'square', .15, t, 1800);
+        tone(1800, .16, 'triangle', .12, t + .04, 2600);
+      },
+      ore(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(880, .12, 'triangle', .14, t);
+        tone(1320, .16, 'triangle', .12, t + .06);
+      },
+      bigOre(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+          tone(f, .28, 'triangle', .13, t + i * .055);
+          tone(f*2, .2, 'sine', .05, t + i * .055 + .01);
+        });
+      },
+      namek(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        [392, 523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+          tone(f, .34, 'triangle', .14, t + i * .045);
+          tone(f*2, .24, 'sine', .05, t + i * .045 + .01);
+        });
+        tone(2093, .55, 'sine', .10, t + .28, 2400);
+      },
+      craft(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        [660, 880, 1100, 1320, 1760].forEach((f, i) => tone(f, .22, 'triangle', .12, t + i * .05));
+      },
+      slime(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(140, .18, 'sine', .18, t, 420);
+        tone(280, .22, 'sine', .12, t + .04, 720);
+      },
+      tnt(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(120, .5, 'sawtooth', .38, t, 30);
+        tone(60, .7, 'triangle', .28, t + .01, 20);
+        noise(.55, .32, t, 600, 'lowpass');
+      },
+      turbo(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(220, .15, 'sawtooth', .14, t, 880);
+        tone(440, .18, 'square', .1, t + .05, 1320);
+      },
+      pickBreak(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(600, .08, 'square', .2, t, 300);
+        noise(.15, .2, t, 1500);
+        tone(400, .35, 'triangle', .16, t + .1, 150);
+      },
+      combo(n){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        const base = 660 + Math.min(n, 8) * 60;
+        tone(base, .18, 'triangle', .14, t);
+        tone(base * 1.5, .22, 'triangle', .12, t + .05);
+        tone(base * 2, .28, 'sine', .08, t + .10);
+      },
+      depth(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(180, .4, 'sawtooth', .1, t, 90);
+        tone(360, .3, 'triangle', .08, t + .08, 240);
+      },
+      cashout(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        [523.25, 659.25, 783.99, 1046.5].forEach((f,i) => {
+          tone(f, .28, 'triangle', .14, t + i * .06);
+          tone(f*2, .22, 'sine', .05, t + i * .06 + .01);
+        });
+      },
+      bigWin(){
+        const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        [523.25,659.25,783.99,1046.5,1318.5,1567.98].forEach((f,i) => {
+          tone(f, .3, 'triangle', .15, t + i * .05);
+          tone(f*2, .22, 'sine', .06, t + i * .05 + .01);
+        });
+        tone(2093, .55, 'sine', .11, t + .35, 2600);
+      }
     };
   })();
 
-  /* ============ CONFIG ============ */
-  const HOUSE_EDGE = 0.01;
   const MIN_BET = 10;
-  const GRID_OPTIONS = [3, 4, 5];
+  const MAP_COLS = 6;
+  const MAP_ROWS = 80;
 
-  const MINE_PRESETS = {
-    3: [1, 2, 3, 4],
-    4: [1, 2, 4, 6],
-    5: [1, 3, 5, 10],
+  // === GRAVITY — moderate, not extreme ===
+  const GRAVITY = 1250;
+  const TERMINAL_VY = 560;
+  const WALL_REST = 0.72;
+  const BLOCK_REST = 0.52;
+  const KICK_X = 320;
+  const ANGULAR_KICK = 18;
+  const TURBO_SCALE = 3.0;
+  const MIN_IMPACT_SPEED = 55;
+  const CRIT_CHANCE = 0.16;
+  const CRIT_MULT = 3;
+
+  // === SMALLER DURABILITY — pickaxes break fast, more losses ===
+  const PICKAXES = [
+    { key:'wood',    name:'Wooden',  dur:8,  speed:1.1, power:1, color:'#a07850', highlight:'#c9a072', dark:'#6a4a28' },
+    { key:'stone',   name:'Stone',   dur:14, speed:1.4, power:1, color:'#8a8a8a', highlight:'#c8c8c8', dark:'#5a5a5a' },
+    { key:'iron',    name:'Iron',    dur:22, speed:1.7, power:2, color:'#c8c8c8', highlight:'#f0f0f0', dark:'#8a8a8a' },
+    { key:'gold',    name:'Golden',  dur:32, speed:2.1, power:2, color:'#d4b46a', highlight:'#f0d080', dark:'#8a6a28' },
+    { key:'diamond', name:'Diamond', dur:44, speed:2.6, power:3, color:'#5ce0e0', highlight:'#a8ffff', dark:'#2a8080' },
+  ];
+  const PICK_WEIGHTS = [26, 26, 22, 16, 10];
+
+  const BLOCKS = {
+    grass:    { hard:1, reward:0,     insta:true, type:'grass',   particleColor:'#78b83c', top:'#78b83c', bot:'#5a3e26' },
+    dirt:     { hard:1, reward:0,     insta:true, type:'dirt',    particleColor:'#8a6039', top:'#8a6039', bot:'#5a3e26' },
+    stone:    { hard:1, reward:0,     insta:true, type:'stone',   particleColor:'#8a8a8a', top:'#9a9a9a', bot:'#6a6a6a' },
+    coal:     { hard:1, reward:0.35,  type:'ore', oreColor:'#1a1a1a', oreHL:'#4a4a4a', oreSize:3, oreCount:6, particleColor:'#1a1a1a', ballColor:'green', top:'#4a4a4a', bot:'#1a1a1a' },
+    iron:     { hard:2, reward:0.70,  type:'ore', oreColor:'#d0b088', oreHL:'#f0d8b0', oreSize:3, oreCount:5, particleColor:'#d0b088', ballColor:'green', top:'#d0b088', bot:'#a08060' },
+    gold:     { hard:2, reward:1.40,  type:'ore', oreColor:'#f7d75d', oreHL:'#ffeb95', oreSize:3, oreCount:5, particleColor:'#f7d75d', ballColor:'gold', top:'#f7d75d', bot:'#b88a20' },
+    redstone: { hard:2, reward:2.20,  type:'ore', oreColor:'#e02828', oreHL:'#ff4848', oreSize:2, oreCount:7, particleColor:'#e02828', ballColor:'purple', top:'#e02828', bot:'#8a1010' },
+    diamond:  { hard:2, reward:8.00,  type:'ore', oreColor:'#4aedd9', oreHL:'#a8ffff', oreSize:3, oreCount:5, particleColor:'#4aedd9', ballColor:'cyan', top:'#4aedd9', bot:'#0a8080' },
+    emerald:  { hard:3, reward:25.0,  type:'ore', oreColor:'#17dd62', oreHL:'#7affa0', oreSize:3, oreCount:5, particleColor:'#17dd62', ballColor:'emerald', top:'#17dd62', bot:'#0a8020' },
+    namek:    { hard:1, reward:60.0,  type:'ore', oreColor:'#3fbf4a', oreHL:'#a6ff8a', oreSize:4, oreCount:6, particleColor:'#7dff6b', ballColor:'emerald', namek:true, glow:'#7dff6b', top:'#3fbf4a', bot:'#1d7a28' },
+    tnt:      { hard:1, reward:0,     type:'tnt', particleColor:'#e04040', top:'#d03030', bot:'#7a1010' },
+    craft:    { hard:1, reward:0,     type:'craft', particleColor:'#b58f56', top:'#c89858', bot:'#8a5c30' },
+    slime:    { hard:1, reward:0,     type:'slime', particleColor:'#7ee87e', top:'#a8f5a8', bot:'#5cc85c' },
   };
 
-  /* ============ STATE ============ */
   const state = {
-    gridSize: 5,
-    mines: 3,
     bet: 10,
     balance: 1000,
-    playing: false,
-    revealed: 0,
-    mineSet: new Set(),
-    multipliers: [],
-    busy: false,
-    shown2xGif: false,
-    rebuilding: false,
+    gameState: 'idle',
+    blocks: [],
+    pickaxe: null,
+    roundEarned: 0,
+    roundHits: 0,
+    history: [],
+    best: 0,
+    cameraY: 0,
+    lastFrame: 0,
+    stuckTimer: 0,
+    lastStuckY: 0,
+    particles: [],
+    confetti: [],
+    breakFrags: [],
+    floatTexts: [],
+    shake: 0,
+    blocksBroken: 0,
+    tntFlash: 0,
+    turbo: false,
+    turboUntil: 0,
+    depthShown: 0,
+    streak: 0,
+    streakTimer: 0,
+    balanceBumpT: 0,
+    spin: {
+      start: 0, dur: 0, from: 0, to: 0, targetIdx: 0,
+      landed: false, finishAt: 0, tickCount: -1,
+    },
   };
 
   try {
-    const b = localStorage.getItem('dllump_mines_balance');
+    const b = localStorage.getItem('dllump_mineshaft_balance');
     if (b !== null) state.balance = Math.max(0, parseInt(b, 10) || 0);
   } catch(_){}
   function persistBalance(){
-    try { localStorage.setItem('dllump_mines_balance', String(state.balance)); } catch(_){}
+    try { localStorage.setItem('dllump_mineshaft_balance', String(state.balance)); } catch(_){}
   }
 
-  /* ============ DOM ============ */
-  const gridEl        = $('#mines-grid');
-  const gridFrame     = $('#grid-frame');
-  const gridStage     = $('#grid-stage');
-  const stageEl       = gridStage;
-  const multBar       = $('#mult-bar');
-  const multInner     = $('#mult-inner');
-  const multIndicator = $('#mult-indicator');
-  const multMaxEl     = $('#mult-max');
-  const multMaxVal    = $('#mult-max-value');
-  const multMaxFill   = $('#mult-max-fill');
-  const next2xHint    = $('#next-2x-hint');
+  const canvas        = $('#game-canvas');
+  const ctx           = canvas.getContext('2d');
+  const frame         = $('#frame');
+  const floats        = $('#floats');
+  const balancePill   = $('#balance-pill');
   const balanceEl     = $('#balance-val');
   const topbarTitle   = $('#topbar-title');
-  const gridBtn       = $('#grid-btn');
-  const minesBtn      = $('#mines-btn');
-  const gridVal       = $('#grid-val');
-  const minesVal      = $('#mines-val');
-  const gridPopup     = $('#grid-popup');
-  const minesPopup    = $('#mines-popup');
+  const pickIconEl    = $('#pick-icon');
+  const heroNameEl    = $('#hero-name');
+  const heroEarnedEl  = $('#hero-earned');
+  const duraFillEl    = $('#dura-fill');
+  const duraTextEl    = $('#dura-text');
   const betInput      = $('#bet-input');
   const allInBtn      = $('#allin-btn');
   const actionBtn     = $('#action-btn');
-  const resultPanel   = $('#result-panel');
-  const resultTitle   = $('#result-title');
-  const resultMult    = $('#result-mult');
-  const resultAmt     = $('#result-amt');
-  const resultCont    = $('#result-continue');
+  const historyStrip  = $('#history-strip');
+  const statDepthEl   = $('#sp-depth');
+  const statEarnedEl  = $('#sp-earned');
+  const statTurboEl   = $('#sp-turbo');
+  const turboIndicator= $('#turbo-indicator');
+  const streakBadge   = $('#streak-badge');
+  const startHint     = $('#start-hint');
+  const startHintIcon = $('#start-hint-icon');
+  const endHint       = $('#end-hint');
+  const endTitle      = $('#end-title');
+  const endAmount     = $('#end-amount');
+  const spinOverlay   = $('#spin-overlay');
+  const spinReel      = $('#spin-reel');
+  const spinResult    = $('#spin-result');
   const toastEl       = $('#toast');
+  const tntFlashEl    = $('#tnt-flash');
 
-  next2xHint.src = GIF_2X[Math.floor(Math.random() * GIF_2X.length)];
+  let W = 0, H = 0, DPR = 1;
+  let BLOCK_SIZE = 60;
+  let MAP_HEIGHT_PX = 0;
 
-  /* ============ MATH ============ */
-  function computeMultipliers(totalTiles, mines){
-    const arr = [1];
-    let raw = 1;
-    const safeMax = totalTiles - mines;
-    for (let k = 1; k <= safeMax; k++){
-      raw = raw * (totalTiles - k + 1) / (totalTiles - mines - k + 1);
-      arr.push((1 - HOUSE_EDGE) * raw);
+  function resizeCanvas(){
+    const rect = frame.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = Math.max(1, Math.round(W * DPR));
+    canvas.height = Math.max(1, Math.round(H * DPR));
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    BLOCK_SIZE = Math.floor(W / MAP_COLS);
+    MAP_HEIGHT_PX = MAP_ROWS * BLOCK_SIZE;
+    for (const k in blockSpriteCache) delete blockSpriteCache[k];
+  }
+
+  const blockSpriteCache = {};
+
+  function getBlockSprite(type, size){
+    const key = type + ':' + size;
+    if (blockSpriteCache[key]) return blockSpriteCache[key];
+    const cv = document.createElement('canvas');
+    cv.width  = Math.round(size * DPR);
+    cv.height = Math.round(size * DPR);
+    const g = cv.getContext('2d');
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    drawBlockSprite(g, type, size);
+    blockSpriteCache[key] = cv;
+    return cv;
+  }
+
+  function drawBlockSprite(g, type, size){
+    const b = BLOCKS[type];
+    if (!b) return;
+
+    if (b.type === 'grass'){
+      const gd = g.createLinearGradient(0, size * 0.25, 0, size);
+      gd.addColorStop(0, '#7a5535');
+      gd.addColorStop(1, '#5a3e26');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      for (let i = 0; i < 14; i++){
+        const x = (Math.sin(i * 4.3) * 0.5 + 0.5) * size;
+        const y = size * 0.3 + ((Math.cos(i * 2.7) * 0.5 + 0.5) * size * 0.7);
+        g.fillStyle = '#3d2718';
+        g.fillRect(Math.floor(x), Math.floor(y), size * 0.08, size * 0.08);
+      }
+      const gt = g.createLinearGradient(0, 0, 0, size * 0.3);
+      gt.addColorStop(0, '#7ac93c');
+      gt.addColorStop(1, '#4a8a20');
+      g.fillStyle = gt;
+      g.fillRect(0, 0, size, size * 0.3);
+      g.fillStyle = '#5aa028';
+      for (let i = 0; i < 8; i++){
+        const x = (i + 0.5) * (size / 8);
+        g.fillRect(Math.floor(x), Math.floor(size * 0.28), Math.ceil(size / 10), Math.ceil(size * 0.05));
+      }
+    } else if (b.type === 'dirt'){
+      const gd = g.createLinearGradient(0, 0, 0, size);
+      gd.addColorStop(0, '#8a6039');
+      gd.addColorStop(1, '#5a3e26');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      for (let i = 0; i < 16; i++){
+        const x = (Math.sin(i * 4.3) * 0.5 + 0.5) * size;
+        const y = (Math.cos(i * 2.7) * 0.5 + 0.5) * size;
+        g.fillStyle = '#3d2718';
+        g.fillRect(Math.floor(x), Math.floor(y), size * 0.07, size * 0.07);
+      }
+    } else if (b.type === 'stone'){
+      const gd = g.createLinearGradient(0, 0, 0, size);
+      gd.addColorStop(0, '#9a9a9a');
+      gd.addColorStop(1, '#6a6a6a');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      for (let i = 0; i < 18; i++){
+        const x = (Math.sin(i * 3.1) * 0.5 + 0.5) * size;
+        const y = (Math.cos(i * 5.3) * 0.5 + 0.5) * size;
+        g.fillStyle = i % 2 ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.10)';
+        g.fillRect(Math.floor(x), Math.floor(y), size * 0.06, size * 0.06);
+      }
+    } else if (b.type === 'ore'){
+      const gd = g.createLinearGradient(0, 0, 0, size);
+      gd.addColorStop(0, '#9a9a9a');
+      gd.addColorStop(1, '#6a6a6a');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      for (let i = 0; i < 16; i++){
+        const x = (Math.sin(i * 3.1) * 0.5 + 0.5) * size;
+        const y = (Math.cos(i * 5.3) * 0.5 + 0.5) * size;
+        g.fillStyle = i % 2 ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.10)';
+        g.fillRect(Math.floor(x), Math.floor(y), size * 0.06, size * 0.06);
+      }
+      const oreUnit = size * 0.12;
+      const seed = (type.charCodeAt(0) * 7) % 100;
+      for (let i = 0; i < b.oreCount; i++){
+        const ang = (i * 2.399 + seed) % (Math.PI * 2);
+        const rr = ((i % 3) * 0.11) + 0.12;
+        const x = (Math.sin(ang) * rr + 0.5) * size;
+        const y = (Math.cos(ang * 1.7) * rr + 0.5) * size;
+        const w = oreUnit * (b.oreSize / 3);
+        g.fillStyle = 'rgba(0,0,0,.4)';
+        g.fillRect(Math.floor(x + 1), Math.floor(y + 1), Math.ceil(w), Math.ceil(w));
+        g.fillStyle = b.oreColor;
+        g.fillRect(Math.floor(x), Math.floor(y), Math.ceil(w), Math.ceil(w));
+        g.fillStyle = b.oreHL;
+        g.fillRect(Math.floor(x), Math.floor(y), Math.ceil(w * 0.5), Math.ceil(w * 0.4));
+      }
+      if (b.namek){
+        const gg = g.createRadialGradient(size/2, size/2, 0, size/2, size/2, size*0.75);
+        gg.addColorStop(0, 'rgba(125,255,107,.55)');
+        gg.addColorStop(1, 'rgba(125,255,107,0)');
+        g.fillStyle = gg;
+        g.fillRect(0, 0, size, size);
+      }
+    } else if (b.type === 'tnt'){
+      const gd = g.createLinearGradient(0, 0, 0, size);
+      gd.addColorStop(0, '#d03030');
+      gd.addColorStop(1, '#7a1010');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      g.fillStyle = '#f0f0f0';
+      g.fillRect(0, size * 0.42, size, size * 0.18);
+      g.strokeStyle = '#2a2a2a';
+      g.lineWidth = Math.max(1, size * 0.02);
+      g.beginPath();
+      g.moveTo(0, size * 0.42 + 0.5); g.lineTo(size, size * 0.42 + 0.5);
+      g.moveTo(0, size * 0.60 - 0.5); g.lineTo(size, size * 0.60 - 0.5);
+      g.stroke();
+      g.fillStyle = '#1a1a1a';
+      g.font = '900 ' + Math.round(size * 0.20) + 'px -apple-system, sans-serif';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText('TNT', size / 2, size / 2);
+    } else if (b.type === 'craft'){
+      const gd = g.createLinearGradient(0, 0, 0, size);
+      gd.addColorStop(0, '#c89858');
+      gd.addColorStop(1, '#8a5c30');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      g.strokeStyle = 'rgba(40,25,10,.6)';
+      g.lineWidth = Math.max(1.2, size * 0.028);
+      const m = size * 0.13;
+      const iw = size - m * 2;
+      for (let i = 1; i < 3; i++){
+        g.beginPath();
+        g.moveTo(m + (iw / 3) * i, m); g.lineTo(m + (iw / 3) * i, size - m);
+        g.stroke();
+        g.beginPath();
+        g.moveTo(m, m + (iw / 3) * i); g.lineTo(size - m, m + (iw / 3) * i);
+        g.stroke();
+      }
+      g.strokeRect(m, m, iw, iw);
+    } else if (b.type === 'slime'){
+      const gd = g.createLinearGradient(0, 0, 0, size);
+      gd.addColorStop(0, '#a8f5a8');
+      gd.addColorStop(1, '#5cc85c');
+      g.fillStyle = gd;
+      g.fillRect(0, 0, size, size);
+      g.fillStyle = 'rgba(255,255,255,.25)';
+      g.fillRect(size * 0.15, size * 0.15, size * 0.7, size * 0.7);
+      for (let i = 0; i < 6; i++){
+        const ang = i * 1.9;
+        const rr = ((i % 3) * 0.1) + 0.15;
+        const x = (Math.sin(ang) * rr + 0.5) * size;
+        const y = (Math.cos(ang * 1.5) * rr + 0.5) * size;
+        g.fillStyle = 'rgba(255,255,255,.6)';
+        g.beginPath();
+        g.arc(x, y, size * 0.05, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.strokeStyle = 'rgba(20,90,20,.55)';
+      g.lineWidth = Math.max(1, size * 0.04);
+      g.strokeRect(size * 0.06, size * 0.06, size * 0.88, size * 0.88);
+    }
+
+    const hl = g.createLinearGradient(0, 0, 0, size * 0.35);
+    hl.addColorStop(0, 'rgba(255,255,255,.14)');
+    hl.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = hl;
+    g.fillRect(0, 0, size, size * 0.35);
+
+    const sh = g.createLinearGradient(0, size * 0.72, 0, size);
+    sh.addColorStop(0, 'rgba(0,0,0,0)');
+    sh.addColorStop(1, 'rgba(0,0,0,.28)');
+    g.fillStyle = sh;
+    g.fillRect(0, size * 0.72, size, size * 0.28);
+
+    g.strokeStyle = 'rgba(0,0,0,.45)';
+    g.lineWidth = Math.max(1, Math.round(size / 60));
+    g.strokeRect(0.5, 0.5, size - 1, size - 1);
+  }
+
+  function drawCracks(g, x, y, size, level, maxLevel){
+    if (level <= 0) return;
+    const ratio = Math.min(1, level / maxLevel);
+    const intensity = 0.4 + ratio * 0.55;
+    g.strokeStyle = 'rgba(8,8,8,' + intensity.toFixed(2) + ')';
+    g.lineWidth = Math.max(1.2, size * 0.026);
+    g.lineCap = 'round';
+    const cx = x + size / 2, cy = y + size / 2;
+    const r = size * 0.42;
+    g.beginPath();
+    g.moveTo(cx - r * 0.7, cy - r * 0.4);
+    g.lineTo(cx - r * 0.15, cy - r * 0.05);
+    g.lineTo(cx + r * 0.18, cy + r * 0.3);
+    g.lineTo(cx - r * 0.22, cy + r * 0.72);
+    g.stroke();
+    if (level >= 2){
+      g.beginPath();
+      g.moveTo(cx + r * 0.55, cy - r * 0.6);
+      g.lineTo(cx + r * 0.22, cy - r * 0.1);
+      g.lineTo(cx + r * 0.5, cy + r * 0.3);
+      g.stroke();
+    }
+  }
+
+  function drawPickaxeShape(g, cx, cy, size, angle, tier){
+    const t = PICKAXES.find(p => p.key === tier) || PICKAXES[0];
+    const s = size / 100;
+
+    g.save();
+    g.translate(cx, cy);
+    g.rotate(angle);
+
+    g.fillStyle = '#4a3018';
+    g.fillRect(-3 * s, 2 * s, 6 * s, 60 * s);
+    g.fillStyle = '#7a5836';
+    g.fillRect(-3 * s, 2 * s, 2 * s, 60 * s);
+    g.strokeStyle = 'rgba(0,0,0,.65)';
+    g.lineWidth = 1.2 * s;
+    g.strokeRect(-3 * s, 2 * s, 6 * s, 60 * s);
+
+    g.beginPath();
+    g.moveTo(-30 * s, 0 * s);
+    g.quadraticCurveTo(-22 * s, -12 * s, 0 * s, -14 * s);
+    g.quadraticCurveTo(22 * s, -12 * s, 30 * s, 0 * s);
+    g.lineTo(26 * s, 5 * s);
+    g.quadraticCurveTo(18 * s, -4 * s, 0 * s, -5 * s);
+    g.quadraticCurveTo(-18 * s, -4 * s, -26 * s, 5 * s);
+    g.closePath();
+    g.fillStyle = t.color;
+    g.fill();
+    g.strokeStyle = 'rgba(0,0,0,.7)';
+    g.lineWidth = 1.4 * s;
+    g.lineJoin = 'round';
+    g.stroke();
+
+    g.beginPath();
+    g.moveTo(-26 * s, -2 * s);
+    g.quadraticCurveTo(-18 * s, -11 * s, 0 * s, -12 * s);
+    g.quadraticCurveTo(18 * s, -11 * s, 26 * s, -2 * s);
+    g.strokeStyle = t.highlight;
+    g.lineWidth = 1.6 * s;
+    g.stroke();
+
+    g.restore();
+  }
+
+  function pickSVGPath(tier, viewW, viewH){
+    const t = PICKAXES.find(p => p.key === tier) || PICKAXES[0];
+    return '<svg viewBox="-40 -20 80 90" width="' + viewW + '" height="' + viewH + '" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">' +
+      '<rect x="-3" y="2" width="6" height="60" fill="#4a3018" stroke="rgba(0,0,0,.65)" stroke-width="1.2"/>' +
+      '<rect x="-3" y="2" width="2" height="60" fill="#7a5836"/>' +
+      '<path d="M -30 0 Q -22 -12 0 -14 Q 22 -12 30 0 L 26 5 Q 18 -4 0 -5 Q -18 -4 -26 5 Z" ' +
+        'fill="' + t.color + '" stroke="rgba(0,0,0,.7)" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<path d="M -26 -2 Q -18 -11 0 -12 Q 18 -11 26 -2" stroke="' + t.highlight + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+    '</svg>';
+  }
+
+  function pickBlockType(row){
+    if (row === 0) return 'grass';
+    if (row <= 3) return 'stone';
+    const depth = Math.min(1, (row - 3) / (MAP_ROWS - 4));
+    const weights = [
+      ['stone',    30 - depth * 12],
+      ['coal',     18],
+      ['iron',     14],
+      ['gold',     9 + depth * 3],
+      ['redstone', 6 + depth * 3],
+      ['slime',    4],
+      ['craft',    4],
+      ['tnt',      4 + depth * 6],
+      ['diamond',   row > 18 ? Math.min(7, (row - 18) * 0.45) : 0],
+      ['emerald',   row > 30 ? Math.min(3, (row - 30) * 0.25) : 0],
+      ['namek',     row > 12 ? Math.min(4, (row - 12) * 0.20) : 0],
+    ];
+    const total = weights.reduce((s, [, w]) => s + Math.max(0, w), 0);
+    let r = Math.random() * total;
+    for (const [type, w] of weights){
+      if (w <= 0) continue;
+      r -= w;
+      if (r <= 0) return type;
+    }
+    return 'stone';
+  }
+
+  function generateMap(){
+    const arr = [];
+    for (let r = 0; r < MAP_ROWS; r++){
+      arr.push([]);
+      for (let c = 0; c < MAP_COLS; c++){
+        const type = pickBlockType(r);
+        const bd = BLOCKS[type];
+        arr[r].push({ type, hp: bd.hard, maxHp: bd.hard, broken: false });
+      }
     }
     return arr;
   }
-  function fmtMult(v){
-    if (!isFinite(v)) return 'x∞';
-    return 'x' + v.toFixed(2);
-  }
-  function fmtMoney(v){
-    const n = Math.floor(v * 100) / 100;
-    return Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2);
-  }
-  function getTierClass(m){
-    if (m >= 21) return 'tier-orange';
-    if (m >= 10) return 'tier-yellow';
-    if (m >= 4)  return 'tier-purple';
-    if (m >= 2)  return 'tier-blue';
-    return '';
+
+  function buildReel(targetIdx){
+    spinReel.innerHTML = '';
+    const ITEM_H = 140;
+    const loops = 3;
+    const totalItems = loops * PICKAXES.length + targetIdx + 1;
+    for (let i = 0; i < totalItems; i++){
+      const t = PICKAXES[i % PICKAXES.length];
+      const el = document.createElement('div');
+      el.className = 'spin-item';
+      el.innerHTML = pickSVGPath(t.key, 64, 76) +
+        '<div class="si-name" style="color:' + t.color + '">' + t.name + '</div>';
+      spinReel.appendChild(el);
+    }
+    spinReel.style.transition = 'none';
+    spinReel.style.transform = 'translateY(0px)';
+    void spinReel.offsetWidth;
+    return { totalItems, ITEM_H };
   }
 
-  /* ============ TYPEWRITER ============ */
+  function updateReel(now){
+    const s = state.spin;
+    if (s.landed){
+      if (now - s.finishAt > 1000){
+        state.gameState = 'mining';
+        spawnPickaxe(PICKAXES[s.targetIdx].key);
+        state.lastFrame = now;
+      }
+      return;
+    }
+    const elapsed = now - s.start;
+    const t = Math.min(1, elapsed / s.dur);
+    const e = 1 - Math.pow(1 - t, 5);
+    const y = s.from + (s.to - s.from) * e;
+    spinReel.style.transform = 'translateY(' + y + 'px)';
+
+    const ticks = Math.floor(Math.abs(y - s.from) / 140);
+    if (ticks !== s.tickCount){
+      s.tickCount = ticks;
+      Sound.reelTick();
+      haptic('light');
+    }
+
+    if (t >= 1){
+      s.landed = true;
+      s.finishAt = now;
+      Sound.reelLand(s.targetIdx);
+      haptic('heavy');
+      const t2 = PICKAXES[s.targetIdx];
+      spinResult.innerHTML = '<span style="color:' + t2.color + '">' + t2.name + ' Pickaxe</span> · ' + t2.dur + ' durability';
+      spinResult.classList.add('show');
+    }
+  }
+
+  function showReel(targetIdx){
+    spinResult.classList.remove('show');
+    spinOverlay.classList.add('show');
+    const { totalItems, ITEM_H } = buildReel(targetIdx);
+    const targetY = -((totalItems - 1) * ITEM_H);
+    const s = state.spin;
+    s.start = performance.now();
+    s.dur = 2400;
+    s.from = 0;
+    s.to = targetY;
+    s.targetIdx = targetIdx;
+    s.landed = false;
+    s.finishAt = 0;
+    s.tickCount = -1;
+  }
+
+  function spawnBreakFrags(worldX, worldY, colorTop, colorBot, count){
+    for (let i = 0; i < count; i++){
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 100 + Math.random() * 220;
+      state.breakFrags.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 220,
+        size: 3 + Math.random() * 7,
+        rot: Math.random() * Math.PI * 2,
+        rotVel: (Math.random() - 0.5) * 22,
+        color: Math.random() < 0.5 ? colorTop : colorBot,
+        born: performance.now(),
+        life: 900 + Math.random() * 500,
+      });
+    }
+  }
+
+  function updateFrags(now){
+    for (let i = state.breakFrags.length - 1; i >= 0; i--){
+      const f = state.breakFrags[i];
+      const age = (now - f.born) / f.life;
+      if (age >= 1){ state.breakFrags.splice(i, 1); continue; }
+      f.vy += GRAVITY * 1.2 / 60;
+      f.x += f.vx / 60;
+      f.y += f.vy / 60;
+      f.rot += f.rotVel / 60;
+    }
+  }
+
+  function spawnFloatText(worldX, worldY, text, opts){
+    opts = opts || {};
+    state.floatTexts.push({
+      x: worldX + (opts.jx != null ? opts.jx : (Math.random() - 0.5) * 22),
+      y: worldY,
+      text: String(text),
+      color: opts.color || '#8ef0b8',
+      size: opts.size || 14,
+      weight: opts.weight || 900,
+      outline: opts.outline !== false,
+      born: performance.now(),
+      life: opts.life || 1050,
+      vy: opts.vy != null ? opts.vy : -78,
+      vx: opts.vx != null ? opts.vx : (Math.random() - 0.5) * 20,
+      pop: opts.pop !== false,
+    });
+  }
+
+  function updateFloatTexts(now){
+    for (let i = state.floatTexts.length - 1; i >= 0; i--){
+      const t = state.floatTexts[i];
+      const age = (now - t.born) / t.life;
+      if (age >= 1){ state.floatTexts.splice(i, 1); continue; }
+    }
+  }
+
+  function drawFloatTexts(now, camY){
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < state.floatTexts.length; i++){
+      const t = state.floatTexts[i];
+      const age = (now - t.born) / t.life;
+      const x = t.x + t.vx * age * 0.6;
+      const y = t.y - camY + t.vy * age + age * age * 60;
+      let scale = 1;
+      if (t.pop && age < 0.22){
+        scale = 1 + (0.22 - age) * 3;
+      }
+      ctx.globalAlpha = age < 0.75 ? 1 : (1 - (age - 0.75) / 0.25);
+      ctx.font = t.weight + ' ' + (t.size * scale) + 'px -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, sans-serif';
+
+      if (t.outline){
+        ctx.lineWidth = Math.max(2, t.size * scale * 0.22);
+        ctx.strokeStyle = 'rgba(0,0,0,.85)';
+        ctx.lineJoin = 'round';
+        ctx.strokeText(t.text, x, y);
+      }
+      ctx.fillStyle = t.color;
+      ctx.fillText(t.text, x, y);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function render(now){
+    if (W <= 0 || H <= 0) return;
+    ctx.clearRect(0, 0, W, H);
+
+    let shakeX = 0, shakeY = 0;
+    if (state.shake > 0.5){
+      shakeX = (Math.random() - 0.5) * state.shake;
+      shakeY = (Math.random() - 0.5) * state.shake;
+      state.shake *= 0.85;
+    }
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
+
+    const camY = state.cameraY;
+    const groundLineY = -camY;
+
+    if (groundLineY > -50){
+      const skyEnd = Math.max(0, groundLineY);
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, skyEnd);
+      skyGrad.addColorStop(0, '#2e7bc4');
+      skyGrad.addColorStop(0.4, '#5aa5e8');
+      skyGrad.addColorStop(0.8, '#9ecdf0');
+      skyGrad.addColorStop(1, '#d4ecfa');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(-30, -30, W + 60, skyEnd + 30);
+
+      ctx.save();
+      ctx.globalAlpha = 0.85;
+      const sunY = Math.max(-20, groundLineY * 0.15);
+      const sunGrad = ctx.createRadialGradient(W * 0.8, sunY, 0, W * 0.8, sunY, 90);
+      sunGrad.addColorStop(0, '#fffbe0');
+      sunGrad.addColorStop(0.3, '#fff2a8');
+      sunGrad.addColorStop(1, 'rgba(255,242,168,0)');
+      ctx.fillStyle = sunGrad;
+      ctx.beginPath();
+      ctx.arc(W * 0.8, sunY, 90, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fffbe0';
+      ctx.beginPath();
+      ctx.arc(W * 0.8, sunY, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.fillStyle = 'rgba(255,255,255,.85)';
+      const cloudBase = groundLineY * 0.3;
+      drawCloud(W * 0.15, cloudBase + 10, 55);
+      drawCloud(W * 0.55, cloudBase - 10, 70);
+      drawCloud(W * 0.9, cloudBase + 25, 45);
+    }
+
+    const underStart = Math.max(-30, groundLineY);
+    if (underStart < H + 30){
+      const ug = ctx.createLinearGradient(0, underStart, 0, H + 60);
+      ug.addColorStop(0, '#3a2818');
+      ug.addColorStop(0.15, '#2a1c10');
+      ug.addColorStop(0.5, '#161010');
+      ug.addColorStop(1, '#08060a');
+      ctx.fillStyle = ug;
+      ctx.fillRect(-30, underStart, W + 60, H - underStart + 60);
+    }
+
+    const startRow = Math.max(0, Math.floor(camY / BLOCK_SIZE) - 1);
+    const endRow = Math.min(MAP_ROWS - 1, Math.ceil((camY + H) / BLOCK_SIZE) + 1);
+
+    for (let r = startRow; r <= endRow; r++){
+      const row = state.blocks[r];
+      if (!row) continue;
+      for (let c = 0; c < MAP_COLS; c++){
+        const b = row[c];
+        if (!b || b.broken) continue;
+        const px = c * BLOCK_SIZE;
+        const py = r * BLOCK_SIZE - camY;
+        if (py < -BLOCK_SIZE - 10 || py > H + 10) continue;
+        const sprite = getBlockSprite(b.type, BLOCK_SIZE);
+        ctx.drawImage(sprite, px, py, BLOCK_SIZE, BLOCK_SIZE);
+        if (b.hp < b.maxHp){
+          drawCracks(ctx, px, py, BLOCK_SIZE, b.maxHp - b.hp, b.maxHp);
+        }
+      }
+    }
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let r = startRow; r <= endRow; r++){
+      const row = state.blocks[r];
+      if (!row) continue;
+      for (let c = 0; c < MAP_COLS; c++){
+        const b = row[c];
+        if (!b || b.broken || b.type !== 'namek') continue;
+        const px = c * BLOCK_SIZE + BLOCK_SIZE/2;
+        const py = r * BLOCK_SIZE - camY + BLOCK_SIZE/2;
+        const pulse = 0.7 + Math.sin(now * 0.004 + r * 0.6 + c * 1.3) * 0.3;
+        const rad = BLOCK_SIZE * 1.55 * pulse;
+        const g = ctx.createRadialGradient(px, py, 0, px, py, rad);
+        g.addColorStop(0, 'rgba(125,255,107,.55)');
+        g.addColorStop(1, 'rgba(125,255,107,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(px, py, rad, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    if (state.pickaxe){
+      if (state.turbo){
+        const px = state.pickaxe.x;
+        const py = state.pickaxe.y - camY;
+        const g = ctx.createRadialGradient(px, py, 0, px, py, BLOCK_SIZE * 0.85);
+        g.addColorStop(0, 'rgba(255,200,100,.4)');
+        g.addColorStop(1, 'rgba(255,157,77,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(px, py, BLOCK_SIZE * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      drawPickaxeShape(ctx, state.pickaxe.x, state.pickaxe.y - camY, BLOCK_SIZE * 0.95, state.pickaxe.angle, state.pickaxe.tier);
+    }
+
+    for (let i = 0; i < state.breakFrags.length; i++){
+      const f = state.breakFrags[i];
+      const age = (now - f.born) / f.life;
+      ctx.globalAlpha = 1 - age;
+      ctx.save();
+      ctx.translate(f.x, f.y - camY);
+      ctx.rotate(f.rot);
+      ctx.fillStyle = f.color;
+      ctx.fillRect(-f.size/2, -f.size/2, f.size, f.size);
+      ctx.strokeStyle = 'rgba(0,0,0,.4)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-f.size/2, -f.size/2, f.size, f.size);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+
+    for (let i = state.particles.length - 1; i >= 0; i--){
+      const p = state.particles[i];
+      const age = (now - p.born) / p.life;
+      if (age >= 1){ state.particles.splice(i, 1); continue; }
+      ctx.globalAlpha = 1 - age;
+      ctx.fillStyle = p.color;
+      const px = p.x;
+      const py = p.y - camY + p.vy * age * 0.5 + age * age * 250;
+      ctx.fillRect(Math.round(px - p.size / 2), Math.round(py - p.size / 2), p.size, p.size);
+      ctx.globalAlpha = 1;
+    }
+
+    for (let i = state.confetti.length - 1; i >= 0; i--){
+      const cf = state.confetti[i];
+      const age = (now - cf.born) / cf.life;
+      if (age >= 1){ state.confetti.splice(i, 1); continue; }
+      ctx.globalAlpha = 1 - age;
+      ctx.save();
+      ctx.translate(cf.x + cf.vx * age * 0.5, cf.y - camY + cf.vy * age * 0.5 + age * age * 320);
+      ctx.rotate(cf.rot + age * 8);
+      ctx.fillStyle = cf.color;
+      ctx.fillRect(-cf.w/2, -cf.h/2, cf.w, cf.h);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+
+    drawFloatTexts(now, camY);
+
+    ctx.restore();
+
+    if (state.tntFlash > 0){
+      const alpha = state.tntFlash * 0.42;
+      const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H));
+      grad.addColorStop(0, 'rgba(255,200,100,' + alpha + ')');
+      grad.addColorStop(1, 'rgba(255,80,20,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+      state.tntFlash -= 0.06;
+      if (state.tntFlash < 0) state.tntFlash = 0;
+    }
+
+    if (state.pickaxe){
+      const row = Math.max(0, Math.min(MAP_ROWS, Math.floor(state.pickaxe.y / BLOCK_SIZE)));
+      statDepthEl.textContent = row + '/' + MAP_ROWS;
+    } else {
+      statDepthEl.textContent = '0/' + MAP_ROWS;
+    }
+    statEarnedEl.textContent = '+' + state.roundEarned.toFixed(2);
+  }
+
+  function drawCloud(cx, cy, size){
+    if (cy < -40 || cy > H + 40) return;
+    ctx.beginPath();
+    ctx.arc(cx, cy, size * 0.4, 0, Math.PI * 2);
+    ctx.arc(cx + size * 0.35, cy - size * 0.1, size * 0.5, 0, Math.PI * 2);
+    ctx.arc(cx + size * 0.75, cy, size * 0.4, 0, Math.PI * 2);
+    ctx.arc(cx + size * 0.4, cy + size * 0.15, size * 0.45, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function spawnMoneyBall(screenX, screenY, text, ballClass){
+    const el = document.createElement('div');
+    el.className = 'money-ball ' + (ballClass || 'green');
+    el.textContent = text;
+    el.style.left = screenX + 'px';
+    el.style.top = screenY + 'px';
+    floats.appendChild(el);
+    setTimeout(() => { if (el.parentNode) el.parentNode.remove(); }, 1700);
+  }
+
+  /* ============================================================
+     PHYSICS — perfect circle-vs-AABB. Damage on any impact.
+     ============================================================ */
+  function circleRectContact(cx, cy, r, rx, ry, rw, rh){
+    const inside = (cx > rx && cx < rx + rw && cy > ry && cy < ry + rh);
+    if (inside){
+      const leftDist  = cx - rx;
+      const rightDist = (rx + rw) - cx;
+      const topDist   = cy - ry;
+      const botDist   = (ry + rh) - cy;
+      const m = Math.min(leftDist, rightDist, topDist, botDist);
+      let nxn = 0, nyn = 0;
+      if (m === leftDist)       nxn = -1;
+      else if (m === rightDist) nxn =  1;
+      else if (m === topDist)   nyn = -1;
+      else                      nyn =  1;
+      return { nxn, nyn, overlap: r + m };
+    }
+
+    const nearestX = Math.max(rx, Math.min(cx, rx + rw));
+    const nearestY = Math.max(ry, Math.min(cy, ry + rh));
+    const dx = cx - nearestX;
+    const dy = cy - nearestY;
+    const d2 = dx * dx + dy * dy;
+    if (d2 >= r * r) return null;
+    const d = Math.sqrt(d2) || 0.0001;
+    return { nxn: dx / d, nyn: dy / d, overlap: r - d };
+  }
+
+  function updateStuck(dt){
+    const p = state.pickaxe;
+    if (!p) return;
+    if (Math.abs(p.y - state.lastStuckY) < 3 && Math.abs(p.vy) < 40){
+      state.stuckTimer += dt;
+      if (state.stuckTimer > 0.6){
+        p.vx += (Math.random() > 0.5 ? 1 : -1) * 300;
+        p.vy = 240;
+        state.stuckTimer = 0;
+      }
+    } else {
+      state.lastStuckY = p.y;
+      state.stuckTimer = 0;
+    }
+  }
+
+  let damageThisFrame = false;
+
+  function updatePhysics(dt, now){
+    const p = state.pickaxe;
+    if (!p) return;
+
+    damageThisFrame = false;
+
+    const maxMove = Math.max(Math.abs(p.vx * dt), Math.abs(p.vy * dt));
+    const substeps = Math.max(1, Math.ceil(maxMove / (p.r * 0.55)));
+    const subDt = dt / substeps;
+
+    for (let s = 0; s < substeps; s++){
+      const alive = stepPhysics(p, subDt, now);
+      if (!alive) return;
+    }
+  }
+
+  function stepPhysics(p, dt, now){
+    p.vy += GRAVITY * p.speed * dt;
+    if (p.vy > TERMINAL_VY * p.speed) p.vy = TERMINAL_VY * p.speed;
+    p.vx *= Math.pow(0.995, dt * 60);
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.angle += p.angleVel * dt;
+    p.angleVel *= Math.pow(0.985, dt * 60);
+
+    const r = p.r;
+
+    if (p.x - r < 0){ p.x = r; p.vx = Math.abs(p.vx) * WALL_REST + 90; p.angleVel += ANGULAR_KICK; }
+    if (p.x + r > W){ p.x = W - r; p.vx = -Math.abs(p.vx) * WALL_REST - 90; p.angleVel -= ANGULAR_KICK; }
+
+    const row = Math.floor(p.y / BLOCK_SIZE);
+    const col = Math.floor(p.x / BLOCK_SIZE);
+    const contacts = [];
+    for (let dr = -1; dr <= 1; dr++){
+      for (let dc = -1; dc <= 1; dc++){
+        const rr = row + dr, cc = col + dc;
+        if (rr < 0 || rr >= MAP_ROWS || cc < 0 || cc >= MAP_COLS) continue;
+        const b = state.blocks[rr][cc];
+        if (!b || b.broken) continue;
+        const c = circleRectContact(p.x, p.y, r, cc * BLOCK_SIZE, rr * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        if (!c) continue;
+        contacts.push({ rr, cc, b, nxn: c.nxn, nyn: c.nyn, overlap: c.overlap });
+      }
+    }
+
+    if (contacts.length === 0){
+      if (p.y > MAP_HEIGHT_PX + 100){ endRound('bottom'); return false; }
+      updateStuck(dt);
+      return true;
+    }
+
+    contacts.sort((a, b) => b.overlap - a.overlap);
+
+    for (let iter = 0; iter < 4; iter++){
+      let anyOverlap = false;
+      for (let i = 0; i < contacts.length; i++){
+        const c = contacts[i];
+        const cc = circleRectContact(p.x, p.y, r, c.cc * BLOCK_SIZE, c.rr * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        if (!cc) continue;
+        p.x += cc.nxn * (cc.overlap + 0.1);
+        p.y += cc.nyn * (cc.overlap + 0.1);
+        anyOverlap = true;
+      }
+      if (!anyOverlap) break;
+    }
+
+    const primary = contacts[0];
+    const vn = p.vx * primary.nxn + p.vy * primary.nyn;
+    const vnMagnitude = Math.abs(vn);
+
+    if (vn < 0){
+      if (primary.b.type === 'slime' && primary.nyn < -0.5){
+        p.vy = -Math.abs(p.vy) * 1.5 - 280;
+        p.vx += (Math.random() - 0.5) * KICK_X * 0.9;
+        p.angleVel += (Math.random() - 0.5) * 22;
+        state.shake = Math.max(state.shake, 6);
+      } else {
+        p.vx -= (1 + BLOCK_REST) * vn * primary.nxn;
+        p.vy -= (1 + BLOCK_REST) * vn * primary.nyn;
+        if (primary.nyn < -0.5){
+          p.vx += (Math.random() - 0.5) * KICK_X;
+          p.angleVel += (Math.random() - 0.5) * ANGULAR_KICK;
+          state.shake = Math.max(state.shake, Math.min(10, 3 + vnMagnitude / 110));
+        }
+      }
+    }
+
+    if (vn < 0 && vnMagnitude > MIN_IMPACT_SPEED && !damageThisFrame){
+      damageThisFrame = true;
+
+      const tierInfo = PICKAXES.find(x => x.key === p.tier) || PICKAXES[0];
+      const speedBonus = Math.min(0.22, (vnMagnitude / 420) * 0.16);
+      const baseDamage = 0.55 + tierInfo.power * 0.09;
+
+      const isCrit = Math.random() < CRIT_CHANCE;
+      const damageMult = isCrit ? CRIT_MULT : 1;
+      const damage = (baseDamage + speedBonus) * damageMult;
+
+      let brokenCount = 0;
+      let brokeRewardTotal = 0;
+
+      for (let i = 0; i < contacts.length; i++){
+        const c = contacts[i];
+        const result = damageBlock(c.rr, c.cc, c.b, damage, now, isCrit);
+        if (result && result.broke){
+          brokenCount++;
+          brokeRewardTotal += result.payout || 0;
+        }
+      }
+
+      if (isCrit){
+        Sound.crit();
+        haptic('heavy');
+        spawnFloatText(p.x, p.y - 14, 'CRIT!', {
+          color:'#fff2a8', size:16, life:750, vy:-110, jx:0, pop:true
+        });
+        state.shake = Math.max(state.shake, 14);
+      }
+
+      // === DURABILITY COST: 1 per block touched ===
+      p.dur -= Math.max(1, contacts.length);
+      state.roundHits += contacts.length;
+      updateHero(true);
+
+      if (p.dur <= 0){
+        setTimeout(() => { if (state.pickaxe) endRound('break'); }, 150);
+        return false;
+      }
+
+      if (brokenCount === 0) Sound.rock();
+      else if (brokenCount === 1) Sound.break();
+      else Sound.bigBreak();
+
+      if (brokenCount >= 2){
+        const comboBonus = state.bet * (brokenCount - 1) * 0.5;
+        state.roundEarned += comboBonus;
+        state.balance += comboBonus;
+        persistBalance();
+        updateBalance(true);
+        updateHero(true);
+        Sound.combo(brokenCount);
+        haptic('heavy');
+        showToast('⚡ ' + brokenCount + '× COMBO  +' + comboBonus.toFixed(2));
+
+        spawnFloatText(p.x, p.y - 46, '+' + comboBonus.toFixed(2), {
+          color:'#ff7ad9', size:17, life:1100, vy:-95, jx:0, pop:true
+        });
+
+        state.shake = Math.max(state.shake, Math.min(20, 6 + brokenCount * 1.4));
+        bumpBalancePill();
+      }
+    }
+
+    if (p.y > MAP_HEIGHT_PX + 100){ endRound('bottom'); return false; }
+    updateStuck(dt);
+    return true;
+  }
+
+  function damageBlock(r, c, b, dmg, now, isCrit){
+    if (b.broken) return null;
+    const bd = BLOCKS[b.type];
+
+    if (bd.insta){
+      breakBlock(r, c, b, now, isCrit);
+      return { broke:true, payout: 0 };
+    }
+
+    const bx = c * BLOCK_SIZE + BLOCK_SIZE / 2;
+    const by = r * BLOCK_SIZE + BLOCK_SIZE / 2;
+
+    spawnFloatText(bx, by - 6, '-' + dmg.toFixed(2), {
+      color: isCrit ? '#fff2a8' : '#ffb04d',
+      size: isCrit ? 13 : 11,
+      life: 620, vy: -60, outline:true
+    });
+
+    b.hp -= dmg;
+    spawnSparks(bx, by, b.type === 'namek' ? 10 : 4, bd.particleColor || '#fff');
+
+    if (b.hp <= 0){
+      const res = breakBlock(r, c, b, now, isCrit);
+      return { broke:true, payout: res ? res.payout : 0 };
+    }
+    return { broke:false, payout:0 };
+  }
+
+  function breakBlock(r, c, b, now, isCrit){
+    if (b.broken) return null;
+    b.broken = true;
+    state.blocksBroken++;
+    const bd = BLOCKS[b.type];
+    const bx = c * BLOCK_SIZE + BLOCK_SIZE / 2;
+    const by = r * BLOCK_SIZE + BLOCK_SIZE / 2;
+
+    const fragmentCount = (b.type === 'diamond' || b.type === 'emerald' || b.type === 'namek') ? 16 : 8;
+    spawnBreakFrags(bx, by, bd.top || bd.oreColor || '#8a8a8a', bd.bot || bd.oreColor || '#5a5a5a', fragmentCount);
+
+    const particleColor = bd.particleColor || '#8a8a8a';
+    for (let i = 0; i < 12; i++){
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 40 + Math.random() * 170;
+      state.particles.push({
+        x: bx, y: by,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 140,
+        size: 2 + Math.random() * 4,
+        color: particleColor,
+        born: now,
+        life: 500 + Math.random() * 500,
+      });
+    }
+
+    if (b.type === 'tnt'){
+      state.shake = 26;
+      state.tntFlash = 1;
+      triggerTntFlash();
+      Sound.tnt();
+      haptic('heavy');
+      if (state.pickaxe){
+        state.pickaxe.vy = -Math.abs(state.pickaxe.vy) - 620;
+        state.pickaxe.vx += (Math.random() - 0.5) * 400;
+        state.pickaxe.angleVel = (Math.random() - 0.5) * 30;
+      }
+      spawnFloatText(bx, by, 'BOOM!', { color:'#ff9d4d', size:20, life:900, vy:-120, jx:0 });
+      explodeArea(r, c, 1, now);
+      return { broke:true, payout:0 };
+    }
+
+    if (b.type === 'craft'){
+      const p = state.pickaxe;
+      if (!p) return { broke:true, payout:0 };
+      const idx = PICKAXES.findIndex(x => x.key === p.tier);
+      if (idx < PICKAXES.length - 1){
+        const next = PICKAXES[idx + 1];
+        p.tier = next.key;
+        p.speed = next.speed;
+        p.maxDur = next.dur;
+        p.dur = next.dur;
+        p.y = Math.min(p.y, r * BLOCK_SIZE - p.r - 4);
+        p.vy = -Math.abs(p.vy) * 0.5 - 40;
+        showToast('⛏ ' + next.name + ' Pickaxe!');
+        spawnFloatText(bx, by, '⛏ ' + next.name, { color:next.color, size:17, life:1200, vy:-100, jx:0 });
+      } else {
+        p.dur = p.maxDur;
+        p.y = Math.min(p.y, r * BLOCK_SIZE - p.r - 4);
+        p.vy = -Math.abs(p.vy) * 0.5 - 40;
+        showToast('⛏ Fully repaired');
+        spawnFloatText(bx, by, 'REPAIRED', { color:'#8ef0b8', size:16, life:1000, vy:-100, jx:0 });
+      }
+      Sound.craft();
+      haptic('heavy');
+      updateHero(true);
+      return { broke:true, payout:0 };
+    }
+
+    let payout = 0;
+    if (bd.reward > 0){
+      payout = state.bet * bd.reward * (isCrit ? 1.5 : 1);
+      state.roundEarned += payout;
+      state.balance += payout;
+      persistBalance();
+      updateBalance(true);
+      updateHero(true);
+      bumpBalancePill();
+
+      const sx = c * BLOCK_SIZE + BLOCK_SIZE / 2;
+      const sy = r * BLOCK_SIZE - state.cameraY + BLOCK_SIZE / 2;
+
+      let ballClass = bd.ballColor || 'green';
+      if (b.type === 'diamond') ballClass = 'cyan diamond';
+      else if (b.type === 'emerald') ballClass = 'emerald emerald-lg';
+      else if (b.type === 'namek') ballClass = 'emerald emerald-lg';
+      spawnMoneyBall(sx, sy, '+' + payout.toFixed(2), ballClass);
+
+      spawnFloatText(bx, by - 10, '+' + payout.toFixed(2), {
+        color: isCrit ? '#fff2a8' : (b.type === 'namek' ? '#a6ff8a' : (b.type === 'emerald' ? '#7affa0' : '#ffd24a')),
+        size: isCrit ? 20 : (bd.reward >= 8 ? 18 : (bd.reward >= 2 ? 16 : 14)),
+        life: 1200, vy: -95, jx:0, pop:true
+      });
+
+      state.streak++;
+      state.streakTimer = 1.8;
+      if (state.streak >= 3){
+        showStreakBadge(state.streak);
+      }
+
+      if (b.type === 'namek'){
+        Sound.namek();
+        haptic('heavy');
+        spawnConfetti(bx, by, 34);
+        state.tntFlash = Math.max(state.tntFlash, 0.5);
+        spawnFloatText(bx, by - 40, '✦ NAMEK ✦', { color:'#a6ff8a', size:16, life:1300, vy:-80, jx:0 });
+      } else if (b.type === 'diamond' || b.type === 'emerald'){
+        Sound.bigOre();
+        haptic('heavy');
+        spawnConfetti(bx, by, 24);
+      } else {
+        Sound.ore();
+        haptic('medium');
+      }
+    } else {
+      if (b.type === 'slime') haptic('medium');
+    }
+
+    return { broke:true, payout };
+  }
+
+  function explodeArea(centerR, centerC, radius, now){
+    for (let dr = -radius; dr <= radius; dr++){
+      for (let dc = -radius; dc <= radius; dc++){
+        if (dr === 0 && dc === 0) continue;
+        const r = centerR + dr, c = centerC + dc;
+        if (r < 0 || r >= MAP_ROWS || c < 0 || c >= MAP_COLS) continue;
+        const b = state.blocks[r][c];
+        if (!b || b.broken) continue;
+
+        const bd = BLOCKS[b.type];
+        const bx = c * BLOCK_SIZE + BLOCK_SIZE / 2;
+        const by = r * BLOCK_SIZE + BLOCK_SIZE / 2;
+
+        b.broken = true;
+        state.blocksBroken++;
+
+        spawnBreakFrags(bx, by, bd.top || bd.oreColor || '#8a8a8a', bd.bot || '#5a5a5a', 5);
+
+        for (let i = 0; i < 6; i++){
+          const ang = Math.random() * Math.PI * 2;
+          const spd = 80 + Math.random() * 180;
+          state.particles.push({
+            x: bx, y: by,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd - 120,
+            size: 2 + Math.random() * 4,
+            color: Math.random() < 0.5 ? '#ff9d4d' : '#ff5020',
+            born: now,
+            life: 400 + Math.random() * 400,
+          });
+        }
+
+        if (bd.reward > 0){
+          const payout = state.bet * bd.reward;
+          state.roundEarned += payout;
+          state.balance += payout;
+          persistBalance();
+          updateBalance(true);
+          updateHero(true);
+          let ballClass = bd.ballColor || 'green';
+          if (b.type === 'diamond') ballClass = 'cyan diamond';
+          else if (b.type === 'emerald') ballClass = 'emerald emerald-lg';
+          else if (b.type === 'namek') ballClass = 'emerald emerald-lg';
+          spawnMoneyBall(bx, by - state.cameraY, '+' + payout.toFixed(2), ballClass);
+          spawnFloatText(bx, by - 10, '+' + payout.toFixed(2), {
+            color:'#ffd24a', size:16, life:1200, vy:-95, jx:0, pop:true
+          });
+        }
+      }
+    }
+  }
+
+  function spawnSparks(x, y, count, color){
+    for (let i = 0; i < count; i++){
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 80 + Math.random() * 160;
+      state.particles.push({
+        x, y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 100,
+        size: 1.5 + Math.random() * 2.5,
+        color: color || '#ffffff',
+        born: performance.now(),
+        life: 400 + Math.random() * 300,
+      });
+    }
+  }
+
+  function spawnConfetti(x, y, count){
+    const colors = ['#4CC38A', '#5b9dff', '#d4b46a', '#ffffff', '#b47aff', '#5ce0e0', '#f5d76e', '#7dff6b'];
+    for (let i = 0; i < count; i++){
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 80 + Math.random() * 200;
+      state.confetti.push({
+        x, y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 100,
+        w: 4 + Math.random() * 4,
+        h: 3 + Math.random() * 4,
+        rot: Math.random() * Math.PI * 2,
+        color: colors[(Math.random() * colors.length) | 0],
+        born: performance.now(),
+        life: 1200 + Math.random() * 400,
+      });
+    }
+  }
+
+  let streakTimerHandle = null;
+  function showStreakBadge(n){
+    streakBadge.textContent = 'x' + n + ' STREAK';
+    streakBadge.classList.remove('fade');
+    streakBadge.classList.add('show');
+    clearTimeout(streakTimerHandle);
+    streakTimerHandle = setTimeout(() => {
+      streakBadge.classList.add('fade');
+      streakBadge.classList.remove('show');
+    }, 700);
+  }
+
+  function bumpBalancePill(){
+    balancePill.classList.remove('bump');
+    void balancePill.offsetWidth;
+    balancePill.classList.add('bump');
+    setTimeout(() => balancePill.classList.remove('bump'), 180);
+  }
+
+  let tntFlashTimer = null;
+  function triggerTntFlash(){
+    tntFlashEl.classList.add('on');
+    clearTimeout(tntFlashTimer);
+    tntFlashTimer = setTimeout(() => tntFlashEl.classList.remove('on'), 120);
+  }
+
+  function updateHero(animate){
+    const p = state.pickaxe;
+    if (!p){
+      pickIconEl.innerHTML = pickSVGPath('wood', 32, 38);
+      pickIconEl.style.opacity = '.35';
+      pickIconEl.style.borderColor = 'rgba(255,255,255,.14)';
+      heroNameEl.textContent = 'No pickaxe';
+      heroNameEl.className = '';
+      heroEarnedEl.textContent = '+0.00 ◆';
+      duraFillEl.style.width = '100%';
+      duraFillEl.style.opacity = '.2';
+      duraTextEl.textContent = '— / —';
+      return;
+    }
+    pickIconEl.style.opacity = '1';
+    const t = PICKAXES.find(x => x.key === p.tier) || PICKAXES[0];
+    pickIconEl.innerHTML = pickSVGPath(p.tier, 32, 38);
+    pickIconEl.style.borderColor = t.color + '90';
+
+    heroNameEl.textContent = t.name + ' Pickaxe';
+    heroNameEl.className = 'tier-' + p.tier;
+
+    heroEarnedEl.textContent = '+' + state.roundEarned.toFixed(2) + ' ◆';
+
+    const durPct = Math.max(0, (p.dur / p.maxDur) * 100);
+    duraFillEl.style.opacity = '1';
+    duraFillEl.style.width = durPct + '%';
+    duraTextEl.textContent = p.dur + ' / ' + p.maxDur;
+
+    if (animate){
+      heroEarnedEl.classList.remove('bump');
+      void heroEarnedEl.offsetWidth;
+      heroEarnedEl.classList.add('bump');
+      setTimeout(() => heroEarnedEl.classList.remove('bump'), 200);
+    }
+  }
+
+  let balanceAnimInterval = null;
+  function updateBalance(animate){
+    const target = Math.floor(state.balance);
+    if (animate){
+      const from = parseInt(balanceEl.textContent.replace(/,/g, ''), 10) || 0;
+      if (from !== target){
+        if (balanceAnimInterval) cancelAnimationFrame(balanceAnimInterval);
+        const start = performance.now();
+        const dur = 340;
+        function step(t){
+          const p = Math.min(1, (t - start) / dur);
+          const e = 1 - Math.pow(1 - p, 3);
+          balanceEl.textContent = Math.round(from + (target - from) * e).toLocaleString('en-US');
+          if (p < 1) balanceAnimInterval = requestAnimationFrame(step);
+          else { balanceEl.textContent = target.toLocaleString('en-US'); balanceAnimInterval = null; }
+        }
+        balanceAnimInterval = requestAnimationFrame(step);
+        return;
+      }
+    }
+    balanceEl.textContent = target.toLocaleString('en-US');
+  }
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+
+  function updateActionButton(){
+    if (state.gameState === 'idle'){
+      actionBtn.textContent = 'Place bet & Start';
+      actionBtn.disabled = state.balance < Math.max(MIN_BET, state.bet);
+      betInput.disabled = false;
+      allInBtn.disabled = false;
+    } else {
+      actionBtn.textContent = state.gameState === 'spinning' ? 'Rolling…' : 'Mining…';
+      actionBtn.disabled = true;
+      betInput.disabled = true;
+      allInBtn.disabled = true;
+    }
+  }
+
+  function triggerTurbo(){
+    if (state.gameState !== 'mining') return;
+    const wasActive = state.turbo;
+    state.turbo = true;
+    state.turboUntil = performance.now() + 3000;
+    if (!wasActive){
+      Sound.turbo();
+      haptic('heavy');
+      turboIndicator.classList.add('on');
+      statTurboEl.classList.add('on');
+    }
+  }
+
+  function updateTurbo(now){
+    if (state.turbo && now > state.turboUntil){
+      state.turbo = false;
+      turboIndicator.classList.remove('on');
+      statTurboEl.classList.remove('on');
+    }
+  }
+
+  frame.addEventListener('pointerdown', () => { triggerTurbo(); });
+
+  function weightedPickIndex(){
+    const total = PICK_WEIGHTS.reduce((a,b) => a+b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < PICK_WEIGHTS.length; i++){
+      r -= PICK_WEIGHTS[i];
+      if (r <= 0) return i;
+    }
+    return 0;
+  }
+
+  function startGame(){
+    if (state.gameState !== 'idle') return;
+    const bet = Math.max(MIN_BET, Math.floor(state.bet));
+    if (bet > state.balance){ showToast('Insufficient balance'); haptic('light'); return; }
+
+    state.bet = bet;
+    state.balance -= bet;
+    persistBalance();
+    updateBalance(true);
+
+    state.blocks = generateMap();
+    state.gameState = 'spinning';
+    state.cameraY = -H * 0.35;
+    state.roundEarned = 0;
+    state.roundHits = 0;
+    state.blocksBroken = 0;
+    state.particles.length = 0;
+    state.confetti.length = 0;
+    state.breakFrags.length = 0;
+    state.floatTexts.length = 0;
+    state.tntFlash = 0;
+    state.turbo = false;
+    state.turboUntil = 0;
+    state.depthShown = 0;
+    state.streak = 0;
+    state.streakTimer = 0;
+    turboIndicator.classList.remove('on');
+    statTurboEl.classList.remove('on');
+    streakBadge.classList.remove('show', 'fade');
+    startHint.classList.remove('show');
+    endHint.classList.remove('show', 'win', 'lose');
+    updateActionButton();
+
+    const targetIdx = weightedPickIndex();
+    showReel(targetIdx);
+  }
+
+  function spawnPickaxe(tier){
+    const t = PICKAXES.find(x => x.key === tier);
+    const r = BLOCK_SIZE * 0.40;
+    const spawnX = BLOCK_SIZE * (0.5 + Math.random() * (MAP_COLS - 1));
+    state.pickaxe = {
+      x: spawnX,
+      y: -BLOCK_SIZE * 10,
+      vx: (Math.random() - 0.5) * 140,
+      vy: 100,
+      r: r,
+      tier: tier,
+      maxDur: t.dur,
+      dur: t.dur,
+      speed: t.speed,
+      angle: 0,
+      angleVel: 5 + Math.random() * 5,
+    };
+    state.stuckTimer = 0;
+    state.lastStuckY = state.pickaxe.y;
+    updateHero(true);
+
+    setTimeout(() => {
+      spinOverlay.classList.remove('show');
+      spinResult.classList.remove('show');
+    }, 350);
+  }
+
+  function endRound(reason){
+    if (state.gameState !== 'mining') return;
+    state.gameState = 'ended';
+    state.turbo = false;
+    turboIndicator.classList.remove('on');
+    statTurboEl.classList.remove('on');
+
+    const earned = state.roundEarned;
+    const isBreak = reason === 'break';
+
+    if (state.pickaxe && isBreak){
+      spawnBreakDebris(state.pickaxe);
+      Sound.pickBreak();
+    }
+
+    endTitle.textContent = isBreak ? 'Pickaxe broke' : 'Reached the bottom';
+    endAmount.textContent = (earned > 0 ? '+' : '') + earned.toFixed(2) + ' ◆';
+    endHint.classList.remove('win', 'lose');
+    endHint.classList.add(earned > 0 ? 'win' : 'lose');
+    endHint.classList.add('show');
+
+    if (earned > 0){
+      if (earned >= state.bet * 5) Sound.bigWin();
+      else Sound.cashout();
+    }
+
+    if (state.bet > 0){
+      const ratio = earned / state.bet;
+      state.history.unshift(ratio);
+      if (state.history.length > 15) state.history.length = 15;
+      if (ratio > state.best) state.best = ratio;
+      renderHistory();
+    }
+
+    setTimeout(() => {
+      endHint.classList.remove('show');
+      state.gameState = 'idle';
+      state.pickaxe = null;
+      state.blocks = generateMap();
+      state.cameraY = 0;
+      state.roundEarned = 0;
+      updateHero();
+      updateActionButton();
+      startHint.classList.add('show');
+    }, 2400);
+  }
+
+  function spawnBreakDebris(p){
+    const sx = p.x;
+    const sy = p.y - state.cameraY;
+    const t = PICKAXES.find(x => x.key === p.tier) || PICKAXES[0];
+    for (let i = 0; i < 8; i++){
+      const el = document.createElement('div');
+      el.className = 'debris';
+      const size = 6 + Math.random() * 8;
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.left = sx + 'px';
+      el.style.top = sy + 'px';
+      el.style.background = i < 3 ? '#4a3018' : t.color;
+      el.style.borderRadius = '2px';
+      el.style.opacity = '1';
+      const ang = (i / 8) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = 60 + Math.random() * 80;
+      const tx = Math.cos(ang) * dist;
+      const ty = Math.sin(ang) * dist - 40;
+      el.animate([
+        { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+        { transform: 'translate(calc(-50% + ' + tx + 'px), calc(-50% + ' + ty + 'px)) rotate(' + (360 + Math.random() * 720) + 'deg)', opacity: 0 },
+      ], { duration: 900, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+      floats.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.parentNode.remove(); }, 1000);
+    }
+  }
+
+  function pillStyle(ratio){
+    if (ratio < 0.5)  return { top:'#3a1a22', bot:'#1c0c12', text:'#e0556b' };
+    if (ratio < 1.0)  return { top:'#3a2e1a', bot:'#1e180c', text:'#f0d080' };
+    if (ratio < 2.0)  return { top:'#2e323a', bot:'#161a22', text:'#d0d6de' };
+    if (ratio < 5.0)  return { top:'#1e2e50', bot:'#0e1630', text:'#a8c0f0' };
+    if (ratio < 12)   return { top:'#2e1e50', bot:'#160e30', text:'#c8a8f0' };
+    return              { top:'#1e3a2c', bot:'#0e1e16', text:'#8ef0b8' };
+  }
+  function renderHistory(){
+    if (!state.history.length){
+      historyStrip.innerHTML = '<div class="history-empty">No runs yet — place a bet to start mining</div>';
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    state.history.forEach(r => {
+      const col = pillStyle(r);
+      const pill = document.createElement('div');
+      pill.className = 'history-pill';
+      pill.style.background = 'linear-gradient(180deg, ' + col.top + ', ' + col.bot + ')';
+      pill.style.color = col.text;
+      pill.textContent = r.toFixed(2) + 'x';
+      frag.appendChild(pill);
+    });
+    historyStrip.innerHTML = '';
+    historyStrip.appendChild(frag);
+  }
+
+  function clampBet(){
+    let v = parseInt(betInput.value.replace(/[^\d]/g, ''), 10);
+    if (!Number.isFinite(v) || v < MIN_BET) v = MIN_BET;
+    if (v > Math.floor(state.balance)) v = Math.max(MIN_BET, Math.floor(state.balance));
+    state.bet = v;
+    betInput.value = v;
+    updateActionButton();
+  }
+  betInput.addEventListener('input', () => {
+    betInput.value = betInput.value.replace(/[^\d]/g, '').slice(0, 9);
+  });
+  betInput.addEventListener('blur', clampBet);
+  betInput.addEventListener('keydown', e => { if (e.key === 'Enter') betInput.blur(); });
+
+  allInBtn.addEventListener('click', () => {
+    if (state.gameState !== 'idle') return;
+    const amt = Math.max(MIN_BET, Math.floor(state.balance));
+    if (amt < MIN_BET){ showToast('Balance too low'); return; }
+    betInput.value = amt;
+    state.bet = amt;
+    haptic('light');
+    Sound.click();
+    updateActionButton();
+  });
+
+  actionBtn.addEventListener('click', () => {
+    if (state.gameState !== 'idle') return;
+    clampBet();
+    startGame();
+  });
+
+  $('#back-btn').addEventListener('click', () => {
+    haptic('light');
+    Sound.click();
+    try {
+      if (TG?.close) TG.close();
+      else history.back();
+    } catch(_){}
+  });
+
   function typeText(el, text, speed){
-    if (el._typeTimer) { clearTimeout(el._typeTimer); el._typeTimer = null; }
+    if (el._typeTimer){ clearTimeout(el._typeTimer); el._typeTimer = null; }
     el.textContent = '';
     const caret = document.createElement('span');
     caret.className = 'caret';
@@ -726,676 +2164,114 @@
     }
     step();
   }
-  function animateValue(el, newText){
-    if (el.textContent === newText) return;
-    el.textContent = newText;
-    el.classList.remove('changing');
-    void el.offsetWidth;
-    el.classList.add('changing');
+
+  function updateCamera(dt){
+    if (!state.pickaxe){
+      const target = -H * 0.35;
+      state.cameraY += (target - state.cameraY) * Math.min(1, dt * 3);
+      return;
+    }
+    const target = state.pickaxe.y - H * 0.42;
+    const minY = -H * 1.5;
+    const maxY = MAP_HEIGHT_PX - H * 0.6;
+    const clamped = Math.max(minY, Math.min(maxY, target));
+    state.cameraY += (clamped - state.cameraY) * Math.min(1, dt * 8);
   }
 
-  /* ============ UI ============ */
-  function showToast(msg){
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    clearTimeout(toastEl._t);
-    toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  function updateDepthMilestone(now){
+    if (!state.pickaxe) return;
+    const row = Math.floor(state.pickaxe.y / BLOCK_SIZE);
+    const milestone = Math.floor(row / 10) * 10;
+    if (milestone > 0 && milestone > state.depthShown){
+      state.depthShown = milestone;
+      Sound.depth();
+      haptic('medium');
+      const bonus = state.bet * 0.5 * (milestone / 10);
+      state.roundEarned += bonus;
+      state.balance += bonus;
+      persistBalance();
+      updateBalance(true);
+      updateHero(true);
+      bumpBalancePill();
+      showToast('⛏ DEPTH ' + milestone + 'm  +' + bonus.toFixed(2));
+      spawnFloatText(state.pickaxe.x, state.pickaxe.y - 30, 'DEPTH ' + milestone + 'm  +' + bonus.toFixed(2), {
+        color:'#8fb8ff', size:15, life:1500, vy:-110, jx:0, pop:true
+      });
+    }
   }
-  function updateBalance(animate){
-    const target = Math.floor(state.balance);
-    if (animate){
-      const from = parseInt(balanceEl.textContent.replace(/,/g, ''), 10) || 0;
-      if (from !== target){
-        const start = performance.now();
-        const dur = 520;
-        function step(t){
-          const p = Math.min(1, (t - start) / dur);
-          const e = 1 - Math.pow(1 - p, 3);
-          balanceEl.textContent = Math.round(from + (target - from) * e).toLocaleString('en-US');
-          if (p < 1) requestAnimationFrame(step);
-          else balanceEl.textContent = target.toLocaleString('en-US');
+
+  let rafId = null;
+  function loop(now){
+    rafId = requestAnimationFrame(loop);
+    if (document.hidden) return;
+    if (!state.lastFrame) state.lastFrame = now;
+    let dt = (now - state.lastFrame) / 1000;
+    state.lastFrame = now;
+    dt = Math.min(0.033, dt);
+
+    if (state.turbo) dt *= TURBO_SCALE;
+
+    updateTurbo(now);
+    updateFloatTexts(now);
+
+    if (state.streakTimer > 0){
+      state.streakTimer -= dt * (state.turbo ? 1 / TURBO_SCALE : 1);
+      if (state.streakTimer <= 0){
+        state.streak = 0;
+      }
+    }
+
+    if (state.gameState === 'mining'){
+      if (state.turbo){
+        for (let i = 0; i < 3; i++){
+          updatePhysics(dt / 3, now);
         }
-        requestAnimationFrame(step);
-        return;
+      } else {
+        updatePhysics(dt, now);
       }
-    }
-    balanceEl.textContent = target.toLocaleString('en-US');
-  }
-
-  /* ============ MULT BAR ============ */
-  function buildMultBar(){
-    multInner.querySelectorAll('.mult-item').forEach(el => el.remove());
-    const activeIdx = state.playing ? state.revealed : 0;
-    const frag = document.createDocumentFragment();
-    state.multipliers.forEach((m, i) => {
-      const item = document.createElement('div');
-      item.className = 'mult-item';
-      const tier = getTierClass(m);
-      if (tier) item.classList.add(tier);
-      if (i === activeIdx) item.classList.add('active');
-      else if (state.playing && i < activeIdx) item.classList.add('done');
-      item.textContent = i === 0 ? 'x1.00' : fmtMult(m);
-      frag.appendChild(item);
-    });
-    multInner.appendChild(frag);
-    multIndicator.style.transition = 'none';
-    moveIndicator(false);
-    void multIndicator.offsetWidth;
-    multIndicator.style.transition = '';
-    updateNext2xHint();
-    updateMaxMultiplierDisplay();
-  }
-
-  function applyIndicatorTier(){
-    const items = multInner.querySelectorAll('.mult-item');
-    const idx = state.playing ? state.revealed : 0;
-    const item = items[idx];
-    if (!item) return;
-    multIndicator.classList.remove('tier-blue','tier-purple','tier-yellow','tier-orange');
-    const curMult = state.multipliers[idx] || 1;
-    const tier = getTierClass(curMult);
-    if (tier) multIndicator.classList.add(tier);
-  }
-
-  function moveIndicator(scroll){
-    const items = multInner.querySelectorAll('.mult-item');
-    const idx = state.playing ? state.revealed : 0;
-    const item = items[idx];
-    if (!item) return;
-    multIndicator.style.left = item.offsetLeft + 'px';
-    multIndicator.style.width = item.offsetWidth + 'px';
-    applyIndicatorTier();
-    if (scroll){
-      const target = item.offsetLeft - multBar.clientWidth / 2 + item.offsetWidth / 2;
-      multBar.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
-    }
-  }
-
-  function updateNext2xHint(){
-    if (!state.playing){
-      next2xHint.classList.remove('show');
-      return;
-    }
-    const nextIdx = state.revealed + 1;
-    const curIdx  = state.revealed;
-    const curMult = state.multipliers[curIdx] || 1;
-    const nextMult = state.multipliers[nextIdx];
-    if (nextMult == null || curMult >= 2 || nextMult < 2){
-      next2xHint.classList.remove('show');
-      return;
-    }
-    const items = multInner.querySelectorAll('.mult-item');
-    const item = items[nextIdx];
-    if (!item){ next2xHint.classList.remove('show'); return; }
-    next2xHint.style.left = (item.offsetLeft + item.offsetWidth / 2) + 'px';
-    next2xHint.classList.add('show');
-  }
-
-  function updateMultBar(){
-    const items = multInner.querySelectorAll('.mult-item');
-    const idx = state.playing ? state.revealed : 0;
-    items.forEach((it, i) => {
-      it.classList.toggle('active', i === idx);
-      it.classList.toggle('done', state.playing && i < idx);
-    });
-    moveIndicator(true);
-    updateNext2xHint();
-    updateMaxFill();
-  }
-
-  function updateMaxFill(){
-    const totalCells = state.gridSize * state.gridSize;
-    const minesForCalc = state.mines || 3;
-    const mults = computeMultipliers(totalCells, Math.min(minesForCalc, totalCells - 1));
-    const maxMult = mults[mults.length - 1] || 1;
-    const curMult = state.playing ? (state.multipliers[state.revealed] ?? 1) : 1;
-    const pct = Math.max(0, Math.min(1, curMult / maxMult)) * 100;
-    if (multMaxFill) multMaxFill.style.width = pct + '%';
-  }
-
-  function updateMaxMultiplierDisplay(){
-    const totalCells = state.gridSize * state.gridSize;
-    const minesForCalc = state.mines || 3;
-    const mults = computeMultipliers(totalCells, Math.min(minesForCalc, totalCells - 1));
-    const maxMult = mults[mults.length - 1] || 1;
-    multMaxVal.textContent = fmtMult(maxMult);
-    multMaxEl.classList.remove('tier-blue','tier-purple','tier-yellow','tier-orange');
-    const tier = getTierClass(maxMult);
-    if (tier) multMaxEl.classList.add(tier);
-    multMaxEl.classList.remove('pulse');
-    void multMaxEl.offsetWidth;
-    multMaxEl.classList.add('pulse');
-    updateMaxFill();
-  }
-
-  /* ============ POPUPS ============ */
-  function renderGridChips(){
-    gridPopup.innerHTML = '';
-    GRID_OPTIONS.forEach(n => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = n + '×' + n;
-      if (n === state.gridSize) b.classList.add('active');
-      b.addEventListener('click', (e) => { e.stopPropagation(); selectGrid(n, b); });
-      gridPopup.appendChild(b);
-    });
-  }
-
-  function renderMineChips(){
-    const presets = MINE_PRESETS[state.gridSize] || [1];
-    if (!presets.includes(state.mines)) {
-      state.mines = presets[Math.min(2, presets.length - 1)];
-    }
-    minesPopup.innerHTML = '';
-    presets.forEach(m => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = m;
-      if (m === state.mines) b.classList.add('active');
-      b.addEventListener('click', (e) => { e.stopPropagation(); selectMines(m, b); });
-      minesPopup.appendChild(b);
-    });
-  }
-
-  function pulseChip(btn){
-    if (!btn) return;
-    btn.classList.remove('pick');
-    void btn.offsetWidth;
-    btn.classList.add('pick');
-    setTimeout(() => btn.classList.remove('pick'), 480);
-  }
-
-  function selectGrid(n, btn){
-    if (state.playing || state.busy || state.rebuilding) { closePopups(); return; }
-    if (n === state.gridSize) { pulseChip(btn); closePopups(); return; }
-    haptic('light'); Sound.click(); pulseChip(btn);
-    state.gridSize = n;
-    animateValue(gridVal, n + ' × ' + n);
-    state.multipliers = computeMultipliers(n * n, state.mines);
-    renderGridChips();
-    renderMineChips();
-    minesVal.textContent = state.mines;
-    setTimeout(() => {
-      closePopups();
-      renderGrid(true);
-      buildMultBar();
-      updateActionButton();
-    }, 180);
-  }
-
-  function selectMines(m, btn){
-    if (state.playing || state.busy || state.rebuilding) { closePopups(); return; }
-    if (m === state.mines) { pulseChip(btn); closePopups(); return; }
-    haptic('light'); Sound.click(); pulseChip(btn);
-    state.mines = m;
-    animateValue(minesVal, String(m));
-    state.multipliers = computeMultipliers(state.gridSize * state.gridSize, m);
-    renderMineChips();
-    setTimeout(() => {
-      closePopups();
-      buildMultBar();
-      updateActionButton();
-    }, 180);
-  }
-
-  function openPopup(which){
-    closePopups();
-    const popup = which === 'grid' ? gridPopup : minesPopup;
-    const btn   = which === 'grid' ? gridBtn   : minesBtn;
-    popup.classList.add('open');
-    btn.classList.add('open');
-    haptic('light');
-    Sound.click();
-  }
-  function closePopups(){
-    gridPopup.classList.remove('open');
-    minesPopup.classList.remove('open');
-    gridBtn.classList.remove('open');
-    minesBtn.classList.remove('open');
-  }
-
-  gridBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (state.playing || state.busy) return;
-    if (gridPopup.classList.contains('open')) closePopups();
-    else openPopup('grid');
-  });
-  minesBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (state.playing || state.busy) return;
-    if (minesPopup.classList.contains('open')) closePopups();
-    else openPopup('mines');
-  });
-
-  document.addEventListener('pointerdown', (e) => {
-    const anyOpen = gridPopup.classList.contains('open') || minesPopup.classList.contains('open');
-    if (!anyOpen) return;
-    if (e.target.closest('.opt-wrap')) return;
-    closePopups();
-  }, true);
-
-  /* ============ GRID ============ */
-  function renderGrid(animate){
-    if (animate && gridEl.children.length > 0){
-      state.rebuilding = true;
-      gridFrame.classList.add('exiting');
-      setTimeout(() => {
-        _doRenderGrid();
-        void gridFrame.offsetWidth;
-        gridFrame.classList.remove('exiting');
-        gridFrame.classList.add('swapping');
-        setTimeout(() => gridFrame.classList.remove('swapping'), 620);
-        setTimeout(() => { state.rebuilding = false; }, 620);
-      }, 240);
+      updateDepthMilestone(now);
+      updateCamera(dt);
+    } else if (state.gameState === 'spinning'){
+      updateReel(now);
+      updateCamera(dt);
     } else {
-      _doRenderGrid();
+      updateCamera(dt);
     }
+    updateFrags(now);
+    render(now);
   }
 
-  function _doRenderGrid(){
-    const n = state.gridSize;
-    const total = n * n;
-    const gapPx = Math.max(5, Math.round(30 / n));
-    const radiusPx = Math.max(9, Math.round(72 / n));
-
-    gridEl.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
-    gridEl.style.gridTemplateRows = 'repeat(' + n + ', 1fr)';
-    gridEl.style.gap = gapPx + 'px';
-    gridEl.style.setProperty('--tile-radius', radiusPx + 'px');
-    gridEl.innerHTML = '';
-
-    const STEP_MS = Math.max(18, Math.round(120 / n));
-
-    for (let i = 0; i < total; i++){
-      const t = document.createElement('button');
-      t.type = 'button';
-      t.className = 'tile';
-      t.dataset.i = i;
-      t.style.animationDelay = (i * STEP_MS) + 'ms';
-      t.innerHTML =
-        '<div class="tile-face tile-front">' +
-          '<img class="gift-ic" src="' + GIF_GIFT + '" alt="" draggable="false">' +
-        '</div>' +
-        '<div class="tile-face tile-back">' +
-          '<img class="ic ic-gem" src="' + GIF_DIAMOND + '" alt="" draggable="false">' +
-          '<img class="ic ic-mine" src="' + GIF_BOMB + '" alt="" draggable="false">' +
-        '</div>';
-      t.addEventListener('click', () => onTileClick(i, t));
-      gridEl.appendChild(t);
-    }
-    sizeGrid();
-  }
-
-  function sizeGrid(){
-    const rect = stageEl.getBoundingClientRect();
-    const size = Math.max(120, Math.floor(Math.min(rect.width, rect.height) - 40));
-    gridEl.style.width  = size + 'px';
-    gridEl.style.height = size + 'px';
-  }
-
-  /* ============ GAME ============ */
-  function generateMines(n, m){
-    const total = n * n;
-    const set = new Set();
-    while (set.size < m) set.add(Math.floor(Math.random() * total));
-    return set;
-  }
-
-  function updateActionButton(){
-    if (state.playing){
-      const mult = state.multipliers[state.revealed] ?? 1;
-      const cash = state.bet * mult;
-      actionBtn.classList.add('cashout');
-      actionBtn.innerHTML = 'Cashout <span class="co-amount">· ' + fmtMoney(cash) + '</span>';
-      actionBtn.disabled = state.revealed === 0 || state.busy;
-    } else {
-      actionBtn.classList.remove('cashout');
-      actionBtn.textContent = 'Start';
-      actionBtn.disabled = state.balance < Math.max(MIN_BET, state.bet) || state.busy;
-    }
-  }
-
-  function startGame(rebuildGrid){
-    if (state.busy || state.rebuilding) return false;
-    const bet = Math.max(MIN_BET, Math.floor(state.bet));
-    if (bet > state.balance){
-      showToast('Insufficient balance');
-      haptic('light');
-      return false;
-    }
-
-    state.busy = true;
-    state.balance -= bet;
-    state.bet = bet;
-    persistBalance();
-    updateBalance(true);
-
-    state.multipliers = computeMultipliers(state.gridSize * state.gridSize, state.mines);
-    state.mineSet = generateMines(state.gridSize, state.mines);
-    state.playing = true;
-    state.revealed = 0;
-    state.shown2xGif = false;
-
-    if (rebuildGrid !== false) renderGrid();
-    buildMultBar();
-
-    betInput.disabled = true;
-    allInBtn.disabled = true;
-    gridBtn.disabled = true;
-    minesBtn.disabled = true;
-
-    haptic('medium');
-    Sound.start();
-    updateMultBar();
-    updateActionButton();
-
-    setTimeout(() => { state.busy = false; updateActionButton(); }, 320);
-    return true;
-  }
-
-  function onTileClick(i, el){
-    if (!state.playing && !state.busy && !state.rebuilding){
-      const ok = startGame(false);
-      if (ok){
-        setTimeout(() => {
-          const tiles = gridEl.querySelectorAll('.tile');
-          const target = tiles[i];
-          if (target) revealTile(i, target);
-        }, 240);
-      }
-      return;
-    }
-    if (!state.playing || state.busy) return;
-    revealTile(i, el);
-  }
-
-  function revealTile(i, el){
-    if (!el || el.classList.contains('revealed')) return;
-
-    if (state.mineSet.has(i)){
-      el.classList.add('revealed', 'mine');
-      haptic('heavy');
-      Sound.mine();
-      loseGame();
-      return;
-    }
-    el.classList.add('revealed', 'gem');
-    state.revealed++;
-    haptic('light');
-    Sound.reveal();
-    spawnGemBurst(el);
-
-    const curMult = state.multipliers[state.revealed];
-    const prevMult = state.multipliers[state.revealed - 1];
-    if (!state.shown2xGif && curMult >= 2 && prevMult < 2){
-      state.shown2xGif = true;
-      show2xGif(el);
-    }
-    updateMultBar();
-    updateActionButton();
-
-    const totalSafe = state.gridSize * state.gridSize - state.mines;
-    if (state.revealed >= totalSafe){
-      setTimeout(() => cashout(true), 380);
-    }
-  }
-
-  function show2xGif(el){
-    el.classList.add('hide-gem');
-    el.classList.remove('milestone');
-    void el.offsetWidth;
-    el.classList.add('milestone');
-
-    const gif = document.createElement('img');
-    gif.src = GIF_2X[Math.floor(Math.random() * GIF_2X.length)];
-    gif.className = 'special-gif';
-    gif.alt = '';
-    gif.draggable = false;
-    el.appendChild(gif);
-
-    requestAnimationFrame(() => requestAnimationFrame(() => gif.classList.add('show')));
-    haptic('heavy');
-    Sound.milestone();
-
-    setTimeout(() => {
-      gif.classList.remove('show');
-      setTimeout(() => {
-        gif.remove();
-        el.classList.remove('hide-gem');
-        el.classList.remove('milestone');
-      }, 400);
-    }, 2500);
-  }
-
-  function loseGame(){
-    state.busy = true;
-    gridFrame.classList.add('shaking');
-    setTimeout(() => gridFrame.classList.remove('shaking'), 520);
-
-    const tiles = gridEl.querySelectorAll('.tile');
-    const mineIdx = [...state.mineSet].sort((a, b) => a - b);
-    mineIdx.forEach((idx, k) => {
-      const t = tiles[idx];
-      if (!t || t.classList.contains('revealed')) return;
-      setTimeout(() => { t.classList.add('revealed', 'mine'); Sound.mine(); }, 90 + k * 55);
-    });
-    tiles.forEach((t, idx) => {
-      if (state.mineSet.has(idx)) return;
-      setTimeout(() => t.classList.add('dimmed'), 280);
-    });
-
-    setTimeout(() => {
-      Sound.lose();
-      showResult(false, 0, state.bet);
-      state.busy = false;
-      state.playing = false;
-      unlockControls();
-      updateActionButton();
-      updateMultBar();
-    }, 680);
-  }
-
-  function cashout(perfect){
-    if (!state.playing) return;
-    const mult = state.multipliers[state.revealed] ?? 1;
-    const payout = state.bet * mult;
-    state.balance += payout;
-    persistBalance();
-    updateBalance(true);
-    haptic('heavy');
-
-    const tiles = gridEl.querySelectorAll('.tile');
-    const mineIdx = [...state.mineSet].sort((a, b) => a - b);
-    mineIdx.forEach((idx, k) => {
-      const t = tiles[idx];
-      if (!t || t.classList.contains('revealed')) return;
-      setTimeout(() => {
-        t.classList.add('revealed', 'mine', 'post-reveal-mine', 'dimmed');
-      }, 60 + k * 55);
-    });
-    tiles.forEach((t, idx) => {
-      if (t.classList.contains('revealed')) return;
-      if (state.mineSet.has(idx)) return;
-      setTimeout(() => t.classList.add('dimmed'), 240);
-    });
-
-    Sound.cashout();
-    spawnConfetti(perfect ? 60 : 40);
-    showResult(true, mult, payout);
-
-    state.playing = false;
-    state.busy = false;
-    unlockControls();
-    updateActionButton();
-    updateMultBar();
-  }
-
-  function unlockControls(){
-    betInput.disabled = false;
-    allInBtn.disabled = false;
-    gridBtn.disabled = false;
-    minesBtn.disabled = false;
-  }
-
-  function resetRound(){
-    state.playing = false;
-    state.revealed = 0;
-    state.mineSet.clear();
-    state.busy = false;
-    state.shown2xGif = false;
-    resultPanel.classList.remove('show', 'win', 'lose');
-    unlockControls();
-    state.multipliers = computeMultipliers(state.gridSize * state.gridSize, state.mines);
-    renderGrid(true);
-    buildMultBar();
-    updateActionButton();
-    updateMaxFill();
-  }
-
-  /* ============ RESULT ============ */
-  function showResult(isWin, mult, amount){
-    resultPanel.classList.remove('win', 'lose');
-    resultPanel.classList.add(isWin ? 'win' : 'lose');
-    typeText(resultTitle, isWin ? 'CASHED OUT' : 'BOOM', 40);
-    resultMult.textContent = isWin ? fmtMult(mult) : 'x0.00';
-    resultAmt.textContent  = isWin ? fmtMoney(amount) : ('-' + fmtMoney(amount));
-    requestAnimationFrame(() => resultPanel.classList.add('show'));
-  }
-
-  function spawnConfetti(count){
-    const rect = gridEl.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const colors = ['#4CC38A', '#8ef0b8', '#5b9dff', '#d4b46a', '#ffffff'];
-    for (let i = 0; i < count; i++){
-      const p = document.createElement('div');
-      p.className = 'confetti';
-      const angle = Math.random() * Math.PI * 2;
-      const dist  = 90 + Math.random() * 220;
-      p.style.setProperty('--tx', (Math.cos(angle) * dist).toFixed(1) + 'px');
-      p.style.setProperty('--ty', (Math.sin(angle) * dist + 60).toFixed(1) + 'px');
-      p.style.setProperty('--rot', (Math.random() * 720 - 360).toFixed(0) + 'deg');
-      p.style.left = cx + 'px';
-      p.style.top  = cy + 'px';
-      p.style.background = colors[(Math.random() * colors.length) | 0];
-      p.style.width = (5 + Math.random() * 5).toFixed(1) + 'px';
-      p.style.height = (4 + Math.random() * 5).toFixed(1) + 'px';
-      p.style.animationDelay = (Math.random() * 90).toFixed(0) + 'ms';
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 1400);
-    }
-  }
-
-  function spawnGemBurst(el){
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    for (let i = 0; i < 6; i++){
-      const p = document.createElement('div');
-      p.className = 'confetti';
-      const angle = (i / 6) * Math.PI * 2 + Math.random() * .4;
-      const dist  = 26 + Math.random() * 34;
-      p.style.setProperty('--tx', (Math.cos(angle) * dist).toFixed(1) + 'px');
-      p.style.setProperty('--ty', (Math.sin(angle) * dist).toFixed(1) + 'px');
-      p.style.setProperty('--rot', (Math.random() * 360 - 180).toFixed(0) + 'deg');
-      p.style.left = cx + 'px';
-      p.style.top  = cy + 'px';
-      p.style.background = i % 2 ? '#8ef0b8' : '#4fd6ff';
-      p.style.width = '4px';
-      p.style.height = '4px';
-      p.style.borderRadius = '50%';
-      p.style.animationDuration = '.7s';
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 900);
-    }
-  }
-
-  /* ============ BET INPUT ============ */
-  function clampBet(){
-    let v = parseInt(betInput.value.replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(v) || v < MIN_BET) v = MIN_BET;
-    if (v > Math.floor(state.balance)) v = Math.max(MIN_BET, Math.floor(state.balance));
-    state.bet = v;
-    betInput.value = v;
-    updateActionButton();
-  }
-
-  betInput.addEventListener('input', () => {
-    betInput.value = betInput.value.replace(/[^\d]/g, '').slice(0, 9);
+  let resizeDebounce = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeDebounce);
+    resizeDebounce = setTimeout(() => { resizeCanvas(); }, 120);
   });
-  betInput.addEventListener('blur', clampBet);
-  betInput.addEventListener('keydown', e => { if (e.key === 'Enter') betInput.blur(); });
+  window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 260));
 
-  allInBtn.addEventListener('click', () => {
-    if (state.playing) return;
-    const amt = Math.max(MIN_BET, Math.floor(state.balance));
-    if (amt < MIN_BET){ showToast('Balance too low'); return; }
-    betInput.value = amt;
-    state.bet = amt;
-    haptic('light');
-    Sound.click();
-    updateActionButton();
-  });
-
-  /* ============ ACTION ============ */
-  actionBtn.addEventListener('click', () => {
-    if (state.busy || state.rebuilding) return;
-    if (state.playing){
-      if (state.revealed === 0) return;
-      cashout(false);
-    } else {
-      startGame(true);
-    }
-  });
-
-  resultCont.addEventListener('click', () => {
-    haptic('light');
-    Sound.click();
-    resetRound();
-  });
-
-  /* ============ BACK ============ */
-  $('#back-btn').addEventListener('click', () => {
-    haptic('light');
-    Sound.click();
-    try {
-      if (TG?.close) TG.close();
-      else history.back();
-    } catch(_){}
-  });
-
-  /* ============ INIT ============ */
   function init(){
-    state.multipliers = computeMultipliers(state.gridSize * state.gridSize, state.mines);
-    gridVal.textContent = state.gridSize + ' × ' + state.gridSize;
-    minesVal.textContent = state.mines;
-    renderGridChips();
-    renderMineChips();
-    renderGrid(false);
-    buildMultBar();
+    typeText(topbarTitle, 'Mineshaft', 85);
     updateBalance(false);
     betInput.value = state.bet;
+    state.blocks = generateMap();
+    state.cameraY = -H * 0.35;
+    updateHero();
     updateActionButton();
+    renderHistory();
 
-    typeText(topbarTitle, 'Mines', 90);
+    startHintIcon.innerHTML = pickSVGPath('diamond', 72, 72);
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      sizeGrid();
-      moveIndicator(false);
-      updateMaxFill();
+      resizeCanvas();
+      state.cameraY = -H * 0.35;
+      startHint.classList.add('show');
+      if (rafId) cancelAnimationFrame(rafId);
+      state.lastFrame = 0;
+      rafId = requestAnimationFrame(loop);
     }));
   }
 
-  window.addEventListener('resize', () => {
-    sizeGrid();
-    moveIndicator(false);
-    updateNext2xHint();
-  });
-  window.addEventListener('orientationchange', () => {
-    setTimeout(() => { sizeGrid(); moveIndicator(false); updateNext2xHint(); }, 260);
-  });
-
   init();
+
 })();
 </script>
 
