@@ -38,13 +38,6 @@
     background:radial-gradient(circle at 30% 20%, rgba(0,0,0,.35), rgba(0,0,0,.8) 70%);pointer-events:none}
   #app > *{position:relative;z-index:1}
 
-  #screen-flash{
-    position:fixed;inset:0;z-index:9997;pointer-events:none;
-    opacity:0;transition:opacity .25s ease-out;
-    background:radial-gradient(circle at 50% 55%, transparent 25%, var(--flash-color, rgba(255,255,255,.5)) 100%);
-  }
-  #screen-flash.on{opacity:1;transition:opacity .06s ease-in}
-
   /* TOPBAR */
   #topbar{display:flex;align-items:center;gap:8px;
     padding:calc(14px + var(--safe-top)) 12px 10px;flex-shrink:0}
@@ -84,10 +77,9 @@
     padding:20px;transform:scale(.9);opacity:0;
     transition:transform .3s var(--ease-spring),opacity .2s ease}
   #settings-overlay.open .settings-panel{transform:scale(1);opacity:1}
-  .settings-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:16px;letter-spacing:.2px}
-  .settings-row{display:flex;align-items:center;justify-content:space-between;
-    padding:14px 0;border-top:1px solid rgba(255,255,255,.06);
-    border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:12px}
+  .settings-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:.2px}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+  .settings-row + .settings-row{border-top:1px solid rgba(255,255,255,.06)}
   .settings-label{font-size:13.5px;font-weight:800;color:#fff;line-height:1.2}
   .settings-desc{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.45);margin-top:3px;line-height:1.2}
   .toggle-switch{
@@ -103,24 +95,7 @@
     background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);
     transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
   .toggle-switch.on .toggle-knob{transform:translateX(22px)}
-
-  .anim-section{margin-bottom:14px}
-  .anim-section .settings-label{margin-bottom:2px}
-  .anim-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-  .anim-chip{flex:1 1 0;min-width:62px;padding:9px 4px;border-radius:10px;
-    border:1px solid rgba(255,255,255,.1);
-    background:rgba(255,255,255,.04);
-    color:rgba(255,255,255,.72);
-    font-family:inherit;font-size:11px;font-weight:900;letter-spacing:.2px;
-    cursor:pointer;transition:all .15s ease;
-    -webkit-appearance:none;appearance:none;outline:none}
-  .anim-chip:active{transform:scale(.94)}
-  .anim-chip.active{background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;border-color:rgba(140,180,255,.7);
-    box-shadow:0 4px 12px rgba(91,157,255,.4),inset 0 1px 0 rgba(255,255,255,.3)}
-  .anim-chip.epic.active{background:linear-gradient(180deg,#ffb877,#e07c1e);border-color:rgba(255,180,120,.7);
-    box-shadow:0 4px 12px rgba(255,150,60,.4),inset 0 1px 0 rgba(255,255,255,.3)}
-
-  .settings-done{width:100%;height:46px;border-radius:14px;border:none;
+  .settings-done{width:100%;height:46px;border-radius:14px;border:none;margin-top:20px;
     background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;
     font-family:inherit;font-size:14px;font-weight:900;letter-spacing:.4px;cursor:pointer;
     box-shadow:0 6px 18px rgba(91,157,255,.4),inset 0 1px 0 rgba(255,255,255,.28);
@@ -171,20 +146,8 @@
     75%{transform:translate(-2px,1px)}
     90%{transform:translate(1px,0)}
   }
-  #grid-frame.quake{animation:gridQuake .7s cubic-bezier(.36,.07,.19,.97)}
-  @keyframes gridQuake{
-    0%,100%{transform:translate(0,0) rotate(0deg)}
-    10%{transform:translate(-12px,5px) rotate(-1.2deg)}
-    22%{transform:translate(11px,-5px) rotate(1.2deg)}
-    35%{transform:translate(-10px,4px) rotate(-1deg)}
-    50%{transform:translate(9px,-3px) rotate(.8deg)}
-    65%{transform:translate(-6px,3px) rotate(-.6deg)}
-    80%{transform:translate(4px,-2px) rotate(.4deg)}
-    92%{transform:translate(-2px,1px) rotate(-.2deg)}
-  }
   #merge-grid{display:grid;position:relative}
 
-  /* TILE */
   .tile{
     position:relative;aspect-ratio:1/1;padding:0;cursor:pointer;
     border:0;background:none;outline:0;
@@ -193,6 +156,8 @@
     contain:layout style;
     animation:tileIn .4s cubic-bezier(.22,.9,.28,1.05) backwards}
   .tile:focus,.tile:focus-visible,.tile:active{outline:0!important;border:0!important}
+  body.hand-mode .tile.filled{cursor:grab;touch-action:none}
+  body.hand-mode .tile.filled:active{cursor:grabbing}
   @keyframes tileIn{
     0%{opacity:0;transform:translateY(24px) scale(.92)}
     100%{opacity:1;transform:translateY(0) scale(1)}
@@ -203,7 +168,7 @@
     border-radius:var(--cell-radius);
     overflow:hidden;
     display:flex;align-items:center;justify-content:center;
-    transition:box-shadow .3s ease,background .3s ease,border-radius .25s ease;
+    transition:box-shadow .3s ease,background .3s ease,border-radius .25s ease,transform .2s ease;
     background:linear-gradient(180deg,#3a3e46 0%,#262a31 100%);
     box-shadow:
       0 5px 0 0 #0e1014,
@@ -217,7 +182,6 @@
       0 3px 6px rgba(0,0,0,.35),
       inset 0 1px 0 rgba(255,255,255,.05);
   }
-
   .tile.opened .face{
     background:linear-gradient(180deg,#0e1115 0%,#181c22 100%);
     box-shadow:
@@ -227,7 +191,6 @@
     transform:none;
   }
   .tile.opened:active .face{transform:none}
-
   .tile.filled .face{
     background:
       radial-gradient(circle at 50% 55%,
@@ -248,6 +211,46 @@
   @keyframes highestPulse{
     0%,100%{box-shadow:0 5px 0 0 #08090c,0 7px 10px rgba(0,0,0,.4),0 0 18px var(--tier-halo),inset 0 0 0 2px var(--tier-color),inset 0 1px 0 rgba(255,255,255,.06)}
     50%{box-shadow:0 5px 0 0 #08090c,0 7px 10px rgba(0,0,0,.4),0 0 34px var(--tier-halo),inset 0 0 0 2px var(--tier-color),inset 0 1px 0 rgba(255,255,255,.06)}
+  }
+
+  /* Hand-mode selection + target highlights */
+  .tile.selected .face{
+    box-shadow:
+      0 5px 0 0 #08090c,
+      0 7px 10px rgba(0,0,0,.4),
+      0 0 24px rgba(0,255,255,.75),
+      inset 0 0 0 3px rgba(0,255,255,.9),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    animation:selectedPulse 1s ease-in-out infinite;
+  }
+  @keyframes selectedPulse{
+    0%,100%{filter:brightness(1)}
+    50%{filter:brightness(1.28)}
+  }
+  .tile.merge-target .face{
+    box-shadow:
+      0 5px 0 0 #08090c,
+      0 7px 10px rgba(0,0,0,.4),
+      0 0 24px rgba(0,255,136,.7),
+      inset 0 0 0 2px rgba(0,255,136,.85),
+      inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .tile.merge-hover .face{
+    transform:scale(1.06);
+    box-shadow:
+      0 5px 0 0 #08090c,
+      0 7px 10px rgba(0,0,0,.4),
+      0 0 32px rgba(0,255,136,1),
+      inset 0 0 0 3px rgba(0,255,136,1),
+      inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .tile.drag-source{opacity:.35;transition:opacity .2s ease}
+
+  .drag-ghost{
+    pointer-events:none;
+    z-index:9999;
+    will-change:left,top;
+    transition:transform .12s ease;
   }
 
   .closed-icon{
@@ -711,22 +714,19 @@
         <div class="toggle-knob"></div>
       </button>
     </div>
-    <div class="anim-section">
-      <div class="settings-label">Merge animation</div>
-      <div class="settings-desc">Choose how cells fly when merging</div>
-      <div class="anim-chips" id="anim-chips">
-        <button class="anim-chip" data-a="random">Random</button>
-        <button class="anim-chip" data-a="arc">Arc</button>
-        <button class="anim-chip" data-a="squash">Squash</button>
-        <button class="anim-chip epic" data-a="epic">Epic</button>
-        <button class="anim-chip" data-a="teleport">Teleport</button>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Hand mode</div>
+        <div class="settings-desc">Drag or tap cells to merge manually</div>
       </div>
+      <button class="toggle-switch" id="toggle-handmode" aria-label="Toggle hand mode">
+        <div class="toggle-knob"></div>
+      </button>
     </div>
     <button class="settings-done" id="settings-done" type="button">Done</button>
   </div>
 </div>
 
-<div id="screen-flash"></div>
 <div id="toast"></div>
 
 <script>
@@ -748,7 +748,7 @@
   }
   const $ = s => document.querySelector(s);
 
-  /* +100 bonus migration */
+  /* +100 bonus */
   try {
     const MK = 'dllump_merge_bonus_v1';
     if (!localStorage.getItem(MK)) {
@@ -758,7 +758,6 @@
     }
   } catch(_){}
 
-  /* ASSETS */
   const GIFT_ICON_SRC = 'https://i.postimg.cc/SsNS5WNq/better-gift-box.png';
   const APPLE_RING = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-160/1f48d.png';
   const APPLE_BOMB = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-160/1f4a3.png';
@@ -775,7 +774,6 @@
   const TIERS = TIERS_SRC.map(t => ({ ...t }));
   let BONUS_URL = BONUS_SRC;
 
-  /* STATIC FRAME EXTRACTION */
   const staticCache = new Map();
   function extractStatic(url){
     if (staticCache.has(url)) return Promise.resolve(staticCache.get(url));
@@ -806,7 +804,6 @@
     await Promise.all(tasks);
   }
 
-  /* AUDIO */
   const Sound = (function(){
     let ctx = null, unlocked = false, master = null;
     function ensure(){
@@ -831,16 +828,6 @@
       g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
       o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + .03);
     }
-    function noise(dur, vol, when, ff){
-      const c = ensure(); if (!c || !unlocked) return;
-      const t0 = when || c.currentTime, len = Math.max(1, Math.floor(c.sampleRate * dur));
-      const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
-      const s = c.createBufferSource(); s.buffer = buf;
-      const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = ff || 1200;
-      const g = c.createGain(); g.gain.value = vol == null ? .22 : vol;
-      s.connect(f); f.connect(g); g.connect(master); s.start(t0); s.stop(t0 + dur + .03);
-    }
     return {
       click(){ tone(720,.03,'sine',.1,null,520); },
       place(){ const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
@@ -850,10 +837,6 @@
         tone(base,.14,'triangle',.16,t,base*1.7);
         tone(base*1.5,.18,'sine',.09,t+.03,base*2.3);
         if (lvl >= 2) tone(base*2,.24,'sine',.08,t+.08,base*3); },
-      epicImpact(){ const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
-        tone(80,.5,'sawtooth',.35,t,35); tone(50,.7,'triangle',.28,t+.03,25);
-        noise(.55,.35,t,600); tone(220,.3,'square',.15,t+.06,80);
-        tone(1046.5,.15,'sine',.12,t+.15,1500); tone(1568,.2,'sine',.1,t+.22,2000); },
       nice(){ const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
         [1046.5, 1318.5, 1568, 2093].forEach((f,i) => tone(f,.22,'triangle',.14,t+i*.05));
         tone(2637,.4,'sine',.1,t+.2,3200); },
@@ -875,11 +858,11 @@
     };
   })();
 
-  /* CONFIG — bigger bomb chances */
   const MIN_BET = 10;
   const MAX_BONUS = 2;
   const OPEN_PER_STEP = 3;
   const BONUS_CHANCE = 0.05;
+  const PREMIUM_TIER = 4;
 
   const DIFFS = {
     easy:    { bomb: .06, k: .009, color: '#4CC38A', weights: [80, 15, 4, 1, 0, 0] },
@@ -888,7 +871,6 @@
     extreme: { bomb: .26, k: .040, color: '#e0556b', weights: [28, 20, 19, 15, 11, 7] }
   };
 
-  /* STATE */
   const state = {
     difficulty: 'medium',
     gridSize: 3,
@@ -901,26 +883,24 @@
     maxTier: -1,
     bestTier: -1,
     roundedCorners: false,
-    mergeAnim: 'random',
+    handMode: false,
+    selectedTile: -1,
     tiles: []
   };
 
   try {
     const b = localStorage.getItem('dllump_merge_balance');
     if (b !== null) state.balance = Math.max(0, parseInt(b, 10) || 0);
-    const rc = localStorage.getItem('dllump_merge_rounded');
-    if (rc === '1') state.roundedCorners = true;
-    const ma = localStorage.getItem('dllump_merge_anim');
-    if (ma) state.mergeAnim = ma;
+    if (localStorage.getItem('dllump_merge_rounded') === '1') state.roundedCorners = true;
+    if (localStorage.getItem('dllump_merge_handmode') === '1') state.handMode = true;
     const bt = localStorage.getItem('dllump_merge_best_tier');
     if (bt !== null) state.bestTier = parseInt(bt, 10) || -1;
   } catch(_){}
   function persistBalance(){ try { localStorage.setItem('dllump_merge_balance', String(state.balance)); } catch(_){} }
   function persistRounded(){ try { localStorage.setItem('dllump_merge_rounded', state.roundedCorners ? '1' : '0'); } catch(_){} }
-  function persistAnim(){ try { localStorage.setItem('dllump_merge_anim', state.mergeAnim); } catch(_){} }
+  function persistHandMode(){ try { localStorage.setItem('dllump_merge_handmode', state.handMode ? '1' : '0'); } catch(_){} }
   function persistBest(){ try { localStorage.setItem('dllump_merge_best_tier', String(state.bestTier)); } catch(_){} }
 
-  /* DOM */
   const els = {
     loading: $('#loading'),
     grid: $('#merge-grid'),
@@ -944,15 +924,13 @@
     panelAmt: $('#result-amt'),
     panelBtn: $('#result-continue'),
     toast: $('#toast'),
-    flash: $('#screen-flash'),
     settingsBtn: $('#settings-btn'),
     settingsOverlay: $('#settings-overlay'),
     settingsDone: $('#settings-done'),
     toggleCorners: $('#toggle-corners'),
-    animChips: $('#anim-chips')
+    toggleHandMode: $('#toggle-handmode')
   };
 
-  /* HELPERS */
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const distTL = i => Math.floor(i / state.gridSize) + (i % state.gridSize);
   const hexA = (hex, a) => {
@@ -975,14 +953,6 @@
     return a;
   }
 
-  function screenFlash(color, strength){
-    els.flash.style.setProperty('--flash-color', color);
-    els.flash.style.opacity = String(strength || '1');
-    els.flash.classList.add('on');
-    setTimeout(() => els.flash.classList.remove('on'), 180);
-  }
-
-  /* BALANCE */
   function updateBalance(animate){
     const target = Math.floor(state.balance);
     if (animate){
@@ -1008,7 +978,6 @@
     els.toast._t = setTimeout(() => els.toast.classList.remove('show'), 2200);
   }
 
-  /* MULTIPLIER */
   function bonusCount(){ let n = 0; for (const t of state.tiles) if (t.tier === -2) n++; return n; }
   function currentMult(){
     const base = 1 + state.points * DIFFS[state.difficulty].k;
@@ -1047,7 +1016,7 @@
   }
   function updateBestBadge(){
     if (state.bestTier >= 0){
-      els.best.textContent = 'BEST: ' + TIERS[state.bestTier].v;
+      els.best.textContent = 'BEST: $' + TIERS[state.bestTier].v;
       els.best.classList.add('show');
     } else {
       els.best.classList.remove('show');
@@ -1067,13 +1036,13 @@
     }
   }
 
-  /* GRID */
   function sizeGrid(){
     const r = els.stage.getBoundingClientRect();
     const s = Math.max(140, Math.floor(Math.min(r.width, r.height) - 40));
     els.grid.style.width = s + 'px';
     els.grid.style.height = s + 'px';
   }
+
   function buildGrid(animate){
     const n = state.gridSize;
     const total = n * n;
@@ -1082,10 +1051,12 @@
     els.grid.style.gap = n === 3 ? '8px' : n === 5 ? '6px' : '7px';
     els.grid.innerHTML = '';
     state.tiles = [];
+    state.selectedTile = -1;
     for (let i = 0; i < total; i++){
       const t = document.createElement('button');
       t.type = 'button';
       t.className = 'tile';
+      t.dataset.idx = i;
       if (animate) t.style.animationDelay = (i * 15) + 'ms';
       else t.style.animation = 'none';
       t.innerHTML =
@@ -1094,7 +1065,7 @@
           '<img class="gift-img" alt="" draggable="false">' +
           '<div class="highest-badge"></div>' +
         '</div>';
-      t.addEventListener('click', onTileClick);
+      t.addEventListener('click', () => onTileClick(i));
       const face = t.firstChild;
       const closedIcon = face.querySelector('.closed-icon');
       const giftImg = face.querySelector('.gift-img');
@@ -1116,7 +1087,6 @@
     faceEl.style.removeProperty('--tier-halo');
   }
 
-  /* CELL STATES */
   function fillFresh(idx, tier){
     const t = state.tiles[idx];
     t.tier = tier;
@@ -1135,7 +1105,7 @@
     t.giftImg.style.transition = '';
     t.giftImg.style.opacity = '';
     t.giftImg.style.visibility = '';
-    t.el.classList.remove('opened', 'is-bomb', 'is-bonus');
+    t.el.classList.remove('opened', 'is-bomb', 'is-bonus', 'selected', 'merge-target', 'merge-hover');
     t.el.classList.add('filled');
     t.el.classList.remove('just-filled');
     void t.el.offsetWidth;
@@ -1179,7 +1149,7 @@
     t.giftImg.style.transition = '';
     t.giftImg.style.opacity = '';
     t.giftImg.style.visibility = '';
-    t.el.classList.remove('opened', 'is-bomb', 'highest');
+    t.el.classList.remove('opened', 'is-bomb', 'highest', 'selected');
     t.el.classList.add('filled', 'is-bonus');
     t.el.classList.remove('just-filled');
     void t.el.offsetWidth;
@@ -1200,7 +1170,7 @@
   function clearCell(idx){
     const t = state.tiles[idx];
     t.tier = -1;
-    t.el.classList.remove('filled','just-filled','landed','highest','is-bomb','is-bonus','bonus-flash');
+    t.el.classList.remove('filled','just-filled','landed','highest','is-bomb','is-bonus','bonus-flash','selected','merge-target','merge-hover','drag-source');
     t.el.style.transform = '';
     t.el.style.opacity = '';
     t.el.style.transition = '';
@@ -1216,7 +1186,6 @@
     if (bl) bl.remove();
   }
 
-  /* FLOATS */
   function showFloatValue(el, text, color){
     const r = el.getBoundingClientRect();
     const f = document.createElement('div');
@@ -1248,12 +1217,15 @@
     setTimeout(() => el.remove(), 1100);
     haptic('heavy');
   }
-  function burstAtPoint(cx, cy, color, count){
+  function burstAt(el, color, count){
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
     for (let i = 0; i < count; i++){
       const p = document.createElement('div');
       p.className = 'confetti';
       const ang = Math.random() * Math.PI * 2;
-      const dist = 28 + Math.random() * 55;
+      const dist = 28 + Math.random() * 52;
       p.style.setProperty('--tx', (Math.cos(ang) * dist).toFixed(1) + 'px');
       p.style.setProperty('--ty', (Math.sin(ang) * dist).toFixed(1) + 'px');
       p.style.setProperty('--rot', (Math.random() * 540 - 270).toFixed(0) + 'deg');
@@ -1263,10 +1235,6 @@
       document.body.appendChild(p);
       setTimeout(() => p.remove(), 800);
     }
-  }
-  function burstAt(el, color, count){
-    const r = el.getBoundingClientRect();
-    burstAtPoint(r.left + r.width / 2, r.top + r.height / 2, color, count);
   }
   function showBonusFlyText(el){
     const r = el.getBoundingClientRect();
@@ -1303,7 +1271,7 @@
     bonusIdx.forEach(idx => state.tiles[idx].el.classList.remove('bonus-flash'));
   }
 
-  /* SHARED MERGE SETUP */
+  /* ============ MERGE ANIMATION ============ */
   function makeFlyFace(srcEl, info, capturedRect){
     const fr = els.frame.getBoundingClientRect();
     const sr = capturedRect;
@@ -1329,242 +1297,135 @@
     return ghost;
   }
 
-  function setupMerge(srcIdx, dstIdx, tier){
-    const srcEl = state.tiles[srcIdx].el;
-    const dstEl = state.tiles[dstIdx].el;
-    const info = TIERS[tier];
-    const srcFace = srcEl.querySelector('.face');
-    const srcRect = srcFace.getBoundingClientRect();
-    const dstRect = dstEl.getBoundingClientRect();
-    clearCell(srcIdx);
-    const ghost = makeFlyFace(srcEl, info, srcRect);
-    return {
-      ghost, dstEl, srcRect, dstRect,
-      dx: dstRect.left - srcRect.left,
-      dy: dstRect.top - srcRect.top,
-      info
-    };
-  }
-
-  function completeMerge(dstIdx, tier, effects){
-    upgradeCell(dstIdx, tier + 1);
-    state.tiles[dstIdx].tier = tier + 1;
-    const dstEl = state.tiles[dstIdx].el;
-    dstEl.classList.remove('landed');
-    void dstEl.offsetWidth;
-    dstEl.classList.add('landed');
-    setTimeout(() => dstEl.classList.remove('landed'), 600);
-    const resultInfo = TIERS[tier + 1];
-    showFloatValue(dstEl, '+$' + resultInfo.v, resultInfo.color);
-    if (effects?.burst) {
-      setTimeout(() => burstAt(dstEl, resultInfo.color, effects.burst), 30);
-    }
-    if (effects?.whiteBurst) {
-      setTimeout(() => burstAt(dstEl, '#ffffff', effects.whiteBurst), 100);
-    }
-    if (effects?.nice) {
-      showNiceText();
-      Sound.nice();
-    }
-    if (tier + 1 > state.maxTier){
-      state.maxTier = tier + 1;
-      if (tier + 1 > state.bestTier){
-        state.bestTier = tier + 1;
-        persistBest();
-        showToast('🏆 BEST TIER ' + (tier + 1) + ' · $' + resultInfo.v);
-      } else {
-        showToast('✨ TIER ' + (tier + 1) + ' · $' + resultInfo.v);
-      }
-      Sound.milestone();
-      updateBestBadge();
-    }
-    Sound.merge(tier);
-    haptic(tier >= 3 ? 'medium' : 'light');
-  }
-
-  /* ARC ANIMATION */
-  function animateArc(srcIdx, dstIdx, tier){
+  /* The "normal" squash-and-stretch merge animation */
+  function animateMerge(srcIdx, dstIdx, tier){
     return new Promise(resolve => {
-      const ctx = setupMerge(srcIdx, dstIdx, tier);
-      const duration = 560;
-      const keyframes = [
+      const srcEl = state.tiles[srcIdx].el;
+      const dstEl = state.tiles[dstIdx].el;
+      const info = TIERS[tier];
+      const srcFace = srcEl.querySelector('.face');
+      const srcRect = srcFace.getBoundingClientRect();
+      const dstRect = dstEl.getBoundingClientRect();
+
+      clearCell(srcIdx);
+      const ghost = makeFlyFace(srcEl, info, srcRect);
+
+      const dx = dstRect.left - srcRect.left;
+      const dy = dstRect.top - srcRect.top;
+      const isPremium = (tier + 1) >= PREMIUM_TIER;
+
+      const keyframes = isPremium ? [
         { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
         { transform: 'translate(0, 8px) scale(1.08, 0.9)', offset: 0.1 },
         { transform: 'translate(0, -70px) scale(0.85, 1.24)', offset: 0.3 },
-        { transform: `translate(${ctx.dx*0.55}px, ${ctx.dy*0.55 - 90}px) scale(0.9, 1.14)`, offset: 0.55 },
-        { transform: `translate(${ctx.dx*0.88}px, ${ctx.dy*0.88 - 25}px) scale(1.08, 0.94)`, offset: 0.8 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.32, 0.72)`, offset: 0.92 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.96, 1.04)`, offset: 0.97 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1, 1)`, offset: 1 }
+        { transform: `translate(${dx*0.55}px, ${dy*0.55 - 90}px) scale(0.9, 1.14)`, offset: 0.55 },
+        { transform: `translate(${dx*0.88}px, ${dy*0.88 - 25}px) scale(1.08, 0.94)`, offset: 0.8 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1.32, 0.72)`, offset: 0.92 },
+        { transform: `translate(${dx}px, ${dy}px) scale(0.96, 1.04)`, offset: 0.97 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1, 1)`, offset: 1 }
+      ] : [
+        { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
+        { transform: 'translate(0, -45px) scale(0.92, 1.12)', offset: 0.3 },
+        { transform: `translate(${dx*0.6}px, ${dy*0.6 - 40}px) scale(0.98, 1.04)`, offset: 0.65 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1.14, 0.88)`, offset: 0.9 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1, 1)`, offset: 1 }
       ];
-      ctx.ghost.animate(keyframes, { duration, easing: 'linear', fill: 'forwards' });
-      if (tier + 1 >= 4){
+
+      const duration = isPremium ? 580 : 420;
+
+      ghost.animate(keyframes, { duration, easing: 'linear', fill: 'forwards' });
+
+      if (isPremium){
         els.frame.classList.add('shaking');
         setTimeout(() => els.frame.classList.remove('shaking'), 520);
       }
+
       setTimeout(() => {
-        ctx.ghost.remove();
-        completeMerge(dstIdx, tier, {
-          burst: tier + 1 >= 4 ? 20 : (tier >= 2 ? 8 : 0),
-          whiteBurst: tier + 1 >= 4 ? 8 : 0,
-          nice: tier + 1 >= 4
-        });
+        ghost.remove();
+        upgradeCell(dstIdx, tier + 1);
+        state.tiles[dstIdx].tier = tier + 1;
+
+        const dstElNew = state.tiles[dstIdx].el;
+        dstElNew.classList.remove('landed');
+        void dstElNew.offsetWidth;
+        dstElNew.classList.add('landed');
+        setTimeout(() => dstElNew.classList.remove('landed'), 600);
+
+        const resultInfo = TIERS[tier + 1];
+        showFloatValue(dstElNew, '+$' + resultInfo.v, resultInfo.color);
+
+        if (isPremium){
+          setTimeout(() => burstAt(dstElNew, resultInfo.color, 20), 30);
+          setTimeout(() => burstAt(dstElNew, '#ffffff', 8), 110);
+          showNiceText();
+          Sound.nice();
+        } else if (tier >= 2){
+          burstAt(dstElNew, resultInfo.color, 8);
+        }
+
+        if (tier + 1 > state.maxTier){
+          state.maxTier = tier + 1;
+          if (tier + 1 > state.bestTier){
+            state.bestTier = tier + 1;
+            persistBest();
+            showToast('🏆 BEST TIER ' + (tier + 1) + ' · $' + resultInfo.v);
+          } else {
+            showToast('✨ TIER ' + (tier + 1) + ' · $' + resultInfo.v);
+          }
+          Sound.milestone();
+          updateBestBadge();
+        }
+
+        Sound.merge(tier);
+        haptic(isPremium ? 'heavy' : (tier >= 2 ? 'medium' : 'light'));
         resolve();
       }, duration);
     });
   }
 
-  /* SQUASH ANIMATION */
-  function animateSquash(srcIdx, dstIdx, tier){
-    return new Promise(resolve => {
-      const ctx = setupMerge(srcIdx, dstIdx, tier);
-      const duration = 440;
-      const keyframes = [
-        { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
-        { transform: 'translate(0, 8px) scale(1.12, 0.88)', offset: 0.15 },
-        { transform: `translate(${ctx.dx*0.35}px, ${ctx.dy*0.35 - 20}px) scale(1.04, 0.96)`, offset: 0.5 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.24, 0.76)`, offset: 0.82 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.94, 1.06)`, offset: 0.93 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1, 1)`, offset: 1 }
-      ];
-      ctx.ghost.animate(keyframes, { duration, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-      setTimeout(() => {
-        ctx.ghost.remove();
-        completeMerge(dstIdx, tier, {
-          burst: tier >= 2 ? 8 : 0,
-          nice: tier + 1 >= 4
-        });
-        resolve();
-      }, duration);
-    });
+  /* ============ PARALLEL MERGE RESOLVER ============ */
+  function findMergePairs(){
+    const used = new Set();
+    const pairs = [];
+    for (let tier = 0; tier < TIERS.length - 1; tier++){
+      const idxs = [];
+      state.tiles.forEach((t, i) => {
+        if (t.tier === tier && !used.has(i)) idxs.push(i);
+      });
+      if (idxs.length < 2) continue;
+      idxs.sort((a, b) => distTL(a) - distTL(b));
+      for (let k = 0; k + 1 < idxs.length; k += 2){
+        const dst = idxs[k];
+        const src = idxs[k+1];
+        if (used.has(dst) || used.has(src)) continue;
+        used.add(dst);
+        used.add(src);
+        pairs.push({ src, dst, tier });
+      }
+    }
+    return pairs;
   }
 
-  /* EPIC LAUNCH + SLAM */
-  function animateEpic(srcIdx, dstIdx, tier){
-    return new Promise(resolve => {
-      const ctx = setupMerge(srcIdx, dstIdx, tier);
-      const duration = 780;
-      const keyframes = [
-        // 0% - start, at source position
-        { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
-        // 8% - squash prep
-        { transform: 'translate(0, 10px) scale(1.15, 0.82)', offset: 0.08 },
-        // 22% - LAUNCH straight up, stretched tall
-        { transform: `translate(${ctx.dx * 0.25}px, ${Math.min(ctx.dy * 0.25, -190)}px) scale(0.82, 1.32)`, offset: 0.22 },
-        // 38% - apex, over destination area
-        { transform: `translate(${ctx.dx * 0.75}px, ${Math.min(ctx.dy * 0.75, -220)}px) scale(1, 1.05)`, offset: 0.38 },
-        // 55% - falling, above destination
-        { transform: `translate(${ctx.dx}px, ${Math.min(ctx.dy, -100)}px) scale(0.94, 1.14)`, offset: 0.55 },
-        // 70% - near destination, starting to squash
-        { transform: `translate(${ctx.dx}px, ${ctx.dy - 20}px) scale(1.06, 0.94)`, offset: 0.7 },
-        // 82% - IMPACT, huge squash
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.46, 0.54)`, offset: 0.82 },
-        // 89% - rebound, stretched tall again
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.84, 1.18)`, offset: 0.89 },
-        // 94% - settle
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.06, 0.94)`, offset: 0.94 },
-        // 100% - normal
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1, 1)`, offset: 1 }
-      ];
-      ctx.ghost.animate(keyframes, { duration, easing: 'cubic-bezier(.4,.05,.5,1)', fill: 'forwards' });
-
-      // Screen shake during launch
-      els.frame.classList.add('shaking');
-
-      // IMPACT — epic explosion moment
-      setTimeout(() => {
-        els.frame.classList.remove('shaking');
-        void els.frame.offsetWidth;
-        els.frame.classList.add('quake');
-        setTimeout(() => els.frame.classList.remove('quake'), 720);
-
-        // Screen edge flash
-        screenFlash(hexA(ctx.info.color, 0.55), '1');
-
-        // Big explosion at impact point
-        const ix = ctx.dstRect.left + ctx.dstRect.width / 2;
-        const iy = ctx.dstRect.top + ctx.dstRect.height / 2;
-        burstAtPoint(ix, iy, ctx.info.color, 28);
-        burstAtPoint(ix, iy, '#ffffff', 12);
-
-        Sound.epicImpact();
-        haptic('heavy');
-      }, Math.round(duration * 0.82));
-
-      setTimeout(() => {
-        ctx.ghost.remove();
-        completeMerge(dstIdx, tier, {
-          burst: 22,
-          whiteBurst: 10,
-          nice: true
-        });
-        resolve();
-      }, duration);
-    });
-  }
-
-  /* TELEPORT ANIMATION */
-  function animateTeleport(srcIdx, dstIdx, tier){
-    return new Promise(resolve => {
-      const ctx = setupMerge(srcIdx, dstIdx, tier);
-      const duration = 320;
-      const keyframes = [
-        { transform: 'translate(0, 0) scale(1, 1)', opacity: 1, offset: 0 },
-        { transform: `translate(${ctx.dx * 0.3}px, ${ctx.dy * 0.3}px) scale(1.18, 1.18)`, opacity: 0.85, offset: 0.35 },
-        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.1, 0.1)`, opacity: 0, offset: 1 }
-      ];
-      ctx.ghost.animate(keyframes, { duration, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' });
-      ctx.dstEl.classList.add('teleport-flash');
-      setTimeout(() => ctx.dstEl.classList.remove('teleport-flash'), 400);
-      setTimeout(() => {
-        ctx.ghost.remove();
-        completeMerge(dstIdx, tier, {
-          burst: tier >= 2 ? 8 : 0,
-          nice: tier + 1 >= 4
-        });
-        resolve();
-      }, duration);
-    });
-  }
-
-  /* ANIMATION DISPATCH */
-  function pickRandomAnim(){
-    const r = Math.random();
-    if (r < 0.28) return 'arc';
-    if (r < 0.55) return 'squash';
-    if (r < 0.82) return 'epic';
-    return 'teleport';
-  }
-  function animateWholeCell(srcIdx, dstIdx, tier){
-    const anim = state.mergeAnim === 'random' ? pickRandomAnim() : state.mergeAnim;
-    if (anim === 'epic') return animateEpic(srcIdx, dstIdx, tier);
-    if (anim === 'teleport') return animateTeleport(srcIdx, dstIdx, tier);
-    if (anim === 'squash') return animateSquash(srcIdx, dstIdx, tier);
-    return animateArc(srcIdx, dstIdx, tier);
-  }
-
-  /* RESOLVE */
   async function resolveMerges(){
-    let merges = 0;
+    let totalMerges = 0;
     let guard = 0;
     while (guard++ < 60){
-      let merged = false;
-      for (let tier = 0; tier < TIERS.length - 1; tier++){
-        const idxs = [];
-        state.tiles.forEach((t, i) => { if (t.tier === tier) idxs.push(i); });
-        if (idxs.length < 2) continue;
-        idxs.sort((a, b) => distTL(a) - distTL(b));
-        const dst = idxs[0], src = idxs[1];
-        await animateWholeCell(src, dst, tier);
-        recalcPoints();
-        updateMultDisplay(true);
-        merges++;
-        merged = true;
-        break;
-      }
-      if (!merged) break;
+      const pairs = findMergePairs();
+      if (!pairs.length) break;
+      const promises = pairs.map((p, i) =>
+        new Promise(resolve => {
+          setTimeout(async () => {
+            await animateMerge(p.src, p.dst, p.tier);
+            totalMerges++;
+            resolve();
+          }, i * 60);
+        })
+      );
+      await Promise.all(promises);
+      recalcPoints();
+      updateMultDisplay(true);
     }
-    return merges;
+    return totalMerges;
   }
 
   function rollTier(){
@@ -1579,7 +1440,6 @@
     return 0;
   }
 
-  /* BOMB + CASCADE FALL */
   async function bombCellsFall(bombIdx){
     const filled = [];
     state.tiles.forEach((t, i) => {
@@ -1588,8 +1448,6 @@
       filled.push(t);
     });
     if (!filled.length) return;
-
-    // Sort by distance from bomb for a cascade effect
     const bombRow = Math.floor(bombIdx / state.gridSize);
     const bombCol = bombIdx % state.gridSize;
     filled.sort((a, b) => {
@@ -1599,14 +1457,12 @@
       const bd = Math.abs(Math.floor(bi / state.gridSize) - bombRow) + Math.abs((bi % state.gridSize) - bombCol);
       return ad - bd;
     });
-
     filled.forEach((t, k) => {
       setTimeout(() => {
         const tx = (Math.random() - 0.5) * 60;
         const ty = 320 + Math.random() * 240;
         const rot = (Math.random() - 0.5) * 900;
         const sc = 0.35 + Math.random() * 0.35;
-        t.el.style.transition = 'none';
         t.el.animate([
           { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
           { transform: `translate(${tx * 0.5}px, ${ty * 0.55}px) rotate(${rot * 0.5}deg) scale(${sc * 1.15})`, opacity: 0.7, offset: 0.55 },
@@ -1614,17 +1470,13 @@
         ], { duration: 720, easing: 'cubic-bezier(.45,0,.55,1)', fill: 'forwards' });
       }, k * 35);
     });
-
-    // Screen flash red at start of cascade
-    screenFlash('rgba(255,77,109,.35)', '1');
-
     await sleep(720 + filled.length * 35 + 80);
   }
 
   async function revealBomb(idx){
     const t = state.tiles[idx];
     t.tier = -1;
-    t.el.classList.remove('filled','just-filled','highest','is-bonus','opened');
+    t.el.classList.remove('filled','just-filled','highest','is-bonus','opened','selected');
     t.giftImg.style.transition = 'none';
     t.giftImg.style.opacity = '0';
     t.giftImg.style.visibility = 'hidden';
@@ -1645,19 +1497,16 @@
     setTimeout(() => els.frame.classList.remove('shaking'), 520);
     Sound.bomb();
     haptic('heavy');
-    screenFlash('rgba(255,77,109,.5)', '1');
 
     await sleep(560);
-
-    // Cascade fall for all other cells
     await bombCellsFall(idx);
-
     loseGame();
   }
 
   function loseGame(){
     state.playing = false;
     state.busy = false;
+    state.selectedTile = -1;
     setTimeout(() => {
       Sound.lose();
       showResult(false, 0, state.bet);
@@ -1666,7 +1515,6 @@
     }, 150);
   }
 
-  /* CASHOUT */
   function cashout(){
     if (!state.playing) return;
     const mult = currentMult();
@@ -1676,15 +1524,14 @@
     updateBalance(true);
     haptic('heavy');
     Sound.cashout();
-    screenFlash('rgba(76,195,138,.35)', '1');
     showResult(true, mult, payout);
     state.playing = false;
     state.busy = false;
+    state.selectedTile = -1;
     unlockControls();
     updateActionButton();
   }
 
-  /* RESULT */
   function showResult(isWin, mult, amount){
     els.panel.classList.remove('win', 'lose');
     els.panel.classList.add(isWin ? 'win' : 'lose');
@@ -1700,6 +1547,7 @@
     state.points = 0;
     state.totalMerges = 0;
     state.maxTier = -1;
+    state.selectedTile = -1;
     unlockControls();
     updateMultDisplay(false);
     updateCombo(false);
@@ -1707,7 +1555,6 @@
     buildGrid(true);
   }
 
-  /* CONTROLS */
   function unlockControls(){
     els.bet.disabled = false;
     els.allin.disabled = false;
@@ -1746,7 +1593,229 @@
     }
   }
 
-  /* OPEN STEP */
+  /* ============ HAND MODE ============ */
+  function setSelection(idx){
+    clearSelection();
+    state.selectedTile = idx;
+    if (idx >= 0) state.tiles[idx].el.classList.add('selected');
+    haptic('light');
+  }
+  function clearSelection(){
+    if (state.selectedTile >= 0){
+      const prev = state.tiles[state.selectedTile];
+      if (prev) prev.el.classList.remove('selected');
+      state.selectedTile = -1;
+    }
+    state.tiles.forEach(t => t.el.classList.remove('merge-target', 'merge-hover', 'drag-source'));
+  }
+
+  async function manualMerge(srcIdx, dstIdx){
+    if (state.busy || !state.playing) return;
+    if (srcIdx === dstIdx) return;
+    const src = state.tiles[srcIdx];
+    const dst = state.tiles[dstIdx];
+    if (src.tier === -1 || dst.tier === -1) return;
+    if (src.tier !== dst.tier) return;
+    if (src.tier >= TIERS.length - 1) return;
+
+    state.busy = true;
+    updateActionButton();
+    clearSelection();
+
+    try {
+      await animateMerge(srcIdx, dstIdx, src.tier);
+      recalcPoints();
+      updateMultDisplay(true);
+
+      const merges = await resolveMerges();
+      if (merges > 0){
+        state.totalMerges += merges;
+        updateCombo(true);
+        if (merges >= 2) showComboText(merges);
+      }
+      await flashBonusCells();
+      updateMultDisplay(true);
+    } finally {
+      state.busy = false;
+      updateActionButton();
+    }
+  }
+
+  function handleHandTap(idx){
+    const t = state.tiles[idx];
+    if (t.tier === -1) return;
+
+    if (state.selectedTile === idx){
+      clearSelection();
+      return;
+    }
+    if (state.selectedTile !== -1){
+      const sel = state.tiles[state.selectedTile];
+      if (sel.tier === t.tier && t.tier < TIERS.length - 1){
+        manualMerge(state.selectedTile, idx);
+        return;
+      }
+      setSelection(idx);
+      return;
+    }
+    setSelection(idx);
+  }
+
+  function onTileClick(idx){
+    if (suppressNextClick){
+      suppressNextClick = false;
+      return;
+    }
+    if (!state.playing || state.busy) return;
+    const t = state.tiles[idx];
+
+    if (state.handMode && t.tier !== -1){
+      handleHandTap(idx);
+      return;
+    }
+    if (state.handMode && state.selectedTile !== -1){
+      clearSelection();
+      return;
+    }
+    openStep(false);
+  }
+
+  /* ============ DRAG LOGIC ============ */
+  let dragState = null;
+  let suppressNextClick = false;
+
+  els.grid.addEventListener('pointerdown', (e) => {
+    if (!state.playing || state.busy) return;
+    if (!state.handMode) return;
+    const tile = e.target.closest('.tile');
+    if (!tile) return;
+    const idx = parseInt(tile.dataset.idx, 10);
+    if (isNaN(idx)) return;
+    if (state.tiles[idx].tier === -1) return;
+    dragState = {
+      idx,
+      startX: e.clientX,
+      startY: e.clientY,
+      dragging: false,
+      ghost: null,
+      rect: null
+    };
+  });
+
+  document.addEventListener('pointermove', (e) => {
+    if (!dragState) return;
+    const dx = e.clientX - dragState.startX;
+    const dy = e.clientY - dragState.startY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (!dragState.dragging && dist > 10){
+      dragState.dragging = true;
+      activateDrag();
+    }
+    if (dragState.dragging) updateDragGhost(e);
+  }, { passive: true });
+
+  document.addEventListener('pointerup', (e) => {
+    if (!dragState) return;
+    if (dragState.dragging){
+      endDrag(e);
+      suppressNextClick = true;
+      setTimeout(() => { suppressNextClick = false; }, 250);
+    }
+    dragState = null;
+  });
+
+  document.addEventListener('pointercancel', () => {
+    if (dragState){
+      if (dragState.ghost) dragState.ghost.remove();
+      state.tiles.forEach(t => t.el.classList.remove('merge-target', 'merge-hover', 'drag-source'));
+      dragState = null;
+    }
+  });
+
+  function activateDrag(){
+    const t = state.tiles[dragState.idx];
+    const rect = t.el.getBoundingClientRect();
+    const info = TIERS[t.tier];
+    const cs = getComputedStyle(t.face);
+
+    const ghost = document.createElement('div');
+    ghost.className = 'drag-ghost';
+    ghost.style.position = 'fixed';
+    ghost.style.width = rect.width + 'px';
+    ghost.style.height = rect.height + 'px';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.pointerEvents = 'none';
+    ghost.style.zIndex = '9999';
+    ghost.style.borderRadius = cs.borderTopLeftRadius;
+    ghost.style.background = 'linear-gradient(180deg,#181b21 0%,#0f1115 100%)';
+    ghost.style.boxShadow = `0 0 26px ${hexA(info.color, 0.7)}, inset 0 0 0 2px ${info.color}`;
+    ghost.style.display = 'flex';
+    ghost.style.alignItems = 'center';
+    ghost.style.justifyContent = 'center';
+    ghost.style.opacity = '0.92';
+    ghost.style.transform = 'scale(1.08)';
+
+    const img = document.createElement('img');
+    img.src = info.url;
+    img.style.width = info.scale + '%';
+    img.style.height = info.scale + '%';
+    img.style.objectFit = 'contain';
+    img.style.pointerEvents = 'none';
+    ghost.appendChild(img);
+
+    document.body.appendChild(ghost);
+    dragState.ghost = ghost;
+    dragState.rect = rect;
+
+    t.el.classList.add('drag-source');
+
+    state.tiles.forEach((other, j) => {
+      if (j === dragState.idx) return;
+      if (other.tier === t.tier && other.tier < TIERS.length - 1){
+        other.el.classList.add('merge-target');
+      }
+    });
+
+    haptic('light');
+  }
+
+  function updateDragGhost(e){
+    if (!dragState || !dragState.ghost) return;
+    const rect = dragState.rect;
+    dragState.ghost.style.left = (e.clientX - rect.width / 2) + 'px';
+    dragState.ghost.style.top = (e.clientY - rect.height / 2) + 'px';
+
+    state.tiles.forEach((other, j) => {
+      if (j === dragState.idx) return;
+      if (!other.el.classList.contains('merge-target')) return;
+      const r = other.el.getBoundingClientRect();
+      const inBounds = e.clientX >= r.left && e.clientX <= r.right &&
+                       e.clientY >= r.top && e.clientY <= r.bottom;
+      other.el.classList.toggle('merge-hover', inBounds);
+    });
+  }
+
+  function endDrag(e){
+    if (!dragState) return;
+    const srcIdx = dragState.idx;
+    let dropIdx = -1;
+    state.tiles.forEach((other, j) => {
+      if (j === srcIdx) return;
+      if (other.tier !== state.tiles[srcIdx].tier) return;
+      const r = other.el.getBoundingClientRect();
+      if (e.clientX >= r.left && e.clientX <= r.right &&
+          e.clientY >= r.top && e.clientY <= r.bottom){
+        dropIdx = j;
+      }
+    });
+    if (dragState.ghost) dragState.ghost.remove();
+    state.tiles.forEach(t => t.el.classList.remove('merge-target', 'merge-hover', 'drag-source'));
+    if (dropIdx !== -1) manualMerge(srcIdx, dropIdx);
+  }
+
+  /* ============ OPEN STEP ============ */
   async function openStep(isFirstOpen){
     if (!state.playing || state.busy) return;
     const empties = [];
@@ -1754,6 +1823,7 @@
     if (!empties.length) return;
 
     state.busy = true;
+    clearSelection();
     updateActionButton();
 
     try {
@@ -1801,12 +1871,6 @@
     }
   }
 
-  function onTileClick(){
-    if (!state.playing || state.busy) return;
-    openStep(false);
-  }
-
-  /* START */
   async function startGame(){
     if (state.busy) return;
     const bet = Math.max(MIN_BET, Math.floor(state.bet));
@@ -1822,6 +1886,7 @@
     state.points = 0;
     state.totalMerges = 0;
     state.maxTier = -1;
+    state.selectedTile = -1;
 
     state.tiles.forEach((t, i) => {
       clearCell(i);
@@ -1840,7 +1905,6 @@
     await openStep(true);
   }
 
-  /* BET INPUT */
   function clampBet(){
     let v = parseInt(els.bet.value.replace(/[^\d]/g, ''), 10);
     if (!Number.isFinite(v) || v < MIN_BET) v = MIN_BET;
@@ -1868,7 +1932,6 @@
     updateActionButton();
   });
 
-  /* DIFFICULTY */
   function setDifficulty(key, animate){
     if (state.playing) return;
     state.difficulty = key;
@@ -1886,7 +1949,6 @@
     btn.addEventListener('click', () => setDifficulty(btn.dataset.d, true));
   });
 
-  /* GRID SIZE */
   function setGridSize(n){
     if (state.playing) return;
     state.gridSize = n;
@@ -1902,15 +1964,14 @@
     btn.addEventListener('click', () => setGridSize(parseInt(btn.dataset.n, 10)));
   });
 
-  /* SETTINGS */
   function applyRoundedState(){
     document.body.classList.toggle('rounded', state.roundedCorners);
     els.toggleCorners.classList.toggle('on', state.roundedCorners);
   }
-  function applyAnimState(){
-    els.animChips.querySelectorAll('.anim-chip').forEach(chip => {
-      chip.classList.toggle('active', chip.dataset.a === state.mergeAnim);
-    });
+  function applyHandModeState(){
+    document.body.classList.toggle('hand-mode', state.handMode);
+    els.toggleHandMode.classList.toggle('on', state.handMode);
+    if (!state.handMode) clearSelection();
   }
   function openSettings(){ els.settingsOverlay.classList.add('open'); haptic('light'); Sound.click(); }
   function closeSettings(){ els.settingsOverlay.classList.remove('open'); haptic('light'); Sound.click(); }
@@ -1923,20 +1984,15 @@
     state.roundedCorners = !state.roundedCorners;
     persistRounded();
     applyRoundedState();
-    haptic('light');
-    Sound.click();
+    haptic('light'); Sound.click();
   });
-  els.animChips.querySelectorAll('.anim-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      state.mergeAnim = chip.dataset.a;
-      persistAnim();
-      applyAnimState();
-      haptic('light');
-      Sound.click();
-    });
+  els.toggleHandMode.addEventListener('click', () => {
+    state.handMode = !state.handMode;
+    persistHandMode();
+    applyHandModeState();
+    haptic('light'); Sound.click();
   });
 
-  /* ACTION */
   els.action.addEventListener('click', async () => {
     if (state.busy) return;
     if (state.playing) await openStep(false);
@@ -1952,7 +2008,6 @@
     resetRound();
   });
 
-  /* BACK */
   $('#back-btn').addEventListener('click', () => {
     haptic('light');
     Sound.click();
@@ -1962,7 +2017,6 @@
     } catch(_){}
   });
 
-  /* RESIZE */
   let resizeTimer = null;
   window.addEventListener('resize', () => {
     if (resizeTimer) clearTimeout(resizeTimer);
@@ -1970,13 +2024,12 @@
   }, { passive: true });
   window.addEventListener('orientationchange', () => setTimeout(sizeGrid, 260));
 
-  /* INIT */
   async function init(){
     try { await preloadAll(); } catch(e){ console.warn('preload:', e); }
     setDifficulty('medium', false);
     setGridSize(3);
     applyRoundedState();
-    applyAnimState();
+    applyHandModeState();
     updateBalance(false);
     updateBestBadge();
     els.bet.value = state.bet;
