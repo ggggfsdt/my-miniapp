@@ -38,6 +38,13 @@
     background:radial-gradient(circle at 30% 20%, rgba(0,0,0,.35), rgba(0,0,0,.8) 70%);pointer-events:none}
   #app > *{position:relative;z-index:1}
 
+  #screen-flash{
+    position:fixed;inset:0;z-index:9997;pointer-events:none;
+    opacity:0;transition:opacity .25s ease-out;
+    background:radial-gradient(circle at 50% 55%, transparent 25%, var(--flash-color, rgba(255,255,255,.5)) 100%);
+  }
+  #screen-flash.on{opacity:1;transition:opacity .06s ease-in}
+
   /* TOPBAR */
   #topbar{display:flex;align-items:center;gap:8px;
     padding:calc(14px + var(--safe-top)) 12px 10px;flex-shrink:0}
@@ -61,7 +68,7 @@
   .balance-pill img{width:18px;height:18px;display:block;object-fit:contain}
   .balance-pill span{font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums}
 
-  /* SETTINGS PANEL */
+  /* SETTINGS */
   #settings-overlay{
     position:fixed;inset:0;z-index:200;pointer-events:none;
     display:flex;align-items:center;justify-content:center;padding:20px;
@@ -69,7 +76,7 @@
     opacity:0;transition:opacity .25s ease}
   #settings-overlay.open{opacity:1;pointer-events:auto}
   .settings-panel{
-    width:100%;max-width:340px;
+    width:100%;max-width:360px;
     background:linear-gradient(180deg,#282c34,#181b20);
     border-radius:22px;
     border:1px solid rgba(255,255,255,.1);
@@ -80,7 +87,7 @@
   .settings-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:16px;letter-spacing:.2px}
   .settings-row{display:flex;align-items:center;justify-content:space-between;
     padding:14px 0;border-top:1px solid rgba(255,255,255,.06);
-    border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:16px}
+    border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:12px}
   .settings-label{font-size:13.5px;font-weight:800;color:#fff;line-height:1.2}
   .settings-desc{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.45);margin-top:3px;line-height:1.2}
   .toggle-switch{
@@ -96,6 +103,23 @@
     background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);
     transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
   .toggle-switch.on .toggle-knob{transform:translateX(22px)}
+
+  .anim-section{margin-bottom:14px}
+  .anim-section .settings-label{margin-bottom:2px}
+  .anim-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .anim-chip{flex:1 1 0;min-width:62px;padding:9px 4px;border-radius:10px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.04);
+    color:rgba(255,255,255,.72);
+    font-family:inherit;font-size:11px;font-weight:900;letter-spacing:.2px;
+    cursor:pointer;transition:all .15s ease;
+    -webkit-appearance:none;appearance:none;outline:none}
+  .anim-chip:active{transform:scale(.94)}
+  .anim-chip.active{background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;border-color:rgba(140,180,255,.7);
+    box-shadow:0 4px 12px rgba(91,157,255,.4),inset 0 1px 0 rgba(255,255,255,.3)}
+  .anim-chip.epic.active{background:linear-gradient(180deg,#ffb877,#e07c1e);border-color:rgba(255,180,120,.7);
+    box-shadow:0 4px 12px rgba(255,150,60,.4),inset 0 1px 0 rgba(255,255,255,.3)}
+
   .settings-done{width:100%;height:46px;border-radius:14px;border:none;
     background:linear-gradient(180deg,#6da9ff,#4a86e8);color:#fff;
     font-family:inherit;font-size:14px;font-weight:900;letter-spacing:.4px;cursor:pointer;
@@ -147,6 +171,17 @@
     75%{transform:translate(-2px,1px)}
     90%{transform:translate(1px,0)}
   }
+  #grid-frame.quake{animation:gridQuake .7s cubic-bezier(.36,.07,.19,.97)}
+  @keyframes gridQuake{
+    0%,100%{transform:translate(0,0) rotate(0deg)}
+    10%{transform:translate(-12px,5px) rotate(-1.2deg)}
+    22%{transform:translate(11px,-5px) rotate(1.2deg)}
+    35%{transform:translate(-10px,4px) rotate(-1deg)}
+    50%{transform:translate(9px,-3px) rotate(.8deg)}
+    65%{transform:translate(-6px,3px) rotate(-.6deg)}
+    80%{transform:translate(4px,-2px) rotate(.4deg)}
+    92%{transform:translate(-2px,1px) rotate(-.2deg)}
+  }
   #merge-grid{display:grid;position:relative}
 
   /* TILE */
@@ -163,7 +198,6 @@
     100%{opacity:1;transform:translateY(0) scale(1)}
   }
 
-  /* FACE — default CLOSED (raised with gift icon) — idle state */
   .face{
     position:absolute;inset:0;
     border-radius:var(--cell-radius);
@@ -184,7 +218,6 @@
       inset 0 1px 0 rgba(255,255,255,.05);
   }
 
-  /* OPENED — recessed slot, used during play for empty cells */
   .tile.opened .face{
     background:linear-gradient(180deg,#0e1115 0%,#181c22 100%);
     box-shadow:
@@ -193,11 +226,8 @@
       inset 0 0 0 1px rgba(255,255,255,.03);
     transform:none;
   }
-  .tile.opened:active .face{
-    transform:none;
-  }
+  .tile.opened:active .face{transform:none}
 
-  /* FILLED — shows the gift, glow from cell background */
   .tile.filled .face{
     background:
       radial-gradient(circle at 50% 55%,
@@ -212,34 +242,14 @@
       inset 0 1px 0 rgba(255,255,255,.06);
     transform:none;
   }
-  .tile.filled:active .face{
-    transform:none;
-  }
+  .tile.filled:active .face{transform:none}
 
-  /* Pulsing halo for highest tier */
-  .tile.filled.highest .face{
-    animation:highestPulse 2s ease-in-out infinite;
-  }
+  .tile.filled.highest .face{animation:highestPulse 2s ease-in-out infinite}
   @keyframes highestPulse{
-    0%,100%{
-      box-shadow:
-        0 5px 0 0 #08090c,
-        0 7px 10px rgba(0,0,0,.4),
-        0 0 18px var(--tier-halo, rgba(255,255,255,0)),
-        inset 0 0 0 2px var(--tier-color, rgba(255,255,255,.08)),
-        inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    50%{
-      box-shadow:
-        0 5px 0 0 #08090c,
-        0 7px 10px rgba(0,0,0,.4),
-        0 0 34px var(--tier-halo, rgba(255,255,255,0)),
-        inset 0 0 0 2px var(--tier-color, rgba(255,255,255,.08)),
-        inset 0 1px 0 rgba(255,255,255,.06);
-    }
+    0%,100%{box-shadow:0 5px 0 0 #08090c,0 7px 10px rgba(0,0,0,.4),0 0 18px var(--tier-halo),inset 0 0 0 2px var(--tier-color),inset 0 1px 0 rgba(255,255,255,.06)}
+    50%{box-shadow:0 5px 0 0 #08090c,0 7px 10px rgba(0,0,0,.4),0 0 34px var(--tier-halo),inset 0 0 0 2px var(--tier-color),inset 0 1px 0 rgba(255,255,255,.06)}
   }
 
-  /* Closed-state gift icon — visible when cell is CLOSED (not opened, not filled) */
   .closed-icon{
     position:absolute;
     width:56%;height:56%;
@@ -250,11 +260,8 @@
     pointer-events:none;
   }
   .tile.opened .closed-icon,
-  .tile.filled .closed-icon{
-    opacity:0;
-  }
+  .tile.filled .closed-icon{opacity:0}
 
-  /* Gift image — no filters, clean */
   .gift-img{
     position:absolute;
     object-fit:contain;
@@ -264,20 +271,14 @@
     pointer-events:none;
     z-index:2;
   }
-  .tile.filled .gift-img{
-    opacity:1;
-    transform:scale(1);
-  }
-  .tile.just-filled .gift-img{
-    animation:giftPop .5s cubic-bezier(.34,1.56,.64,1) both;
-  }
+  .tile.filled .gift-img{opacity:1;transform:scale(1)}
+  .tile.just-filled .gift-img{animation:giftPop .5s cubic-bezier(.34,1.56,.64,1) both}
   @keyframes giftPop{
     0%{opacity:0;transform:scale(.18) rotate(-12deg)}
     60%{opacity:1;transform:scale(1.12) rotate(2deg)}
     100%{opacity:1;transform:scale(1) rotate(0)}
   }
 
-  /* BOMB */
   .tile.is-bomb .face{
     background:
       radial-gradient(circle at 50% 55%, rgba(255,77,109,.45) 0%, rgba(0,0,0,0) 68%),
@@ -303,7 +304,6 @@
     100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
   }
 
-  /* BONUS */
   .tile.is-bonus .face{
     background:
       radial-gradient(circle at 50% 55%, rgba(0,255,136,.45) 0%, rgba(0,0,0,0) 68%),
@@ -314,9 +314,7 @@
       0 0 26px rgba(0,255,136,.5),
       inset 0 0 0 2px rgba(0,255,136,.65);
   }
-  .tile.is-bonus.bonus-flash .face{
-    animation:bonusFlashAnim .7s ease;
-  }
+  .tile.is-bonus.bonus-flash .face{animation:bonusFlashAnim .7s ease}
   @keyframes bonusFlashAnim{
     0%{transform:scale(1);filter:brightness(1)}
     40%{transform:scale(1.12);filter:brightness(1.8)}
@@ -330,7 +328,6 @@
     pointer-events:none;z-index:4;
   }
 
-  /* Highest badge */
   .highest-badge{
     position:absolute;top:4px;left:4px;
     padding:3px 7px;
@@ -346,10 +343,7 @@
   }
   .tile.highest .highest-badge{opacity:1;transform:scale(1)}
 
-  /* Landing bounce */
-  .tile.landed .face{
-    animation:landBounce .55s cubic-bezier(.34,1.56,.64,1);
-  }
+  .tile.landed .face{animation:landBounce .55s cubic-bezier(.34,1.56,.64,1)}
   @keyframes landBounce{
     0%{transform:scale(1.12, .88)}
     35%{transform:scale(.93, 1.07)}
@@ -358,7 +352,6 @@
     100%{transform:scale(1, 1)}
   }
 
-  /* Flying ghost */
   .fly-face{
     position:absolute;
     z-index:40;
@@ -378,12 +371,8 @@
     transform-origin:center;
     transform:translateZ(0);
   }
-  .fly-face img{
-    object-fit:contain;
-    pointer-events:none;
-  }
+  .fly-face img{object-fit:contain;pointer-events:none}
 
-  /* Float texts */
   .float-value{
     position:fixed;z-index:45;pointer-events:none;
     font-size:16px;font-weight:900;color:#fff;
@@ -431,8 +420,6 @@
     0%{transform:translate(-50%,-50%) scale(1);opacity:1}
     100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.2) rotate(var(--rot));opacity:0}
   }
-
-  /* Bonus fly text — floats up to multiplier */
   .bonus-fly-text{
     position:fixed;z-index:9999;pointer-events:none;
     color:#00ff88;font-size:17px;font-weight:900;white-space:nowrap;
@@ -590,7 +577,20 @@
     100%{transform:scale(1) translateY(0)}
   }
 
-  /* Loading splash */
+  #best-badge{
+    position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);
+    z-index:20;padding:4px 10px;border-radius:10px;
+    background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.12);
+    color:rgba(255,255,255,.75);
+    font-size:10px;font-weight:900;letter-spacing:1.2px;
+    font-variant-numeric:tabular-nums;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s ease;
+    white-space:nowrap}
+  #best-badge.show{opacity:1}
+
+  /* Loading */
   #loading{
     position:fixed;inset:0;background:#0a0a0a;z-index:99999;
     display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
@@ -646,22 +646,23 @@
     <div id="grid-frame">
       <div id="combo-badge">COMBO ×0</div>
       <div id="merge-grid"></div>
+      <div id="best-badge">BEST: —</div>
     </div>
   </div>
 
   <div id="controls">
     <div id="diff-row">
       <button class="diff-chip" data-d="easy" type="button">
-        <span class="dc-name">Easy</span><span class="dc-sub">4%</span>
+        <span class="dc-name">Easy</span><span class="dc-sub">6%</span>
       </button>
       <button class="diff-chip" data-d="medium" type="button">
-        <span class="dc-name">Medium</span><span class="dc-sub">9%</span>
+        <span class="dc-name">Medium</span><span class="dc-sub">12%</span>
       </button>
       <button class="diff-chip" data-d="hard" type="button">
-        <span class="dc-name">Hard</span><span class="dc-sub">14%</span>
+        <span class="dc-name">Hard</span><span class="dc-sub">18%</span>
       </button>
       <button class="diff-chip" data-d="extreme" type="button">
-        <span class="dc-name">Extreme</span><span class="dc-sub">20%</span>
+        <span class="dc-name">Extreme</span><span class="dc-sub">26%</span>
       </button>
     </div>
 
@@ -710,10 +711,22 @@
         <div class="toggle-knob"></div>
       </button>
     </div>
+    <div class="anim-section">
+      <div class="settings-label">Merge animation</div>
+      <div class="settings-desc">Choose how cells fly when merging</div>
+      <div class="anim-chips" id="anim-chips">
+        <button class="anim-chip" data-a="random">Random</button>
+        <button class="anim-chip" data-a="arc">Arc</button>
+        <button class="anim-chip" data-a="squash">Squash</button>
+        <button class="anim-chip epic" data-a="epic">Epic</button>
+        <button class="anim-chip" data-a="teleport">Teleport</button>
+      </div>
+    </div>
     <button class="settings-done" id="settings-done" type="button">Done</button>
   </div>
 </div>
 
+<div id="screen-flash"></div>
 <div id="toast"></div>
 
 <script>
@@ -735,17 +748,17 @@
   }
   const $ = s => document.querySelector(s);
 
-  /* ============ +100 MIGRATION ============ */
+  /* +100 bonus migration */
   try {
-    const MIGRATION_KEY = 'dllump_merge_bonus_v1';
-    if (!localStorage.getItem(MIGRATION_KEY)) {
-      const current = parseInt(localStorage.getItem('dllump_merge_balance') || '1000', 10);
-      localStorage.setItem('dllump_merge_balance', String(current + 100));
-      localStorage.setItem(MIGRATION_KEY, '1');
+    const MK = 'dllump_merge_bonus_v1';
+    if (!localStorage.getItem(MK)) {
+      const cur = parseInt(localStorage.getItem('dllump_merge_balance') || '1000', 10);
+      localStorage.setItem('dllump_merge_balance', String(cur + 100));
+      localStorage.setItem(MK, '1');
     }
   } catch(_){}
 
-  /* ============ ASSETS ============ */
+  /* ASSETS */
   const GIFT_ICON_SRC = 'https://i.postimg.cc/SsNS5WNq/better-gift-box.png';
   const APPLE_RING = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-160/1f48d.png';
   const APPLE_BOMB = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-160/1f4a3.png';
@@ -759,11 +772,10 @@
     { v: 450, url: 'https://i.postimg.cc/kXmffxNX/ezgif-1bcbf26839329366.gif', color: '#ffd54a', scale: 94 }
   ];
   const BONUS_SRC = 'https://i.postimg.cc/PJkzVjw6/ezgif-731108219aa0df74.gif';
-
   const TIERS = TIERS_SRC.map(t => ({ ...t }));
   let BONUS_URL = BONUS_SRC;
 
-  /* ============ STATIC FIRST FRAME EXTRACTION ============ */
+  /* STATIC FRAME EXTRACTION */
   const staticCache = new Map();
   function extractStatic(url){
     if (staticCache.has(url)) return Promise.resolve(staticCache.get(url));
@@ -794,7 +806,7 @@
     await Promise.all(tasks);
   }
 
-  /* ============ AUDIO ============ */
+  /* AUDIO */
   const Sound = (function(){
     let ctx = null, unlocked = false, master = null;
     function ensure(){
@@ -819,6 +831,16 @@
       g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
       o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + .03);
     }
+    function noise(dur, vol, when, ff){
+      const c = ensure(); if (!c || !unlocked) return;
+      const t0 = when || c.currentTime, len = Math.max(1, Math.floor(c.sampleRate * dur));
+      const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+      const s = c.createBufferSource(); s.buffer = buf;
+      const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = ff || 1200;
+      const g = c.createGain(); g.gain.value = vol == null ? .22 : vol;
+      s.connect(f); f.connect(g); g.connect(master); s.start(t0); s.stop(t0 + dur + .03);
+    }
     return {
       click(){ tone(720,.03,'sine',.1,null,520); },
       place(){ const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
@@ -828,6 +850,10 @@
         tone(base,.14,'triangle',.16,t,base*1.7);
         tone(base*1.5,.18,'sine',.09,t+.03,base*2.3);
         if (lvl >= 2) tone(base*2,.24,'sine',.08,t+.08,base*3); },
+      epicImpact(){ const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
+        tone(80,.5,'sawtooth',.35,t,35); tone(50,.7,'triangle',.28,t+.03,25);
+        noise(.55,.35,t,600); tone(220,.3,'square',.15,t+.06,80);
+        tone(1046.5,.15,'sine',.12,t+.15,1500); tone(1568,.2,'sine',.1,t+.22,2000); },
       nice(){ const c = ensure(); if (!c || !unlocked) return; const t = c.currentTime;
         [1046.5, 1318.5, 1568, 2093].forEach((f,i) => tone(f,.22,'triangle',.14,t+i*.05));
         tone(2637,.4,'sine',.1,t+.2,3200); },
@@ -849,21 +875,20 @@
     };
   })();
 
-  /* ============ CONFIG ============ */
+  /* CONFIG — bigger bomb chances */
   const MIN_BET = 10;
   const MAX_BONUS = 2;
   const OPEN_PER_STEP = 3;
   const BONUS_CHANCE = 0.05;
-  const PREMIUM_TIER = 4;
 
   const DIFFS = {
-    easy:    { bomb: .04, k: .009, color: '#4CC38A', weights: [80, 15, 4, 1, 0, 0] },
-    medium:  { bomb: .09, k: .016, color: '#5b9dff', weights: [60, 22, 11, 5, 1.8, .2] },
-    hard:    { bomb: .14, k: .026, color: '#ff9d4d', weights: [44, 22, 16, 10, 6, 2] },
-    extreme: { bomb: .20, k: .040, color: '#e0556b', weights: [28, 20, 19, 15, 11, 7] }
+    easy:    { bomb: .06, k: .009, color: '#4CC38A', weights: [80, 15, 4, 1, 0, 0] },
+    medium:  { bomb: .12, k: .016, color: '#5b9dff', weights: [60, 22, 11, 5, 1.8, .2] },
+    hard:    { bomb: .18, k: .026, color: '#ff9d4d', weights: [44, 22, 16, 10, 6, 2] },
+    extreme: { bomb: .26, k: .040, color: '#e0556b', weights: [28, 20, 19, 15, 11, 7] }
   };
 
-  /* ============ STATE ============ */
+  /* STATE */
   const state = {
     difficulty: 'medium',
     gridSize: 3,
@@ -874,7 +899,9 @@
     points: 0,
     totalMerges: 0,
     maxTier: -1,
+    bestTier: -1,
     roundedCorners: false,
+    mergeAnim: 'random',
     tiles: []
   };
 
@@ -883,15 +910,17 @@
     if (b !== null) state.balance = Math.max(0, parseInt(b, 10) || 0);
     const rc = localStorage.getItem('dllump_merge_rounded');
     if (rc === '1') state.roundedCorners = true;
+    const ma = localStorage.getItem('dllump_merge_anim');
+    if (ma) state.mergeAnim = ma;
+    const bt = localStorage.getItem('dllump_merge_best_tier');
+    if (bt !== null) state.bestTier = parseInt(bt, 10) || -1;
   } catch(_){}
-  function persistBalance(){
-    try { localStorage.setItem('dllump_merge_balance', String(state.balance)); } catch(_){}
-  }
-  function persistRounded(){
-    try { localStorage.setItem('dllump_merge_rounded', state.roundedCorners ? '1' : '0'); } catch(_){}
-  }
+  function persistBalance(){ try { localStorage.setItem('dllump_merge_balance', String(state.balance)); } catch(_){} }
+  function persistRounded(){ try { localStorage.setItem('dllump_merge_rounded', state.roundedCorners ? '1' : '0'); } catch(_){} }
+  function persistAnim(){ try { localStorage.setItem('dllump_merge_anim', state.mergeAnim); } catch(_){} }
+  function persistBest(){ try { localStorage.setItem('dllump_merge_best_tier', String(state.bestTier)); } catch(_){} }
 
-  /* ============ DOM ============ */
+  /* DOM */
   const els = {
     loading: $('#loading'),
     grid: $('#merge-grid'),
@@ -908,19 +937,22 @@
     diffRow: $('#diff-row'),
     gsRow: $('#grid-size-row'),
     combo: $('#combo-badge'),
+    best: $('#best-badge'),
     panel: $('#result-panel'),
     panelTitle: $('#result-title'),
     panelMult: $('#result-mult'),
     panelAmt: $('#result-amt'),
     panelBtn: $('#result-continue'),
     toast: $('#toast'),
+    flash: $('#screen-flash'),
     settingsBtn: $('#settings-btn'),
     settingsOverlay: $('#settings-overlay'),
     settingsDone: $('#settings-done'),
-    toggleCorners: $('#toggle-corners')
+    toggleCorners: $('#toggle-corners'),
+    animChips: $('#anim-chips')
   };
 
-  /* ============ HELPERS ============ */
+  /* HELPERS */
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const distTL = i => Math.floor(i / state.gridSize) + (i % state.gridSize);
   const hexA = (hex, a) => {
@@ -943,7 +975,14 @@
     return a;
   }
 
-  /* ============ BALANCE ============ */
+  function screenFlash(color, strength){
+    els.flash.style.setProperty('--flash-color', color);
+    els.flash.style.opacity = String(strength || '1');
+    els.flash.classList.add('on');
+    setTimeout(() => els.flash.classList.remove('on'), 180);
+  }
+
+  /* BALANCE */
   function updateBalance(animate){
     const target = Math.floor(state.balance);
     if (animate){
@@ -969,7 +1008,7 @@
     els.toast._t = setTimeout(() => els.toast.classList.remove('show'), 2200);
   }
 
-  /* ============ MULTIPLIER ============ */
+  /* MULTIPLIER */
   function bonusCount(){ let n = 0; for (const t of state.tiles) if (t.tier === -2) n++; return n; }
   function currentMult(){
     const base = 1 + state.points * DIFFS[state.difficulty].k;
@@ -1006,6 +1045,14 @@
       els.combo.classList.remove('show');
     }
   }
+  function updateBestBadge(){
+    if (state.bestTier >= 0){
+      els.best.textContent = 'BEST: ' + TIERS[state.bestTier].v;
+      els.best.classList.add('show');
+    } else {
+      els.best.classList.remove('show');
+    }
+  }
   function updateHighestBadge(){
     let maxTier = -1, maxIdx = -1;
     state.tiles.forEach((t, i) => {
@@ -1016,20 +1063,17 @@
     });
     if (maxIdx >= 0){
       const badge = state.tiles[maxIdx].badge;
-      if (badge){
-        badge.textContent = fmtMult(currentMult());
-      }
+      if (badge) badge.textContent = fmtMult(currentMult());
     }
   }
 
-  /* ============ GRID ============ */
+  /* GRID */
   function sizeGrid(){
     const r = els.stage.getBoundingClientRect();
     const s = Math.max(140, Math.floor(Math.min(r.width, r.height) - 40));
     els.grid.style.width = s + 'px';
     els.grid.style.height = s + 'px';
   }
-
   function buildGrid(animate){
     const n = state.gridSize;
     const total = n * n;
@@ -1038,11 +1082,10 @@
     els.grid.style.gap = n === 3 ? '8px' : n === 5 ? '6px' : '7px';
     els.grid.innerHTML = '';
     state.tiles = [];
-
     for (let i = 0; i < total; i++){
       const t = document.createElement('button');
       t.type = 'button';
-      t.className = 'tile';  /* CLOSED by default — no .opened */
+      t.className = 'tile';
       if (animate) t.style.animationDelay = (i * 15) + 'ms';
       else t.style.animation = 'none';
       t.innerHTML =
@@ -1062,7 +1105,6 @@
     sizeGrid();
   }
 
-  /* Apply tier glow variables */
   function setTierGlow(faceEl, color){
     faceEl.style.setProperty('--tier-color', color);
     faceEl.style.setProperty('--tier-glow', hexA(color, 0.42));
@@ -1074,19 +1116,14 @@
     faceEl.style.removeProperty('--tier-halo');
   }
 
-  /* ============ CELL STATES ============ */
-
+  /* CELL STATES */
   function fillFresh(idx, tier){
     const t = state.tiles[idx];
     t.tier = tier;
     const info = TIERS[tier];
-
     const oldB = t.face.querySelector('.bonus-label');
     if (oldB) oldB.remove();
-
     setTierGlow(t.face, info.color);
-
-    /* Hard-hide the gift image while we swap src */
     t.giftImg.style.transition = 'none';
     t.giftImg.style.opacity = '0';
     t.giftImg.style.visibility = 'hidden';
@@ -1098,10 +1135,8 @@
     t.giftImg.style.transition = '';
     t.giftImg.style.opacity = '';
     t.giftImg.style.visibility = '';
-
     t.el.classList.remove('opened', 'is-bomb', 'is-bonus');
     t.el.classList.add('filled');
-
     t.el.classList.remove('just-filled');
     void t.el.offsetWidth;
     t.el.classList.add('just-filled');
@@ -1112,19 +1147,15 @@
     const t = state.tiles[idx];
     const info = TIERS[newTier];
     t.tier = newTier;
-
     t.giftImg.style.transition = 'opacity .12s ease';
     t.giftImg.style.opacity = '0';
-
     setTimeout(() => {
       t.giftImg.src = info.url;
       t.giftImg.style.width = info.scale + '%';
       t.giftImg.style.height = info.scale + '%';
       setTierGlow(t.face, info.color);
-
       t.giftImg.style.transition = 'opacity .24s ease, transform .38s cubic-bezier(.34,1.56,.64,1)';
       t.giftImg.style.opacity = '';
-
       t.el.classList.remove('just-filled', 'landed');
       void t.el.offsetWidth;
       t.el.classList.add('just-filled', 'landed');
@@ -1136,9 +1167,7 @@
   function fillBonus(idx){
     const t = state.tiles[idx];
     t.tier = -2;
-
     setTierGlow(t.face, '#00ff88');
-
     t.giftImg.style.transition = 'none';
     t.giftImg.style.opacity = '0';
     t.giftImg.style.visibility = 'hidden';
@@ -1150,14 +1179,12 @@
     t.giftImg.style.transition = '';
     t.giftImg.style.opacity = '';
     t.giftImg.style.visibility = '';
-
     t.el.classList.remove('opened', 'is-bomb', 'highest');
     t.el.classList.add('filled', 'is-bonus');
     t.el.classList.remove('just-filled');
     void t.el.offsetWidth;
     t.el.classList.add('just-filled');
     setTimeout(() => t.el.classList.remove('just-filled'), 550);
-
     let bl = t.face.querySelector('.bonus-label');
     if (!bl){
       bl = document.createElement('div');
@@ -1165,22 +1192,23 @@
       bl.textContent = 'BONUS';
       t.face.appendChild(bl);
     }
-
     Sound.bonus();
     haptic('medium');
     showFloatValue(t.el, '+1.2×', '#00ff88');
   }
 
-  /* The critical fix: hard-hide the gift image via visibility */
   function clearCell(idx){
     const t = state.tiles[idx];
     t.tier = -1;
     t.el.classList.remove('filled','just-filled','landed','highest','is-bomb','is-bonus','bonus-flash');
+    t.el.style.transform = '';
+    t.el.style.opacity = '';
+    t.el.style.transition = '';
     clearTierGlow(t.face);
     if (t.giftImg){
       t.giftImg.style.transition = 'none';
       t.giftImg.style.opacity = '0';
-      t.giftImg.style.visibility = 'hidden';  /* hard hide, no transition */
+      t.giftImg.style.visibility = 'hidden';
     }
     const bomb = t.face.querySelector('.bomb-img');
     if (bomb) bomb.remove();
@@ -1188,7 +1216,7 @@
     if (bl) bl.remove();
   }
 
-  /* ============ FLOAT TEXT ============ */
+  /* FLOATS */
   function showFloatValue(el, text, color){
     const r = el.getBoundingClientRect();
     const f = document.createElement('div');
@@ -1203,7 +1231,9 @@
   function showComboText(count){
     const el = document.createElement('div');
     el.className = 'combo-text';
-    if (count >= 4) el.textContent = 'MEGA ×' + count;
+    if (count >= 6) el.textContent = 'LEGENDARY ×' + count;
+    else if (count >= 5) el.textContent = 'INSANE ×' + count;
+    else if (count >= 4) el.textContent = 'MEGA ×' + count;
     else if (count >= 3) el.textContent = 'SUPER ×' + count;
     else el.textContent = 'COMBO ×' + count;
     document.body.appendChild(el);
@@ -1218,15 +1248,12 @@
     setTimeout(() => el.remove(), 1100);
     haptic('heavy');
   }
-  function burstAt(el, color, count){
-    const r = el.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
+  function burstAtPoint(cx, cy, color, count){
     for (let i = 0; i < count; i++){
       const p = document.createElement('div');
       p.className = 'confetti';
       const ang = Math.random() * Math.PI * 2;
-      const dist = 28 + Math.random() * 52;
+      const dist = 28 + Math.random() * 55;
       p.style.setProperty('--tx', (Math.cos(ang) * dist).toFixed(1) + 'px');
       p.style.setProperty('--ty', (Math.sin(ang) * dist).toFixed(1) + 'px');
       p.style.setProperty('--rot', (Math.random() * 540 - 270).toFixed(0) + 'deg');
@@ -1234,11 +1261,13 @@
       p.style.top = cy + 'px';
       p.style.background = i % 3 === 0 ? '#fff' : color;
       document.body.appendChild(p);
-      setTimeout(() => p.remove(), 750);
+      setTimeout(() => p.remove(), 800);
     }
   }
-
-  /* Bonus fly-text toward multiplier */
+  function burstAt(el, color, count){
+    const r = el.getBoundingClientRect();
+    burstAtPoint(r.left + r.width / 2, r.top + r.height / 2, color, count);
+  }
   function showBonusFlyText(el){
     const r = el.getBoundingClientRect();
     const target = els.mult.getBoundingClientRect();
@@ -1246,7 +1275,6 @@
     const startY = r.top + r.height / 2;
     const endX = target.left + target.width / 2;
     const endY = target.top + target.height / 2;
-
     const f = document.createElement('div');
     f.className = 'bonus-fly-text';
     f.textContent = '+1.2×';
@@ -1254,19 +1282,14 @@
     f.style.top = startY + 'px';
     document.body.appendChild(f);
     void f.offsetWidth;
-
     f.style.transform = `translate(calc(-50% + ${endX - startX}px), calc(-50% + ${endY - startY}px)) scale(.7)`;
     f.style.opacity = '0';
-
     setTimeout(() => f.remove(), 900);
   }
-
-  /* Bonus celebration — flash all bonus cells in parallel */
   async function flashBonusCells(){
     const bonusIdx = [];
     state.tiles.forEach((t, i) => { if (t.tier === -2) bonusIdx.push(i); });
     if (!bonusIdx.length) return;
-
     bonusIdx.forEach(idx => {
       const t = state.tiles[idx];
       t.el.classList.remove('bonus-flash');
@@ -1274,24 +1297,18 @@
       t.el.classList.add('bonus-flash');
       showBonusFlyText(t.el);
     });
-
     Sound.bonus();
     haptic('light');
-
     await sleep(700);
-
-    bonusIdx.forEach(idx => {
-      state.tiles[idx].el.classList.remove('bonus-flash');
-    });
+    bonusIdx.forEach(idx => state.tiles[idx].el.classList.remove('bonus-flash'));
   }
 
-  /* ============ WHOLE-CELL MERGE ANIMATION ============ */
+  /* SHARED MERGE SETUP */
   function makeFlyFace(srcEl, info, capturedRect){
     const fr = els.frame.getBoundingClientRect();
     const sr = capturedRect;
     const cs = getComputedStyle(srcEl.querySelector('.face'));
     const radius = cs.borderTopLeftRadius || '0px';
-
     const ghost = document.createElement('div');
     ghost.className = 'fly-face';
     ghost.style.left = (sr.left - fr.left) + 'px';
@@ -1302,105 +1319,231 @@
     ghost.style.setProperty('--fly-tier-color', info.color);
     ghost.style.setProperty('--fly-glow', hexA(info.color, 0.42));
     ghost.style.setProperty('--fly-halo', hexA(info.color, 0.5));
-
     const img = document.createElement('img');
     img.src = info.url;
     img.style.width = info.scale + '%';
     img.style.height = info.scale + '%';
     img.style.objectFit = 'contain';
     ghost.appendChild(img);
-
     els.frame.appendChild(ghost);
     return ghost;
   }
 
-  function animateWholeCell(srcIdx, dstIdx, tier){
+  function setupMerge(srcIdx, dstIdx, tier){
+    const srcEl = state.tiles[srcIdx].el;
+    const dstEl = state.tiles[dstIdx].el;
+    const info = TIERS[tier];
+    const srcFace = srcEl.querySelector('.face');
+    const srcRect = srcFace.getBoundingClientRect();
+    const dstRect = dstEl.getBoundingClientRect();
+    clearCell(srcIdx);
+    const ghost = makeFlyFace(srcEl, info, srcRect);
+    return {
+      ghost, dstEl, srcRect, dstRect,
+      dx: dstRect.left - srcRect.left,
+      dy: dstRect.top - srcRect.top,
+      info
+    };
+  }
+
+  function completeMerge(dstIdx, tier, effects){
+    upgradeCell(dstIdx, tier + 1);
+    state.tiles[dstIdx].tier = tier + 1;
+    const dstEl = state.tiles[dstIdx].el;
+    dstEl.classList.remove('landed');
+    void dstEl.offsetWidth;
+    dstEl.classList.add('landed');
+    setTimeout(() => dstEl.classList.remove('landed'), 600);
+    const resultInfo = TIERS[tier + 1];
+    showFloatValue(dstEl, '+$' + resultInfo.v, resultInfo.color);
+    if (effects?.burst) {
+      setTimeout(() => burstAt(dstEl, resultInfo.color, effects.burst), 30);
+    }
+    if (effects?.whiteBurst) {
+      setTimeout(() => burstAt(dstEl, '#ffffff', effects.whiteBurst), 100);
+    }
+    if (effects?.nice) {
+      showNiceText();
+      Sound.nice();
+    }
+    if (tier + 1 > state.maxTier){
+      state.maxTier = tier + 1;
+      if (tier + 1 > state.bestTier){
+        state.bestTier = tier + 1;
+        persistBest();
+        showToast('🏆 BEST TIER ' + (tier + 1) + ' · $' + resultInfo.v);
+      } else {
+        showToast('✨ TIER ' + (tier + 1) + ' · $' + resultInfo.v);
+      }
+      Sound.milestone();
+      updateBestBadge();
+    }
+    Sound.merge(tier);
+    haptic(tier >= 3 ? 'medium' : 'light');
+  }
+
+  /* ARC ANIMATION */
+  function animateArc(srcIdx, dstIdx, tier){
     return new Promise(resolve => {
-      const srcEl = state.tiles[srcIdx].el;
-      const dstEl = state.tiles[dstIdx].el;
-      const info = TIERS[tier];
-
-      /* Capture rect FIRST, then clear cell, then create ghost from cached rect */
-      const srcFace = srcEl.querySelector('.face');
-      const srcRect = srcFace.getBoundingClientRect();
-      const dstRect = dstEl.getBoundingClientRect();
-
-      /* Hard-clear source BEFORE creating ghost — bug fix */
-      clearCell(srcIdx);
-
-      const ghost = makeFlyFace(srcEl, info, srcRect);
-
-      const dx = dstRect.left - srcRect.left;
-      const dy = dstRect.top - srcRect.top;
-      const isPremium = (tier + 1) >= PREMIUM_TIER;
-
-      const keyframes = isPremium ? [
+      const ctx = setupMerge(srcIdx, dstIdx, tier);
+      const duration = 560;
+      const keyframes = [
         { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
         { transform: 'translate(0, 8px) scale(1.08, 0.9)', offset: 0.1 },
         { transform: 'translate(0, -70px) scale(0.85, 1.24)', offset: 0.3 },
-        { transform: `translate(${dx*0.55}px, ${dy*0.55 - 90}px) scale(0.9, 1.14)`, offset: 0.55 },
-        { transform: `translate(${dx*0.88}px, ${dy*0.88 - 25}px) scale(1.08, 0.94)`, offset: 0.8 },
-        { transform: `translate(${dx}px, ${dy}px) scale(1.32, 0.72)`, offset: 0.92 },
-        { transform: `translate(${dx}px, ${dy}px) scale(0.96, 1.04)`, offset: 0.97 },
-        { transform: `translate(${dx}px, ${dy}px) scale(1, 1)`, offset: 1 }
-      ] : [
-        { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
-        { transform: 'translate(0, -45px) scale(0.92, 1.12)', offset: 0.3 },
-        { transform: `translate(${dx*0.6}px, ${dy*0.6 - 40}px) scale(0.98, 1.04)`, offset: 0.65 },
-        { transform: `translate(${dx}px, ${dy}px) scale(1.14, 0.88)`, offset: 0.9 },
-        { transform: `translate(${dx}px, ${dy}px) scale(1, 1)`, offset: 1 }
+        { transform: `translate(${ctx.dx*0.55}px, ${ctx.dy*0.55 - 90}px) scale(0.9, 1.14)`, offset: 0.55 },
+        { transform: `translate(${ctx.dx*0.88}px, ${ctx.dy*0.88 - 25}px) scale(1.08, 0.94)`, offset: 0.8 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.32, 0.72)`, offset: 0.92 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.96, 1.04)`, offset: 0.97 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1, 1)`, offset: 1 }
       ];
-
-      const duration = isPremium ? 580 : 420;
-
-      ghost.animate(keyframes, {
-        duration,
-        easing: 'linear',
-        fill: 'forwards'
-      });
-
-      if (isPremium){
+      ctx.ghost.animate(keyframes, { duration, easing: 'linear', fill: 'forwards' });
+      if (tier + 1 >= 4){
         els.frame.classList.add('shaking');
         setTimeout(() => els.frame.classList.remove('shaking'), 520);
       }
-
       setTimeout(() => {
-        ghost.remove();
-        upgradeCell(dstIdx, tier + 1);
-        state.tiles[dstIdx].tier = tier + 1;
-
-        const dstElNew = state.tiles[dstIdx].el;
-        dstElNew.classList.remove('landed');
-        void dstElNew.offsetWidth;
-        dstElNew.classList.add('landed');
-        setTimeout(() => dstElNew.classList.remove('landed'), 600);
-
-        const resultInfo = TIERS[tier + 1];
-        showFloatValue(dstElNew, '+$' + resultInfo.v, resultInfo.color);
-
-        if (isPremium){
-          setTimeout(() => burstAt(dstElNew, resultInfo.color, 20), 30);
-          setTimeout(() => burstAt(dstElNew, '#ffffff', 8), 110);
-          showNiceText();
-          Sound.nice();
-        } else if (tier >= 2){
-          burstAt(dstElNew, resultInfo.color, 8);
-        }
-
-        if (tier + 1 > state.maxTier){
-          state.maxTier = tier + 1;
-          showToast('✨ TIER ' + (tier + 1) + ' · $' + resultInfo.v);
-          Sound.milestone();
-        }
-
-        Sound.merge(tier);
-        haptic(isPremium ? 'heavy' : (tier >= 2 ? 'medium' : 'light'));
+        ctx.ghost.remove();
+        completeMerge(dstIdx, tier, {
+          burst: tier + 1 >= 4 ? 20 : (tier >= 2 ? 8 : 0),
+          whiteBurst: tier + 1 >= 4 ? 8 : 0,
+          nice: tier + 1 >= 4
+        });
         resolve();
       }, duration);
     });
   }
 
-  /* ============ RESOLVE MERGES ============ */
+  /* SQUASH ANIMATION */
+  function animateSquash(srcIdx, dstIdx, tier){
+    return new Promise(resolve => {
+      const ctx = setupMerge(srcIdx, dstIdx, tier);
+      const duration = 440;
+      const keyframes = [
+        { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
+        { transform: 'translate(0, 8px) scale(1.12, 0.88)', offset: 0.15 },
+        { transform: `translate(${ctx.dx*0.35}px, ${ctx.dy*0.35 - 20}px) scale(1.04, 0.96)`, offset: 0.5 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.24, 0.76)`, offset: 0.82 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.94, 1.06)`, offset: 0.93 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1, 1)`, offset: 1 }
+      ];
+      ctx.ghost.animate(keyframes, { duration, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+      setTimeout(() => {
+        ctx.ghost.remove();
+        completeMerge(dstIdx, tier, {
+          burst: tier >= 2 ? 8 : 0,
+          nice: tier + 1 >= 4
+        });
+        resolve();
+      }, duration);
+    });
+  }
+
+  /* EPIC LAUNCH + SLAM */
+  function animateEpic(srcIdx, dstIdx, tier){
+    return new Promise(resolve => {
+      const ctx = setupMerge(srcIdx, dstIdx, tier);
+      const duration = 780;
+      const keyframes = [
+        // 0% - start, at source position
+        { transform: 'translate(0, 0) scale(1, 1)', offset: 0 },
+        // 8% - squash prep
+        { transform: 'translate(0, 10px) scale(1.15, 0.82)', offset: 0.08 },
+        // 22% - LAUNCH straight up, stretched tall
+        { transform: `translate(${ctx.dx * 0.25}px, ${Math.min(ctx.dy * 0.25, -190)}px) scale(0.82, 1.32)`, offset: 0.22 },
+        // 38% - apex, over destination area
+        { transform: `translate(${ctx.dx * 0.75}px, ${Math.min(ctx.dy * 0.75, -220)}px) scale(1, 1.05)`, offset: 0.38 },
+        // 55% - falling, above destination
+        { transform: `translate(${ctx.dx}px, ${Math.min(ctx.dy, -100)}px) scale(0.94, 1.14)`, offset: 0.55 },
+        // 70% - near destination, starting to squash
+        { transform: `translate(${ctx.dx}px, ${ctx.dy - 20}px) scale(1.06, 0.94)`, offset: 0.7 },
+        // 82% - IMPACT, huge squash
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.46, 0.54)`, offset: 0.82 },
+        // 89% - rebound, stretched tall again
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.84, 1.18)`, offset: 0.89 },
+        // 94% - settle
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1.06, 0.94)`, offset: 0.94 },
+        // 100% - normal
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(1, 1)`, offset: 1 }
+      ];
+      ctx.ghost.animate(keyframes, { duration, easing: 'cubic-bezier(.4,.05,.5,1)', fill: 'forwards' });
+
+      // Screen shake during launch
+      els.frame.classList.add('shaking');
+
+      // IMPACT — epic explosion moment
+      setTimeout(() => {
+        els.frame.classList.remove('shaking');
+        void els.frame.offsetWidth;
+        els.frame.classList.add('quake');
+        setTimeout(() => els.frame.classList.remove('quake'), 720);
+
+        // Screen edge flash
+        screenFlash(hexA(ctx.info.color, 0.55), '1');
+
+        // Big explosion at impact point
+        const ix = ctx.dstRect.left + ctx.dstRect.width / 2;
+        const iy = ctx.dstRect.top + ctx.dstRect.height / 2;
+        burstAtPoint(ix, iy, ctx.info.color, 28);
+        burstAtPoint(ix, iy, '#ffffff', 12);
+
+        Sound.epicImpact();
+        haptic('heavy');
+      }, Math.round(duration * 0.82));
+
+      setTimeout(() => {
+        ctx.ghost.remove();
+        completeMerge(dstIdx, tier, {
+          burst: 22,
+          whiteBurst: 10,
+          nice: true
+        });
+        resolve();
+      }, duration);
+    });
+  }
+
+  /* TELEPORT ANIMATION */
+  function animateTeleport(srcIdx, dstIdx, tier){
+    return new Promise(resolve => {
+      const ctx = setupMerge(srcIdx, dstIdx, tier);
+      const duration = 320;
+      const keyframes = [
+        { transform: 'translate(0, 0) scale(1, 1)', opacity: 1, offset: 0 },
+        { transform: `translate(${ctx.dx * 0.3}px, ${ctx.dy * 0.3}px) scale(1.18, 1.18)`, opacity: 0.85, offset: 0.35 },
+        { transform: `translate(${ctx.dx}px, ${ctx.dy}px) scale(0.1, 0.1)`, opacity: 0, offset: 1 }
+      ];
+      ctx.ghost.animate(keyframes, { duration, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' });
+      ctx.dstEl.classList.add('teleport-flash');
+      setTimeout(() => ctx.dstEl.classList.remove('teleport-flash'), 400);
+      setTimeout(() => {
+        ctx.ghost.remove();
+        completeMerge(dstIdx, tier, {
+          burst: tier >= 2 ? 8 : 0,
+          nice: tier + 1 >= 4
+        });
+        resolve();
+      }, duration);
+    });
+  }
+
+  /* ANIMATION DISPATCH */
+  function pickRandomAnim(){
+    const r = Math.random();
+    if (r < 0.28) return 'arc';
+    if (r < 0.55) return 'squash';
+    if (r < 0.82) return 'epic';
+    return 'teleport';
+  }
+  function animateWholeCell(srcIdx, dstIdx, tier){
+    const anim = state.mergeAnim === 'random' ? pickRandomAnim() : state.mergeAnim;
+    if (anim === 'epic') return animateEpic(srcIdx, dstIdx, tier);
+    if (anim === 'teleport') return animateTeleport(srcIdx, dstIdx, tier);
+    if (anim === 'squash') return animateSquash(srcIdx, dstIdx, tier);
+    return animateArc(srcIdx, dstIdx, tier);
+  }
+
+  /* RESOLVE */
   async function resolveMerges(){
     let merges = 0;
     let guard = 0;
@@ -1410,12 +1553,9 @@
         const idxs = [];
         state.tiles.forEach((t, i) => { if (t.tier === tier) idxs.push(i); });
         if (idxs.length < 2) continue;
-
         idxs.sort((a, b) => distTL(a) - distTL(b));
         const dst = idxs[0], src = idxs[1];
-
         await animateWholeCell(src, dst, tier);
-
         recalcPoints();
         updateMultDisplay(true);
         merges++;
@@ -1427,7 +1567,6 @@
     return merges;
   }
 
-  /* ============ TIER ROLL ============ */
   function rollTier(){
     const w = DIFFS[state.difficulty].weights;
     let total = 0;
@@ -1440,7 +1579,48 @@
     return 0;
   }
 
-  /* ============ BOMB ============ */
+  /* BOMB + CASCADE FALL */
+  async function bombCellsFall(bombIdx){
+    const filled = [];
+    state.tiles.forEach((t, i) => {
+      if (i === bombIdx) return;
+      if (t.tier === -1 && !t.el.classList.contains('is-bomb')) return;
+      filled.push(t);
+    });
+    if (!filled.length) return;
+
+    // Sort by distance from bomb for a cascade effect
+    const bombRow = Math.floor(bombIdx / state.gridSize);
+    const bombCol = bombIdx % state.gridSize;
+    filled.sort((a, b) => {
+      const ai = state.tiles.indexOf(a);
+      const bi = state.tiles.indexOf(b);
+      const ad = Math.abs(Math.floor(ai / state.gridSize) - bombRow) + Math.abs((ai % state.gridSize) - bombCol);
+      const bd = Math.abs(Math.floor(bi / state.gridSize) - bombRow) + Math.abs((bi % state.gridSize) - bombCol);
+      return ad - bd;
+    });
+
+    filled.forEach((t, k) => {
+      setTimeout(() => {
+        const tx = (Math.random() - 0.5) * 60;
+        const ty = 320 + Math.random() * 240;
+        const rot = (Math.random() - 0.5) * 900;
+        const sc = 0.35 + Math.random() * 0.35;
+        t.el.style.transition = 'none';
+        t.el.animate([
+          { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
+          { transform: `translate(${tx * 0.5}px, ${ty * 0.55}px) rotate(${rot * 0.5}deg) scale(${sc * 1.15})`, opacity: 0.7, offset: 0.55 },
+          { transform: `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(${sc * 0.5})`, opacity: 0 }
+        ], { duration: 720, easing: 'cubic-bezier(.45,0,.55,1)', fill: 'forwards' });
+      }, k * 35);
+    });
+
+    // Screen flash red at start of cascade
+    screenFlash('rgba(255,77,109,.35)', '1');
+
+    await sleep(720 + filled.length * 35 + 80);
+  }
+
   async function revealBomb(idx){
     const t = state.tiles[idx];
     t.tier = -1;
@@ -1458,17 +1638,20 @@
     bomb.src = APPLE_BOMB;
     bomb.alt = '';
     t.face.appendChild(bomb);
-
     t.el.classList.add('is-bomb');
     clearTierGlow(t.face);
 
     els.frame.classList.add('shaking');
     setTimeout(() => els.frame.classList.remove('shaking'), 520);
-
     Sound.bomb();
     haptic('heavy');
+    screenFlash('rgba(255,77,109,.5)', '1');
 
-    await sleep(900);
+    await sleep(560);
+
+    // Cascade fall for all other cells
+    await bombCellsFall(idx);
+
     loseGame();
   }
 
@@ -1483,7 +1666,7 @@
     }, 150);
   }
 
-  /* ============ CASHOUT ============ */
+  /* CASHOUT */
   function cashout(){
     if (!state.playing) return;
     const mult = currentMult();
@@ -1492,17 +1675,16 @@
     persistBalance();
     updateBalance(true);
     haptic('heavy');
-
     Sound.cashout();
+    screenFlash('rgba(76,195,138,.35)', '1');
     showResult(true, mult, payout);
-
     state.playing = false;
     state.busy = false;
     unlockControls();
     updateActionButton();
   }
 
-  /* ============ RESULT ============ */
+  /* RESULT */
   function showResult(isWin, mult, amount){
     els.panel.classList.remove('win', 'lose');
     els.panel.classList.add(isWin ? 'win' : 'lose');
@@ -1511,7 +1693,6 @@
     els.panelAmt.textContent = isWin ? fmtMoney(amount) : ('-' + fmtMoney(amount));
     requestAnimationFrame(() => els.panel.classList.add('show'));
   }
-
   function resetRound(){
     els.panel.classList.remove('show', 'win', 'lose');
     state.playing = false;
@@ -1523,11 +1704,10 @@
     updateMultDisplay(false);
     updateCombo(false);
     updateActionButton();
-    /* Rebuild grid - all cells CLOSED (no .opened) */
     buildGrid(true);
   }
 
-  /* ============ CONTROLS ============ */
+  /* CONTROLS */
   function unlockControls(){
     els.bet.disabled = false;
     els.allin.disabled = false;
@@ -1566,10 +1746,9 @@
     }
   }
 
-  /* ============ OPEN STEP ============ */
+  /* OPEN STEP */
   async function openStep(isFirstOpen){
     if (!state.playing || state.busy) return;
-
     const empties = [];
     state.tiles.forEach((t, i) => { if (t.tier === -1) empties.push(i); });
     if (!empties.length) return;
@@ -1581,7 +1760,6 @@
       const count = isFirstOpen
         ? Math.max(1, empties.length - 3)
         : Math.min(OPEN_PER_STEP, empties.length);
-
       shuffle(empties);
       const toFill = empties.slice(0, count);
 
@@ -1592,12 +1770,10 @@
 
       for (const idx of toFill){
         if (!state.playing) return;
-
         if (idx === bombIdx){
           await revealBomb(idx);
           return;
         }
-
         if (bonusCount() < MAX_BONUS && Math.random() < BONUS_CHANCE){
           fillBonus(idx);
         } else {
@@ -1615,9 +1791,7 @@
         if (merges >= 2) showComboText(merges);
       }
 
-      /* Bonus celebration after merges resolve */
       await flashBonusCells();
-
       updateMultDisplay(true);
     } catch(err){
       console.error('openStep:', err);
@@ -1632,7 +1806,7 @@
     openStep(false);
   }
 
-  /* ============ START ============ */
+  /* START */
   async function startGame(){
     if (state.busy) return;
     const bet = Math.max(MIN_BET, Math.floor(state.bet));
@@ -1649,10 +1823,9 @@
     state.totalMerges = 0;
     state.maxTier = -1;
 
-    /* Transition cells from CLOSED to OPENED state */
     state.tiles.forEach((t, i) => {
       clearCell(i);
-      t.el.classList.add('opened');  /* recessed slot look during play */
+      t.el.classList.add('opened');
     });
 
     lockControls();
@@ -1663,12 +1836,11 @@
     haptic('medium');
 
     await sleep(220);
-
     state.busy = false;
     await openStep(true);
   }
 
-  /* ============ BET INPUT ============ */
+  /* BET INPUT */
   function clampBet(){
     let v = parseInt(els.bet.value.replace(/[^\d]/g, ''), 10);
     if (!Number.isFinite(v) || v < MIN_BET) v = MIN_BET;
@@ -1696,7 +1868,7 @@
     updateActionButton();
   });
 
-  /* ============ DIFFICULTY ============ */
+  /* DIFFICULTY */
   function setDifficulty(key, animate){
     if (state.playing) return;
     state.difficulty = key;
@@ -1714,7 +1886,7 @@
     btn.addEventListener('click', () => setDifficulty(btn.dataset.d, true));
   });
 
-  /* ============ GRID SIZE ============ */
+  /* GRID SIZE */
   function setGridSize(n){
     if (state.playing) return;
     state.gridSize = n;
@@ -1730,21 +1902,18 @@
     btn.addEventListener('click', () => setGridSize(parseInt(btn.dataset.n, 10)));
   });
 
-  /* ============ SETTINGS ============ */
+  /* SETTINGS */
   function applyRoundedState(){
     document.body.classList.toggle('rounded', state.roundedCorners);
     els.toggleCorners.classList.toggle('on', state.roundedCorners);
   }
-  function openSettings(){
-    els.settingsOverlay.classList.add('open');
-    haptic('light');
-    Sound.click();
+  function applyAnimState(){
+    els.animChips.querySelectorAll('.anim-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.a === state.mergeAnim);
+    });
   }
-  function closeSettings(){
-    els.settingsOverlay.classList.remove('open');
-    haptic('light');
-    Sound.click();
-  }
+  function openSettings(){ els.settingsOverlay.classList.add('open'); haptic('light'); Sound.click(); }
+  function closeSettings(){ els.settingsOverlay.classList.remove('open'); haptic('light'); Sound.click(); }
   els.settingsBtn.addEventListener('click', openSettings);
   els.settingsDone.addEventListener('click', closeSettings);
   els.settingsOverlay.addEventListener('click', (e) => {
@@ -1757,8 +1926,17 @@
     haptic('light');
     Sound.click();
   });
+  els.animChips.querySelectorAll('.anim-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      state.mergeAnim = chip.dataset.a;
+      persistAnim();
+      applyAnimState();
+      haptic('light');
+      Sound.click();
+    });
+  });
 
-  /* ============ ACTION ============ */
+  /* ACTION */
   els.action.addEventListener('click', async () => {
     if (state.busy) return;
     if (state.playing) await openStep(false);
@@ -1774,7 +1952,7 @@
     resetRound();
   });
 
-  /* ============ BACK ============ */
+  /* BACK */
   $('#back-btn').addEventListener('click', () => {
     haptic('light');
     Sound.click();
@@ -1784,7 +1962,7 @@
     } catch(_){}
   });
 
-  /* ============ RESIZE ============ */
+  /* RESIZE */
   let resizeTimer = null;
   window.addEventListener('resize', () => {
     if (resizeTimer) clearTimeout(resizeTimer);
@@ -1792,21 +1970,19 @@
   }, { passive: true });
   window.addEventListener('orientationchange', () => setTimeout(sizeGrid, 260));
 
-  /* ============ INIT ============ */
+  /* INIT */
   async function init(){
-    try {
-      await preloadAll();
-    } catch(e){ console.warn('preload:', e); }
-
+    try { await preloadAll(); } catch(e){ console.warn('preload:', e); }
     setDifficulty('medium', false);
     setGridSize(3);
     applyRoundedState();
+    applyAnimState();
     updateBalance(false);
+    updateBestBadge();
     els.bet.value = state.bet;
     updateMultDisplay(false);
     updateActionButton();
     requestAnimationFrame(() => requestAnimationFrame(sizeGrid));
-
     els.loading.classList.add('hide');
     setTimeout(() => els.loading.remove(), 400);
   }
