@@ -12,7 +12,7 @@
   --text:#fff;--text-2:#a0a0a0;--text-3:#5a5a5a;
   --border:rgba(255,255,255,.07);--border-2:rgba(255,255,255,.14);
   --accent:#4d9fff;--accent-2:#6eb0ff;
-  --green:#34d399;--gold:#fbbf24;--red:#f87171;--pink:#f472b6;
+  --green:#34d399;--gold:#fbbf24;--red:#f87171;
   --safe-top:max(env(safe-area-inset-top,0px),24px);
   --safe-bottom:max(env(safe-area-inset-bottom,0px),10px);
   --header-h:54px;--tabs-h:68px;
@@ -47,25 +47,26 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;visibility:visible;transform:translateY(0)}
 
-/* TABS + SLIDER */
+/* TABS - draggable slider */
 #tabs{position:fixed;bottom:0;left:0;right:0;height:calc(var(--safe-bottom) + var(--tabs-h));
   padding:8px 12px calc(var(--safe-bottom) + 8px);background:rgba(0,0,0,.94);
   border-top:.5px solid var(--border);z-index:100;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  touch-action:none;user-select:none;-webkit-user-select:none}
 #tabs-inner{position:relative;display:flex;align-items:center;height:52px;
   background:rgba(20,20,20,.7);border:1px solid var(--border);border-radius:16px;
-  padding:5px;touch-action:none;cursor:grab}
-#tabs-inner:active{cursor:grabbing}
+  padding:5px;touch-action:none;overflow:hidden}
 .tab-indicator{position:absolute;top:5px;bottom:5px;left:5px;
   width:calc((100% - 10px) / 4);background:rgba(77,159,255,.16);
   border:1px solid rgba(77,159,255,.35);border-radius:12px;pointer-events:none;
   transition:transform .45s var(--spring);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 14px rgba(77,159,255,.18)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 14px rgba(77,159,255,.18);z-index:1}
 .tab-indicator.dragging{transition:none}
-.tab-btn{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;background:none;border:0;color:var(--text-3);
-  font-family:inherit;font-size:10px;font-weight:600;letter-spacing:.2px;cursor:pointer;
-  transition:color .2s var(--ease);height:42px;pointer-events:none}
+.tab-btn{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;background:none;border:0;
+  color:var(--text-3);font-family:inherit;font-size:10px;font-weight:600;
+  letter-spacing:.2px;cursor:pointer;transition:color .2s var(--ease);
+  height:42px;pointer-events:none}
 .tab-btn.active{color:var(--accent)}
 .tab-icon{position:relative;display:inline-flex;transition:transform .3s var(--spring)}
 .tab-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;
@@ -73,13 +74,13 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .tab-btn.active .tab-icon{transform:scale(1.14) translateY(-1px)}
 .tab-bell{position:absolute;top:-5px;right:-8px;font-size:10px;line-height:1;
   animation:bellWobble 2.4s ease-in-out infinite;transform-origin:50% 20%}
-@keyframes bellWobble{0%,100%{transform:rotate(0)}8%{transform:rotate(14deg)}16%{transform:rotate(-12deg)}
-  24%{transform:rotate(8deg)}32%{transform:rotate(-4deg)}40%{transform:rotate(0)}}
+@keyframes bellWobble{0%,100%{transform:rotate(0)}8%{transform:rotate(14deg)}
+  16%{transform:rotate(-12deg)}24%{transform:rotate(8deg)}32%{transform:rotate(-4deg)}40%{transform:rotate(0)}}
 .tab-bell::before{content:'';position:absolute;top:-1px;right:-1px;width:5px;height:5px;
   background:var(--red);border-radius:50%;border:1px solid #000;box-shadow:0 0 6px rgba(248,113,113,.8)}
 
 /* SEARCH */
-.search-hero{margin-bottom:18px}
+.search-hero{margin-bottom:16px}
 .search-title{font-size:24px;font-weight:800;letter-spacing:-.7px;margin-bottom:4px}
 .search-sub{font-size:13px;color:var(--text-2);margin-bottom:14px;line-height:1.4}
 .search-wrap{position:relative}
@@ -98,6 +99,9 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   color:var(--text-2);font-size:12px;cursor:pointer;display:none;
   align-items:center;justify-content:center}
 .search-clear.show{display:flex}
+.search-status{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:11px;color:var(--text-3);font-weight:600;display:none}
+.search-status.show{display:block}
 
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chip{padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--border);
@@ -106,10 +110,10 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .chip:active{transform:scale(.94);background:var(--surface-2);
   border-color:var(--accent);color:var(--accent)}
 
-/* RESULT CARD */
-.results{margin-top:20px}
+/* RESULT */
+.results{margin-top:18px}
 .result-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;
-  padding:18px;margin-bottom:14px;animation:resultIn .45s var(--spring) both}
+  padding:18px;margin-bottom:14px;animation:resultIn .5s var(--spring) both}
 @keyframes resultIn{from{opacity:0;transform:translateY(12px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}}
 .result-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
@@ -121,77 +125,138 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .result-info{flex:1;min-width:0}
 .result-name-row{display:flex;align-items:center;gap:6px}
 .result-name{font-size:18px;font-weight:700;letter-spacing:-.3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:22px}
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .result-verified{flex-shrink:0;width:16px;height:16px;background:var(--accent);
   border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
 .result-verified svg{width:10px;height:10px;stroke:#fff;stroke-width:3;fill:none}
 .result-handle{font-size:13px;color:var(--text-3);margin-top:3px;font-weight:500}
 
-/* PENDING / CONNECTED BADGE */
-.pending-badge{padding:14px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);
-  border-radius:12px;text-align:center;font-size:13px;font-weight:600;color:var(--gold);
+/* PENDING / CONNECTED */
+.pending-badge{padding:14px;background:rgba(251,191,36,.1);
+  border:1px solid rgba(251,191,36,.3);border-radius:12px;text-align:center;
+  font-size:13px;font-weight:600;color:var(--gold);
   display:flex;align-items:center;justify-content:center;gap:8px}
-.connected-badge{padding:14px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);
-  border-radius:12px;text-align:center;font-size:13px;font-weight:600;color:var(--green);
+.connected-badge{padding:14px;background:rgba(52,211,153,.12);
+  border:1px solid rgba(52,211,153,.3);border-radius:12px;text-align:center;
+  font-size:13px;font-weight:600;color:var(--green);
   display:flex;align-items:center;justify-content:center;gap:8px}
 .spin{animation:spin 1s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* LIQUID GLASS SLIDER */
 .lg-slider{position:relative;height:58px;border-radius:29px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
   overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;
-  cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
-  inset 0 -1px 0 rgba(0,0,0,.3)}
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.4),
+    inset 0 0 20px rgba(255,255,255,.02)}
 .lg-slider::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.08),transparent 55%),
-    radial-gradient(ellipse at 80% 100%,rgba(77,159,255,.1),transparent 55%);
+  background:radial-gradient(ellipse 60% 50% at 20% 0%,rgba(255,255,255,.1),transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 100%,rgba(77,159,255,.15),transparent 70%);
   border-radius:29px}
+.lg-slider::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle at 25% 30%,rgba(255,255,255,.03) 1px,transparent 1px),
+    radial-gradient(circle at 75% 70%,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:8px 8px;border-radius:29px;opacity:.5;mix-blend-mode:overlay}
 .lg-fill{position:absolute;top:0;left:0;bottom:0;width:0;
-  background:linear-gradient(90deg,rgba(77,159,255,.4),rgba(77,159,255,.75));
-  border-radius:29px;pointer-events:none;box-shadow:0 0 20px rgba(77,159,255,.4)}
+  background:linear-gradient(90deg,rgba(77,159,255,.3),rgba(77,159,255,.6),rgba(140,190,255,.7));
+  border-radius:29px;pointer-events:none;
+  box-shadow:0 0 30px rgba(77,159,255,.5),inset 0 0 20px rgba(255,255,255,.2)}
 .lg-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.3px;
+  font-size:13px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.3px;
   pointer-events:none;transition:opacity .2s var(--ease)}
-.lg-knob{position:absolute;left:4px;top:4px;width:50px;height:50px;border-radius:50%;
-  background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.08));
-  backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
-  border:1px solid rgba(255,255,255,.35);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.15),
-    0 6px 16px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+.lg-knob{position:absolute;left:4px;top:4px;width:50px;height:50px;
+  will-change:transform;z-index:2}
+.lg-knob-inner{width:100%;height:100%;border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 25%,rgba(255,255,255,.5),transparent 45%),
+    radial-gradient(circle at 70% 80%,rgba(255,255,255,.15),transparent 55%),
+    linear-gradient(135deg,rgba(255,255,255,.3),rgba(255,255,255,.05) 60%,rgba(200,220,255,.15));
+  backdrop-filter:blur(40px) saturate(200%);-webkit-backdrop-filter:blur(40px) saturate(200%);
+  border:1px solid rgba(255,255,255,.45);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.7),
+    inset 0 -3px 6px rgba(0,0,0,.15),
+    inset -1px 0 2px rgba(255,255,255,.3),
+    0 6px 20px rgba(0,0,0,.5),
+    0 2px 8px rgba(0,0,0,.3),
+    0 0 0 1px rgba(255,255,255,.1);
   display:flex;align-items:center;justify-content:center;cursor:grab;
-  transition:box-shadow .2s var(--ease),background .2s var(--ease);will-change:transform}
-.lg-knob.dragging{cursor:grabbing;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.15),
-    0 8px 24px rgba(77,159,255,.55),0 2px 8px rgba(0,0,0,.4)}
-.lg-knob svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.6;
-  stroke-linecap:round;stroke-linejoin:round;pointer-events:none;
-  transition:transform .25s var(--spring)}
-.lg-knob.dragging svg{transform:scale(1.1)}
+  transition:transform .35s var(--spring);
+  transform-origin:center center;position:relative;overflow:hidden}
+.lg-knob-inner::before{content:'';position:absolute;top:15%;left:20%;right:20%;height:30%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.5),transparent 70%);
+  border-radius:50%;filter:blur(2px);pointer-events:none}
+.lg-knob-inner svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round;pointer-events:none;position:relative;z-index:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.lg-knob.dragging .lg-knob-inner{cursor:grabbing;animation:knobJiggle .5s ease-in-out infinite}
+@keyframes knobJiggle{
+  0%,100%{transform:scale(1.18) rotate(-4deg) skewX(2deg)}
+  25%{transform:scale(1.22) rotate(4deg) skewX(-2deg)}
+  50%{transform:scale(1.18) rotate(-2deg) skewX(1deg)}
+  75%{transform:scale(1.22) rotate(3deg) skewX(-1deg)}
+}
+.lg-knob.dragging .lg-knob-inner svg{transform:scale(1.15);
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.lg-slider.completed .lg-knob-inner{
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.5),transparent 45%),
+    linear-gradient(135deg,#34d399,#22c55e);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.7),
+    0 6px 20px rgba(52,211,153,.6),
+    0 0 0 1px rgba(255,255,255,.15)}
 
-/* CONNECTIONS */
-.section{background:var(--surface);border:1px solid var(--border);border-radius:18px;
+/* CONNECTIONS - chat style */
+.chat-list{background:var(--surface);border:1px solid var(--border);border-radius:18px;
   overflow:hidden;margin-bottom:14px}
-.section-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
-  color:var(--text-3);padding:14px 18px 10px}
-.conn-row{display:flex;align-items:center;gap:12px;padding:10px 18px;position:relative;
+.chat-list-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between}
+.chat-list-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--text-3)}
+.chat-list-count{font-size:11px;color:var(--text-3);font-weight:600}
+.chat-row{display:flex;align-items:center;gap:12px;padding:11px 16px;position:relative;
   cursor:pointer;transition:background .15s var(--ease);
-  animation:connIn .35s var(--spring) both}
-.conn-row:active{background:var(--surface-2)}
-@keyframes connIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.conn-row+.conn-row::before{content:'';position:absolute;top:0;left:70px;right:18px;
+  animation:chatIn .35s var(--spring) both}
+.chat-row:active{background:var(--surface-2)}
+@keyframes chatIn{from{opacity:0;transform:translateX(-10px)}
+  to{opacity:1;transform:translateX(0)}}
+.chat-row+.chat-row::before{content:'';position:absolute;top:0;left:68px;right:16px;
   height:.5px;background:var(--border)}
-.conn-av{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;
-  background:var(--surface-2)}
-.conn-av img{width:100%;height:100%;object-fit:cover;display:block}
-.conn-body{flex:1;min-width:0}
-.conn-name{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis}
-.conn-handle{font-size:12.5px;color:var(--text-3);margin-top:1px;font-weight:500}
-.conn-chevron{width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;
-  stroke-linecap:round;flex-shrink:0}
-.conn-empty{padding:32px 18px;text-align:center;font-size:13px;color:var(--text-3);
+.chat-av{width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  background:var(--surface-2);position:relative}
+.chat-av img{width:100%;height:100%;object-fit:cover;display:block}
+.chat-online{position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;
+  background:var(--green);border:2px solid var(--surface);
+  box-shadow:0 0 8px rgba(52,211,153,.6)}
+.chat-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.chat-name-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chat-name{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;letter-spacing:-.1px}
+.chat-time{font-size:11px;color:var(--text-3);font-weight:500;flex-shrink:0}
+.chat-preview{font-size:12.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
+.chat-preview .you{color:var(--accent);font-weight:600}
+.chat-preview .dot{width:3px;height:3px;border-radius:50%;background:var(--text-3);flex-shrink:0}
+.chat-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+  min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;padding:0 5px;flex-shrink:0}
+.chat-empty{padding:32px 18px;text-align:center;font-size:13px;color:var(--text-3);
   line-height:1.5}
+
+/* PENDING list */
+.pending-list{background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  overflow:hidden;margin-bottom:14px}
+.pend-row{display:flex;align-items:center;gap:12px;padding:11px 16px;position:relative}
+.pend-row+.pend-row::before{content:'';position:absolute;top:0;left:68px;right:16px;
+  height:.5px;background:var(--border)}
+.pend-av{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  background:var(--surface-2);opacity:.7}
+.pend-av img{width:100%;height:100%;object-fit:cover;display:block}
+.pend-body{flex:1;min-width:0}
+.pend-name{font-size:14px;font-weight:600;opacity:.85}
+.pend-handle{font-size:12px;color:var(--text-3);margin-top:1px}
+.pend-status{font-size:11px;color:var(--gold);font-weight:600;
+  display:flex;align-items:center;gap:4px}
 
 /* STATE MSG */
 .state-msg{text-align:center;padding:32px 20px;color:var(--text-3)}
@@ -200,33 +265,127 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .state-msg .state-title{font-size:15px;font-weight:600;color:var(--text-2);margin-bottom:6px}
 .state-msg .state-text{font-size:13px;line-height:1.5}
 
-/* NOVA / PET ROOM */
-.pet-room{position:relative;width:100%;max-width:340px;aspect-ratio:340/320;
-  margin:0 auto 16px;touch-action:none;user-select:none;-webkit-user-select:none}
-.room-svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible;
-  filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
-.pet{position:absolute;transform:translate(-50%,-100%);z-index:10;
-  cursor:grab;filter:drop-shadow(0 8px 8px rgba(0,0,0,.6));
-  transition:left .3s var(--ease),top .3s var(--ease)}
-.pet:active{cursor:grabbing}
-.pet.dragging{transition:none;z-index:999}
-.pet-body{display:block;font-size:44px;line-height:1;animation:petIdle 3s ease-in-out infinite;
-  transform-origin:50% 90%}
-@keyframes petIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.02)}}
-.pet.dragging .pet-body{animation:petDrag .5s ease-in-out infinite alternate}
-@keyframes petDrag{0%{transform:rotate(-6deg) scale(1.08)}100%{transform:rotate(6deg) scale(1.08)}}
-.pet.sleeping .pet-body{animation:petSleep 2.5s ease-in-out infinite}
-@keyframes petSleep{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.03) rotate(-3deg)}}
-.pet.sleeping::after{content:'💤';position:absolute;top:-22px;right:-14px;font-size:16px;
-  animation:zzz 2s ease-in-out infinite}
-@keyframes zzz{0%,100%{transform:translateY(0) scale(1);opacity:1}
-  50%{transform:translateY(-8px) scale(1.2);opacity:.5}}
-.pet.playing .pet-body{animation:petPlay .35s ease-in-out infinite alternate}
-@keyframes petPlay{0%{transform:translateY(0) rotate(-4deg)}
-  100%{transform:translateY(-6px) rotate(4deg)}}
-.pet.walking .pet-body{animation:petWalk .35s ease-in-out infinite alternate}
-@keyframes petWalk{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
+/* NOVA / 3D ROOM */
+.room-scene{position:relative;width:100%;height:420px;margin:0 auto 16px;
+  perspective:900px;perspective-origin:50% 35%;
+  overflow:hidden;border-radius:20px;
+  background:radial-gradient(ellipse at 50% 25%,rgba(60,45,80,.35),rgba(0,0,0,.7) 75%);
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  border:1px solid var(--border)}
+.room-scene::after{content:'drag to rotate';position:absolute;bottom:8px;left:50%;
+  transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.25);
+  letter-spacing:.8px;text-transform:uppercase;pointer-events:none;font-weight:600}
 
+.room{position:absolute;left:50%;top:55%;width:340px;height:340px;
+  margin-left:-170px;margin-top:-100px;transform-style:preserve-3d;
+  transform:rotateX(-18deg) rotateY(0deg);will-change:transform}
+
+.wall{position:absolute;width:340px;height:170px;
+  background:linear-gradient(180deg,#1a1d2a 0%,#0f1220 100%);
+  border:1px solid rgba(255,255,255,.05)}
+.wall::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0 40px,
+    rgba(255,255,255,.015) 40px 41px)}
+
+.wall-back{transform:translate3d(0,85px,-170px)}
+.wall-left{transform:translate3d(-170px,85px,0) rotateY(90deg)}
+.wall-right{transform:translate3d(170px,85px,0) rotateY(-90deg)}
+
+.floor{position:absolute;width:340px;height:340px;
+  background:radial-gradient(ellipse at 50% 50%,#3a2c1e 0%,#1f1810 80%);
+  transform:translate3d(0,170px,0) rotateX(90deg);
+  transform-origin:center center}
+.floor::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent 0 30px,
+    rgba(255,255,255,.02) 30px 31px),
+    repeating-linear-gradient(-45deg,transparent 0 30px,
+    rgba(255,255,255,.02) 30px 31px)}
+
+.rug{position:absolute;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(160,100,80,.65) 0%,rgba(100,60,50,.45) 70%,transparent 100%);
+  border:2px solid rgba(200,150,120,.25);border-radius:50%;
+  transform:translate3d(80px,169px,80px) rotateX(90deg);
+  transform-origin:center center;pointer-events:none}
+.rug::after{content:'';position:absolute;inset:20px;border-radius:50%;
+  border:1px dashed rgba(255,200,150,.2)}
+
+.window{position:absolute;width:80px;height:90px;
+  background:linear-gradient(180deg,#0a1428 0%,#162a4a 100%);
+  border:3px solid rgba(40,50,70,.9);border-radius:2px;
+  transform:translate3d(-130px,60px,-169px);
+  box-shadow:inset 0 0 30px rgba(100,150,255,.3),0 0 40px rgba(100,150,255,.15)}
+.window::before{content:'';position:absolute;top:0;left:50%;width:2px;height:100%;
+  background:rgba(40,50,70,.9);transform:translateX(-50%)}
+.window::after{content:'';position:absolute;top:50%;left:0;width:100%;height:2px;
+  background:rgba(40,50,70,.9);transform:translateY(-50%)}
+.window-stars{position:absolute;inset:0;pointer-events:none}
+.window-star{position:absolute;width:2px;height:2px;border-radius:50%;
+  background:rgba(200,220,255,.9);animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+
+.poster{position:absolute;width:70px;height:70px;
+  background:linear-gradient(135deg,#f472b6 0%,#a78bfa 100%);
+  border:2px solid rgba(255,255,255,.15);border-radius:2px;
+  transform:translate3d(100px,50px,-169px);
+  box-shadow:0 4px 20px rgba(244,114,182,.3)}
+.poster::after{content:'♥';position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;font-size:24px;color:rgba(255,255,255,.6)}
+
+.shelf{position:absolute;width:60px;height:8px;
+  background:linear-gradient(180deg,#3a2c20 0%,#1f1810 100%);
+  transform:translate3d(-160px,120px,60px) rotateY(90deg);pointer-events:none}
+
+.bowl{position:absolute;width:36px;height:36px;font-size:28px;line-height:36px;
+  text-align:center;transform:translate3d(120px,152px,120px);
+  transform-origin:center bottom;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));pointer-events:none}
+.ball{position:absolute;width:28px;height:28px;font-size:22px;line-height:28px;
+  text-align:center;transform:translate3d(-120px,156px,-100px);
+  transform-origin:center bottom;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.6));pointer-events:none;
+  animation:ballRoll 4s ease-in-out infinite}
+@keyframes ballRoll{0%,100%{transform:translate3d(-120px,156px,-100px) rotate(0)}
+  50%{transform:translate3d(-100px,156px,-80px) rotate(180deg)}}
+
+/* PET */
+.pet-wrap{position:absolute;left:50%;top:55%;width:100px;height:100px;
+  margin-left:-50px;margin-top:-100px;
+  transform-style:preserve-3d;
+  transform:translate3d(var(--px,0),160px,var(--pz,0))
+    rotateY(calc(-1 * var(--ry,0deg)))
+    rotateX(18deg);
+  transform-origin:center bottom;
+  cursor:grab;z-index:10;will-change:transform;transition:filter .2s ease}
+.pet-wrap:active{cursor:grabbing}
+.pet-wrap.dragging{filter:drop-shadow(0 12px 20px rgba(0,0,0,.8))}
+.pet-wrap.dragging .pet-img{animation:petSquish .3s ease-in-out infinite}
+@keyframes petSquish{0%,100%{transform:scale(1.15,1.15)}50%{transform:scale(1.22,1.08)}}
+.pet-img{width:100%;height:100%;object-fit:contain;display:block;
+  filter:drop-shadow(0 6px 8px rgba(0,0,0,.6));
+  animation:petBreathe 3s ease-in-out infinite;
+  transition:transform .2s var(--spring);pointer-events:none}
+@keyframes petBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.pet-shadow{position:absolute;width:70px;height:20px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);
+  left:50%;bottom:-4px;transform:translateX(-50%);pointer-events:none;
+  filter:blur(3px);transition:opacity .2s ease}
+.pet-wrap.dragging .pet-shadow{opacity:.4}
+
+/* HAND CURSOR */
+#hand-cursor{position:fixed;pointer-events:none;z-index:99999;display:none;
+  transform:translate(-8px,-8px);filter:drop-shadow(0 4px 10px rgba(0,0,0,.7))}
+#hand-cursor.active{display:block;animation:handAppear .25s var(--spring)}
+@keyframes handAppear{from{transform:translate(-8px,-8px) scale(.5);opacity:0}
+  to{transform:translate(-8px,-8px) scale(1);opacity:1}}
+.hand-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;
+  border:2px solid #fff;background:var(--surface-2);
+  box-shadow:0 2px 10px rgba(0,0,0,.7)}
+.hand-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.hand-icon{font-size:24px;margin-top:-8px;margin-left:22px;line-height:1;
+  animation:handGrab 1.5s ease-in-out infinite}
+@keyframes handGrab{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(2deg)}}
+
+/* NOVA INFO */
 .nova-info{text-align:center;margin-bottom:16px}
 .nova-name{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
 .nova-meta{font-size:12px;color:var(--text-3);font-weight:500}
@@ -245,30 +404,22 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .nova-btns svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;
   stroke-linecap:round;stroke-linejoin:round}
 
-/* HAND CURSOR */
-#hand-cursor{position:fixed;pointer-events:none;z-index:99999;display:none;
-  transform:translate(-8px,-8px);filter:drop-shadow(0 4px 10px rgba(0,0,0,.7))}
-#hand-cursor.active{display:block}
-.hand-avatar{width:30px;height:30px;border-radius:50%;overflow:hidden;
-  border:2px solid #fff;background:var(--surface-2);
-  box-shadow:0 2px 8px rgba(0,0,0,.6)}
-.hand-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.hand-icon{font-size:22px;margin-top:-6px;margin-left:20px;line-height:1}
-
-/* PULSE / TYPING */
+/* PULSE */
 .anon-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
   padding:16px;margin-bottom:10px}
-.anon-text{font-size:13.5px;line-height:1.5;font-style:italic;margin-bottom:10px;min-height:22px}
+.anon-text{font-size:13.5px;line-height:1.55;font-style:italic;margin-bottom:10px;
+  min-height:22px;color:var(--text)}
 .reveal-btn{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);
   background:var(--surface-2);color:var(--accent);font-family:inherit;font-size:12.5px;
   font-weight:600;cursor:pointer}
 .reveal-btn:active{opacity:.7}
 .type-char{display:inline-block;opacity:0;
-  animation:typeIn .35s cubic-bezier(.34,1.56,.64,1) forwards}
-@keyframes typeIn{from{opacity:0;transform:translateY(6px) scale(.7)}
+  animation:typeIn .4s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes typeIn{from{opacity:0;transform:translateY(8px) scale(.6)}
   to{opacity:1;transform:translateY(0) scale(1)}}
-.cursor-bar{display:inline-block;width:2px;height:1em;background:var(--accent);
-  margin-left:2px;vertical-align:text-bottom;animation:blink .7s steps(2) infinite}
+.cursor-bar{display:inline-block;width:2px;height:1.05em;background:var(--accent);
+  margin-left:2px;vertical-align:text-bottom;animation:blink .7s steps(2) infinite;
+  border-radius:1px;box-shadow:0 0 6px var(--accent)}
 @keyframes blink{50%{opacity:0}}
 
 /* PROFILE */
@@ -324,11 +475,7 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   <section class="page" id="page-pulse"></section>
   <section class="page" id="page-profile"></section>
 </main>
-<nav id="tabs">
-  <div id="tabs-inner">
-    <div class="tab-indicator" id="tab-indicator"></div>
-  </div>
-</nav>
+<nav id="tabs"><div id="tabs-inner"><div class="tab-indicator" id="tab-indicator"></div></div></nav>
 <div id="toast-wrap"></div>
 <div id="hand-cursor">
   <div class="hand-avatar"><img id="hand-avatar-img" src="" alt=""></div>
@@ -339,16 +486,10 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 (function(){
 'use strict';
 
-/* ============================================
-   TELEGRAM
-   ============================================ */
 const tg = window.Telegram?.WebApp;
 if (tg){ try{tg.ready()}catch(_){}; try{tg.expand()}catch(_){} }
 function haptic(t){ try{tg?.HapticFeedback?.impactOccurred(t||'light')}catch(_){} }
 
-/* ============================================
-   ICONS
-   ============================================ */
 const I = {
   people:'<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
   paw:'<svg viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><circle cx="9" cy="10" r="2"/><path d="M9 14a4 4 0 0 1 4-4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4z"/></svg>',
@@ -361,24 +502,21 @@ const I = {
   feed:'<svg viewBox="0 0 24 24"><path d="M4 5h16l-2 4H6zM6 9v10h12V9M9 13h6"/></svg>',
   play:'<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>',
   sleep:'<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-  empty:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
-  chev:'<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>'
+  empty:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
 };
 
-/* ============================================
-   STATE
-   ============================================ */
-const LS_KEY = 'orbit_v6';
+const LS_KEY = 'orbit_v7';
 const state = {
   tab: 'friends', query: '', result: null, error: null,
-  connections: [], pending: new Set(),
+  connections: [], pending: new Map(), // username -> {name, photo, requestedAt}
   nova: { food: 68, happy: 54, energy: 41, level: 3, xp: 340, xpMax: 500,
-    x: 170, y: 160 },
+    x: 0, y: 0 }, // floor coords
   balance: 1250, notifications: true
 };
 function save(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify({
-    connections: state.connections, pending: [...state.pending],
+    connections: state.connections,
+    pending: [...state.pending.entries()],
     nova: state.nova, balance: state.balance, notifications: state.notifications
   })) }catch(_){}
 }
@@ -386,7 +524,7 @@ function load(){
   try{ const r = localStorage.getItem(LS_KEY); if(!r) return;
     const d = JSON.parse(r);
     if (Array.isArray(d.connections)) state.connections = d.connections;
-    if (Array.isArray(d.pending)) state.pending = new Set(d.pending);
+    if (Array.isArray(d.pending)) state.pending = new Map(d.pending);
     if (d.nova) state.nova = { ...state.nova, ...d.nova };
     if (typeof d.balance === 'number') state.balance = d.balance;
     if (typeof d.notifications === 'boolean') state.notifications = d.notifications;
@@ -405,9 +543,7 @@ function getUserInfo(){
   return { name, photo, username: u?.username || '' };
 }
 
-/* ============================================
-   SEARCH
-   ============================================ */
+/* SEARCH */
 const KNOWN = {
   durov:'Pavel Durov', telegram:'Telegram', botfather:'BotFather',
   tginfo:'Telegram Info', stickers:'Stickers', premium:'Telegram Premium', gif:'GIF'
@@ -427,9 +563,7 @@ function search(q){
   }};
 }
 
-/* ============================================
-   TYPEWRITER
-   ============================================ */
+/* TYPEWRITER */
 function typeText(el, text, speed = 40, onDone){
   if (!el) return;
   el.innerHTML = '';
@@ -438,7 +572,7 @@ function typeText(el, text, speed = 40, onDone){
   bar.className = 'cursor-bar';
   el.appendChild(bar);
   function tick(){
-    if (i >= text.length){ setTimeout(() => bar.remove(), 400); onDone && onDone(); return; }
+    if (i >= text.length){ setTimeout(() => bar.remove(), 500); onDone && onDone(); return; }
     const ch = text[i++];
     const span = document.createElement('span');
     span.className = 'type-char';
@@ -449,9 +583,7 @@ function typeText(el, text, speed = 40, onDone){
   tick();
 }
 
-/* ============================================
-   TOAST
-   ============================================ */
+/* TOAST */
 function toast(text, type){
   type = type || 'info';
   const wrap = $('#toast-wrap');
@@ -464,9 +596,7 @@ function toast(text, type){
   haptic('light');
 }
 
-/* ============================================
-   HEADER
-   ============================================ */
+/* HEADER */
 function renderHeader(){
   const u = getUserInfo();
   $('#header').innerHTML = `
@@ -478,9 +608,7 @@ function renderHeader(){
     <div class="h-right">${state.balance.toLocaleString()} 💎</div>`;
 }
 
-/* ============================================
-   TABS + SLIDER
-   ============================================ */
+/* TABS */
 const TABS = [
   {id:'friends', label:'Friends', icon:'people', bell:true},
   {id:'nova', label:'Nova', icon:'paw'},
@@ -528,34 +656,54 @@ function switchTab(tab){
   if (tab==='profile') renderProfile();
 }
 
+/* TAB SLIDER - fixed for mobile */
 function initTabSlider(){
   const inner = $('#tabs-inner');
+  const ind = $('#tab-indicator');
   let dragging = false, moved = false, startX = 0, startIdx = 0;
 
-  inner.addEventListener('pointerdown', e => {
-    dragging = true; moved = false;
-    startX = e.clientX;
+  function getX(e){
+    if (e.touches && e.touches.length) return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    return e.clientX;
+  }
+  function getY(e){
+    if (e.touches && e.touches.length) return e.touches[0].clientY;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
+    return e.clientY;
+  }
+
+  function onDown(e){
+    const x = getX(e);
+    const y = getY(e);
+    dragging = true;
+    moved = false;
+    startX = x;
     startIdx = TABS.findIndex(t => t.id === state.tab);
-    $('#tab-indicator').classList.add('dragging');
-  });
-  document.addEventListener('pointermove', e => {
+    ind.classList.add('dragging');
+  }
+
+  function onMove(e){
     if (!dragging) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 8) moved = true;
+    const x = getX(e);
+    const dx = x - startX;
+    if (Math.abs(dx) > 6) moved = true;
     if (moved){
+      e.preventDefault();
       const w = tabWidth;
       const maxX = (TABS.length - 1) * w;
       const target = clamp(startIdx * w + dx, 0, maxX);
-      $('#tab-indicator').style.transform = `translateX(${target}px)`;
+      ind.style.transform = `translateX(${target}px)`;
     }
-  });
-  document.addEventListener('pointerup', e => {
+  }
+
+  function onUp(e){
     if (!dragging) return;
     dragging = false;
-    const ind = $('#tab-indicator');
     ind.classList.remove('dragging');
+    const x = getX(e);
     const innerRect = inner.getBoundingClientRect();
-    const relX = e.clientX - innerRect.left - 5;
+    const relX = x - innerRect.left - 5;
     let idx;
     if (!moved){
       idx = Math.floor(relX / tabWidth);
@@ -567,28 +715,38 @@ function initTabSlider(){
     if (TABS[idx].id !== state.tab){
       haptic('medium');
       switchTab(TABS[idx].id);
+    } else {
+      setTabIndicator(idx, true);
     }
-  });
+  }
+
+  inner.addEventListener('pointerdown', onDown);
+  document.addEventListener('pointermove', onMove, { passive: false });
+  document.addEventListener('pointerup', onUp);
   document.addEventListener('pointercancel', () => {
     if (!dragging) return;
     dragging = false;
-    $('#tab-indicator').classList.remove('dragging');
+    ind.classList.remove('dragging');
     setTabIndicator(TABS.findIndex(t => t.id === state.tab), true);
   });
+  // Fallback for browsers without pointer events
+  inner.addEventListener('touchstart', onDown, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onUp);
   window.addEventListener('resize', () => {
     tabWidth = (inner.clientWidth - 10) / TABS.length;
     setTabIndicator(TABS.findIndex(t => t.id === state.tab), false);
   });
 }
 
-/* ============================================
-   FRIENDS PAGE
-   ============================================ */
+/* FRIENDS PAGE */
 let lastResultUsername = null;
-let typewriterPending = false;
+let searchTimer = null;
+let searchPending = false;
 
 function renderFriends(){
   const page = $('#page-friends');
+
   let resultHtml = '';
   if (state.error){
     const t = {empty:'Type a username',too_short:'Too short',invalid:'Invalid username'};
@@ -601,34 +759,70 @@ function renderFriends(){
     resultHtml = `<div class="results">${renderResultCard(state.result)}</div>`;
   }
 
-  const connHtml = state.connections.length
-    ? state.connections.map((c,i) => `
-      <div class="conn-row" data-open="${esc(c.username)}" style="animation-delay:${i*40}ms">
-        <div class="conn-av"><img src="${esc(c.photo)}" alt=""
-          onerror="this.src='${esc(c.fallbackPhoto||'')}'"></div>
-        <div class="conn-body">
-          <div class="conn-name">${esc(c.name)}</div>
-          <div class="conn-handle">@${esc(c.username)}</div>
-        </div>
-        ${I.chev}
-      </div>`).join('')
-    : `<div class="conn-empty">Nobody yet.<br>Search a username above to send your first request.</div>`;
-
-  const pendingArr = [...state.pending];
+  // Pending list
+  const pendingArr = [...state.pending.entries()];
   const pendingHtml = pendingArr.length
-    ? `<div class="section">
-        <div class="section-title">Pending requests (${pendingArr.length})</div>
-        ${pendingArr.map(u => `
-          <div class="conn-row" style="opacity:.7">
-            <div class="conn-av" style="background:var(--surface-3)"></div>
-            <div class="conn-body">
-              <div class="conn-name">@${esc(u)}</div>
-              <div class="conn-handle">Waiting for acceptance…</div>
+    ? `<div class="pending-list">
+        <div class="chat-list-head">
+          <div class="chat-list-title">Pending requests</div>
+          <div class="chat-list-count">${pendingArr.length}</div>
+        </div>
+        ${pendingArr.map(([username, data]) => `
+          <div class="pend-row">
+            <div class="pend-av"><img src="${esc(data.photo)}" alt=""
+              onerror="this.src='${esc(data.fallbackPhoto||'')}'"></div>
+            <div class="pend-body">
+              <div class="pend-name">${esc(data.name)}</div>
+              <div class="pend-handle">@${esc(username)}</div>
             </div>
-            <span style="font-size:14px" class="spin">⏳</span>
+            <div class="pend-status"><span class="spin">⏳</span> Waiting</div>
           </div>`).join('')}
       </div>`
     : '';
+
+  // Chat-style connections
+  const connHtml = state.connections.length
+    ? `<div class="chat-list">
+        <div class="chat-list-head">
+          <div class="chat-list-title">Your connections</div>
+          <div class="chat-list-count">${state.connections.length}</div>
+        </div>
+        ${state.connections.map((c, i) => {
+          const previews = [
+            'Tap to open chat',
+            'Say hi 👋',
+            'Message on Telegram',
+            'Start a conversation'
+          ];
+          const preview = previews[i % previews.length];
+          const isOnline = Math.random() > 0.5;
+          const timeAgo = ['now', '2m', '5m', '12m', '1h'][i % 5];
+          return `
+          <div class="chat-row" data-open="${esc(c.username)}" style="animation-delay:${i*50}ms">
+            <div class="chat-av">
+              <img src="${esc(c.photo)}" alt=""
+                onerror="this.src='${esc(c.fallbackPhoto||'')}'">
+              ${isOnline ? '<span class="chat-online"></span>' : ''}
+            </div>
+            <div class="chat-body">
+              <div class="chat-name-row">
+                <div class="chat-name">${esc(c.name)}</div>
+                <div class="chat-time">${timeAgo}</div>
+              </div>
+              <div class="chat-preview">
+                <span>${esc(preview)}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`
+    : `<div class="chat-list">
+        <div class="chat-list-head">
+          <div class="chat-list-title">Your connections</div>
+          <div class="chat-list-count">0</div>
+        </div>
+        <div class="chat-empty">Nobody yet.<br>Search a username above to send your first request.</div>
+      </div>`;
 
   page.innerHTML = `
     <div class="search-hero">
@@ -640,6 +834,7 @@ function renderFriends(){
           value="${esc(state.query)}" autocomplete="off" autocapitalize="none"
           autocorrect="off" spellcheck="false">
         <button class="search-clear ${state.query?'show':''}" id="search-clear">✕</button>
+        <div class="search-status" id="search-status">typing…</div>
       </div>
       <div class="chips">
         <button class="chip" data-try="durov">⭐ @durov</button>
@@ -649,10 +844,7 @@ function renderFriends(){
     </div>
     ${resultHtml}
     ${pendingHtml}
-    <div class="section">
-      <div class="section-title">Your connections (${state.connections.length})</div>
-      ${connHtml}
-    </div>`;
+    ${connHtml}`;
 
   wireFriends();
 
@@ -666,25 +858,52 @@ function renderFriends(){
 
 function wireFriends(){
   const input = $('#search-input');
-  let t;
-  input?.addEventListener('input', e => {
+  if (!input) return;
+
+  input.addEventListener('input', e => {
     state.query = e.target.value;
     $('#search-clear')?.classList.toggle('show', !!state.query);
-    clearTimeout(t);
-    if (!state.query.trim()){ state.result = null; state.error = null; renderFriends(); return; }
-    t = setTimeout(() => doSearch(state.query), 220);
+    clearTimeout(searchTimer);
+
+    // Show "typing…" indicator while waiting
+    const status = $('#search-status');
+    if (status) status.classList.toggle('show', !!state.query.trim());
+
+    if (!state.query.trim()){
+      state.result = null; state.error = null;
+      renderFriends();
+      return;
+    }
+
+    // Longer debounce (700ms) so user can finish typing without result flashing
+    searchTimer = setTimeout(() => {
+      if (status) status.classList.remove('show');
+      doSearch(state.query);
+    }, 700);
   });
-  input?.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ clearTimeout(t); doSearch(state.query); }
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      clearTimeout(searchTimer);
+      $('#search-status')?.classList.remove('show');
+      doSearch(state.query);
+      input.blur();
+    }
   });
+
   $('#search-clear')?.addEventListener('click', () => {
-    state.query = ''; state.result = null; state.error = null; renderFriends();
+    state.query = ''; state.result = null; state.error = null;
+    renderFriends();
   });
+
   $$('[data-try]').forEach(chip => chip.addEventListener('click', () => {
+    clearTimeout(searchTimer);
     state.query = '@' + chip.dataset.try;
     doSearch(chip.dataset.try);
   }));
+
   $$('[data-open]').forEach(row => row.addEventListener('click', () => openChat(row.dataset.open)));
+
   const sliderEl = $('#lg-slider');
   if (sliderEl) setupLiquidSlider(sliderEl, () => sendRequest(state.result));
 }
@@ -709,7 +928,7 @@ function renderResultCard(u){
     actionHtml = `<div class="lg-slider" id="lg-slider">
       <div class="lg-fill"></div>
       <div class="lg-text">Slide to send request</div>
-      <div class="lg-knob">${I.arrow}</div>
+      <div class="lg-knob"><div class="lg-knob-inner">${I.arrow}</div></div>
     </div>`;
   }
 
@@ -732,9 +951,7 @@ function renderResultCard(u){
     </div>`;
 }
 
-/* ============================================
-   SEND REQUEST
-   ============================================ */
+/* SEND REQUEST */
 function sendRequest(user){
   if (!user) return;
   if (state.connections.some(c => c.username.toLowerCase() === user.username.toLowerCase())){
@@ -742,14 +959,19 @@ function sendRequest(user){
   }
   if (state.pending.has(user.username)){ toast('Request already sent', 'info'); return; }
 
-  state.pending.add(user.username);
+  state.pending.set(user.username, {
+    name: user.name,
+    photo: user.photo,
+    fallbackPhoto: user.fallbackPhoto,
+    requestedAt: Date.now()
+  });
   save();
   haptic('heavy');
   toast(`Request sent to @${user.username}`, 'success');
   renderFriends();
 
-  // Simulate acceptance after a delay (in real app: server push)
-  const delay = 6000 + Math.random() * 6000;
+  // Simulate acceptance
+  const delay = 8000 + Math.random() * 7000;
   setTimeout(() => {
     if (!state.pending.has(user.username)) return;
     state.pending.delete(user.username);
@@ -757,13 +979,14 @@ function sendRequest(user){
       username: user.username,
       name: user.name,
       photo: user.photo,
-      fallbackPhoto: user.fallbackPhoto
+      fallbackPhoto: user.fallbackPhoto,
+      connectedAt: Date.now()
     });
     save();
     haptic('heavy');
     toast(`@${user.username} accepted your request`, 'success');
-    renderFriends();
-    renderProfile();
+    if (state.tab === 'friends') renderFriends();
+    if (state.tab === 'profile') renderProfile();
   }, delay);
 }
 
@@ -776,9 +999,7 @@ function openChat(username){
   window.open('https://t.me/' + clean, '_blank');
 }
 
-/* ============================================
-   LIQUID GLASS SLIDER
-   ============================================ */
+/* LIQUID GLASS SLIDER */
 function setupLiquidSlider(el, onComplete){
   const knob = el.querySelector('.lg-knob');
   const fill = el.querySelector('.lg-fill');
@@ -789,18 +1010,24 @@ function setupLiquidSlider(el, onComplete){
   requestAnimationFrame(measure);
   window.addEventListener('resize', measure);
 
+  function getX(e){
+    if (e.touches && e.touches.length) return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    return e.clientX;
+  }
+
   function onDown(e){
     dragging = true;
-    startX = e.clientX - currentX;
+    startX = getX(e) - currentX;
     knob.style.transition = 'none';
     fill.style.transition = 'none';
     knob.classList.add('dragging');
-    try { el.setPointerCapture(e.pointerId); } catch(_){}
     haptic('light');
   }
   function onMove(e){
     if (!dragging) return;
-    currentX = clamp(e.clientX - startX, 0, maxX);
+    e.preventDefault();
+    currentX = clamp(getX(e) - startX, 0, maxX);
     knob.style.transform = `translateX(${currentX}px)`;
     fill.style.width = (currentX + knob.offsetWidth + 4) + 'px';
     text.style.opacity = String(Math.max(0, 1 - currentX / (maxX * 0.4)));
@@ -809,14 +1036,15 @@ function setupLiquidSlider(el, onComplete){
     if (!dragging) return;
     dragging = false;
     knob.classList.remove('dragging');
-    knob.style.transition = 'transform .45s cubic-bezier(.34,1.56,.64,1)';
-    fill.style.transition = 'width .45s cubic-bezier(.34,1.56,.64,1)';
-    if (currentX >= maxX * 0.82){
+    knob.style.transition = 'transform .5s cubic-bezier(.34,1.56,.64,1)';
+    fill.style.transition = 'width .5s cubic-bezier(.34,1.56,.64,1)';
+    if (currentX >= maxX * 0.8){
       currentX = maxX;
       knob.style.transform = `translateX(${maxX}px)`;
       fill.style.width = '100%';
+      el.classList.add('completed');
       haptic('heavy');
-      setTimeout(() => onComplete && onComplete(), 250);
+      setTimeout(() => onComplete && onComplete(), 280);
     } else {
       currentX = 0;
       knob.style.transform = 'translateX(0)';
@@ -829,100 +1057,51 @@ function setupLiquidSlider(el, onComplete){
   el.addEventListener('pointermove', onMove);
   el.addEventListener('pointerup', onUp);
   el.addEventListener('pointercancel', onUp);
+  el.addEventListener('touchstart', onDown, { passive: true });
+  el.addEventListener('touchmove', onMove, { passive: false });
+  el.addEventListener('touchend', onUp);
 }
 
 /* ============================================
-   NOVA — ISOMETRIC ROOM + DRAGGABLE PET
+   NOVA - 3D rotatable room + GIF pet
    ============================================ */
-let petState = 'idle';
-let petBehaviorTimer = null;
-let dragging = false;
-let petOffset = { x: 0, y: 0 };
+const PET_GIF = 'https://i.postimg.cc/fRqXk2SR/ezgif-21ab08378515e1ba.gif';
+let roomY = 0;
+let rotating = false;
+let rotateStartX = 0, rotateStartY = 0, rotateStartVal = 0;
 
 function renderNova(){
   const n = state.nova;
   const pct = Math.min(100, (n.xp / n.xpMax) * 100);
-  const roomHTML = `
-    <div class="pet-room" id="pet-room">
-      <svg class="room-svg" viewBox="0 0 340 320" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#2a2018"/>
-            <stop offset="100%" stop-color="#141008"/>
-          </linearGradient>
-          <linearGradient id="wallL" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1a1d2a"/>
-            <stop offset="100%" stop-color="#0f1220"/>
-          </linearGradient>
-          <linearGradient id="wallR" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#20232f"/>
-            <stop offset="100%" stop-color="#141720"/>
-          </linearGradient>
-          <radialGradient id="warm" cx="35%" cy="45%" r="55%">
-            <stop offset="0%" stop-color="rgba(255,180,90,.14)"/>
-            <stop offset="100%" stop-color="rgba(255,180,90,0)"/>
-          </radialGradient>
-          <radialGradient id="cool" cx="75%" cy="20%" r="40%">
-            <stop offset="0%" stop-color="rgba(100,150,255,.1)"/>
-            <stop offset="100%" stop-color="rgba(100,150,255,0)"/>
-          </radialGradient>
-        </defs>
-
-        <!-- Back walls -->
-        <polygon points="60,150 170,95 170,15 60,70" fill="url(#wallL)"
-          stroke="rgba(255,255,255,.04)" stroke-width="1"/>
-        <polygon points="280,150 170,95 170,15 280,70" fill="url(#wallR)"
-          stroke="rgba(255,255,255,.04)" stroke-width="1"/>
-
-        <!-- Window on left wall -->
-        <polygon points="85,115 125,95 125,55 85,75" fill="#0a1428"
-          stroke="rgba(120,170,255,.35)" stroke-width="1.5"/>
-        <polygon points="85,115 125,95 125,55 85,75" fill="url(#cool)"/>
-        <circle cx="105" cy="80" r="2" fill="rgba(200,220,255,.6)"/>
-        <circle cx="115" cy="70" r="1.5" fill="rgba(200,220,255,.4)"/>
-
-        <!-- Poster on right wall -->
-        <polygon points="215,95 255,115 255,75 215,55" fill="rgba(244,114,182,.15)"
-          stroke="rgba(244,114,182,.4)" stroke-width="1.2"/>
-        <circle cx="235" cy="85" r="6" fill="rgba(244,114,182,.3)"/>
-
-        <!-- Floor -->
-        <polygon points="170,95 280,150 170,205 60,150" fill="url(#floorG)"
-          stroke="rgba(255,255,255,.06)" stroke-width="1"/>
-
-        <!-- Floor planks -->
-        <line x1="115" y1="122" x2="225" y2="177" stroke="rgba(255,255,255,.02)" stroke-width="1"/>
-        <line x1="115" y1="177" x2="225" y2="122" stroke="rgba(255,255,255,.02)" stroke-width="1"/>
-        <line x1="140" y1="110" x2="140" y2="190" stroke="rgba(255,255,255,.02)" stroke-width=".5"/>
-        <line x1="200" y1="110" x2="200" y2="190" stroke="rgba(255,255,255,.02)" stroke-width=".5"/>
-
-        <!-- Rug on floor (isometric rectangle) -->
-        <polygon points="135,150 175,170 215,150 175,130"
-          fill="rgba(139,92,64,.55)" stroke="rgba(255,255,255,.06)" stroke-width=".8"/>
-        <polygon points="145,152 175,166 205,152 175,138"
-          fill="rgba(160,110,80,.4)"/>
-
-        <!-- Food bowl (right side) -->
-        <ellipse cx="235" cy="170" rx="12" ry="6" fill="#2a2a2a"
-          stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <ellipse cx="235" cy="168" rx="9" ry="3.5" fill="#8b5a2b"/>
-
-        <!-- Ball (left side) -->
-        <circle cx="115" cy="175" r="7" fill="#f472b6" opacity=".8"/>
-        <circle cx="113" cy="173" r="2.5" fill="rgba(255,255,255,.35)"/>
-
-        <!-- Warm ambient light -->
-        <rect x="0" y="0" width="340" height="320" fill="url(#warm)" pointer-events="none"/>
-      </svg>
-
-      <div class="pet" id="pet" style="left:${(n.x/340*100)}%;top:${(n.y/320*100)}%">
-        <div class="pet-body">🦊</div>
+  $('#page-nova').innerHTML = `
+    <div class="room-scene" id="room-scene">
+      <div class="room" id="room">
+        <div class="wall wall-back"></div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="floor"></div>
+        <div class="rug"></div>
+        <div class="window">
+          <div class="window-stars">
+            <div class="window-star" style="top:20%;left:30%"></div>
+            <div class="window-star" style="top:40%;left:70%;animation-delay:.5s"></div>
+            <div class="window-star" style="top:65%;left:25%;animation-delay:1s"></div>
+            <div class="window-star" style="top:75%;left:65%;animation-delay:1.5s"></div>
+          </div>
+        </div>
+        <div class="poster"></div>
+        <div class="bowl">🍖</div>
+        <div class="ball">⚽</div>
+      </div>
+      <div class="pet-wrap" id="pet-wrap" style="--px:${n.x}px;--pz:${n.y}px;--ry:${roomY}deg">
+        <div class="pet-shadow"></div>
+        <img class="pet-img" id="pet-img" src="${PET_GIF}" alt="Nova">
       </div>
     </div>
 
     <div class="nova-info">
       <div class="nova-name">Nova</div>
-      <div class="nova-meta">Level ${n.level} · ${state.connections.length} friends · drag me around</div>
+      <div class="nova-meta">Level ${n.level} · ${state.connections.length} friends</div>
     </div>
 
     <div class="nova-bars">
@@ -939,82 +1118,161 @@ function renderNova(){
       <button data-care="sleep">${I.sleep}<span>Sleep</span></button>
     </div>
 
-    <div class="section" style="margin-top:16px">
-      <div class="section-title">Level progress</div>
+    <div class="chat-list" style="margin-top:16px">
+      <div class="chat-list-head">
+        <div class="chat-list-title">Level progress</div>
+        <div class="chat-list-count">${n.xp}/${n.xpMax}</div>
+      </div>
       <div style="padding:0 18px 16px">
-        <div class="bar-head"><span>Level ${n.level}</span><span>${n.xp}/${n.xpMax}</span></div>
         <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--accent)"></div></div>
       </div>
     </div>`;
 
-  $('#page-nova').innerHTML = roomHTML;
-
   $$('[data-care]').forEach(b => b.addEventListener('click', () => care(b.dataset.care)));
-  initPetDrag();
-  startPetBehavior();
+  initRoomInteraction();
+  updatePetPosition();
 }
 
-function initPetDrag(){
-  const pet = $('#pet');
-  const room = $('#pet-room');
-  if (!pet || !room) return;
+function initRoomInteraction(){
+  const scene = $('#room-scene');
+  const room = $('#room');
+  const pet = $('#pet-wrap');
+  if (!scene || !room || !pet) return;
 
-  function getSvgCoords(clientX, clientY){
-    const rect = room.getBoundingClientRect();
-    const x = ((clientX - rect.left) / rect.width) * 340;
-    const y = ((clientY - rect.top) / rect.height) * 320;
-    return { x, y };
+  let petDragging = false;
+  let petStartX = 0, petStartY = 0;
+  let petStartPX = state.nova.x, petStartPZ = state.nova.y;
+
+  function getPt(e){
+    if (e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if (e.changedTouches && e.changedTouches.length) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
   }
 
-  function clampToFloor(x, y){
-    // Floor diamond: center (170,150), half-width 110, half-height 55
-    // Safe inner region: shrink by 15 to keep pet on floor
-    const cx = 170, cy = 150, hw = 95, hh = 45;
-    // Clamp to diamond: |dx|/hw + |dy|/hh <= 1
-    let dx = x - cx, dy = y - cy;
-    const d = Math.abs(dx)/hw + Math.abs(dy)/hh;
-    if (d > 1){ dx /= d; dy /= d; }
-    return { x: cx + dx, y: cy + dy };
-  }
+  // Room rotation - drag anywhere on scene except pet
+  scene.addEventListener('pointerdown', e => {
+    if (e.target.closest('#pet-wrap')) return;
+    rotating = true;
+    const p = getPt(e);
+    rotateStartX = p.x;
+    rotateStartY = p.y;
+    rotateStartVal = roomY;
+    scene.style.cursor = 'grabbing';
+  });
 
-  function setPetPos(svgX, svgY, animate){
-    if (animate) pet.style.transition = 'left .35s ease, top .35s ease';
-    else pet.style.transition = 'none';
-    pet.style.left = (svgX / 340 * 100) + '%';
-    pet.style.top = (svgY / 320 * 100) + '%';
-    state.nova.x = svgX;
-    state.nova.y = svgY;
-  }
-
+  // Pet drag
   pet.addEventListener('pointerdown', e => {
     e.preventDefault();
-    dragging = true;
+    e.stopPropagation();
+    petDragging = true;
+    const p = getPt(e);
+    petStartX = p.x;
+    petStartY = p.y;
+    petStartPX = state.nova.x;
+    petStartPZ = state.nova.y;
     pet.classList.add('dragging');
-    try { pet.setPointerCapture(e.pointerId); } catch(_){}
-    showHand(e.clientX, e.clientY);
+    showHand(p.x, p.y);
     haptic('medium');
   });
 
   document.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    updateHandPos(e.clientX, e.clientY);
-    const c = getSvgCoords(e.clientX, e.clientY);
-    const clamped = clampToFloor(c.x, c.y);
-    setPetPos(clamped.x, clamped.y, false);
+    const p = getPt(e);
+
+    if (rotating){
+      const dx = p.x - rotateStartX;
+      roomY = clamp(rotateStartVal + dx * 0.45, -50, 50);
+      room.style.transform = `rotateX(-18deg) rotateY(${roomY}deg)`;
+      updatePetPosition();
+    }
+
+    if (petDragging){
+      updateHandPos(p.x, p.y);
+      const dx = p.x - petStartX;
+      const dy = p.y - petStartY;
+      const theta = roomY * Math.PI / 180;
+      // Inverse rotation to convert screen delta to floor coords
+      const dfx = dx * Math.cos(theta) + (dy / 0.45) * Math.sin(theta);
+      const dfz = -dx * Math.sin(theta) + (dy / 0.45) * Math.cos(theta);
+      state.nova.x = clamp(petStartPX + dfx, -100, 100);
+      state.nova.y = clamp(petStartPZ + dfz, -100, 100);
+      pet.style.setProperty('--px', state.nova.x + 'px');
+      pet.style.setProperty('--pz', state.nova.y + 'px');
+    }
+  }, { passive: false });
+
+  document.addEventListener('pointerup', () => {
+    if (rotating){
+      rotating = false;
+      scene.style.cursor = '';
+    }
+    if (petDragging){
+      petDragging = false;
+      pet.classList.remove('dragging');
+      hideHand();
+      save();
+      haptic('light');
+    }
   });
 
-  document.addEventListener('pointerup', e => {
-    if (!dragging) return;
-    dragging = false;
-    pet.classList.remove('dragging');
-    try { pet.releasePointerCapture(e.pointerId); } catch(_){}
-    hideHand();
-    save();
-    haptic('light');
+  // Touch fallback
+  scene.addEventListener('touchstart', e => {
+    if (e.target.closest('#pet-wrap')) return;
+    rotating = true;
+    const p = getPt(e);
+    rotateStartX = p.x;
+    rotateStartY = p.y;
+    rotateStartVal = roomY;
+  }, { passive: true });
+  pet.addEventListener('touchstart', e => {
+    e.preventDefault();
+    petDragging = true;
+    const p = getPt(e);
+    petStartX = p.x;
+    petStartY = p.y;
+    petStartPX = state.nova.x;
+    petStartPZ = state.nova.y;
+    pet.classList.add('dragging');
+    showHand(p.x, p.y);
+    haptic('medium');
+  }, { passive: false });
+  document.addEventListener('touchmove', e => {
+    const p = getPt(e);
+    if (rotating){
+      e.preventDefault();
+      const dx = p.x - rotateStartX;
+      roomY = clamp(rotateStartVal + dx * 0.45, -50, 50);
+      room.style.transform = `rotateX(-18deg) rotateY(${roomY}deg)`;
+      updatePetPosition();
+    }
+    if (petDragging){
+      e.preventDefault();
+      updateHandPos(p.x, p.y);
+      const dx = p.x - petStartX;
+      const dy = p.y - petStartY;
+      const theta = roomY * Math.PI / 180;
+      const dfx = dx * Math.cos(theta) + (dy / 0.45) * Math.sin(theta);
+      const dfz = -dx * Math.sin(theta) + (dy / 0.45) * Math.cos(theta);
+      state.nova.x = clamp(petStartPX + dfx, -100, 100);
+      state.nova.y = clamp(petStartPZ + dfz, -100, 100);
+      pet.style.setProperty('--px', state.nova.x + 'px');
+      pet.style.setProperty('--pz', state.nova.y + 'px');
+    }
+  }, { passive: false });
+  document.addEventListener('touchend', () => {
+    if (rotating){ rotating = false; }
+    if (petDragging){
+      petDragging = false;
+      pet.classList.remove('dragging');
+      hideHand();
+      save();
+    }
   });
+}
 
-  // Persist saved position
-  setPetPos(state.nova.x || 170, state.nova.y || 160, false);
+function updatePetPosition(){
+  const pet = $('#pet-wrap');
+  if (!pet) return;
+  pet.style.setProperty('--ry', roomY + 'deg');
 }
 
 function showHand(x, y){
@@ -1033,46 +1291,7 @@ function hideHand(){
   $('#hand-cursor').classList.remove('active');
 }
 
-/* ============================================
-   PET HABITS (autonomous behavior)
-   ============================================ */
-function startPetBehavior(){
-  clearTimeout(petBehaviorTimer);
-  const states = ['idle','idle','idle','sleeping','playing','walking'];
-  function next(){
-    if (dragging) { petBehaviorTimer = setTimeout(next, 2000); return; }
-    const s = states[Math.floor(Math.random() * states.length)];
-    const pet = $('#pet');
-    if (!pet){ petBehaviorTimer = setTimeout(next, 3000); return; }
-    pet.classList.remove('sleeping','playing','walking');
-    if (s !== 'idle') pet.classList.add(s);
-
-    if (s === 'walking'){
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 25 + Math.random() * 40;
-      let nx = 170 + Math.cos(angle) * dist;
-      let ny = 150 + Math.sin(angle) * dist * 0.5;
-      // Clamp to floor
-      const hw = 95, hh = 45;
-      let dx = nx - 170, dy = ny - 150;
-      const d = Math.abs(dx)/hw + Math.abs(dy)/hh;
-      if (d > 1){ dx /= d; dy /= d; }
-      nx = 170 + dx; ny = 150 + dy;
-      state.nova.x = nx; state.nova.y = ny;
-      pet.style.transition = 'left 2s ease-in-out, top 2s ease-in-out';
-      pet.style.left = (nx/340*100) + '%';
-      pet.style.top = (ny/320*100) + '%';
-      setTimeout(() => { pet.style.transition = ''; }, 2100);
-    }
-
-    petBehaviorTimer = setTimeout(next, 3500 + Math.random() * 4000);
-  }
-  next();
-}
-
-/* ============================================
-   NOVA ACTIONS
-   ============================================ */
+/* NOVA actions */
 function care(kind){
   const n = state.nova;
   if (kind==='feed'){ n.food=clamp(n.food+18,0,100); n.energy=clamp(n.energy-5,0,100); n.xp+=15; }
@@ -1084,14 +1303,14 @@ function care(kind){
   save(); renderNova();
 }
 
-/* ============================================
-   PULSE
-   ============================================ */
+/* PULSE */
 function renderPulse(){
   $('#page-pulse').innerHTML = `
-    <div class="section">
-      <div class="section-title">Anonymous messages</div>
-      <div style="padding:0 18px 16px">
+    <div class="chat-list">
+      <div class="chat-list-head">
+        <div class="chat-list-title">Anonymous messages</div>
+      </div>
+      <div style="padding:0 16px 16px">
         <div class="anon-card">
           <div class="anon-text" id="anon1"></div>
           <button class="reveal-btn" data-reveal="50">Reveal author · 50 💎</button>
@@ -1104,8 +1323,8 @@ function renderPulse(){
     </div>`;
   const m1 = "You're building something cool. Keep going.";
   const m2 = "Bro it's 3am, close the laptop and sleep.";
-  setTimeout(() => typeText($('#anon1'), m1, 35), 150);
-  setTimeout(() => typeText($('#anon2'), m2, 35), 1500);
+  setTimeout(() => typeText($('#anon1'), m1, 35), 200);
+  setTimeout(() => typeText($('#anon2'), m2, 35), 1700);
 
   $$('[data-reveal]').forEach(b => b.addEventListener('click', () => {
     const cost = +b.dataset.reveal;
@@ -1116,9 +1335,7 @@ function renderPulse(){
   }));
 }
 
-/* ============================================
-   PROFILE
-   ============================================ */
+/* PROFILE */
 function renderProfile(){
   const u = getUserInfo();
   const handle = u.username ? '@'+u.username : 'no username';
@@ -1141,13 +1358,11 @@ function renderProfile(){
         <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
       </div>
     </div>
-    <div style="padding:20px;text-align:center;font-size:11px;color:var(--text-3)">Orbit · v1.1</div>`;
+    <div style="padding:20px;text-align:center;font-size:11px;color:var(--text-3)">Orbit · v1.2</div>`;
   $('#notif')?.addEventListener('change', e => { state.notifications = e.target.checked; save(); });
 }
 
-/* ============================================
-   INIT
-   ============================================ */
+/* INIT */
 function init(){
   load();
   renderHeader();
