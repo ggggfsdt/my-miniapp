@@ -1,2265 +1,1285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Forge — Telegram NFT Crafting</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#07090d">
+<title>Orbit · Your circle, in sync</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 :root{
-  --bg:#080a0e;--panel:#141a23;--line:#222b37;
-  --txt:#e9eff8;--dim:#8794a6;--dim2:#5d6a7c;
-  --accent:#3d8bfd;--accent2:#6ee7ff;--danger:#ff6b6b;
+  --bg:#07090d;--bg-2:#0d1117;
+  --surface:rgba(255,255,255,.045);--surface-2:rgba(255,255,255,.08);--surface-3:rgba(255,255,255,.12);
+  --border:rgba(255,255,255,.07);--border-2:rgba(255,255,255,.12);
+  --accent:#5b9dff;--accent-2:#8ecae6;--accent-glow:rgba(91,157,255,.45);
+  --green:#4ade80;--red:#f87171;--gold:#fbbf24;--purple:#a78bfa;--pink:#f472b6;
+  --text:#fff;--text-2:rgba(255,255,255,.62);--text-3:rgba(255,255,255,.35);
+  --r-sm:12px;--r-md:16px;--r-lg:22px;--r-xl:28px;
+  --ease:cubic-bezier(.34,1.56,.64,1);--ease-out:cubic-bezier(.22,1,.36,1);
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{
-  background:
-    radial-gradient(1000px 700px at 50% -10%, #1c2636 0%, transparent 62%),
-    radial-gradient(800px 600px at 100% 110%, #16202e 0%, transparent 55%),
-    var(--bg);
-  color:var(--txt);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;overflow:hidden;user-select:none;
-}
-.app{
-  height:100vh;height:100dvh;max-width:520px;margin:0 auto;
-  display:flex;flex-direction:column;position:relative;
-  background:linear-gradient(180deg,rgba(12,16,22,.5),rgba(8,11,16,.94));
-  border-left:1px solid rgba(255,255,255,.04);
-  border-right:1px solid rgba(255,255,255,.04);
-}
+html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;touch-action:manipulation}
+.em{display:inline-block;object-fit:contain;vertical-align:-.15em;pointer-events:none}
 
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.8px)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.055)}}
-@keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
-@keyframes flap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.82)}}
-@keyframes flicker{0%,100%{opacity:.7}50%{opacity:1}}
-@keyframes sparkle{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1) rotate(180deg)}}
-@keyframes glow{0%,100%{opacity:.5}50%{opacity:1}}
-@keyframes orbit{to{transform:rotate(360deg)}}
-@keyframes ripple{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.55;transform:scale(1.08)}}
+/* ============ LOADER ============ */
+#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;
+  background:radial-gradient(ellipse at center,#0d1117 0%,#050608 100%);transition:opacity .6s,visibility .6s}
+#loader.out{opacity:0;visibility:hidden;pointer-events:none}
+#loader-grid{width:230px;height:230px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:8px;position:relative}
+.l-sq{background:rgba(255,255,255,.05);border-radius:16px;display:flex;align-items:center;justify-content:center;
+  transform:scale(0) rotate(-8deg);opacity:0;transition:all .6s var(--ease);border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.l-sq.in{transform:scale(1) rotate(0deg);opacity:1}
+.l-sq.merge{transform:scale(.35) translate(0,0);opacity:0}
+#loader-logo{font-size:36px;font-weight:800;letter-spacing:-1.5px;opacity:0;transform:scale(.5);
+  background:linear-gradient(135deg,#5b9dff 0%,#8ecae6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  transition:all .7s var(--ease);text-shadow:0 0 40px rgba(91,157,255,.3)}
+#loader-logo.in{opacity:1;transform:scale(1)}
+#loader-tag{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);
+  opacity:0;transition:opacity .5s .3s}
+#loader-tag.in{opacity:1}
 
-.nft-float{animation:float 3.6s ease-in-out infinite}
-.nft-pulse{animation:pulse 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.nft-sway{animation:sway 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
-.nft-flap{animation:flap 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.nft-flicker{animation:flicker 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.nft-sparkle{animation:sparkle 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.nft-glow{animation:glow 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.nft-orbit{animation:orbit 12s linear infinite;transform-box:fill-box;transform-origin:center}
-.nft-ripple{animation:ripple 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+/* ============ APP ============ */
+#app{position:relative;width:100%;max-width:480px;height:100dvh;margin:0 auto;overflow:hidden;
+  background:radial-gradient(ellipse at 30% -10%,rgba(91,157,255,.08),transparent 60%),
+             radial-gradient(ellipse at 80% 110%,rgba(167,139,250,.06),transparent 60%),var(--bg)}
 
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;flex:0 0 auto;gap:8px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand-mark{
-  width:34px;height:34px;border-radius:11px;
-  background:linear-gradient(145deg,#3a4453,#1c232d);
-  display:grid;place-items:center;
-  box-shadow:0 4px 14px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.08);
-}
-.brand-mark svg{width:19px;height:19px;color:#c8d4e4}
-.brand-title{font-size:15px;font-weight:700;letter-spacing:.2px}
-.brand-sub{font-size:11px;color:var(--dim2);margin-top:1px;letter-spacing:.4px;text-transform:uppercase}
-.coins{
-  display:flex;align-items:center;gap:5px;
-  font-size:12.5px;font-weight:800;color:#ffcf5c;
-  background:rgba(255,207,92,.10);
-  border:1px solid rgba(255,207,92,.28);
-  padding:6px 10px;border-radius:9px;
-  font-variant-numeric:tabular-nums;
-}
-.coins svg{width:12px;height:12px;color:#ffcf5c}
+/* ============ HEADER ============ */
+#header{position:absolute;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-t) + 8px) 14px 8px;z-index:100;
+  background:linear-gradient(180deg,rgba(7,9,13,.95),rgba(7,9,13,.4) 70%,transparent);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.h-left{display:flex;align-items:center;gap:10px;min-width:0}
+.h-av{position:relative;width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--surface-2)}
+.h-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.h-av .dot{position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;background:var(--green);
+  border:2px solid var(--bg);box-shadow:0 0 10px rgba(74,222,128,.7);animation:pulseDot 2s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.75}}
+.h-info{display:flex;flex-direction:column;gap:1px;min-width:0}
+.h-name{font-size:13.5px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.h-sub{font-size:10.5px;font-weight:600;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.h-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px}
+.h-brand span{font-size:15px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#fff;text-shadow:0 0 20px rgba(91,157,255,.4)}
+.h-right{display:flex;align-items:center;gap:8px}
+.h-pill{display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:99px;
+  background:var(--surface-2);border:1px solid var(--border);font-size:12.5px;font-weight:800;cursor:pointer;
+  transition:transform .15s var(--ease)}
+.h-pill:active{transform:scale(.94)}
+.h-pill .val{color:var(--gold)}
 
-main{flex:1 1 auto;position:relative;overflow:hidden}
-.view{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;transform:translateX(30px);
-  transition:opacity .28s ease, transform .36s cubic-bezier(.22,.9,.3,1);
-  overflow-y:auto;overscroll-behavior:contain;
-}
-.view.active{opacity:1;pointer-events:auto;transform:translateX(0)}
-.view.exit-left{transform:translateX(-30px)}
-.view::-webkit-scrollbar{width:0}
+/* ============ MAIN ============ */
+#main{position:absolute;inset:0;padding-top:calc(var(--safe-t) + 60px);padding-bottom:calc(var(--safe-b) + 82px);overflow:hidden}
+.tab-page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:6px 14px 20px;opacity:0;visibility:hidden;transform:translateX(24px);
+  transition:opacity .3s,transform .4s var(--ease),visibility .3s}
+.tab-page::-webkit-scrollbar{width:0;display:none}
+.tab-page.active{opacity:1;visibility:visible;transform:translateX(0)}
+.tab-page.exit{opacity:0;transform:translateX(-24px)}
 
-.stage{
-  position:relative;height:298px;flex:0 0 auto;
-  display:grid;place-items:center;
-  perspective:1050px;perspective-origin:50% 46%;
-}
-.stage.vib{animation:microVib .2s ease-out}
-@keyframes microVib{
-  0%,100%{transform:translate(0,0) rotate(0)}
-  25%{transform:translate(-2px,.7px) rotate(-.15deg)}
-  50%{transform:translate(2px,-.7px) rotate(.15deg)}
-  75%{transform:translate(-1px,-.4px) rotate(-.08deg)}
-}
-.stage::before{
-  content:'';position:absolute;width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle,rgba(120,140,170,.09),rgba(120,140,170,0) 66%);
-  filter:blur(10px);pointer-events:none;
-}
-.floor{
-  position:absolute;bottom:24px;width:200px;height:28px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(120,140,175,.16),rgba(0,0,0,0) 70%);
-  filter:blur(5px);
-}
-.cube-pos{transform-style:preserve-3d;will-change:transform}
-.cube{
-  position:relative;width:150px;height:150px;
-  transform-style:preserve-3d;will-change:transform;
-}
+/* ============ TABS ============ */
+#tabs{position:absolute;bottom:0;left:0;right:0;padding:8px 10px calc(var(--safe-b) + 8px);z-index:100}
+#tabs-inner{display:flex;align-items:center;background:rgba(20,24,32,.85);
+  border:1px solid var(--border);border-radius:22px;padding:6px;height:58px;position:relative;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+#tab-indicator{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px) / 5);
+  background:linear-gradient(180deg,rgba(91,157,255,.22),rgba(91,157,255,.1));
+  border:1px solid rgba(91,157,255,.35);border-radius:16px;
+  transition:transform .42s var(--ease);z-index:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 4px 20px rgba(91,157,255,.2)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:none;border:none;color:var(--text-3);padding:6px 4px;cursor:pointer;position:relative;z-index:2;
+  font-family:inherit;transition:color .25s;height:100%}
+.tab-btn.active{color:#fff}
+.tab-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .3s var(--ease)}
+.tab-btn.active svg{transform:translateY(-1px) scale(1.08)}
+.tab-btn .lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
 
-.face{
-  position:absolute;inset:0;width:150px;height:150px;border-radius:15px;
-  background:#3e434b;border:1px solid rgba(0,0,0,.6);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.04),
-    inset 0 -28px 40px rgba(0,0,0,.32),
-    inset 0 28px 40px rgba(255,255,255,.03);
-  display:grid;place-items:center;overflow:hidden;
-  transition:box-shadow .3s ease, border-color .3s ease;
-}
-.face[data-f="front"] {transform:translateZ(75px)}
-.face[data-f="back"]  {transform:rotateY(180deg) translateZ(75px)}
-.face[data-f="right"] {transform:rotateY(90deg)  translateZ(75px)}
-.face[data-f="left"]  {transform:rotateY(-90deg) translateZ(75px)}
-.face[data-f="top"]   {transform:rotateX(90deg)  translateZ(75px)}
-.face[data-f="bottom"]{transform:rotateX(-90deg) translateZ(75px)}
+/* ============ COMMON ============ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;margin-bottom:12px;
+  animation:fadeUp .5s var(--ease) both;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.1s}
+.card:nth-child(3){animation-delay:.15s}.card:nth-child(4){animation-delay:.2s}
+.card:nth-child(5){animation-delay:.25s}.card:nth-child(6){animation-delay:.3s}
+.title{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.1),transparent)}
+.hint{font-size:11.5px;color:var(--text-3);line-height:1.5}
 
-.face-icon{position:absolute;width:42px;height:42px;color:rgba(20,24,30,.42);transition:opacity .25s}
-.face-icon svg{width:100%;height:100%}
-.face.has-nft .face-icon{opacity:0}
-.face .attached{
-  position:absolute;inset:0;display:grid;place-items:center;
-  opacity:0;transform:scale(.35);
-}
-.face.has-nft .attached{
-  opacity:1;transform:scale(1);
-  transition:opacity .26s ease, transform .52s cubic-bezier(.18,1.7,.4,1);
-}
-.face.has-nft{
-  border-color:rgba(150,220,255,.72);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.15),
-    inset 0 0 46px rgba(120,200,255,.28),
-    0 0 26px rgba(110,190,255,.32);
-}
-.face .attached svg{width:76%;height:76%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
-.face.result{
-  border-color:rgba(255,214,110,.95);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.2),
-    inset 0 0 60px rgba(255,196,72,.42),
-    0 0 40px rgba(255,196,72,.5);
-}
-.face.result .attached{animation:revealPop .82s cubic-bezier(.2,1.5,.35,1) both}
-@keyframes revealPop{
-  0%{opacity:0;transform:scale(.12) rotate(-32deg)}
-  62%{opacity:1;transform:scale(1.14) rotate(5deg)}
-  100%{opacity:1;transform:scale(1) rotate(0)}
-}
-.face.burn{
-  border-color:rgba(255,90,90,.85)!important;
-  box-shadow:inset 0 0 54px rgba(255,60,60,.55),0 0 30px rgba(255,60,60,.45)!important;
-  animation:burnFlicker .48s ease-in-out 3;
-}
-@keyframes burnFlicker{0%,100%{opacity:1}50%{opacity:.3}}
-.face.burn .attached{opacity:.22!important;filter:grayscale(1) brightness(.5)}
+.btn{border:0;border-radius:var(--r-md);padding:12px 16px;font-size:14px;font-weight:800;font-family:inherit;
+  cursor:pointer;transition:transform .15s var(--ease),background .2s,box-shadow .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:linear-gradient(135deg,#5b9dff,#4a86e8);color:#fff;
+  box-shadow:0 6px 20px rgba(91,157,255,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn.ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border-2)}
+.btn.gold{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1000;
+  box-shadow:0 6px 20px rgba(251,191,36,.35),inset 0 1px 0 rgba(255,255,255,.3)}
+.btn.full{width:100%}
+.btn.sm{padding:8px 12px;font-size:12px;border-radius:10px}
 
-.status{
-  position:absolute;bottom:0;left:0;right:0;text-align:center;
-  font-size:12.5px;font-weight:600;color:var(--dim);
-  letter-spacing:.5px;transition:color .3s ease;
-}
-.status.live{color:var(--accent2)}
-.status.bad{color:var(--danger)}
+.seg{display:flex;background:var(--surface-2);border-radius:14px;padding:4px;margin-bottom:12px;border:1px solid var(--border)}
+.seg button{flex:1;background:transparent;border:0;color:var(--text-3);font-family:inherit;font-size:12.5px;
+  font-weight:800;padding:8px 4px;border-radius:10px;cursor:pointer;transition:all .25s var(--ease)}
+.seg button.on{background:rgba(91,157,255,.18);color:var(--accent);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 2px 8px rgba(91,157,255,.15)}
 
-.panel{flex:0 0 auto;padding:0 14px 10px}
-.slots{display:flex;gap:6px;margin-bottom:8px}
-.slot{
-  flex:1;aspect-ratio:1;border-radius:12px;
-  border:1.5px dashed rgba(130,150,180,.24);
-  background:rgba(255,255,255,.014);
-  display:grid;place-items:center;position:relative;overflow:hidden;
-  transition:border-color .25s ease, background .25s ease;
-}
-.slot.filled{border-style:solid;border-color:rgba(130,180,240,.55);background:rgba(60,90,140,.12)}
-.slot .ph{width:15px;height:15px;color:rgba(130,160,200,.22)}
-.slot .ph svg{width:100%;height:100%}
-.slot .sl-bg{position:absolute;inset:0;opacity:.92}
-.slot .sl-bg svg{width:100%;height:100%;display:block}
-.slot .sl-md{position:absolute;inset:0;display:grid;place-items:center}
-.slot .sl-md svg{width:78%;height:78%;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
-.slot .sl-bgname{
-  position:absolute;bottom:2px;left:2px;right:2px;
-  font-size:6px;font-weight:800;letter-spacing:.2px;
-  text-align:center;color:#e2ecf8;
-  padding:1px 0;border-radius:4px;
-  background:rgba(0,0,0,.6);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2;
-}
-.slot .sl-x{
-  position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;
-  background:rgba(10,14,20,.88);border:1px solid rgba(255,255,255,.14);
-  display:grid;place-items:center;z-index:3;
-}
-.slot .sl-x svg{width:6px;height:6px;color:#b9c6d8}
+/* ============ CIRCLE (Friends) ============ */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  border:1px solid var(--border);border-radius:14px;padding:11px 6px;text-align:center;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(91,157,255,.4),transparent)}
+.stat .v{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1}
+.stat .v.accent{color:var(--accent)}.stat .v.green{color:var(--green)}
+.stat .l{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);margin-top:4px}
 
-.odds{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;min-height:16px}
-.odds .od{
-  display:flex;align-items:center;gap:5px;
-  font-size:10px;font-weight:600;color:var(--dim);
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.06);
-  padding:2px 7px;border-radius:20px;
-}
-.odds .dot{width:6px;height:6px;border-radius:50%}
-.odds .od b{color:var(--txt);font-weight:700}
+.search{position:relative;margin-bottom:10px}
+.search input{width:100%;padding:11px 14px 11px 38px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border .2s}
+.search input:focus{border-color:rgba(91,157,255,.5)}
+.search input::placeholder{color:var(--text-3)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;
+  stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round}
 
-.riskline{
-  display:flex;align-items:center;gap:6px;
-  font-size:10.5px;font-weight:600;color:var(--dim2);
-  margin-bottom:9px;min-height:15px;letter-spacing:.2px;
-}
-.riskline.warn{color:#cf8f8f}
-.riskline b{color:var(--danger);font-weight:800}
-.riskline .rdot{width:7px;height:7px;border-radius:50%;background:var(--danger);box-shadow:0 0 8px rgba(255,90,90,.7)}
-.riskline.safe{color:#6a8a6a}
-.riskline.safe b{color:#7ee88c}
-.riskline .sdot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px rgba(80,220,130,.7)}
+.actions{display:flex;gap:8px;margin-bottom:12px}
+.actions .btn{flex:1;padding:10px 12px;font-size:12.5px}
+.actions .icon-btn{flex:0 0 44px;padding:10px}
 
-.craft-btn{
-  width:100%;height:50px;border:none;border-radius:15px;
-  font-size:14.5px;font-weight:800;letter-spacing:.5px;
-  color:#fff;cursor:pointer;
-  background:linear-gradient(135deg,#4b5563,#2a303a);
-  box-shadow:0 8px 22px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.14);
-  transition:transform .12s ease, opacity .2s ease, box-shadow .2s ease, background .25s;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-}
-.craft-btn svg{width:18px;height:18px}
-.craft-btn:active{transform:scale(.975)}
-.craft-btn:disabled{background:linear-gradient(135deg,#222b38,#181f29);color:#57657a;box-shadow:none;cursor:default}
-.craft-btn.ready{
-  background:linear-gradient(135deg,#3d8bfd,#2a5fd0);
-  box-shadow:0 8px 24px rgba(45,110,220,.38), inset 0 1px 0 rgba(255,255,255,.22);
-}
+.friend-list{display:flex;flex-direction:column;gap:2px}
+.friend{display:flex;align-items:center;gap:11px;padding:10px 8px;border-radius:14px;
+  transition:background .15s;position:relative;animation:fadeUp .4s var(--ease) both}
+.friend:active{background:var(--surface)}
+.friend+.friend::before{content:'';position:absolute;top:0;left:57px;right:8px;height:1px;background:rgba(255,255,255,.04)}
+.f-av{position:relative;width:44px;height:44px;flex-shrink:0}
+.f-av img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--surface-2);display:block}
+.f-av .on{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;
+  background:var(--green);border:2px solid var(--bg);box-shadow:0 0 8px var(--green)}
+.f-av .off{background:var(--text-3);box-shadow:none}
+.f-info{flex:1;min-width:0}
+.f-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
+.f-handle{font-size:11.5px;color:var(--text-3);font-weight:500;margin-left:4px}
+.f-prev{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.f-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.f-count{font-size:10.5px;font-weight:700;color:var(--text-3)}
+.f-add{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:99px;
+  padding:6px 11px;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;
+  transition:all .18s var(--ease);white-space:nowrap}
+.f-add:active{transform:scale(.94);background:rgba(91,157,255,.15)}
+.f-added{color:var(--green);font-size:11.5px;font-weight:800;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.f-time{font-size:10px;color:var(--text-3);font-weight:600}
 
-.upg-wrap{padding:14px 16px 22px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.wheel-wrap{position:relative;width:230px;height:230px;display:grid;place-items:center}
-.wheel-svg{width:100%;height:100%;filter:drop-shadow(0 12px 32px rgba(0,0,0,.6))}
-#wheelRotate{
-  transition:transform 4.4s cubic-bezier(.15,.7,.2,1);
-  transform-origin:100px 100px;transform:rotate(0deg);
-}
-.wlabel{font-size:8.5px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none;letter-spacing:.3px;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:1.2px}
-.wheel-pointer{
-  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
-  width:0;height:0;
-  border-left:11px solid transparent;border-right:11px solid transparent;
-  border-top:18px solid #ffcf5c;
-  filter:drop-shadow(0 0 8px rgba(255,207,92,.9));z-index:10;
-}
-.wheel-hub{
-  position:absolute;width:44px;height:44px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#4a525e,#1a202a);
-  border:2px solid #2a3038;
-  box-shadow:0 0 0 5px #10151c, 0 6px 16px rgba(0,0,0,.7);
-  z-index:5;display:grid;place-items:center;
-}
-.wheel-hub svg{width:20px;height:20px;color:#c8d4e4}
+/* ============ NOVA (Pet) ============ */
+.nova-card{background:radial-gradient(ellipse at 50% 0%,rgba(91,157,255,.18),rgba(13,17,23,.95) 70%),
+  var(--surface);border:1px solid var(--border-2);border-radius:var(--r-xl);padding:20px 16px;text-align:center;
+  position:relative;overflow:hidden;margin-bottom:12px}
+.nova-card::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 20%,rgba(167,139,250,.08),transparent 50%),
+             radial-gradient(circle at 70% 80%,rgba(91,157,255,.08),transparent 50%);pointer-events:none}
+.nova-em{position:relative;display:inline-block;margin-bottom:8px;animation:novaBob 3s ease-in-out infinite}
+@keyframes novaBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.nova-em::before{content:'';position:absolute;inset:-20px;border-radius:50%;
+  background:radial-gradient(circle,rgba(91,157,255,.3),transparent 70%);filter:blur(15px);z-index:-1;
+  animation:novaGlow 3s ease-in-out infinite}
+@keyframes novaGlow{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
+.nova-name{font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:2px;position:relative;z-index:1}
+.nova-lvl{font-size:11.5px;color:var(--text-3);font-weight:700;letter-spacing:.5px;margin-bottom:16px;position:relative;z-index:1}
+.nova-bars{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;position:relative;z-index:1}
+.nbar{text-align:left}
+.nbar-head{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px}
+.nbar-head .v{color:var(--text);font-variant-numeric:tabular-nums}
+.nbar-track{height:8px;background:rgba(0,0,0,.4);border-radius:99px;overflow:hidden;position:relative;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.nbar-fill{height:100%;border-radius:99px;transition:width .7s var(--ease);position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.nbar-fill::after{content:'';position:absolute;inset:0;border-radius:99px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  animation:nbarShine 2s linear infinite;background-size:200% 100%}
+@keyframes nbarShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.nova-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative;z-index:1}
+.nova-actions .btn{padding:11px 4px;font-size:12px;flex-direction:column;gap:4px;min-height:64px}
 
-.upg-info{
-  font-size:11.5px;color:var(--dim);text-align:center;
-  max-width:280px;line-height:1.5;font-weight:600;
-}
-.upg-info b{color:var(--accent2)}
+.care-log{display:flex;flex-direction:column}
+.care-item{display:flex;align-items:center;gap:10px;padding:8px 4px}
+.care-item+.care-item{border-top:1px solid rgba(255,255,255,.05)}
+.care-item .av{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:var(--surface-2);
+  overflow:hidden;display:flex;align-items:center;justify-content:center}
+.care-item .av img{width:100%;height:100%;object-fit:cover}
+.care-info{flex:1;min-width:0}
+.care-name{font-size:12.5px;font-weight:700}
+.care-text{font-size:11px;color:var(--text-3);margin-top:1px}
 
-.spin-btn{
-  width:100%;max-width:300px;height:50px;border:none;border-radius:15px;
-  font-size:14.5px;font-weight:800;letter-spacing:.5px;
-  color:#fff;cursor:pointer;
-  background:linear-gradient(135deg,#8b5cf6,#6d28d9);
-  box-shadow:0 8px 24px rgba(120,60,220,.4), inset 0 1px 0 rgba(255,255,255,.22);
-  transition:transform .12s ease, opacity .2s ease;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.spin-btn:active{transform:scale(.975)}
-.spin-btn:disabled{background:linear-gradient(135deg,#222b38,#181f29);color:#57657a;box-shadow:none;cursor:default}
-.spin-btn svg{width:18px;height:18px}
+/* ============ SHOTS (Photos) ============ */
+.challenge{background:linear-gradient(135deg,rgba(91,157,255,.15),rgba(167,139,250,.1));
+  border:1px solid rgba(91,157,255,.3);border-radius:var(--r-lg);padding:16px;margin-bottom:12px;
+  position:relative;overflow:hidden;animation:fadeUp .5s var(--ease) both}
+.challenge::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(91,157,255,.3),transparent 70%);filter:blur(30px);pointer-events:none}
+.challenge-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);
+  background:rgba(91,157,255,.15);border:1px solid rgba(91,157,255,.3);padding:4px 10px;border-radius:99px;margin-bottom:10px}
+.challenge-title{font-size:19px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;position:relative;z-index:1}
+.challenge-sub{font-size:12px;color:var(--text-2);margin-bottom:14px;position:relative;z-index:1}
 
-.upg-slot{
-  width:100%;max-width:300px;height:100px;border-radius:16px;
-  border:1.5px dashed rgba(130,150,180,.28);
-  background:rgba(255,255,255,.02);
-  display:grid;place-items:center;position:relative;overflow:hidden;
-}
-.upg-slot.filled{border-style:solid;border-color:rgba(160,140,250,.6);background:rgba(80,60,160,.12)}
-.upg-slot .u-bg{position:absolute;inset:0;opacity:.85}
-.upg-slot .u-bg svg{width:100%;height:100%;display:block}
-.upg-slot .u-md{position:absolute;left:0;top:0;bottom:0;width:100px;display:grid;place-items:center}
-.upg-slot .u-md svg{width:80%;height:80%;filter:drop-shadow(0 4px 10px rgba(0,0,0,.55))}
-.upg-slot .u-info{position:absolute;left:104px;right:12px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center}
-.upg-slot .u-nm{font-size:13px;font-weight:800;color:#eef4fb}
-.upg-slot .u-tier{font-size:10px;font-weight:800;letter-spacing:.7px;margin-top:3px}
-.upg-slot .u-bgnm{font-size:10px;color:var(--dim);margin-top:2px;font-weight:600}
-.upg-slot .ph-txt{font-size:12px;font-weight:700;color:var(--dim2);letter-spacing:.3px}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.photo-tile{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:space-between;padding:8px;
+  transition:transform .15s var(--ease);animation:photoIn .5s var(--ease) both}
+.photo-tile:active{transform:scale(.94)}
+@keyframes photoIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.photo-tile .emwrap{flex:1;display:grid;place-items:center}
+.photo-tile .by{font-size:9.5px;font-weight:800;text-align:right;text-shadow:0 1px 4px rgba(0,0,0,.7);color:#fff;position:relative;z-index:1}
+.photo-tile .votes{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border-radius:99px;
+  padding:2px 7px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:3px;
+  backdrop-filter:blur(8px)}
+.photo-tile.voted .votes{background:rgba(244,114,182,.4)}
+.photo-tile .cam{position:absolute;top:6px;left:6px;font-size:14px;opacity:.85}
 
-.picker-title{
-  font-size:11.5px;font-weight:800;letter-spacing:.6px;color:var(--dim);
-  text-transform:uppercase;margin-top:6px;align-self:flex-start;padding-left:2px;
-}
+.frames-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.frames-scroll::-webkit-scrollbar{display:none}
+.frame-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:none;border:0;color:var(--text-3);font-family:inherit;font-size:10.5px;font-weight:700;cursor:pointer;
+  transition:color .2s}
+.frame-btn.on{color:var(--accent)}
+.frame-circle{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#5b9dff,#4a86e8);
+  display:grid;place-items:center;font-size:18px;font-weight:800;color:#fff;
+  position:relative;transition:box-shadow .25s,transform .15s var(--ease)}
+.frame-btn:active .frame-circle{transform:scale(.92)}
+.frame-btn.on .frame-circle{box-shadow:0 0 0 2.5px #07090d,0 0 0 4.5px var(--accent),0 0 20px rgba(91,157,255,.5)}
+.frame-circle .badge{position:absolute;bottom:-3px;right:-3px;font-size:14px}
 
-.prof-head{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;flex:0 0 auto}
-.prof-title{font-size:17px;font-weight:800;letter-spacing:.2px}
-.prof-count{font-size:11.5px;color:var(--dim2);margin-top:3px;font-weight:600}
-.mint-btn{
-  border:1px solid rgba(130,180,240,.32);background:rgba(60,120,220,.14);
-  color:#9ecbff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:11px;cursor:pointer;
-  display:flex;align-items:center;gap:6px;
-  transition:background .2s ease, transform .12s ease;
-}
-.mint-btn:active{background:rgba(60,120,220,.3);transform:scale(.96)}
-.mint-btn svg{width:13px;height:13px}
+/* ============ ECHO (Anonymous) ============ */
+.echo-friends{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}
+.echo-friends::-webkit-scrollbar{display:none}
+.echo-pick{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:none;border:0;color:var(--text-3);font-family:inherit;font-size:10.5px;font-weight:700;
+  cursor:pointer;transition:color .2s;width:60px}
+.echo-pick .av{width:48px;height:48px;border-radius:50%;overflow:hidden;background:var(--surface-2);
+  position:relative;transition:box-shadow .25s,transform .15s var(--ease)}
+.echo-pick .av img{width:100%;height:100%;object-fit:cover}
+.echo-pick:active .av{transform:scale(.92)}
+.echo-pick.on{color:var(--accent)}
+.echo-pick.on .av{box-shadow:0 0 0 2.5px #07090d,0 0 0 4.5px var(--accent),0 0 20px rgba(91,157,255,.5)}
+.echo-pick .nm{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px}
+.echo-pick .av::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.3))}
 
-.gifts-section{padding:0 16px 14px}
-.gifts-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.gifts-title{font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--dim);text-transform:uppercase}
-.gifts-actions{display:flex;gap:6px}
-.gbtn{
-  border:1px solid rgba(255,207,92,.32);background:rgba(255,207,92,.10);
-  color:#ffcf5c;font-size:10.5px;font-weight:800;padding:6px 10px;border-radius:9px;cursor:pointer;
-  letter-spacing:.3px;transition:background .2s ease,transform .12s ease;
-}
-.gbtn:active{background:rgba(255,207,92,.22);transform:scale(.95)}
-.gifts-row{display:flex;gap:8px;flex-wrap:wrap;min-height:66px}
-.gift-box{
-  width:56px;height:56px;border-radius:12px;
-  background:linear-gradient(145deg,#2a1f0a,#1a1208);
-  border:1.5px solid rgba(255,207,92,.42);
-  display:grid;place-items:center;position:relative;overflow:hidden;cursor:pointer;
-  transition:transform .15s ease, box-shadow .2s ease;
-  animation:cardIn .4s cubic-bezier(.2,.9,.3,1) backwards;
-}
-.gift-box:active{transform:scale(.94)}
-.gift-box::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at 30% 25%,rgba(255,207,92,.28),transparent 65%);
-  pointer-events:none;
-}
-.gift-box svg{width:60%;height:60%;color:#ffcf5c;filter:drop-shadow(0 3px 6px rgba(255,180,0,.5))}
-.gift-box.shake{animation:giftShake .45s ease}
-@keyframes giftShake{
-  0%,100%{transform:translate(0,0) rotate(0)}
-  25%{transform:translate(-3px,1px) rotate(-4deg)}
-  50%{transform:translate(3px,-1px) rotate(4deg)}
-  75%{transform:translate(-2px,1px) rotate(-2deg)}
-}
-.gifts-empty{font-size:11px;color:var(--dim2);font-weight:600;padding:14px 0;text-align:center;width:100%}
+.echo-composer textarea{width:100%;min-height:80px;resize:none;background:var(--bg);border:1px solid var(--border-2);
+  border-radius:12px;padding:12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;
+  transition:border .2s}
+.echo-composer textarea:focus{border-color:rgba(91,157,255,.5)}
+.echo-composer textarea::placeholder{color:var(--text-3)}
 
-.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px 26px}
-@keyframes cardIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:none}}
-.inv-card{
-  position:relative;aspect-ratio:.78;border-radius:14px;overflow:hidden;
-  border:1.5px solid rgba(255,255,255,.07);background:#0b0f15;cursor:pointer;
-  transition:transform .16s ease, border-color .2s ease, box-shadow .2s ease;
-  animation:cardIn .36s cubic-bezier(.2,.9,.3,1) backwards;
-}
-.inv-card:active{transform:scale(.965)}
-.inv-card.sel{
-  border-color:rgba(140,210,255,.95);
-  box-shadow:0 0 0 1.5px rgba(140,210,255,.4), 0 0 22px rgba(90,170,255,.4);
-}
-.inv-card .c-bg{position:absolute;inset:0}
-.inv-card .c-bg svg{width:100%;height:100%;display:block}
-.inv-card .c-md{position:absolute;left:0;right:0;top:0;bottom:44px;display:grid;place-items:center}
-.inv-card .c-md svg{width:84%;height:84%;filter:drop-shadow(0 6px 12px rgba(0,0,0,.55))}
-.inv-card .c-ft{
-  position:absolute;left:0;right:0;bottom:0;padding:3px 5px 4px;
-  background:linear-gradient(180deg,rgba(8,11,16,0),rgba(8,11,16,.95) 40%);
-}
-.inv-card .c-nm{font-size:8.5px;font-weight:800;color:#eef4fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.05px}
-.inv-card .c-bgname{
-  display:inline-block;font-size:7px;font-weight:700;letter-spacing:.2px;
-  padding:1px 5px;border-radius:20px;margin-top:1px;max-width:calc(100% - 42px);
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);
-  color:#cdd9e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.inv-card .c-price{
-  position:absolute;bottom:4px;right:5px;
-  font-size:7.5px;font-weight:800;color:#ffcf5c;
-  display:flex;align-items:center;gap:2px;
-  text-shadow:0 1px 2px rgba(0,0,0,.8);
-}
-.inv-card .c-price svg{width:7px;height:7px}
-.inv-card .c-check{
-  position:absolute;top:5px;right:5px;width:18px;height:18px;border-radius:50%;
-  background:linear-gradient(140deg,#4d9dff,#2a6fe0);
-  display:grid;place-items:center;
-  opacity:0;transform:scale(.5);
-  transition:all .2s cubic-bezier(.2,1.6,.4,1);
-  box-shadow:0 3px 10px rgba(50,120,240,.6);
-}
-.inv-card.sel .c-check{opacity:1;transform:scale(1)}
-.inv-card .c-check svg{width:9px;height:9px;color:#fff}
+.echo-inbox{display:flex;flex-direction:column;gap:10px}
+.echo-msg{background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(167,139,250,.02));
+  border:1px solid rgba(167,139,250,.2);border-radius:14px;padding:12px 14px;position:relative;overflow:hidden}
+.echo-msg::before{content:'';position:absolute;top:-30%;right:-10%;width:100px;height:100px;
+  background:radial-gradient(circle,rgba(167,139,250,.2),transparent 70%);filter:blur(20px);pointer-events:none}
+.echo-text{font-size:13.5px;line-height:1.5;font-style:italic;position:relative;z-index:1;margin-bottom:10px}
+.echo-from{font-size:11.5px;font-weight:800;color:var(--green);display:flex;align-items:center;gap:5px;position:relative;z-index:1}
+.echo-btn{position:relative;z-index:1;width:100%;padding:8px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--border-2);color:var(--accent);
+  font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:8px}
+.echo-btn:active{transform:scale(.97);background:rgba(91,157,255,.15)}
 
-.market-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:4px 16px 12px;flex:0 0 auto;
-}
-.market-bal{
-  display:flex;flex-direction:column;gap:2px;
-}
-.market-bal-label{font-size:11px;color:var(--dim2);font-weight:600;letter-spacing:.3px}
-.market-bal-value{font-size:19px;font-weight:800;color:#ffcf5c;display:flex;align-items:center;gap:6px}
-.market-bal-value svg{width:16px;height:16px}
+/* ============ FIESTA (Events) ============ */
+.event{display:flex;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);margin-bottom:10px;animation:fadeUp .5s var(--ease) both;
+  position:relative;overflow:hidden}
+.event:nth-child(2){animation-delay:.08s}
+.event:nth-child(3){animation-delay:.16s}
+.event:nth-child(4){animation-delay:.24s}
+.event-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;
+  font-size:26px;position:relative;overflow:hidden}
+.event-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent 60%)}
+.event-body{flex:1;min-width:0}
+.event-title{font-size:15px;font-weight:800;letter-spacing:-.2px;margin-bottom:2px}
+.event-date{font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.event-desc{font-size:11.5px;color:var(--text-3);line-height:1.4;margin-bottom:10px}
+.event-actions{display:flex;gap:6px;flex-wrap:wrap}
+.event-actions .btn{padding:7px 12px;font-size:11.5px;border-radius:9px}
 
-.tabbar{
-  flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);
-  border-top:1px solid var(--line);
-  background:rgba(12,16,22,.94);
-  backdrop-filter:blur(14px);
-  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
-  gap:4px;
-}
-.tab{
-  border:none;background:transparent;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:7px 0;border-radius:12px;
-  color:var(--dim2);font-size:10px;font-weight:700;letter-spacing:.3px;
-  transition:color .2s ease, background .2s ease;
-}
-.tab svg{width:20px;height:20px}
-.tab.active{color:var(--accent2);background:rgba(61,139,253,.12)}
+/* ============ MODAL ============ */
+.modal-back{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);opacity:0;visibility:hidden;
+  transition:opacity .25s,visibility .25s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal-back.show{opacity:1;visibility:visible}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);opacity:0;
+  z-index:9001;width:calc(100% - 40px);max-width:340px;background:linear-gradient(160deg,#14161d,#080a0e);
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px 20px 18px;
+  transition:opacity .3s var(--ease),transform .35s var(--ease);
+  box-shadow:0 30px 80px rgba(0,0,0,.8)}
+.modal.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.modal-text{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:18px}
+.modal-actions{display:flex;gap:8px}
+.modal-actions .btn{flex:1}
 
-.flyer{
-  position:fixed;left:0;top:0;width:68px;height:68px;border-radius:14px;
-  pointer-events:none;z-index:900;display:grid;place-items:center;will-change:transform;
-}
-.flyer svg{width:86%;height:86%;filter:drop-shadow(0 8px 18px rgba(0,0,0,.65))}
+/* ============ TOAST ============ */
+#toast-wrap{position:fixed;top:calc(var(--safe-t) + 12px);left:50%;transform:translateX(-50%);
+  z-index:10000;display:flex;flex-direction:column;gap:8px;width:calc(100% - 24px);max-width:400px;
+  pointer-events:none}
+.toast{padding:12px 16px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(56,68,100,.92),rgba(22,28,46,.95));
+  border:1px solid rgba(180,210,255,.22);
+  backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:0 14px 44px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2);
+  color:#fff;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:10px;
+  opacity:0;transform:translateY(-20px);transition:opacity .3s,transform .35s var(--ease);
+  pointer-events:auto;overflow:hidden}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:linear-gradient(135deg,rgba(30,80,55,.92),rgba(14,40,30,.95));
+  border-color:rgba(120,220,160,.35)}
+.toast.error{background:linear-gradient(135deg,rgba(90,30,40,.92),rgba(40,10,20,.95));
+  border-color:rgba(248,113,113,.35)}
+.toast .ti{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);font-size:14px}
+.toast.success .ti{background:linear-gradient(135deg,#4ade80,#22c55e)}
+.toast.error .ti{background:linear-gradient(135deg,#f87171,#ef4444)}
+.toast .tm{flex:1}
 
-.modal-back{
-  position:fixed;inset:0;z-index:1000;
-  background:rgba(4,6,10,.74);backdrop-filter:blur(9px);
-  display:grid;place-items:center;padding:22px;
-  opacity:0;pointer-events:none;transition:opacity .26s ease;
-}
-.modal-back.on{opacity:1;pointer-events:auto}
-.modal{
-  width:100%;max-width:340px;
-  background:linear-gradient(180deg,#151c26,#0f151d);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:24px;padding:20px 18px 18px;
-  transform:translateY(22px) scale(.95);
-  transition:transform .34s cubic-bezier(.2,1.2,.4,1);
-  max-height:82vh;overflow-y:auto;
-  box-shadow:0 30px 70px rgba(0,0,0,.7);
-}
-.modal-back.on .modal{transform:translateY(0) scale(1)}
-.modal::-webkit-scrollbar{width:0}
-
-.res-card{
-  position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.1);margin-bottom:14px;
-  box-shadow:0 14px 38px rgba(0,0,0,.55);
-}
-.res-card .bg{position:absolute;inset:0}
-.res-card .bg svg{width:100%;height:100%;display:block}
-.res-card .mdl{position:absolute;inset:0;display:grid;place-items:center}
-.res-card .mdl svg{width:70%;height:70%;filter:drop-shadow(0 12px 28px rgba(0,0,0,.65))}
-.res-card .shine{
-  position:absolute;inset:0;
-  background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.17) 46%,transparent 60%);
-  animation:shine 3.4s ease-in-out infinite;pointer-events:none;
-}
-@keyframes shine{0%,100%{transform:translateX(-115%)}55%{transform:translateX(115%)}}
-
-.res-name{font-size:17px;font-weight:800;text-align:center;letter-spacing:.2px}
-.res-sub{font-size:11.5px;color:var(--dim2);text-align:center;margin-top:5px;font-weight:600}
-.res-bgline{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  margin-top:10px;font-size:11px;font-weight:700;color:#cdd9e8;
-}
-.res-bgline .bdot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 8px currentColor}
-.res-price{
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  margin-top:9px;font-size:14px;font-weight:800;color:#ffcf5c;
-}
-.res-price svg{width:13px;height:13px}
-
-.res-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap}
-.tier{font-size:9.5px;font-weight:800;letter-spacing:.9px;padding:4px 9px;border-radius:7px;border:1px solid currentColor}
-.mono-tag{
-  font-size:9.5px;font-weight:800;letter-spacing:.9px;padding:4px 9px;border-radius:7px;
-  background:linear-gradient(135deg,#2b2f36,#0d0f13);
-  border:1px solid #6b7480;color:#dfe6ef;
-}
-.grail-tag{
-  font-size:9.5px;font-weight:800;letter-spacing:.9px;padding:4px 9px;border-radius:7px;
-  background:linear-gradient(135deg,#fff,#999);
-  border:1px solid #fff;color:#000;
-}
-.chance-btn{
-  border:none;background:rgba(61,139,253,.14);
-  color:#5ea8ff;font-size:13px;font-weight:800;
-  padding:7px 14px;border-radius:10px;cursor:pointer;
-  border:1px solid rgba(61,139,253,.3);
-  font-variant-numeric:tabular-nums;
-  transition:background .2s ease,transform .12s ease;
-}
-.chance-btn:active{transform:scale(.95)}
-
-.modal-actions{display:flex;gap:9px;margin-top:18px}
-.mbtn{
-  flex:1;height:46px;border-radius:13px;border:none;
-  font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.3px;
-  transition:transform .12s ease,opacity .2s ease;
-}
-.mbtn:active{transform:scale(.97)}
-.mbtn.primary{
-  background:linear-gradient(135deg,#3d8bfd,#2a5fd0);color:#fff;
-  box-shadow:0 6px 18px rgba(45,110,220,.35), inset 0 1px 0 rgba(255,255,255,.22);
-}
-.mbtn.ghost{background:rgba(255,255,255,.06);color:#c4d1e2;border:1px solid rgba(255,255,255,.1)}
-.mbtn.sell{
-  background:linear-gradient(135deg,#ffcf5c,#c9922a);color:#1a1208;
-  box-shadow:0 6px 18px rgba(200,150,40,.4), inset 0 1px 0 rgba(255,255,255,.3);
-}
-
-.fail-card{
-  position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;
-  border:1px solid rgba(255,90,90,.28);
-  background:radial-gradient(circle at 50% 45%,#2a1418,#0d0709 70%);
-  margin-bottom:14px;display:grid;place-items:center;
-  box-shadow:0 14px 38px rgba(0,0,0,.6), inset 0 0 60px rgba(255,50,50,.12);
-}
-.fail-card svg{width:56%;height:56%;filter:drop-shadow(0 0 22px rgba(255,70,70,.55))}
-.lost-list{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
-.lost-item{
-  position:relative;width:56px;height:56px;border-radius:12px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.09);
-  filter:grayscale(.8) brightness(.7);
-}
-.lost-item .lbg{position:absolute;inset:0}
-.lost-item .lbg svg{width:100%;height:100%;display:block}
-.lost-item .lm{position:absolute;inset:0;display:grid;place-items:center}
-.lost-item .lm svg{width:74%;height:74%}
-
-.ml-head{text-align:center;margin-bottom:14px}
-.ml-title{font-size:15px;font-weight:800}
-.ml-sub{font-size:11px;color:var(--dim2);margin-top:4px;font-weight:600}
-.ml-list{display:flex;flex-direction:column;gap:7px}
-.ml-item{
-  display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:13px;
-  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);
-}
-.ml-item.own{border-color:rgba(255,215,110,.5);background:rgba(255,200,80,.08)}
-.ml-ic{
-  width:40px;height:40px;border-radius:10px;flex:0 0 auto;
-  display:grid;place-items:center;
-  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.07);overflow:hidden;
-}
-.ml-ic svg{width:84%;height:84%}
-.ml-info{flex:1;min-width:0}
-.ml-nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ml-tier{font-size:9px;font-weight:800;letter-spacing:.7px;margin-top:2px}
-.ml-pct{font-size:12.5px;font-weight:800;color:#5ea8ff;font-variant-numeric:tabular-nums;flex:0 0 auto}
-
-.reveal-card{
-  position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;
-  border:1px solid rgba(255,207,92,.4);margin-bottom:14px;
-  box-shadow:0 14px 38px rgba(0,0,0,.6), inset 0 0 60px rgba(255,207,92,.15);
-}
-.reveal-card .bg{position:absolute;inset:0}
-.reveal-card .bg svg{width:100%;height:100%;display:block}
-.reveal-card .mdl{position:absolute;inset:0;display:grid;place-items:center}
-.reveal-card .mdl svg{width:72%;height:72%;filter:drop-shadow(0 12px 28px rgba(0,0,0,.7));animation:revealPop .9s cubic-bezier(.2,1.5,.35,1) both}
-.reveal-card::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at 50% 50%,rgba(255,207,92,.28),transparent 70%);
-  animation:glow 2s ease-in-out infinite;pointer-events:none;
-}
-
-.flash{
-  position:fixed;inset:0;z-index:600;pointer-events:none;
-  background:radial-gradient(circle at 50% 45%,rgba(255,60,60,.42),rgba(255,60,60,0) 68%);
-  opacity:0;transition:opacity .18s ease;
-}
-.flash.on{opacity:1}
-.toast{
-  position:fixed;left:50%;bottom:96px;transform:translate(-50%,14px);
-  background:rgba(22,30,42,.97);border:1px solid rgba(255,255,255,.1);
-  color:#dbe6f4;font-size:12.5px;font-weight:700;
-  padding:11px 18px;border-radius:13px;
-  opacity:0;pointer-events:none;z-index:1200;
-  transition:all .28s cubic-bezier(.2,1.2,.4,1);
-  box-shadow:0 12px 30px rgba(0,0,0,.5);
-}
-.toast.on{opacity:1;transform:translate(-50%,0)}
+/* ============ EMPTY ============ */
+.empty{text-align:center;padding:40px 20px;color:var(--text-3)}
+.empty .ico{font-size:40px;margin-bottom:12px;opacity:.4}
+.empty p{font-size:12.5px;line-height:1.5;font-weight:600}
 </style>
 </head>
 <body>
 
-<div class="app">
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
-          <path d="M4 8h11l3 2h3v3h-5l-2 2H9l-1 3H6"/><path d="M7 20h11l-1-3H8z"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-title">Forge</div>
-        <div class="brand-sub">Telegram NFT Crafting</div>
-      </div>
-    </div>
-    <div class="coins">
-      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9" fill="#ffcf5c"/><circle cx="12" cy="12" r="6" fill="none" stroke="#a87a1a" stroke-width="1.5"/><path d="M12 8v8M9 10h6M9 13h6" stroke="#a87a1a" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span id="coinBal">0</span>
-    </div>
-  </header>
+<div id="loader">
+  <div id="loader-grid"></div>
+  <div id="loader-logo">Orbit</div>
+  <div id="loader-tag">Your circle, in sync</div>
+</div>
 
-  <main>
-    <section class="view active" id="view-forge">
-      <div class="stage" id="stage">
-        <div class="floor"></div>
-        <div class="cube-pos" id="cubePos"><div class="cube" id="cube"></div></div>
-        <div class="status" id="status">Select up to 5 NFTs</div>
-      </div>
-      <div class="panel">
-        <div class="slots" id="slots"></div>
-        <div class="odds" id="odds"></div>
-        <div class="riskline" id="riskLine"></div>
-        <button class="craft-btn" id="craftBtn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M4 8h11l3 2h3v3h-5l-2 2H9l-1 3H6"/><path d="M7 20h11l-1-3H8z"/>
-          </svg>
-          CRAFT
-        </button>
-      </div>
-    </section>
-
-    <section class="view" id="view-upgrade">
-      <div class="upg-wrap">
-        <div class="wheel-wrap">
-          <div class="wheel-pointer"></div>
-          <svg viewBox="0 0 200 200" class="wheel-svg"><g id="wheelRotate"></g></svg>
-          <div class="wheel-hub">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>
-            </svg>
-          </div>
-        </div>
-        <div class="upg-info" id="upgInfo">Select an NFT below to begin upgrading</div>
-        <div class="upg-slot" id="upgSlot"><div class="ph-txt">No NFT selected</div></div>
-        <button class="spin-btn" id="spinBtn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6"/><path d="M21 3v6h-6"/>
-          </svg>
-          SPIN
-        </button>
-        <div class="picker-title">Your NFTs</div>
-        <div class="inv-grid" id="upgGrid"></div>
-      </div>
-    </section>
-
-    <section class="view" id="view-market">
-      <div class="market-head">
-        <div class="market-bal">
-          <div class="market-bal-label">Your balance</div>
-          <div class="market-bal-value" id="marketBal">
-            <svg viewBox="0 0 24 24" fill="#ffcf5c"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" fill="none" stroke="#a87a1a" stroke-width="1.5"/></svg>
-            <span id="marketBalVal">0</span>
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--dim2);font-weight:600;text-align:right;max-width:140px;line-height:1.4">
-          Tap any NFT to sell it for coins
-        </div>
-      </div>
-      <div class="inv-grid" id="marketGrid"></div>
-    </section>
-
-    <section class="view" id="view-profile">
-      <div class="prof-head">
-        <div>
-          <div class="prof-title">Inventory</div>
-          <div class="prof-count" id="invCount">0 items</div>
-        </div>
-        <button class="mint-btn" id="mintBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          Mint
-        </button>
-      </div>
-      <div class="gifts-section">
-        <div class="gifts-head">
-          <div class="gifts-title">Unrevealed Gifts</div>
-          <div class="gifts-actions">
-            <button class="gbtn" id="buyGiftBtn">+ Get Gift</button>
-            <button class="gbtn" id="revealAllBtn">Reveal All</button>
-          </div>
-        </div>
-        <div class="gifts-row" id="giftsRow"></div>
-      </div>
-      <div class="inv-grid" id="invGrid"></div>
-    </section>
+<div id="app">
+  <header id="header"></header>
+  <main id="main">
+    <section class="tab-page" id="page-circle" data-tab="circle"></section>
+    <section class="tab-page" id="page-nova" data-tab="nova"></section>
+    <section class="tab-page" id="page-shots" data-tab="shots"></section>
+    <section class="tab-page" id="page-echo" data-tab="echo"></section>
+    <section class="tab-page" id="page-fiesta" data-tab="fiesta"></section>
   </main>
-
-  <nav class="tabbar">
-    <button class="tab active" data-tab="forge">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M4 8h11l3 2h3v3h-5l-2 2H9l-1 3H6"/><path d="M7 20h11l-1-3H8z"/>
-      </svg>
-      <span>Forge</span>
-    </button>
-    <button class="tab" data-tab="upgrade">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
-      </svg>
-      <span>Upgrade</span>
-    </button>
-    <button class="tab" data-tab="market">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M3 9l2-5h14l2 5M3 9v10h18V9M3 9h18"/>
-        <path d="M9 15h6"/>
-      </svg>
-      <span>Market</span>
-    </button>
-    <button class="tab" data-tab="profile">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-        <rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/>
-        <rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/>
-        <rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/>
-        <rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>
-      </svg>
-      <span>Profile</span>
-    </button>
+  <nav id="tabs">
+    <div id="tabs-inner">
+      <div id="tab-indicator"></div>
+    </div>
   </nav>
 </div>
 
-<div class="modal-back" id="modalBack"><div class="modal" id="modalBody"></div></div>
-<div class="toast" id="toast"></div>
-<div class="flash" id="flash"></div>
+<div id="toast-wrap"></div>
+<div class="modal-back" id="modal-back"></div>
+<div class="modal" id="modal"></div>
 
 <script>
-/* =========================================================
-   UTILS
-   ========================================================= */
-const $  = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-let _uid = 0;
-const uid = () => ++_uid;
-const rnd = (a,b) => a + Math.random()*(b-a);
-const pick = a => a[Math.floor(Math.random()*a.length)];
-const wait = ms => new Promise(r => setTimeout(r, ms));
-const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; };
+/* ==================================================================
+   ORBIT · mini app prototype
+   ================================================================== */
+(function(){
+'use strict';
 
-function shade(hex, p){
-  const n = parseInt(hex.slice(1),16);
-  let r=(n>>16)&255, g=(n>>8)&255, b=n&255;
-  if(p>=0){ r+=(255-r)*p; g+=(255-g)*p; b+=(255-b)*p; }
-  else { r*=(1+p); g*=(1+p); b*=(1+p); }
-  const h = v => Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
-  return '#'+h(r)+h(g)+h(b);
-}
-function weightedPick(list){
-  const total = list.reduce((s,x)=>s+x.w,0);
-  let r = Math.random()*total;
-  for(const it of list){ r -= it.w; if(r<=0) return it; }
-  return list[list.length-1];
-}
-function tween(dur, fn){
-  return new Promise(res=>{
-    const t0 = performance.now();
-    (function step(t){
-      const p = Math.min(1,(t-t0)/dur);
-      fn(p);
-      if(p<1) requestAnimationFrame(step); else res();
-    })(t0);
-  });
-}
-const easeOutQuart = p => 1 - Math.pow(1-p,4);
-const easeInQuad   = p => p*p;
-
-function vibe(p){ if(navigator.vibrate){ try{ navigator.vibrate(p); }catch(e){} } }
-
-/* =========================================================
-   CHARACTER SYSTEM — base body + optional style parts
-   ========================================================= */
-const CHARS = {
-
-  dragon: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="28" ry="5" fill="#000" opacity=".4"/>
-      <g class="nft-float">
-        <path d="M14 80 Q24 64 38 70" stroke="${shade(c2,-.15)}" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <path d="M38 70 Q55 78 68 62 Q78 50 72 34" stroke="${c1}" stroke-width="12" fill="none" stroke-linecap="round"/>
-        <ellipse cx="70" cy="30" rx="13" ry="9" fill="${c1}" transform="rotate(-18 70 30)"/>
-        <path d="M80 28 Q90 25 88 32 Q85 35 80 34" fill="${shade(c1,-.12)}"/>
-        <circle cx="74" cy="27" r="2.2" fill="#fff"/>
-        <circle cx="74" cy="27" r="1.1" fill="#1a1010"/>
-        <path d="M62 22 Q60 13 56 11 M76 20 Q78 11 82 9" stroke="${shade(c2,.4)}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-        <g stroke="${shade(c2,.3)}" stroke-width=".8" fill="none" opacity=".55">
-          <path d="M46 73 Q49 68 52 73"/>
-          <path d="M54 73 Q57 68 60 73"/>
-        </g>
-        <g class="nft-flicker" fill="${shade(c2,.55)}" opacity=".8">
-          <circle cx="20" cy="74" r="1.1"/>
-          <circle cx="14" cy="82" r="1.5"/>
-        </g>`;
-    if(style === 'crowned'){
-      s += `<path d="M58 18 L61 10 L64 15 L68 8 L72 15 L75 10 L78 18 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".8"/>
-            <circle cx="68" cy="13" r="1.2" fill="#fff"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<g class="nft-flap">
-              <path d="M42 52 Q20 32 8 42 Q18 52 30 58 Q38 62 42 58 Z" fill="${shade(c2,.35)}" opacity=".85"/>
-              <path d="M42 52 Q20 32 8 42 Q18 52 30 58 Q38 62 42 58 Z" fill="none" stroke="${shade(c2,-.2)}" stroke-width="1"/>
-              <path d="M42 56 Q22 44 14 52 Q24 60 36 62 Z" fill="${shade(c2,.15)}" opacity=".7"/>
-            </g>`;
-    } else if(style === 'armored'){
-      s += `<path d="M56 54 Q62 50 68 56 Q70 62 64 66 Q58 64 56 54 Z" fill="${shade(c2,.4)}" stroke="${shade(c2,-.3)}" stroke-width=".8"/>
-            <circle cx="62" cy="58" r="2" fill="${shade(c1,.3)}"/>
-            <path d="M44 72 L50 68 L56 72" stroke="${shade(c2,.5)}" stroke-width="1.5" fill="none"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <circle class="nft-glow" cx="50" cy="50" r="36" fill="none" stroke="#fff" stroke-width=".6" opacity=".3"/>
-            <g class="nft-sparkle" fill="#fff">
-              <path d="M86 20 L87 24 L91 25 L87 26 L86 30 L85 26 L81 25 L85 24 Z"/>
-            </g>`;
-    }
-    s += `</g>`;
-    return s;
-  },
-
-  phoenix: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="28" ry="5" fill="#000" opacity=".4"/>
-      <g class="nft-float">
-        <g class="nft-flicker" stroke="${shade(c2,.35)}" stroke-width="2.6" fill="none" stroke-linecap="round">
-          <path d="M50 64 Q38 80 30 92"/><path d="M50 64 Q50 82 46 94"/><path d="M50 64 Q62 80 70 92"/>
-        </g>
-        <g class="nft-flap">
-          <path d="M42 46 Q22 36 14 46 Q22 54 40 54 Z" fill="${c1}"/>
-          <path d="M58 46 Q78 36 86 46 Q78 54 60 54 Z" fill="${c1}"/>
-        </g>
-        <ellipse cx="50" cy="54" rx="10" ry="16" fill="${c1}"/>
-        <ellipse cx="50" cy="54" rx="6" ry="13" fill="${shade(c1,.5)}"/>
-        <circle cx="50" cy="34" r="8" fill="${c1}"/>
-        <path d="M50 26 Q47 18 53 14 M50 26 Q54 19 58 18 M50 26 Q46 20 42 20" stroke="${shade(c2,.5)}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M56 34 L62 35.5 L56 37.5 Z" fill="${shade(c2,.2)}"/>
-        <circle cx="53" cy="33" r="1.4" fill="#1a1010"/>
-        <ellipse class="nft-pulse" cx="50" cy="68" rx="13" ry="5" fill="${shade(c2,.6)}" opacity=".4"/>`;
-    if(style === 'crowned'){
-      s += `<path d="M38 22 L41 15 L45 20 L50 12 L55 20 L59 15 L62 22 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".8"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<g class="nft-flap" opacity=".8">
-              <path d="M40 42 Q10 24 -4 40 Q14 54 38 50 Z" fill="${shade(c1,.4)}"/>
-              <path d="M60 42 Q90 24 104 40 Q86 54 62 50 Z" fill="${shade(c1,.4)}"/>
-            </g>`;
-    } else if(style === 'armored'){
-      s += `<path d="M50 46 Q56 46 60 52 Q56 58 50 58 Q44 58 40 52 Q44 46 50 46 Z" fill="${shade(c2,.3)}" stroke="${shade(c2,-.2)}" stroke-width=".8"/>
-            <circle cx="50" cy="52" r="2.2" fill="${shade(c1,.6)}"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <g class="nft-sparkle" fill="#fff"><path d="M14 18 L15 22 L19 23 L15 24 L14 28 L13 24 L9 23 L13 22 Z"/></g>`;
-    }
-    s += `</g>`;
-    return s;
-  },
-
-  wolf: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="28" ry="5" fill="#000" opacity=".4"/>
-      <g class="nft-float">
-        <circle class="nft-pulse" cx="50" cy="44" r="32" fill="${shade(c2,.5)}" opacity=".25"/>
-        <path d="M28 86 Q30 62 44 56 Q50 44 62 46 Q72 54 70 74 Q68 84 56 88 Z" fill="${c1}"/>
-        <ellipse cx="52" cy="44" rx="12" ry="10" fill="${c1}"/>
-        <path d="M58 38 Q66 29 64 22 Q60 27 56 30" fill="${c1}"/>
-        <path d="M42 38 L40 27 L47 35 Z" fill="${c1}"/>
-        <path d="M48 34 L46 23 L53 31 Z" fill="${c1}"/>
-        <path d="M42 35 L41 30 L44 34 Z" fill="${shade(c1,-.35)}"/>
-        <path d="M48 32 L47 27 L50 31 Z" fill="${shade(c1,-.35)}"/>
-        <circle cx="53" cy="42" r="2" fill="${shade(c2,.5)}"/>
-        <circle cx="53.4" cy="41.6" r=".7" fill="#fff"/>
-        <path d="M46 57 Q50 64 56 57 Q52 65 48 65 Z" fill="${shade(c1,.35)}"/>`;
-    if(style === 'crowned'){
-      s += `<path d="M44 22 L46 14 L50 19 L54 12 L58 19 L62 14 L64 22 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".7"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<g class="nft-flap" opacity=".75">
-              <path d="M36 60 Q14 44 4 56 Q16 68 34 68 Z" fill="${shade(c2,.35)}"/>
-              <path d="M64 60 Q86 44 96 56 Q84 68 66 68 Z" fill="${shade(c2,.35)}"/>
-            </g>`;
-    } else if(style === 'armored'){
-      s += `<path d="M42 66 Q50 60 58 66 Q58 76 50 80 Q42 76 42 66 Z" fill="${shade(c2,.25)}" stroke="${shade(c2,-.2)}" stroke-width=".8"/>
-            <circle cx="50" cy="70" r="2" fill="${shade(c1,.4)}"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <g class="nft-sparkle" fill="#fff"><path d="M84 24 L85 28 L89 29 L85 30 L84 34 L83 30 L79 29 L83 28 Z"/></g>`;
-    }
-    s += `</g>`;
-    return s;
-  },
-
-  koi: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="26" ry="4" fill="#000" opacity=".36"/>
-      <g class="nft-float">
-        <ellipse class="nft-ripple" cx="50" cy="84" rx="32" ry="4" fill="none" stroke="${shade(c2,.5)}" stroke-width=".8" opacity=".4"/>
-        <g class="nft-sway">
-          <path d="M18 55 Q8 43 14 33 Q20 44 26 50 Z" fill="${shade(c2,.15)}"/>
-          <path d="M18 55 Q8 62 14 72 Q22 62 26 58 Z" fill="${shade(c2,.15)}"/>
-        </g>
-        <path d="M26 54 Q40 40 55 44 Q70 47 78 41 Q86 48 78 58 Q70 51 55 55 Q40 58 26 54 Z" fill="${c1}"/>
-        <path d="M36 49 Q50 45 65 49" stroke="${shade(c1,.55)}" stroke-width="1.6" fill="none" opacity=".9"/>
-        <g fill="${shade(c2,.25)}" opacity=".75">
-          <circle cx="42" cy="50" r="3.8"/>
-          <circle cx="58" cy="51" r="3"/>
-          <circle cx="68" cy="49" r="2.2"/>
-        </g>
-        <circle cx="80" cy="44" r="7" fill="${c1}"/>
-        <circle cx="82" cy="42" r="1.6" fill="#1a1010"/>
-        <circle cx="82.4" cy="41.6" r=".6" fill="#fff"/>`;
-    if(style === 'crowned'){
-      s += `<path d="M76 36 L77 31 L80 34 L82 29 L85 34 L88 31 L89 36 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".6"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<path d="M60 44 Q50 30 40 32 Q46 42 58 48 Z" fill="${shade(c1,.5)}" opacity=".8"/>
-            <path d="M70 46 Q78 30 88 32 Q82 44 72 50 Z" fill="${shade(c1,.5)}" opacity=".8"/>`;
-    } else if(style === 'armored'){
-      s += `<path d="M46 47 Q50 44 54 47 Q56 53 50 55 Q44 53 46 47 Z" fill="${shade(c2,.3)}" stroke="${shade(c2,-.2)}" stroke-width=".7"/>
-            <circle cx="50" cy="50" r="1.6" fill="${shade(c1,.6)}"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <g class="nft-sparkle" fill="#fff"><path d="M16 28 L17 32 L21 33 L17 34 L16 38 L15 34 L11 33 L15 32 Z"/></g>`;
-    }
-    s += `</g>`;
-    return s;
-  },
-
-  lotus: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="24" ry="4" fill="#000" opacity=".36"/>
-      <g class="nft-float">
-        <ellipse class="nft-pulse" cx="50" cy="82" rx="30" ry="4" fill="${shade(c2,-.25)}" opacity=".4"/>
-        <g class="nft-sway">
-          <path d="M50 78 Q30 64 20 44 Q36 54 50 73 Z" fill="${shade(c1,-.25)}"/>
-          <path d="M50 78 Q70 64 80 44 Q64 54 50 73 Z" fill="${shade(c1,-.25)}"/>
-          <path d="M50 76 Q38 52 36 26 Q48 48 50 70 Z" fill="${shade(c1,-.05)}"/>
-          <path d="M50 76 Q62 52 64 26 Q52 48 50 70 Z" fill="${shade(c1,-.05)}"/>
-          <path d="M50 70 Q40 52 44 30 Q50 48 50 66 Z" fill="${c1}"/>
-          <path d="M50 70 Q60 52 56 30 Q50 48 50 66 Z" fill="${c1}"/>
-          <circle cx="50" cy="62" r="10" fill="${c2}"/>
-          <circle cx="50" cy="62" r="7" fill="${shade(c2,.35)}"/>
-        </g>`;
-    if(style === 'crowned'){
-      s += `<path d="M42 22 L44 15 L48 20 L50 12 L52 20 L56 15 L58 22 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".7"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<g class="nft-glow" fill="${shade(c1,.6)}" opacity=".8">
-              <circle cx="24" cy="44" r="2"/>
-              <circle cx="76" cy="44" r="2"/>
-              <circle cx="18" cy="62" r="1.5"/>
-              <circle cx="82" cy="62" r="1.5"/>
-            </g>`;
-    } else if(style === 'armored'){
-      s += `<path d="M44 55 Q50 50 56 55 Q56 62 50 65 Q44 62 44 55 Z" fill="${shade(c2,.3)}" stroke="${shade(c2,-.2)}" stroke-width=".7"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <g class="nft-sparkle" fill="#fff"><path d="M78 24 L79 28 L83 29 L79 30 L78 34 L77 30 L73 29 L77 28 Z"/></g>`;
-    }
-    s += `</g>`;
-    return s;
-  },
-
-  butterfly: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="22" ry="4" fill="#000" opacity=".36"/>
-      <g class="nft-float">
-        <g class="nft-sway">
-          <g class="nft-flap">
-            <path d="M50 46 Q24 20 12 36 Q12 52 46 54 Z" fill="${c1}"/>
-            <path d="M50 46 Q76 20 88 36 Q88 52 54 54 Z" fill="${c1}"/>
-            <path d="M38 40 Q32 32 26 36" stroke="${shade(c2,.4)}" stroke-width="1.6" fill="none" opacity=".85"/>
-            <path d="M62 40 Q68 32 74 36" stroke="${shade(c2,.4)}" stroke-width="1.6" fill="none" opacity=".85"/>
-            <circle cx="28" cy="42" r="2.4" fill="${shade(c2,.3)}" opacity=".75"/>
-            <circle cx="72" cy="42" r="2.4" fill="${shade(c2,.3)}" opacity=".75"/>
-          </g>
-          <path d="M50 54 Q30 62 24 78 Q42 74 50 60 Z" fill="${shade(c1,.35)}"/>
-          <path d="M50 54 Q70 62 76 78 Q58 74 50 60 Z" fill="${shade(c1,.35)}"/>
-          <ellipse cx="50" cy="52" rx="2.6" ry="16" fill="${shade(c2,.2)}"/>
-          <path d="M50 38 Q48 30 41 26 M50 38 Q52 30 59 26" stroke="${shade(c2,.3)}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-          <circle cx="41" cy="26" r="1.6" fill="${shade(c2,.5)}"/>
-          <circle cx="59" cy="26" r="1.6" fill="${shade(c2,.5)}"/>
-          <circle cx="50" cy="38" r="3" fill="${shade(c2,-.1)}"/>
-        </g>`;
-    if(style === 'crowned'){
-      s += `<path d="M44 18 L46 12 L50 16 L54 10 L58 16 L62 12 L64 18 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".6"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<g class="nft-sparkle" fill="${shade(c2,.6)}">
-              <circle cx="30" cy="42" r="2.5"/>
-              <circle cx="70" cy="42" r="2.5"/>
-              <circle cx="44" cy="66" r="2"/>
-              <circle cx="56" cy="66" r="2"/>
-            </g>`;
-    } else if(style === 'armored'){
-      s += `<circle cx="34" cy="46" r="2.4" fill="${shade(c2,.3)}" stroke="${shade(c2,-.15)}" stroke-width=".5"/>
-            <circle cx="66" cy="46" r="2.4" fill="${shade(c2,.3)}" stroke="${shade(c2,-.15)}" stroke-width=".5"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <g class="nft-sparkle" fill="#fff"><path d="M18 18 L19 22 L23 23 L19 24 L18 28 L17 24 L13 23 L17 22 Z"/></g>`;
-    }
-    s += `</g>`;
-    return s;
-  },
-
-  /* ---------- RESISTANCE DOG (Telegram) ---------- */
-  dog: (c1, c2, style, u) => {
-    let s = `
-      <ellipse cx="50" cy="92" rx="28" ry="5" fill="#000" opacity=".4"/>
-      <g class="nft-float">
-        <path d="M22 80 Q30 60 50 58 Q70 60 78 80 Q70 92 50 92 Q30 92 22 80 Z" fill="${c1}"/>
-        <ellipse cx="50" cy="46" rx="22" ry="18" fill="${c1}"/>
-        <path d="M32 34 L26 18 L40 26 Z" fill="${c1}"/>
-        <path d="M68 34 L74 18 L60 26 Z" fill="${c1}"/>
-        <path d="M33 33 L28 23 L39 27 Z" fill="${shade(c1,-.35)}"/>
-        <path d="M67 33 L72 23 L61 27 Z" fill="${shade(c1,-.35)}"/>
-        <ellipse cx="43" cy="44" rx="2.6" ry="3" fill="#1a1010"/>
-        <ellipse cx="57" cy="44" rx="2.6" ry="3" fill="#1a1010"/>
-        <circle cx="43.6" cy="43.2" r=".8" fill="#fff"/>
-        <circle cx="57.6" cy="43.2" r=".8" fill="#fff"/>
-        <ellipse cx="50" cy="52" rx="4.5" ry="3.2" fill="${shade(c1,-.45)}"/>
-        <ellipse cx="50" cy="51" rx="1.8" ry="1" fill="${shade(c2,-.2)}" opacity=".7"/>
-        <path d="M42 58 Q50 62 58 58" stroke="${shade(c1,-.4)}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <path d="M50 56 L50 60" stroke="${shade(c1,-.4)}" stroke-width="1" stroke-linecap="round"/>
-        <path d="M50 62 Q46 66 42 64" stroke="${shade(c2,-.1)}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <path d="M50 62 Q54 66 58 64" stroke="${shade(c2,-.1)}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
-    if(style === 'crowned'){
-      s += `<path d="M38 24 L40 16 L44 21 L48 13 L52 21 L56 16 L58 24 Z" fill="#ffcf5c" stroke="#a87a1a" stroke-width=".7"/>
-            <circle cx="48" cy="18" r="1.2" fill="#fff"/>`;
-    } else if(style === 'winged' || style === 'legendary'){
-      s += `<path d="M22 78 Q8 72 6 84 Q16 90 24 86 Z" fill="${c2}" opacity=".85"/>
-            <path d="M78 78 Q92 72 94 84 Q84 90 76 86 Z" fill="${c2}" opacity=".85"/>`;
-    } else if(style === 'armored'){
-      s += `<path d="M26 70 L38 66 L50 70 L62 66 L74 70 L74 82 Q62 88 50 88 Q38 88 26 82 Z" fill="${c2}" opacity=".55" stroke="${shade(c2,-.2)}" stroke-width=".7"/>
-            <circle cx="50" cy="76" r="2.6" fill="#3d8bfd"/>
-            <circle cx="50" cy="76" r="1.4" fill="#fff"/>`;
-    } else if(style === 'grail'){
-      s += `<circle class="nft-glow" cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-            <g class="nft-sparkle" fill="#fff"><path d="M84 24 L85 28 L89 29 L85 30 L84 34 L83 30 L79 29 L83 28 Z"/></g>`;
-    }
-    s += `</g>`;
-    return s;
+/* ---------- Emoji renderer (Apple style, cross-platform) ---------- */
+const EMOJI_CDN = 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.0.1/img/apple/64/';
+function E(char, size){
+  size = size || 18;
+  let code = '';
+  for (const c of char){
+    if (code) code += '-';
+    code += c.codePointAt(0).toString(16).padStart(4, '0');
   }
-};
-
-function charSVG(char, c1, c2, style, u){
-  const fn = CHARS[char] || CHARS.dragon;
-  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">${fn(c1,c2,style||'simple',u)}</svg>`;
+  return `<img class="em" src="${EMOJI_CDN}${code}.png" style="width:${size}px;height:${size}px" alt="${char}" draggable="false">`;
 }
 
-/* =========================================================
-   BACKGROUNDS
-   ========================================================= */
-const BGS = [
-  { id:'onyx',     name:'Black Onyx', rarity:'Mythic',    tier:'#c9d3e0', weight:1,  a:'#060608', b:'#121218', sym:'#2c2c38' },
-  { id:'gunmetal', name:'Gunmetal',   rarity:'Legendary', tier:'#ffcf5c', weight:2,  a:'#2b323b', b:'#0d1116', sym:'#4c586b' },
-  { id:'nebula',   name:'Nebula',     rarity:'Epic',      tier:'#b48cff', weight:8,  a:'#3a1d6e', b:'#0c0f2c', sym:'#7a5cff' },
-  { id:'aurora',   name:'Aurora',     rarity:'Epic',      tier:'#b48cff', weight:8,  a:'#0d5a55', b:'#0a1a3a', sym:'#3ef0c8' },
-  { id:'inferno',  name:'Inferno',    rarity:'Rare',      tier:'#5ea8ff', weight:16, a:'#6b1d0d', b:'#190a0a', sym:'#ff7a3d' },
-  { id:'abyss',    name:'Abyss',      rarity:'Rare',      tier:'#5ea8ff', weight:16, a:'#0a2a4a', b:'#050d18', sym:'#3d8bfd' },
-  { id:'verdant',  name:'Verdant',    rarity:'Uncommon',  tier:'#4ade80', weight:24, a:'#124a2a', b:'#06140d', sym:'#4ade80' },
-  { id:'dune',     name:'Dune',       rarity:'Uncommon',  tier:'#4ade80', weight:24, a:'#5a4420', b:'#1a1409', sym:'#e8c07a' },
-  { id:'slate',    name:'Slate',      rarity:'Common',    tier:'#8b98a9', weight:40, a:'#2a3340', b:'#121820', sym:'#55647a' },
-  { id:'ash',      name:'Ash',        rarity:'Common',    tier:'#8b98a9', weight:40, a:'#33333a', b:'#151518', sym:'#5c5c68' }
-];
-const BG_MAP = Object.fromEntries(BGS.map(b => [b.id, b]));
-const TIER_ORDER = ['Common','Uncommon','Rare','Epic','Legendary','Mythic'];
-const TIER_COLORS = {
-  Common:'#8b98a9', Uncommon:'#4ade80', Rare:'#5ea8ff',
-  Epic:'#b48cff',   Legendary:'#ffcf5c', Mythic:'#ff6b6b'
-};
-const TIER_PRICE = {
-  Common: 15, Uncommon: 45, Rare: 150, Epic: 600, Legendary: 2500, Mythic: 12000
-};
-
-function bgSVG(bg, u){
-  const shapes = [];
-  for(let i=0;i<6;i++) for(let j=0;j<6;j++){
-    const x = 9 + i*16.4, y = 9 + j*16.4;
-    const r = 2.2 + ((i*7 + j*13) % 3) * 0.9;
-    const m = (i*3 + j*5) % 3;
-    if(m === 0) shapes.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}"/>`);
-    else if(m === 1) shapes.push(`<path d="M${x.toFixed(1)} ${(y-r).toFixed(1)} L${(x+r).toFixed(1)} ${(y+r).toFixed(1)} L${(x-r).toFixed(1)} ${(y+r).toFixed(1)} Z"/>`);
-    else shapes.push(`<path d="M${x.toFixed(1)} ${(y-r).toFixed(1)} L${(x+r).toFixed(1)} ${y.toFixed(1)} L${x.toFixed(1)} ${(y+r).toFixed(1)} L${(x-r).toFixed(1)} ${y.toFixed(1)} Z"/>`);
-  }
-  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <radialGradient id="bgg${u}" cx="28%" cy="16%" r="96%">
-        <stop offset="0%" stop-color="${bg.a}"/>
-        <stop offset="100%" stop-color="${bg.b}"/>
-      </radialGradient>
-      <radialGradient id="bgv${u}" cx="50%" cy="50%" r="70%">
-        <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-        <stop offset="100%" stop-color="#000" stop-opacity=".5"/>
-      </radialGradient>
-    </defs>
-    <rect width="100" height="100" fill="url(#bgg${u})"/>
-    <g fill="none" stroke="${bg.sym}" stroke-width=".75" opacity=".5">${shapes.join('')}</g>
-    <rect width="100" height="100" fill="url(#bgv${u})"/>
-  </svg>`;
+/* ---------- Haptics ---------- */
+const tg = window.Telegram?.WebApp;
+function haptic(type){
+  type = type || 'light';
+  try {
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+    else if (navigator.vibrate) navigator.vibrate(type === 'heavy' ? 25 : 10);
+  } catch(_) {}
 }
 
-/* =========================================================
-   BASES — each model has a distinct STYLE (different parts)
-   ========================================================= */
-const BASES = [
-  { id:'dragon', name:'Dragon', char:'dragon', c1:'#e85a4a', c2:'#8a1a0a', models:[
-    { name:'Ember Dragon',   style:'simple',    c1:'#ff8a6a', c2:'#a83c14', weight:460 },
-    { name:'Crimson Dragon', style:'crowned',   c1:'#e85a4a', c2:'#8a1a0a', weight:250 },
-    { name:'Jade Dragon',    style:'winged',    c1:'#6ae8a0', c2:'#0f6b3a', weight:150 },
-    { name:'Storm Dragon',   style:'armored',   c1:'#7ab8ff', c2:'#1a4a8a', weight: 90 },
-    { name:'Void Dragon',    style:'legendary', c1:'#b48cff', c2:'#3b1e78', weight: 45 },
-    { name:'Grail Dragon',   style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]},
-  { id:'phoenix', name:'Phoenix', char:'phoenix', c1:'#ffcf5c', c2:'#c92a10', models:[
-    { name:'Sun Phoenix',    style:'simple',    c1:'#ffe08a', c2:'#c98a2a', weight:460 },
-    { name:'Flame Phoenix',  style:'crowned',   c1:'#ffcf5c', c2:'#c92a10', weight:250 },
-    { name:'Ice Phoenix',    style:'winged',    c1:'#bff4ff', c2:'#3a7aa8', weight:150 },
-    { name:'Storm Phoenix',  style:'armored',   c1:'#b48cff', c2:'#4a2a8a', weight: 90 },
-    { name:'Void Phoenix',   style:'legendary', c1:'#9a6bff', c2:'#2a1258', weight: 45 },
-    { name:'Grail Phoenix',  style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]},
-  { id:'wolf', name:'Wolf', char:'wolf', c1:'#8a96aa', c2:'#e8c24a', models:[
-    { name:'Gray Wolf',      style:'simple',    c1:'#a8b4c8', c2:'#8a6410', weight:460 },
-    { name:'Shadow Wolf',    style:'crowned',   c1:'#5a6478', c2:'#c9a03a', weight:250 },
-    { name:'Snow Wolf',      style:'winged',    c1:'#eef4fa', c2:'#7a8aa8', weight:150 },
-    { name:'Blood Wolf',     style:'armored',   c1:'#e85a6a', c2:'#a83a4a', weight: 90 },
-    { name:'Void Wolf',      style:'legendary', c1:'#7a5aaa', c2:'#3a1a6a', weight: 45 },
-    { name:'Grail Wolf',     style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]},
-  { id:'koi', name:'Koi', char:'koi', c1:'#ff8a5a', c2:'#3a8ac8', models:[
-    { name:'Coral Koi',      style:'simple',    c1:'#ffb08a', c2:'#4aa8d8', weight:460 },
-    { name:'Ember Koi',      style:'crowned',   c1:'#ff7a4a', c2:'#2a6aa8', weight:250 },
-    { name:'Snow Koi',       style:'winged',    c1:'#f4f0fa', c2:'#8a9ac8', weight:150 },
-    { name:'Jade Koi',       style:'armored',   c1:'#7dffb0', c2:'#2a8a5a', weight: 90 },
-    { name:'Void Koi',       style:'legendary', c1:'#a87aff', c2:'#3a1a6a', weight: 45 },
-    { name:'Grail Koi',      style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]},
-  { id:'lotus', name:'Lotus', char:'lotus', c1:'#ff9ac8', c2:'#ffcf5c', models:[
-    { name:'Pink Lotus',     style:'simple',    c1:'#ffb8d8', c2:'#ffd76e', weight:460 },
-    { name:'Crimson Lotus',  style:'crowned',   c1:'#ff5a8a', c2:'#c92a4a', weight:250 },
-    { name:'White Lotus',    style:'winged',    c1:'#f4f0f6', c2:'#e8d76a', weight:150 },
-    { name:'Blue Lotus',     style:'armored',   c1:'#7ab8ff', c2:'#3a7ac8', weight: 90 },
-    { name:'Void Lotus',     style:'legendary', c1:'#a87aff', c2:'#3a1a6a', weight: 45 },
-    { name:'Grail Lotus',    style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]},
-  { id:'butterfly', name:'Butterfly', char:'butterfly', c1:'#7ac8ff', c2:'#3a5a8a', models:[
-    { name:'Sky Butterfly',  style:'simple',    c1:'#a8d8ff', c2:'#4a6aa8', weight:460 },
-    { name:'Morpho',         style:'crowned',   c1:'#5ab8ff', c2:'#1a3a7a', weight:250 },
-    { name:'Rose Butterfly', style:'winged',    c1:'#ff9ac8', c2:'#a83a6a', weight:150 },
-    { name:'Jade Butterfly', style:'armored',   c1:'#7dffb0', c2:'#2a8a5a', weight: 90 },
-    { name:'Void Butterfly', style:'legendary', c1:'#a87aff', c2:'#3a1a6a', weight: 45 },
-    { name:'Grail Butterfly',style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]},
-  { id:'dog', name:'Resistance Dog', char:'dog', c1:'#d4a373', c2:'#8a4a2a', models:[
-    { name:'Stray Dog',      style:'simple',    c1:'#e0b888', c2:'#9a5a3a', weight:460 },
-    { name:'Bandana Dog',    style:'crowned',   c1:'#d4a373', c2:'#8a4a2a', weight:250 },
-    { name:'Blue Dog',       style:'winged',    c1:'#a8c8e8', c2:'#3a5a8a', weight:150 },
-    { name:'Armored Dog',    style:'armored',   c1:'#c8c8d0', c2:'#3d8bfd', weight: 90 },
-    { name:'Void Dog',       style:'legendary', c1:'#a87aff', c2:'#3a1a6a', weight: 45 },
-    { name:'Grail Dog',      style:'grail',     c1:'#ffffff', c2:'#0a0a0a', weight:  5, grail:true }
-  ]}
-];
-const BASE_MAP = Object.fromEntries(BASES.map(b => [b.id, b]));
+/* ---------- Telegram init ---------- */
+if (tg){
+  try { tg.ready(); } catch(_) {}
+  try { tg.expand(); } catch(_) {}
+  try { tg.setHeaderColor?.('#07090d'); } catch(_) {}
+  try { tg.setBackgroundColor?.('#07090d'); } catch(_) {}
+  try { if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes(); } catch(_) {}
+}
 
-/* =========================================================
-   STATE
-   ========================================================= */
+/* ---------- State ---------- */
+const STORAGE = 'orbit_state_v1';
 const state = {
-  inventory: [],
-  selected: [],
-  upgradeSelected: null,
-  gifts: [],
-  coins: 0,
-  busy: false,
-  serial: 1,
-  tab: 'forge',
-  wheelAngle: 0
-};
-let NFT_ID = 0, GIFT_ID = 0;
-const MAX_MERGE = 5;
-const RISK_TABLE = { 1: 0, 2: 0.08, 3: 0.15, 4: 0.25, 5: 0.35 };
-const riskFor = n => RISK_TABLE[n] || 0;
-
-/* =========================================================
-   CUBE
-   ========================================================= */
-const FACES = ['front','back','right','left','top','bottom'];
-const FACE_ROT = {
-  front:  { rx:0,   ry:0   }, back:   { rx:0,   ry:180 },
-  right:  { rx:0,   ry:-90 }, left:   { rx:0,   ry:90  },
-  top:    { rx:-90, ry:0   }, bottom: { rx:90,  ry:0   }
-};
-const FACE_KICK = {
-  front:  { dx: 0,  dy: 40,  ax: 0,   ay: 0,   az: 3.2 },
-  back:   { dx: 0,  dy:-36,  ax: 0,   ay: 0,   az:-3.2 },
-  right:  { dx: 50, dy: 0,   ax: 0,   ay: 3.5, az: 0   },
-  left:   { dx:-50, dy: 0,   ax: 0,   ay:-3.5, az: 0   },
-  top:    { dx: 0,  dy:-44,  ax: 3.5, ay: 0,   az: 0   },
-  bottom: { dx: 0,  dy: 44,  ax:-3.5, ay: 0,   az: 0   }
+  user: { name: 'Explorer', username: '', photo: '', id: 0 },
+  tab: 'circle',
+  filter: 'chatted',
+  search: '',
+  friends: new Set(),
+  nova: { food: 68, happy: 54, energy: 41, level: 3, name: 'Nova' },
+  myPhoto: false,
+  votes: new Set(),
+  frame: 'none',
+  echoTo: null,
+  echoSent: [],
+  echoOpened: new Set(),
+  balance: 1250
 };
 
-const ANVIL_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M3 9h11l3 2h4v3h-5l-2 2H9l-1 3H6"/><path d="M7 21h11l-1-3H8z"/></svg>`;
-const PLUS_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
-const X_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>`;
-const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>`;
-const GIFT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M3 8h18v4H3z"/><path d="M5 12v9h14v-9"/><path d="M12 8v13"/>
-  <path d="M12 8c-2 0-4-1-4-3s2-3 3-2c1 .5 1 2 1 5z"/>
-  <path d="M12 8c2 0 4-1 4-3s-2-3-3-2c-1 .5-1 2-1 5z"/></svg>`;
-const COIN_ICON = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" fill="none" stroke="#a87a1a" stroke-width="1.5"/></svg>`;
+/* ---------- Mock contacts ---------- */
+const CONTACTS = [
+  { id: 1, name: 'Alexey Petrov',    username: 'alex_p',     photo: 12, online: true,  msgs: 342, prev: 'yo check this out', last: 2*60*1000 },
+  { id: 2, name: 'Maria Sokolova',   username: 'masha_s',    photo: 45, online: true,  msgs: 128, prev: 'see u at 8', last: 15*60*1000 },
+  { id: 3, name: 'Dmitry Vlasov',    username: 'dmitry_v',   photo: 33, online: false, msgs: 87,  prev: 'ok, going', last: 2*60*60*1000 },
+  { id: 4, name: 'Anna Kim',         username: 'anna_kim',   photo: 5,  online: true,  msgs: 456, prev: 'sending now', last: 30*60*1000 },
+  { id: 5, name: 'Timur Aliyev',     username: 'timur',      photo: 15, online: false, msgs: 23,  prev: 'thumbs up', last: 5*60*60*1000 },
+  { id: 6, name: 'Sofia Ivanova',    username: 'sofia_iv',   photo: 20, online: true,  msgs: 234, prev: 'that meme tho', last: 5*60*1000 },
+  { id: 7, name: 'Nikita Orlov',     username: 'nick_o',     photo: 51, online: false, msgs: 0,   prev: '', last: 0 },
+  { id: 8, name: 'Lisa Smirnova',    username: 'lisa_sm',    photo: 24, online: true,  msgs: 67,  prev: 'happy bday', last: 45*60*1000 },
+  { id: 9, name: 'Artem Volkov',     username: 'artem_v',    photo: 40, online: false, msgs: 12,  prev: 'later', last: 24*60*60*1000 },
+  { id: 10, name: 'Daria Petrova',   username: 'daria_',     photo: 26, online: true,  msgs: 891, prev: 'yo where u at', last: 60*1000 },
+  { id: 11, name: 'Maxim Lebedev',   username: 'max_l',      photo: 60, online: false, msgs: 0,   prev: '', last: 0 },
+  { id: 12, name: 'Katya Morozova',  username: 'katya_m',    photo: 9,  online: true,  msgs: 45,  prev: 'cool cool', last: 3*60*60*1000 },
+  { id: 13, name: 'Ivan Fedorov',    username: 'ivan_f',     photo: 22, online: false, msgs: 34,  prev: 'on my way', last: 20*60*1000 },
+  { id: 14, name: 'Olya Kozlova',    username: 'olya_k',     photo: 18, online: true,  msgs: 234, prev: 'yaaas', last: 8*60*1000 },
+  { id: 15, name: 'Pavel Novikov',   username: 'pavel_n',    photo: 7,  online: false, msgs: 0,   prev: '', last: 0 },
+  { id: 16, name: 'Nastya Belova',   username: 'nastya_b',   photo: 28, online: true,  msgs: 156, prev: 'haha nice', last: 12*60*1000 }
+];
 
-const cubeEl = $('#cube');
-const cubePosEl = $('#cubePos');
-const stageEl = $('#stage');
+/* ---------- Photo challenge data ---------- */
+const PHOTO_DATA = [
+  { id: 1, emoji: '🖥️', by: 'Anna',  photo: 5,  votes: 7 },
+  { id: 2, emoji: '🌵', by: 'Mark',  photo: 33, votes: 5 },
+  { id: 3, emoji: '☕', by: 'Sonya', photo: 20, votes: 4 },
+  { id: 4, emoji: '🎧', by: 'Tim',   photo: 15, votes: 3 },
+  { id: 5, emoji: '📚', by: 'Lisa',  photo: 24, votes: 2 },
+  { id: 6, emoji: '🐈', by: 'Nick',  photo: 51, votes: 1 }
+];
 
-FACES.forEach(f => {
-  const d = document.createElement('div');
-  d.className = 'face'; d.dataset.f = f;
-  d.innerHTML = `<div class="face-icon">${ANVIL_ICON}</div><div class="attached"></div>`;
-  cubeEl.appendChild(d);
-});
+/* ---------- Frames ---------- */
+const FRAMES = [
+  { id: 'none',    emoji: '',   color: 'transparent' },
+  { id: 'fire',    emoji: '🔥', color: '#f97316' },
+  { id: 'blossom', emoji: '🌸', color: '#f472b6' },
+  { id: 'bolt',    emoji: '⚡', color: '#fbbf24' },
+  { id: 'crown',   emoji: '👑', color: '#a78bfa' },
+  { id: 'star',    emoji: '⭐', color: '#fbbf24' }
+];
 
-const st = {
-  rx:-16, ry:-34, rz:-6,
-  spinX: 7, spinY: 20, spinZ: 2.6,
-  spinExtra: { x:0, y:0, z:0 },
-  freeze: false,
-  holdFace: null,
-  ox:0, oy:0, orx:0, ory:0,
-  vx:0, vy:0, vrx:0, vry:0
-};
+/* ---------- Echo inbox ---------- */
+const ECHO_INBOX = [
+  { id: 1, text: 'you are actually building something cool, keep going', from: 'Maria' },
+  { id: 2, text: 'stop coding at 3am and go to sleep, the bugs will wait', from: 'Alexey' },
+  { id: 3, text: 'the pet is so cute lol, i fed it twice today', from: 'Sofia' }
+];
 
-function applyFaceKick(faceName){
-  const k = FACE_KICK[faceName];
-  if(!k) return;
-  st.vx += k.dx * 16;
-  st.vy += k.dy * 16;
-  st.spinExtra.x += k.ax * 38;
-  st.spinExtra.y += k.ay * 38;
-  st.spinExtra.z += k.az * 38;
-  vibe([18, 22, 30]);
-  microVib();
+/* ---------- Events ---------- */
+const EVENTS = [
+  { icon: '🎅', grad: 'linear-gradient(135deg,#e0556b,#8b1f2c)', title: 'Secret Santa', date: 'Dec 20 · in 37 days',
+    desc: 'Draw names in your friend circle. Wishlists, dates, reminders — all inside Orbit.', btn: 'Create room' },
+  { icon: '🎄', grad: 'linear-gradient(135deg,#4ade80,#16a34a)', title: 'New Year Capsule', date: 'Dec 31',
+    desc: 'Everyone writes a wish. You open them together on January 1st.', btn: 'Open capsule' },
+  { icon: '💐', grad: 'linear-gradient(135deg,#f472b6,#be185d)', title: 'March 8', date: 'Mar 8',
+    desc: 'Anonymous compliments for the girls in your chat. Reveal authors for stars.', btn: 'Start' },
+  { icon: '🎂', grad: 'linear-gradient(135deg,#fbbf24,#b45309)', title: 'Birthday', date: 'Any day',
+    desc: 'Group gift collection: who chipped in, voting on the gift, reminders.', btn: 'Collect' }
+];
+
+/* ---------- Helpers ---------- */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+function avatarUrl(p){ return `https://i.pravatar.cc/150?img=${p}`; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function timeAgo(ts){
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'now';
+  if (m < 60) return m + 'm';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h';
+  const d = Math.floor(h / 24);
+  return d + 'd';
 }
-function microVib(){
-  stageEl.classList.remove('vib');
-  void stageEl.offsetWidth;
-  stageEl.classList.add('vib');
-  setTimeout(() => stageEl.classList.remove('vib'), 220);
+function barColor(v){ return v > 65 ? '#4ade80' : v > 35 ? '#fbbf24' : '#f87171'; }
+
+/* ---------- Persistence ---------- */
+function save(){
+  try {
+    const data = {
+      friends: [...state.friends],
+      nova: state.nova,
+      frame: state.frame,
+      myPhoto: state.myPhoto,
+      votes: [...state.votes],
+      echoSent: state.echoSent,
+      echoOpened: [...state.echoOpened],
+      balance: state.balance
+    };
+    localStorage.setItem(STORAGE, JSON.stringify(data));
+  } catch(_) {}
 }
-
-let _last = performance.now();
-function loop(t){
-  const dt = Math.min(0.05, (t - _last) / 1000);
-  _last = t;
-
-  if(!st.freeze){
-    st.ry += (st.spinY + st.spinExtra.y) * dt;
-    st.rx += (st.spinX + st.spinExtra.x) * dt;
-    st.rz += (st.spinZ + st.spinExtra.z) * dt;
-    const decay = 1 - 0.11 * dt * 60 / 60;
-    st.spinExtra.x *= decay;
-    st.spinExtra.y *= decay;
-    st.spinExtra.z *= decay;
-  }
-
-  const K = 65, D = 6;
-  const acc = (v,x) => -K*x - D*v;
-  st.vx  += acc(st.vx,  st.ox)  * dt;  st.ox  += st.vx  * dt;
-  st.vy  += acc(st.vy,  st.oy)  * dt;  st.oy  += st.vy  * dt;
-  st.vrx += acc(st.vrx, st.orx) * dt;  st.orx += st.vrx * dt;
-  st.vry += acc(st.vry, st.ory) * dt;  st.ory += st.vry * dt;
-
-  cubePosEl.style.transform = `translate3d(${st.ox.toFixed(2)}px, ${st.oy.toFixed(2)}px, 0)`;
-  cubeEl.style.transform =
-    `rotateX(${(st.rx + st.orx).toFixed(2)}deg) ` +
-    `rotateY(${(st.ry + st.ory).toFixed(2)}deg) ` +
-    `rotateZ(${st.rz.toFixed(2)}deg)`;
-
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-
-/* =========================================================
-   NFT FACTORY
-   ========================================================= */
-function makeNFT(baseId, bgId, modelOverride){
-  const b = BASE_MAP[baseId];
-  const model = modelOverride || weightedPick(b.models.map(m => ({ ...m, w:m.weight })));
-  const bg = bgId ? BG_MAP[bgId] : weightedPick(BGS.map(x => ({ id:x.id, w:x.weight })));
-  const isGrail = !!model.grail;
-  const c1 = isGrail ? '#ffffff' : model.c1;
-  const c2 = isGrail ? '#0a0a0a' : model.c2;
-  const finalBg = isGrail ? 'onyx' : bg.id;
-  const finalBgObj = BG_MAP[finalBg];
-  return {
-    id: 'n' + (++NFT_ID),
-    baseId,
-    name: model.name,
-    char: b.char,
-    style: model.style || 'simple',
-    c1, c2,
-    bg: finalBg,
-    grail: isGrail,
-    price: TIER_PRICE[finalBgObj.rarity] || 15,
-    crafted: !!modelOverride
-  };
-}
-
-function makeRandomNFT(){
-  const base = pick(BASES);
-  const model = weightedPick(base.models.map(m => ({ ...m, w:m.weight })));
-  const bg = weightedPick(BGS.map(x => ({ id:x.id, w:x.weight })));
-  const isGrail = !!model.grail;
-  const finalBg = isGrail ? BG_MAP.onyx : bg;
-  return {
-    id: 'n' + (++NFT_ID),
-    baseId: base.id,
-    name: model.name,
-    char: base.char,
-    style: model.style || 'simple',
-    c1: isGrail ? '#ffffff' : model.c1,
-    c2: isGrail ? '#0a0a0a' : model.c2,
-    bg: finalBg.id,
-    grail: isGrail,
-    price: TIER_PRICE[finalBg.rarity] || 15,
-    crafted: true
-  };
+function load(){
+  try {
+    const raw = localStorage.getItem(STORAGE);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.friends) state.friends = new Set(d.friends);
+    if (d.nova) state.nova = { ...state.nova, ...d.nova };
+    if (d.frame) state.frame = d.frame;
+    if (d.myPhoto) state.myPhoto = d.myPhoto;
+    if (d.votes) state.votes = new Set(d.votes);
+    if (d.echoSent) state.echoSent = d.echoSent;
+    if (d.echoOpened) state.echoOpened = new Set(d.echoOpened);
+    if (typeof d.balance === 'number') state.balance = d.balance;
+  } catch(_) {}
 }
 
-function seedInventory(){
-  state.inventory = [];
-  BASES.forEach(b => { for(let i=0;i<2;i++) state.inventory.push(makeNFT(b.id)); });
-  state.inventory[2].bg  = 'nebula';
-  state.inventory[7].bg  = 'gunmetal';
-  state.inventory = shuffle(state.inventory);
-  state.coins = 250;
-
-  const giftCount = Math.floor(rnd(3, 9));
-  state.gifts = [];
-  for(let i=0;i<giftCount;i++) state.gifts.push({ id: 'g' + (++GIFT_ID) });
-}
-
-/* =========================================================
-   RENDER — INVENTORY
-   ========================================================= */
-function renderInventory(){
-  const grid = $('#invGrid');
-  grid.innerHTML = '';
-  $('#invCount').textContent = state.inventory.length + ' items';
-
-  state.inventory.forEach((nft, i) => {
-    const bg = BG_MAP[nft.bg];
-    const card = document.createElement('div');
-    card.className = 'inv-card' + (state.selected.includes(nft.id) ? ' sel' : '');
-    card.dataset.id = nft.id;
-    card.style.animationDelay = Math.min(i * 18, 340) + 'ms';
-
-    card.innerHTML = `
-      <div class="c-bg">${bgSVG(bg, uid())}</div>
-      <div class="c-md">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-      <div class="c-check">${CHECK_ICON}</div>
-      <div class="c-ft">
-        <div class="c-nm">${nft.name}</div>
-        <div class="c-bgname">${bg.name}</div>
-        <div class="c-price">${COIN_ICON}${nft.price}</div>
-      </div>`;
-    card.addEventListener('click', () => toggleSelect(nft.id));
-    grid.appendChild(card);
-  });
-}
-
-function renderUpgradePicker(){
-  const grid = $('#upgGrid');
-  grid.innerHTML = '';
-  if(!state.inventory.length){
-    grid.innerHTML = '<div class="gifts-empty">No NFTs to upgrade</div>';
-    return;
-  }
-  state.inventory.forEach((nft, i) => {
-    const bg = BG_MAP[nft.bg];
-    const card = document.createElement('div');
-    card.className = 'inv-card' + (state.upgradeSelected === nft.id ? ' sel' : '');
-    card.dataset.id = nft.id;
-    card.style.animationDelay = Math.min(i * 18, 340) + 'ms';
-
-    card.innerHTML = `
-      <div class="c-bg">${bgSVG(bg, uid())}</div>
-      <div class="c-md">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-      <div class="c-check">${CHECK_ICON}</div>
-      <div class="c-ft">
-        <div class="c-nm">${nft.name}</div>
-        <div class="c-bgname">${bg.name}</div>
-        <div class="c-price">${COIN_ICON}${nft.price}</div>
-      </div>`;
-    card.addEventListener('click', () => selectForUpgrade(nft.id));
-    grid.appendChild(card);
-  });
-}
-
-function renderMarket(){
-  const grid = $('#marketGrid');
-  grid.innerHTML = '';
-  if(!state.inventory.length){
-    grid.innerHTML = '<div class="gifts-empty" style="grid-column:1/-1">Inventory empty — nothing to sell</div>';
-    return;
-  }
-  state.inventory.forEach((nft, i) => {
-    const bg = BG_MAP[nft.bg];
-    const card = document.createElement('div');
-    card.className = 'inv-card';
-    card.dataset.id = nft.id;
-    card.style.animationDelay = Math.min(i * 18, 340) + 'ms';
-
-    card.innerHTML = `
-      <div class="c-bg">${bgSVG(bg, uid())}</div>
-      <div class="c-md">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-      <div class="c-ft">
-        <div class="c-nm">${nft.name}</div>
-        <div class="c-bgname">${bg.name}</div>
-        <div class="c-price">${COIN_ICON}${nft.price}</div>
-      </div>`;
-    card.addEventListener('click', () => openSellModal(nft));
-    grid.appendChild(card);
-  });
-  updateCoins();
-}
-
-function updateCoins(){
-  $('#coinBal').textContent = state.coins.toLocaleString();
-  $('#marketBalVal').textContent = state.coins.toLocaleString();
-}
-
-function toggleSelect(id){
-  if(state.busy) return;
-  const i = state.selected.indexOf(id);
-  if(i >= 0) state.selected.splice(i,1);
-  else {
-    if(state.selected.length >= MAX_MERGE){ toast('Max ' + MAX_MERGE + ' NFTs per forge'); return; }
-    state.selected.push(id);
-    vibe([12, 18, 22]);
-  }
-  refreshSelectionUI();
-}
-
-function refreshSelectionUI(){
-  $$('#invGrid .inv-card').forEach(c =>
-    c.classList.toggle('sel', state.selected.includes(c.dataset.id))
-  );
-  renderSlots(); renderOdds(); renderRisk();
-  const btn = $('#craftBtn');
-  const ready = state.selected.length > 0 && !state.busy;
-  btn.disabled = !ready;
-  btn.classList.toggle('ready', ready);
-}
-
-/* =========================================================
-   SLOTS / ODDS / RISK
-   ========================================================= */
-function renderSlots(){
-  const wrap = $('#slots');
-  wrap.innerHTML = '';
-  for(let i=0;i<MAX_MERGE;i++){
-    const nftId = state.selected[i];
-    const nft = nftId ? state.inventory.find(n => n.id === nftId) : null;
-    const slot = document.createElement('div');
-    slot.className = 'slot' + (nft ? ' filled' : '');
-    slot.dataset.id = nft ? nft.id : '';
-
-    if(nft){
-      const bg = BG_MAP[nft.bg];
-      slot.innerHTML = `
-        <div class="sl-bg">${bgSVG(bg, uid())}</div>
-        <div class="sl-md">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-        <div class="sl-bgname">${bg.name}</div>
-        <div class="sl-x">${X_ICON}</div>`;
-      slot.querySelector('.sl-x').addEventListener('click', e => {
-        e.stopPropagation(); toggleSelect(nft.id);
-      });
-    } else {
-      slot.innerHTML = `<div class="ph">${PLUS_ICON}</div>`;
-    }
-    wrap.appendChild(slot);
+/* ---------- Telegram user ---------- */
+function initUser(){
+  const u = tg?.initDataUnsafe?.user;
+  if (u){
+    state.user.name = ((u.first_name || '') + (u.last_name ? ' ' + u.last_name : '')).trim() || 'Explorer';
+    state.user.username = u.username || '';
+    state.user.photo = u.photo_url || '';
+    state.user.id = u.id || 0;
   }
 }
 
-function computeOdds(){
-  const counts = {};
-  state.selected.forEach(id => {
-    const n = state.inventory.find(x => x.id === id);
-    if(n) counts[n.bg] = (counts[n.bg] || 0) + 1;
+/* ---------- TOAST ---------- */
+let toastId = 0;
+function toast(text, type, icon){
+  type = type || 'info';
+  const wrap = $('#toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type !== 'info' ? type : '');
+  el.id = 'toast_' + (++toastId);
+  const iconHtml = type === 'success' ? E('✅', 18) : type === 'error' ? E('⚠️', 18) : (icon || E('✨', 18));
+  el.innerHTML = `<div class="ti">${iconHtml}</div><div class="tm">${escapeHtml(text)}</div>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 400);
+  }, 2800);
+  haptic('light');
+}
+
+/* ---------- MODAL ---------- */
+function showModal(title, text, okText, onOk, cancelText){
+  const back = $('#modal-back');
+  const modal = $('#modal');
+  modal.innerHTML = `
+    <div class="modal-title">${escapeHtml(title)}</div>
+    <div class="modal-text">${text}</div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="modal-cancel">${escapeHtml(cancelText || 'Cancel')}</button>
+      <button class="btn primary" id="modal-ok">${escapeHtml(okText || 'OK')}</button>
+    </div>`;
+  back.classList.add('show');
+  modal.classList.add('show');
+  $('#modal-cancel').onclick = () => { hideModal(); };
+  $('#modal-ok').onclick = () => { hideModal(); if (onOk) onOk(); };
+  haptic('medium');
+}
+function hideModal(){
+  $('#modal-back').classList.remove('show');
+  $('#modal').classList.remove('show');
+}
+
+/* ==================================================================
+   LOADER
+   ================================================================== */
+function runLoader(){
+  const grid = $('#loader-grid');
+  const loader = $('#loader');
+  const logo = $('#loader-logo');
+  const tag = $('#loader-tag');
+  const emojis = ['🚀','🌟','🛸','🪐','🌙','✨','⭐','💫','🌠'];
+
+  emojis.forEach((em, i) => {
+    const sq = document.createElement('div');
+    sq.className = 'l-sq';
+    sq.innerHTML = E(em, 28);
+    grid.appendChild(sq);
   });
-  const entries = Object.entries(counts).map(([id,c]) => ({ id, w: c*c*10 + 1 }));
-  const total = entries.reduce((s,e) => s + e.w, 0) || 1;
-  return entries.map(e => ({ bg: BG_MAP[e.id], pct: e.w/total*100 })).sort((a,b) => b.pct - a.pct);
-}
 
-function renderOdds(){
-  const wrap = $('#odds');
-  wrap.innerHTML = '';
-  if(!state.selected.length) return;
-  computeOdds().forEach(o => {
-    const d = document.createElement('div');
-    d.className = 'od';
-    d.innerHTML = `<span class="dot" style="background:${o.bg.sym}"></span>${o.bg.name} <b>${o.pct.toFixed(0)}%</b>`;
-    wrap.appendChild(d);
+  const squares = Array.from(grid.children);
+  squares.forEach((sq, i) => {
+    setTimeout(() => sq.classList.add('in'), 80 + i * 70);
   });
-}
 
-function renderRisk(){
-  const el = $('#riskLine');
-  const n = state.selected.length;
-  if(!n){ el.className = 'riskline'; el.innerHTML = 'Select NFTs to see forge risk'; return; }
-  const r = riskFor(n);
-  if(r === 0){
-    el.className = 'riskline safe';
-    el.innerHTML = `<span class="sdot"></span>Safe forge — no failure risk`;
-  } else {
-    el.className = 'riskline warn';
-    el.innerHTML = `<span class="rdot"></span>Failure risk <b>${Math.round(r*100)}%</b> — inputs destroyed`;
-  }
-}
-
-/* =========================================================
-   TABS
-   ========================================================= */
-const TAB_ORDER = ['forge','upgrade','market','profile'];
-function switchTab(tab){
-  state.tab = tab;
-  $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  const to = TAB_ORDER.indexOf(tab);
-  $$('.view').forEach(v => {
-    const idx = TAB_ORDER.indexOf(v.id.replace('view-',''));
-    v.classList.toggle('active', v.id === 'view-' + tab);
-    v.classList.toggle('exit-left', idx < to);
-  });
-  if(tab === 'upgrade') renderUpgradePicker();
-  if(tab === 'profile') { renderInventory(); renderGifts(); }
-  if(tab === 'market') renderMarket();
-}
-$$('.tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-
-/* =========================================================
-   TOAST
-   ========================================================= */
-let toastT;
-function toast(msg){
-  const el = $('#toast');
-  el.textContent = msg; el.classList.add('on');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => el.classList.remove('on'), 1900);
-}
-
-/* =========================================================
-   CUBE HELPERS
-   ========================================================= */
-const faceEl = name => cubeEl.querySelector(`.face[data-f="${name}"]`);
-const statusEl = $('#status');
-function setStatus(txt, cls){ statusEl.textContent = txt; statusEl.className = 'status' + (cls ? ' ' + cls : ''); }
-
-function resetCube(){
-  FACES.forEach(f => {
-    const el = faceEl(f);
-    el.classList.remove('has-nft','result','burn');
-    el.querySelector('.attached').innerHTML = '';
-  });
-  st.spinExtra = { x:0, y:0, z:0 };
-}
-
-function attachToFace(faceName, nft){
-  const el = faceEl(faceName);
-  el.classList.add('has-nft');
-  el.querySelector('.attached').innerHTML = charSVG(nft.char, nft.c1, nft.c2, nft.style, uid());
-}
-
-/* =========================================================
-   FLY-IN
-   ========================================================= */
-async function flyToCube(nft){
-  const src = document.querySelector(`.slot[data-id="${nft.id}"]`);
-  const srcRect = src ? src.getBoundingClientRect()
-                      : { left: innerWidth/2-30, top: innerHeight-150, width:60, height:60 };
-  const stageRect = stageEl.getBoundingClientRect();
-  const sx = srcRect.left + srcRect.width/2;
-  const sy = srcRect.top  + srcRect.height/2;
-  const cx = stageRect.left + stageRect.width/2;
-  const cy = stageRect.top  + stageRect.height/2;
-
-  const flyer = document.createElement('div');
-  flyer.className = 'flyer';
-  flyer.innerHTML = charSVG(nft.char, nft.c1, nft.c2, nft.style, uid());
-  document.body.appendChild(flyer);
-
-  const mx = (sx + cx)/2 + rnd(-80,80);
-  const my = (sy + cy)/2 - 130;
-
-  const anim = flyer.animate([
-    { transform:`translate(${sx}px,${sy}px) translate(-50%,-50%) scale(1) rotate(0deg)`, opacity:1 },
-    { transform:`translate(${mx}px,${my}px) translate(-50%,-50%) scale(1.12) rotate(240deg)`, opacity:1, offset:.55 },
-    { transform:`translate(${cx}px,${cy}px) translate(-50%,-50%) scale(.12) rotate(600deg)`, opacity:0 }
-  ], { duration: 720, easing:'cubic-bezier(.4,0,.25,1)', fill:'forwards' });
-
-  try { await anim.finished; } catch(e){}
-  flyer.remove();
-}
-
-/* =========================================================
-   RESULT CALC
-   ========================================================= */
-function colorDist(a, b){
-  const pa = parseInt(a.slice(1),16), pb = parseInt(b.slice(1),16);
-  const dr = ((pa>>16)&255) - ((pb>>16)&255);
-  const dg = ((pa>>8)&255)  - ((pb>>8)&255);
-  const db = (pa&255)       - (pb&255);
-  return Math.sqrt(dr*dr + dg*dg + db*db);
-}
-
-function computeResult(inputs){
-  const baseCounts = {};
-  inputs.forEach(n => baseCounts[n.baseId] = (baseCounts[n.baseId]||0) + 1);
-  const basePick = weightedPick(Object.entries(baseCounts).map(([id,c]) => ({ id, w:c })));
-  const base = BASE_MAP[basePick.id];
-
-  const totalW = base.models.reduce((s,m) => s + m.weight, 0);
-  const model  = weightedPick(base.models.map(m => ({ ...m, w:m.weight })));
-  const chance = model.weight / totalW * 100;
-
-  const bgCounts = {};
-  inputs.forEach(n => bgCounts[n.bg] = (bgCounts[n.bg]||0) + 1);
-  const bgPicks = Object.entries(bgCounts).map(([id,c]) => ({ id, w: c*c*10 + 1 }));
-  let bgId = weightedPick(bgPicks).id;
-  let bg   = BG_MAP[bgId];
-
-  /* Grail override: model.grail forces black/white + Black Onyx */
-  const isGrail = !!model.grail;
-  let c1 = model.c1, c2 = model.c2;
-  if(isGrail){
-    c1 = '#ffffff';
-    c2 = '#0a0a0a';
-    bgId = 'onyx';
-    bg = BG_MAP.onyx;
-  }
-
-  const forcedMono  = !isGrail && Math.random() < 0.045;
-  const naturalMono = !isGrail && colorDist(c1, bg.sym) < 42 && colorDist(c2, bg.a) < 60;
-  const mono = isGrail || forcedMono || naturalMono;
-
-  if(forcedMono){ c1 = shade(bg.sym, 0.34); c2 = shade(bg.a, -0.12); }
-
-  return {
-    id: 'c' + (++NFT_ID),
-    baseId: base.id,
-    name: model.name,
-    char: base.char,
-    style: model.style || 'simple',
-    c1, c2,
-    bg: bgId,
-    chance,
-    mono,
-    grail: isGrail,
-    price: TIER_PRICE[bg.rarity] || 15,
-    serial: state.serial++,
-    crafted: true
-  };
-}
-
-/* =========================================================
-   ALIGN — freeze after (no snap-back free spin)
-   ========================================================= */
-async function alignTo(faceName, dur = 1600){
-  const t = FACE_ROT[faceName];
-  const baseRy = t.ry + 360 * Math.round((st.ry - t.ry) / 360);
-  const fromRx = st.rx, fromRy = st.ry, fromRz = st.rz;
-  const toRy = baseRy + 360;
-
-  st.freeze = true;
-  st.spinExtra = { x:0, y:0, z:0 };
-  await tween(dur, p => {
-    const e = easeOutQuart(p);
-    st.rx = fromRx + (t.rx - fromRx) * e;
-    st.ry = fromRy + (toRy  - fromRy) * e;
-    st.rz = fromRz + (0     - fromRz) * e;
-  });
-  /* Snap exactly to target — no residual offset */
-  st.rx = t.rx;
-  st.ry = baseRy;
-  st.rz = 0;
-  st.spinExtra = { x:0, y:0, z:0 };
-  /* Keep frozen — cube stays on the result face until modal closes */
-  st.holdFace = faceName;
-}
-
-/* =========================================================
-   CRAFT — with failure risk
-   ========================================================= */
-async function craft(){
-  if(state.busy || !state.selected.length) return;
-
-  switchTab('forge');
-  state.busy = true;
-  $('#craftBtn').disabled = true;
-  $('#craftBtn').classList.remove('ready');
-
-  resetCube();
-  st.freeze = false;
-  st.holdFace = null;
-
-  const inputs = state.selected.map(id => state.inventory.find(n => n.id === id)).filter(Boolean);
-  const risk = riskFor(inputs.length);
-  const willFail = Math.random() < risk;
-
-  const sideFaces  = ['front','back','right','left'];
-  const shuffled   = shuffle(FACES);
-  const inputFaces = shuffled.slice(0, inputs.length);
-  const freeSides  = sideFaces.filter(f => !inputFaces.includes(f));
-  const resultFace = freeSides.length ? pick(freeSides) : 'front';
-
-  setStatus('Feeding the forge…', 'live');
-  vibe([22, 18, 30]);
-
-  for(let i=0;i<inputs.length;i++){
-    await flyToCube(inputs[i]);
-    attachToFace(inputFaces[i], inputs[i]);
-    applyFaceKick(inputFaces[i]);
-    await wait(250);
-  }
-  await wait(140);
-
-  setStatus('Fusing…', 'live');
-  await tween(680, p => {
-    st.spinExtra.y += 28 * (1 - p) * 0.5;
-    st.spinExtra.x += 12 * (1 - p) * 0.5;
-  });
-  for(let i=0;i<3;i++){
-    st.vx += rnd(-42,42) * 4;
-    st.vy += rnd(-34,34) * 4;
-    st.spinExtra.x += rnd(-44,44);
-    st.spinExtra.y += rnd(-66,66);
-    vibe([16, 22, 30]);
-    await wait(140);
-  }
-  await wait(160);
-
-  /* ============ FAILURE ============ */
-  if(willFail){
-    setStatus('Unstable!', 'bad');
-    st.vx += 500; st.vy -= 380;
-    st.spinExtra.x += 220; st.spinExtra.y += 320; st.spinExtra.z += 150;
-    vibe([60, 40, 120, 40, 180]);
-
-    FACES.forEach(f => {
-      const el = faceEl(f);
-      if(el.classList.contains('has-nft')) el.classList.add('burn');
+  setTimeout(() => {
+    squares.forEach((sq, i) => {
+      setTimeout(() => sq.classList.add('merge'), i * 40);
     });
-    flashScreen();
-    await wait(1000);
-    flashScreen();
-    vibe([40, 30, 80]);
-    await wait(220);
+  }, 1100);
 
-    state.inventory = state.inventory.filter(n => !state.selected.includes(n.id));
-    state.selected = [];
-    refreshSelectionUI();
-    renderInventory();
-    showFailModal(inputs);
-    return;
-  }
+  setTimeout(() => {
+    logo.classList.add('in');
+    tag.classList.add('in');
+  }, 1450);
 
-  /* ============ SUCCESS ============ */
-  setStatus('Locking…', 'live');
-  await alignTo(resultFace, 1500);
-
-  const result = computeResult(inputs);
-  const rf = faceEl(resultFace);
-  rf.classList.add('has-nft','result');
-  rf.querySelector('.attached').innerHTML = charSVG(result.char, result.c1, result.c2, result.style, uid());
-
-  st.vx += 34; st.vy += 30;
-  vibe([30, 25, 45, 30, 80]);
-  setStatus('Forged!', 'live');
-
-  state.inventory = state.inventory.filter(n => !state.selected.includes(n.id));
-  state.selected = [];
-  state.inventory.unshift(result);
-
-  refreshSelectionUI();
-  renderInventory();
-
-  await wait(900);
-  showResultModal(result);
+  setTimeout(() => {
+    loader.classList.add('out');
+    setTimeout(() => {
+      renderAll();
+      initTabs();
+      switchTab('circle', false);
+    }, 400);
+  }, 2400);
 }
 
-async function flashScreen(){
-  const el = $('#flash');
-  el.classList.add('on');
-  await wait(190);
-  el.classList.remove('on');
-}
-
-/* =========================================================
-   MODALS
-   ========================================================= */
-const modalBack = $('#modalBack');
-const modalBody = $('#modalBody');
-function openModal(html){ modalBody.innerHTML = html; modalBack.classList.add('on'); }
-function closeModal(){
-  modalBack.classList.remove('on');
-  resetCube();
-  st.freeze = false;
-  st.holdFace = null;
-  setStatus('Ready to forge');
-  state.busy = false;
-  refreshSelectionUI();
-  renderUpgradePicker();
-  updateUpgradeUI();
-}
-modalBack.addEventListener('click', e => { if(e.target === modalBack) closeModal(); });
-
-function showResultModal(nft){
-  const bg   = BG_MAP[nft.bg];
-  const tier = tierOfChance(nft.chance);
-
-  openModal(`
-    <div class="res-card">
-      <div class="bg">${bgSVG(bg, uid())}</div>
-      <div class="mdl">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-      <div class="shine"></div>
-    </div>
-    <div class="res-name">${nft.name}</div>
-    <div class="res-sub">#${String(nft.serial).padStart(4,'0')} · ${bg.rarity}</div>
-    <div class="res-bgline">
-      <span class="bdot" style="background:${bg.sym};color:${bg.sym}"></span>
-      ${bg.name}
-    </div>
-    <div class="res-price">${COIN_ICON} ${nft.price.toLocaleString()} coins</div>
-    <div class="res-row">
-      <span class="tier" style="color:${tier.color}">${tier.name}</span>
-      ${nft.grail ? '<span class="grail-tag">GRAIL</span>' : (nft.mono ? '<span class="mono-tag">MONO</span>' : '')}
-      <button class="chance-btn" id="chanceBtn">${fmtPct(nft.chance)}</button>
-    </div>
-    <div class="modal-actions">
-      <button class="mbtn ghost" id="mClose">Close</button>
-      <button class="mbtn primary" id="mAdd">Keep</button>
-    </div>
-  `);
-
-  $('#mClose').addEventListener('click', closeModal);
-  $('#mAdd').addEventListener('click', () => { closeModal(); toast('Added to inventory'); });
-  $('#chanceBtn').addEventListener('click', () => showModelList(nft.baseId, nft));
-}
-
-function showFailModal(inputs){
-  const lost = inputs.map(n => {
-    const bg = BG_MAP[n.bg];
-    return `<div class="lost-item">
-      <div class="lbg">${bgSVG(bg, uid())}</div>
-      <div class="lm">${charSVG(n.char, n.c1, n.c2, n.style, uid())}</div>
-    </div>`;
-  }).join('');
-
-  openModal(`
-    <div class="fail-card">
-      <svg viewBox="0 0 100 100" fill="none" stroke="#ff8080" stroke-width="2.4" stroke-linejoin="round">
-        <path d="M50 6 L88 28 L88 72 L50 94 L12 72 L12 28 Z" stroke-opacity=".55"/>
-        <path d="M50 6 L50 40 L30 52 L44 64 L34 86" stroke="#ff5a5a" stroke-width="3" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="res-name" style="color:#ff7b7b">FORGE FAILED</div>
-    <div class="res-sub">The cube rejected your offering</div>
-    <div class="lost-list">${lost}</div>
-    <div class="modal-actions">
-      <button class="mbtn primary" id="fClose" style="background:linear-gradient(135deg,#b34242,#7d2626);box-shadow:0 6px 18px rgba(180,50,50,.35)">
-        Accept Loss
-      </button>
-    </div>
-  `);
-
-  $('#fClose').addEventListener('click', () => {
-    closeModal();
-    toast('Forge failed — inputs destroyed');
-  });
-}
-
-function showModelList(baseId, owned){
-  const base = BASE_MAP[baseId];
-  const totalW = base.models.reduce((s,m) => s + m.weight, 0);
-
-  const rows = base.models.slice().sort((a,b) => b.weight - a.weight).map(m => {
-    const pct  = m.weight / totalW * 100;
-    const tier = tierOfChance(pct);
-    const isOwn = owned && owned.name === m.name;
-    const style = m.grail ? 'grail' : (m.style || 'simple');
-    return `<div class="ml-item${isOwn ? ' own' : ''}">
-      <div class="ml-ic">${charSVG(base.char, m.c1, m.c2, style, uid())}</div>
-      <div class="ml-info">
-        <div class="ml-nm">${m.name}</div>
-        <div class="ml-tier" style="color:${tier.color}">${tier.name}</div>
+/* ==================================================================
+   RENDER HEADER
+   ================================================================== */
+function renderHeader(){
+  const h = $('#header');
+  const u = state.user;
+  const photo = u.photo || avatarUrl(u.id % 70 || 12);
+  const initial = u.name.charAt(0).toUpperCase();
+  const fallback = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.name)}&backgroundColor=5b9dff`;
+  h.innerHTML = `
+    <div class="h-left">
+      <div class="h-av">
+        <img src="${escapeHtml(photo)}" alt="" onerror="this.src='${fallback}'">
+        <span class="dot"></span>
       </div>
-      <div class="ml-pct">${fmtPct(pct)}</div>
+      <div class="h-info">
+        <div class="h-name">${escapeHtml(u.name)}</div>
+        <div class="h-sub">${u.username ? '@' + escapeHtml(u.username) : 'online'}</div>
+      </div>
+    </div>
+    <div class="h-brand">
+      <span>Orbit</span>
+    </div>
+    <div class="h-right">
+      <div class="h-pill" id="balance-pill">
+        ${E('💎', 14)}<span class="val">${state.balance.toLocaleString()}</span>
+      </div>
     </div>`;
+  $('#balance-pill')?.addEventListener('click', () => {
+    toast('Balance: ' + state.balance + ' 💎', 'success');
+  });
+}
+
+/* ==================================================================
+   RENDER TABS NAV
+   ================================================================== */
+const TABS = [
+  { id: 'circle', label: 'Circle', icon: '👥' },
+  { id: 'nova',   label: 'Nova',   icon: '🦊' },
+  { id: 'shots',  label: 'Shots',  icon: '📸' },
+  { id: 'echo',   label: 'Echo',   icon: '🔒' },
+  { id: 'fiesta', label: 'Fiesta', icon: '🎉' }
+];
+function renderTabs(){
+  const wrap = $('#tabs-inner');
+  TABS.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'tab-btn';
+    b.dataset.tab = t.id;
+    b.innerHTML = `<span style="font-size:18px;line-height:1">${E(t.icon, 20)}</span><span class="lbl">${t.label}</span>`;
+    b.addEventListener('click', () => switchTab(t.id));
+    wrap.appendChild(b);
+  });
+}
+function initTabs(){
+  renderTabs();
+  updateIndicator();
+  setTimeout(updateIndicator, 100);
+  window.addEventListener('resize', updateIndicator);
+}
+function updateIndicator(){
+  const ind = $('#tab-indicator');
+  if (!ind) return;
+  const idx = TABS.findIndex(t => t.id === state.tab);
+  if (idx < 0) return;
+  const width = (ind.parentElement.clientWidth - 12) / TABS.length;
+  ind.style.width = width + 'px';
+  ind.style.transform = `translateX(${idx * width}px)`;
+}
+
+/* ==================================================================
+   RENDER: CIRCLE
+   ================================================================== */
+function renderCircle(){
+  const page = $('#page-circle');
+  const chatted = CONTACTS.filter(c => c.msgs > 0).length;
+  const online = CONTACTS.filter(c => c.online).length;
+
+  page.innerHTML = `
+    <div class="stats">
+      <div class="stat"><div class="v">${CONTACTS.length}</div><div class="l">Contacts</div></div>
+      <div class="stat"><div class="v green">${online}</div><div class="l">Online</div></div>
+      <div class="stat"><div class="v accent">${state.friends.size}</div><div class="l">In Orbit</div></div>
+    </div>
+
+    <div class="seg">
+      <button class="${state.filter === 'chatted' ? 'on' : ''}" data-filter="chatted">💬 From chats (${chatted})</button>
+      <button class="${state.filter === 'all' ? 'on' : ''}" data-filter="all">👥 All contacts</button>
+    </div>
+
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search-input" placeholder="Search name or username" value="${escapeHtml(state.search)}">
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="add-all-btn">Add everyone · ${getAddable().length}</button>
+      <button class="btn ghost icon-btn" id="add-random-btn">🎲</button>
+    </div>
+
+    <div class="card" style="padding:6px 4px">
+      <div class="friend-list" id="friend-list"></div>
+    </div>
+
+    <div class="hint" style="padding:0 6px">
+      "From chats" shows only contacts you've messaged at least once. Switch to "All contacts" for your full list.
+    </div>`;
+
+  renderFriendList();
+
+  // wiring
+  $$('.seg button[data-filter]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.filter = b.dataset.filter;
+      renderCircle();
+      haptic('light');
+    });
+  });
+  $('#search-input')?.addEventListener('input', e => {
+    state.search = e.target.value;
+    renderFriendList();
+  });
+  $('#add-all-btn')?.addEventListener('click', addAll);
+  $('#add-random-btn')?.addEventListener('click', addRandom);
+}
+
+function getAddable(){
+  return CONTACTS.filter(c => {
+    const passFilter = state.filter === 'chatted' ? c.msgs > 0 : true;
+    return passFilter && !state.friends.has(c.id);
+  });
+}
+
+function renderFriendList(){
+  const list = $('#friend-list');
+  if (!list) return;
+  const q = state.search.trim().toLowerCase();
+  const visible = CONTACTS
+    .filter(c => state.filter === 'chatted' ? c.msgs > 0 : true)
+    .filter(c => !q || c.name.toLowerCase().includes(q) || c.username.toLowerCase().includes(q));
+
+  if (!visible.length){
+    list.innerHTML = `<div class="empty"><div class="ico">${E('🔍', 40)}</div><p>No one matches your search</p></div>`;
+    return;
+  }
+
+  list.innerHTML = visible.map((c, i) => {
+    const added = state.friends.has(c.id);
+    const photo = avatarUrl(c.photo);
+    const prev = c.msgs > 0
+      ? escapeHtml(c.prev || 'You: ok') + ' · ' + c.msgs + ' msgs'
+      : 'No messages yet';
+    const time = timeAgo(c.last);
+    return `
+      <div class="friend" style="animation-delay:${i * 22}ms">
+        <div class="f-av">
+          <img src="${photo}" alt="" onerror="this.style.background='#232e3c'">
+          <span class="${c.online ? 'on' : 'off'}" style="position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;border:2px solid #07090d;${c.online ? 'background:#4ade80;box-shadow:0 0 8px #4ade80' : 'background:rgba(255,255,255,.3)'}"></span>
+        </div>
+        <div class="f-info">
+          <div class="f-name">${escapeHtml(c.name)}<span class="f-handle">@${escapeHtml(c.username)}</span></div>
+          <div class="f-prev">${prev}</div>
+        </div>
+        <div class="f-meta">
+          ${time ? `<div class="f-time">${time}</div>` : ''}
+          ${added
+            ? `<span class="f-added">${E('✅', 13)} Added</span>`
+            : `<button class="f-add" data-add="${c.id}">Add</button>`}
+        </div>
+      </div>`;
   }).join('');
 
-  openModal(`
-    <div class="ml-head">
-      <div class="ml-title">${base.name}</div>
-      <div class="ml-sub">${base.models.length} forged variants</div>
-    </div>
-    <div class="ml-list">${rows}</div>
-    <div class="modal-actions">
-      <button class="mbtn primary" id="mlBack">Back</button>
-    </div>
-  `);
-
-  $('#mlBack').addEventListener('click', () => {
-    if(owned) showResultModal(owned); else closeModal();
+  list.querySelectorAll('[data-add]').forEach(b => {
+    b.addEventListener('click', () => addFriend(+b.dataset.add));
   });
 }
 
-/* =========================================================
-   MARKET — sell
-   ========================================================= */
-function openSellModal(nft){
-  if(state.busy) return;
-  const bg = BG_MAP[nft.bg];
-  openModal(`
-    <div class="res-card">
-      <div class="bg">${bgSVG(bg, uid())}</div>
-      <div class="mdl">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
+function addFriend(id){
+  if (state.friends.has(id)) return;
+  state.friends.add(id);
+  save();
+  haptic('medium');
+  const c = CONTACTS.find(x => x.id === id);
+  toast((c ? c.name.split(' ')[0] : 'Friend') + ' added to Orbit ✨', 'success');
+  renderCircle();
+  updateHeaderBadge();
+  if (state.tab === 'echo') renderEcho();
+}
+function addAll(){
+  const addable = getAddable();
+  if (!addable.length){ toast('Already added everyone', 'info'); return; }
+  addable.forEach(c => state.friends.add(c.id));
+  save();
+  haptic('heavy');
+  toast(`Added ${addable.length} friends to Orbit ✨`, 'success');
+  renderCircle();
+  updateHeaderBadge();
+}
+function addRandom(){
+  const addable = getAddable();
+  if (!addable.length){ toast('Already added everyone', 'info'); return; }
+  const pick = addable[Math.floor(Math.random() * addable.length)];
+  addFriend(pick.id);
+}
+function updateHeaderBadge(){
+  // optionally re-render
+}
+
+/* ==================================================================
+   RENDER: NOVA
+   ================================================================== */
+function renderNova(){
+  const page = $('#page-nova');
+  const n = state.nova;
+  const friendsInOrbit = state.friends.size;
+
+  page.innerHTML = `
+    <div class="nova-card">
+      <div class="nova-em">${E('🦊', 84)}</div>
+      <div class="nova-name">${escapeHtml(n.name)}</div>
+      <div class="nova-lvl">Level ${n.level} · ${friendsInOrbit} friends in orbit</div>
+
+      <div class="nova-bars">
+        ${renderBar('Food', '🍖', n.food, '#4ade80')}
+        ${renderBar('Mood', '💚', n.happy, '#fbbf24')}
+        ${renderBar('Energy', '⚡', n.energy, '#5b9dff')}
+      </div>
+
+      <div class="nova-actions">
+        <button class="btn primary" data-care="feed">${E('🍖', 20)}<span>Feed</span></button>
+        <button class="btn ghost" data-care="play">${E('🎾', 20)}<span>Play</span></button>
+        <button class="btn ghost" data-care="sleep">${E('💤', 20)}<span>Sleep</span></button>
+      </div>
     </div>
-    <div class="res-name">${nft.name}</div>
-    <div class="res-bgline">
-      <span class="bdot" style="background:${bg.sym};color:${bg.sym}"></span>
-      ${bg.name} · ${bg.rarity}
+
+    <div class="card">
+      <div class="title">Care log</div>
+      <div class="care-log" id="care-log"></div>
     </div>
-    <div class="res-price">${COIN_ICON} ${nft.price.toLocaleString()} coins</div>
-    <div class="modal-actions">
-      <button class="mbtn ghost" id="sellCancel">Cancel</button>
-      <button class="mbtn sell" id="sellConfirm">Sell</button>
-    </div>
-  `);
-  $('#sellCancel').addEventListener('click', closeModal);
-  $('#sellConfirm').addEventListener('click', () => {
-    state.coins += nft.price;
-    state.inventory = state.inventory.filter(n => n.id !== nft.id);
-    state.selected = state.selected.filter(id => id !== nft.id);
-    updateCoins();
-    renderMarket();
-    renderInventory();
-    refreshSelectionUI();
-    vibe([20, 30, 40, 30, 60]);
-    toast(`Sold for ${nft.price} coins`);
-    closeModal();
-  });
-}
 
-/* =========================================================
-   RARITY
-   ========================================================= */
-function tierOfChance(pct){
-  if(pct > 30)  return { name:'COMMON',    color:'#8b98a9' };
-  if(pct > 10)  return { name:'UNCOMMON',  color:'#4ade80' };
-  if(pct > 4)   return { name:'RARE',      color:'#5ea8ff' };
-  if(pct > 1.5) return { name:'EPIC',      color:'#b48cff' };
-  if(pct > 0.6) return { name:'LEGENDARY', color:'#ffcf5c' };
-  return { name:'MYTHIC', color:'#ff6b6b' };
-}
-function fmtPct(p){
-  if(p >= 10) return p.toFixed(1) + '%';
-  return p.toFixed(2) + '%';
-}
-
-/* =========================================================
-   UPGRADER WHEEL
-   ========================================================= */
-const UPGRADE_PATTERN = [1, 2, 1, 3, 1, 2];
-
-function segmentPath(i){
-  const a1 = i * 60 * Math.PI / 180;
-  const a2 = (i + 1) * 60 * Math.PI / 180;
-  const x1 = 100 + 85 * Math.sin(a1);
-  const y1 = 100 - 85 * Math.cos(a1);
-  const x2 = 100 + 85 * Math.sin(a2);
-  const y2 = 100 - 85 * Math.cos(a2);
-  return `M100,100 L${x1.toFixed(2)},${y1.toFixed(2)} A85,85 0 0,1 ${x2.toFixed(2)},${y2.toFixed(2)} Z`;
-}
-function labelPos(i){
-  const a = (i * 60 + 30) * Math.PI / 180;
-  return { x: 100 + 58 * Math.sin(a), y: 100 - 58 * Math.cos(a) };
-}
-
-function buildWheel(currentTierIdx){
-  const g = $('#wheelRotate');
-  g.innerHTML = '';
-  for(let i=0;i<6;i++){
-    const upgrade = UPGRADE_PATTERN[i];
-    const newIdx = Math.min(currentTierIdx + upgrade, TIER_ORDER.length - 1);
-    const tierName = TIER_ORDER[newIdx];
-    const color = TIER_COLORS[tierName];
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d', segmentPath(i));
-    path.setAttribute('fill', shade(color, -0.15));
-    path.setAttribute('stroke', '#0f151d');
-    path.setAttribute('stroke-width', '1');
-    g.appendChild(path);
-
-    const pos = labelPos(i);
-    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x', pos.x.toFixed(1));
-    txt.setAttribute('y', pos.y.toFixed(1));
-    txt.setAttribute('class', 'wlabel');
-    txt.textContent = tierName;
-    g.appendChild(txt);
-  }
-}
-
-function selectForUpgrade(id){
-  if(state.busy) return;
-  if(state.upgradeSelected === id) state.upgradeSelected = null;
-  else state.upgradeSelected = id;
-  vibe([12, 16, 20]);
-  updateUpgradeUI();
-  renderUpgradePicker();
-}
-
-function updateUpgradeUI(){
-  const nft = state.upgradeSelected ? state.inventory.find(n => n.id === state.upgradeSelected) : null;
-  const slot = $('#upgSlot');
-  const spinBtn = $('#spinBtn');
-  const info = $('#upgInfo');
-
-  if(!nft){
-    slot.className = 'upg-slot';
-    slot.innerHTML = `<div class="ph-txt">No NFT selected</div>`;
-    info.innerHTML = 'Select an NFT below to begin upgrading';
-    spinBtn.disabled = true;
-    buildWheel(0);
-    return;
-  }
-
-  const bg = BG_MAP[nft.bg];
-  const tierIdx = TIER_ORDER.indexOf(bg.rarity);
-  const isMax = tierIdx === TIER_ORDER.length - 1;
-
-  slot.className = 'upg-slot filled';
-  slot.innerHTML = `
-    <div class="u-bg">${bgSVG(bg, uid())}</div>
-    <div class="u-md">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-    <div class="u-info">
-      <div class="u-nm">${nft.name}</div>
-      <div class="u-tier" style="color:${TIER_COLORS[bg.rarity]}">${bg.rarity.toUpperCase()}</div>
-      <div class="u-bgnm">${bg.name}</div>
+    <div class="card" style="background:linear-gradient(135deg,rgba(91,157,255,.1),rgba(167,139,250,.05));border-color:rgba(91,157,255,.25)">
+      <div class="title" style="margin-bottom:8px">Grow together</div>
+      <div class="hint" style="margin-bottom:12px">The more friends you add to Orbit, the more they can help care for ${escapeHtml(n.name)}. Every friend you add will occasionally feed or play with Nova.</div>
+      <button class="btn gold full" id="nova-invite-btn">${E('✉️', 16)} Invite friends to feed Nova</button>
     </div>`;
-  buildWheel(tierIdx);
 
-  if(isMax){
-    info.innerHTML = '<b>Already Mythic!</b> This NFT is at max rarity.';
-    spinBtn.disabled = true;
-  } else {
-    info.innerHTML = `Spin to upgrade the background. Guaranteed upgrade!`;
-    spinBtn.disabled = false;
-  }
-}
+  renderCareLog();
 
-async function spinWheel(){
-  if(state.busy) return;
-  const nft = state.upgradeSelected ? state.inventory.find(n => n.id === state.upgradeSelected) : null;
-  if(!nft) return;
-  const bg = BG_MAP[nft.bg];
-  const currentIdx = TIER_ORDER.indexOf(bg.rarity);
-  if(currentIdx === TIER_ORDER.length - 1) return;
-
-  state.busy = true;
-  $('#spinBtn').disabled = true;
-
-  const segIdx = Math.floor(Math.random() * 6);
-  const upgrade = UPGRADE_PATTERN[segIdx];
-  const newIdx = Math.min(currentIdx + upgrade, TIER_ORDER.length - 1);
-  const newTier = TIER_ORDER[newIdx];
-
-  vibe([18, 22, 26, 22, 34]);
-
-  const extraSpins = 5;
-  const targetAngle = 360 * extraSpins + (330 - segIdx * 60);
-  state.wheelAngle += targetAngle;
-  $('#wheelRotate').style.transform = `rotate(${state.wheelAngle}deg)`;
-
-  const ticks = [];
-  for(let i=0;i<12;i++) ticks.push(setTimeout(() => vibe(8), 200 + i * 180));
-
-  await wait(4400);
-  ticks.forEach(clearTimeout);
-  vibe([40, 30, 60, 30, 100]);
-
-  const pool = BGS.filter(b => b.rarity === newTier);
-  const newBg = pick(pool);
-
-  nft.bg = newBg.id;
-  nft.price = TIER_PRICE[newBg.rarity] || 15;
-  nft.crafted = true;
-
-  showUpgradeResult(nft, bg, newBg);
-}
-
-function showUpgradeResult(nft, oldBg, newBg){
-  openModal(`
-    <div class="reveal-card">
-      <div class="bg">${bgSVG(newBg, uid())}</div>
-      <div class="mdl">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-    </div>
-    <div class="res-name">Upgraded!</div>
-    <div class="res-sub">${oldBg.rarity} → <span style="color:${TIER_COLORS[newBg.rarity]};font-weight:800">${newBg.rarity}</span></div>
-    <div class="res-bgline">
-      <span class="bdot" style="background:${newBg.sym};color:${newBg.sym}"></span>
-      ${newBg.name}
-    </div>
-    <div class="res-price">${COIN_ICON} ${nft.price.toLocaleString()} coins</div>
-    <div class="modal-actions">
-      <button class="mbtn primary" id="uClose">Nice!</button>
-    </div>
-  `);
-  $('#uClose').addEventListener('click', () => {
-    closeModal();
-    renderInventory();
-    renderUpgradePicker();
-    updateUpgradeUI();
-    renderMarket();
+  page.querySelectorAll('[data-care]').forEach(b => {
+    b.addEventListener('click', () => care(b.dataset.care));
+  });
+  $('#nova-invite-btn')?.addEventListener('click', () => {
+    if (tg?.openTelegramLink){
+      toast('Share link copied', 'success');
+    } else {
+      toast('Invite sent to your orbit ✨', 'success');
+    }
+    haptic('medium');
   });
 }
 
-$('#spinBtn').addEventListener('click', spinWheel);
+function renderBar(label, emoji, value, color){
+  return `
+    <div class="nbar">
+      <div class="nbar-head">
+        <span>${E(emoji, 13)} ${label}</span>
+        <span class="v">${Math.round(value)}%</span>
+      </div>
+      <div class="nbar-track">
+        <div class="nbar-fill" style="width:${value}%;background:linear-gradient(90deg,${color}aa,${color})"></div>
+      </div>
+    </div>`;
+}
 
-/* =========================================================
-   GIFTS
-   ========================================================= */
-function renderGifts(){
-  const row = $('#giftsRow');
-  row.innerHTML = '';
-  if(!state.gifts.length){
-    row.innerHTML = '<div class="gifts-empty">No gifts — tap "+ Get Gift" to mint one</div>';
+const CARE_LOG = [];
+function renderCareLog(){
+  const el = $('#care-log');
+  if (!el) return;
+  if (!CARE_LOG.length){
+    // seed with friend helpers if any
+    const friendIds = [...state.friends].slice(0, 3);
+    friendIds.forEach(id => {
+      const c = CONTACTS.find(x => x.id === id);
+      if (c) CARE_LOG.push({
+        name: c.name.split(' ')[0],
+        photo: avatarUrl(c.photo),
+        text: ['fed Nova 🍖', 'played with Nova 🎾', 'put Nova to sleep 💤'][Math.floor(Math.random() * 3)],
+        t: Math.floor(Math.random() * 20) + 1
+      });
+    });
+  }
+  if (!CARE_LOG.length){
+    el.innerHTML = `<div class="hint">Nobody has helped yet. Add friends so they can join!</div>`;
     return;
   }
-  state.gifts.forEach((gift, i) => {
-    const box = document.createElement('div');
-    box.className = 'gift-box';
-    box.style.animationDelay = Math.min(i * 30, 300) + 'ms';
-    box.innerHTML = GIFT_ICON;
-    box.addEventListener('click', () => revealGift(gift.id, box));
-    row.appendChild(box);
+  el.innerHTML = CARE_LOG.slice(0, 6).map(l => `
+    <div class="care-item">
+      <div class="av"><img src="${l.photo}" alt="" onerror="this.style.display='none'"></div>
+      <div class="care-info">
+        <div class="care-name">${escapeHtml(l.name)}</div>
+        <div class="care-text">${escapeHtml(l.text)} · ${l.t}m ago</div>
+      </div>
+    </div>`).join('');
+}
+
+function care(kind){
+  const n = state.nova;
+  const clamp = v => Math.max(0, Math.min(100, Math.round(v)));
+
+  if (kind === 'feed'){
+    n.food = clamp(n.food + 18);
+    n.energy = clamp(n.energy - 5);
+    CARE_LOG.unshift({ name: 'You', photo: state.user.photo || avatarUrl(12), text: 'fed Nova 🍖', t: 0 });
+  } else if (kind === 'play'){
+    n.happy = clamp(n.happy + 16);
+    n.energy = clamp(n.energy - 12);
+    n.food = clamp(n.food - 5);
+    CARE_LOG.unshift({ name: 'You', photo: state.user.photo || avatarUrl(12), text: 'played with Nova 🎾', t: 0 });
+  } else if (kind === 'sleep'){
+    n.energy = clamp(n.energy + 22);
+    n.food = clamp(n.food - 4);
+    CARE_LOG.unshift({ name: 'You', photo: state.user.photo || avatarUrl(12), text: 'put Nova to sleep 💤', t: 0 });
+  }
+
+  // random friend helper
+  if (state.friends.size && Math.random() < 0.5){
+    const fids = [...state.friends];
+    const pick = CONTACTS.find(x => x.id === fids[Math.floor(Math.random() * fids.length)]);
+    if (pick){
+      n.happy = clamp(n.happy + 4);
+      CARE_LOG.unshift({ name: pick.name.split(' ')[0], photo: avatarUrl(pick.photo), text: 'helped Nova too', t: 0 });
+    }
+  }
+
+  if ((n.food + n.happy + n.energy) / 3 > 78){
+    n.level++;
+    n.food = n.happy = n.energy = 60;
+    toast(`Nova leveled up! Now level ${n.level} 🎉`, 'success');
+    haptic('heavy');
+  } else {
+    haptic('light');
+  }
+
+  save();
+  renderNova();
+}
+
+/* ==================================================================
+   RENDER: SHOTS
+   ================================================================== */
+function renderShots(){
+  const page = $('#page-shots');
+  const myFrame = FRAMES.find(f => f.id === state.frame) || FRAMES[0];
+  const initial = state.user.name.charAt(0).toUpperCase();
+
+  page.innerHTML = `
+    <div class="challenge">
+      <span class="challenge-tag">${E('🔥', 12)} Today's challenge</span>
+      <div class="challenge-title">"My desk setup"</div>
+      <div class="challenge-sub">Ends in 6h 12m · ${PHOTO_DATA.length + (state.myPhoto ? 1 : 0)} people joined</div>
+      <button class="btn primary full" id="join-challenge">${state.myPhoto ? '📸 You\'re in' : '📸 Join the challenge'}</button>
+    </div>
+
+    <div class="card" style="padding:12px 14px">
+      <div class="title">Frame your avatar</div>
+      <div class="frames-scroll" id="frames-scroll"></div>
+      <div class="hint" style="margin-top:6px">Changes your profile picture frame across the app.</div>
+    </div>
+
+    <div class="card">
+      <div class="title">Community feed</div>
+      <div class="photo-grid" id="photo-grid"></div>
+      <div class="hint">Tap a photo to vote ❤️</div>
+    </div>`;
+
+  // frames
+  const fr = $('#frames-scroll');
+  FRAMES.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'frame-btn' + (state.frame === f.id ? ' on' : '');
+    btn.dataset.frame = f.id;
+    const bg = f.id === 'none' ? 'linear-gradient(135deg,#5b9dff,#4a86e8)' : f.color;
+    btn.innerHTML = `
+      <div class="frame-circle" style="background:${bg}">
+        ${initial}${f.emoji ? `<span class="badge">${E(f.emoji, 14)}</span>` : ''}
+      </div>
+      <span>${f.id === 'none' ? 'Default' : f.emoji}</span>`;
+    btn.addEventListener('click', () => {
+      state.frame = f.id;
+      save();
+      haptic('medium');
+      renderShots();
+      toast('Frame applied ✨', 'success');
+    });
+    fr.appendChild(btn);
+  });
+
+  renderPhotoGrid();
+
+  $('#join-challenge')?.addEventListener('click', () => {
+    if (state.myPhoto){ toast('You are already participating', 'info'); return; }
+    state.myPhoto = true;
+    save();
+    haptic('heavy');
+    toast('Your photo joined the challenge 📸', 'success');
+    renderShots();
   });
 }
 
-async function revealGift(giftId, boxEl){
-  if(state.busy) return;
-  state.busy = true;
-  boxEl.classList.add('shake');
-  vibe([25, 20, 35, 20, 50]);
-  await wait(450);
+function renderPhotoGrid(){
+  const grid = $('#photo-grid');
+  if (!grid) return;
+  const all = [...PHOTO_DATA];
+  if (state.myPhoto) all.push({ id: 99, emoji: '😎', by: 'You', photo: null, votes: 0, mine: true });
 
-  const nft = makeRandomNFT();
-  state.gifts = state.gifts.filter(g => g.id !== giftId);
-  state.inventory.unshift(nft);
+  const grads = ['g1','g2','g3','g4','g5','g6'];
+  const gradColors = {
+    g1:'linear-gradient(135deg,#ff9a6b,#ff5e8a)',
+    g2:'linear-gradient(135deg,#5ec6ff,#7b6bff)',
+    g3:'linear-gradient(135deg,#6ef2a8,#2ec5c5)',
+    g4:'linear-gradient(135deg,#ffd36b,#ff8f4d)',
+    g5:'linear-gradient(135deg,#ff9fe0,#b48bff)',
+    g6:'linear-gradient(135deg,#8fa3b8,#4b6076)'
+  };
 
-  vibe([40, 30, 70, 30, 120]);
-  renderInventory();
-  renderGifts();
+  grid.innerHTML = all.map((p, i) => {
+    const voted = state.votes.has(p.id);
+    const grad = p.mine ? 'linear-gradient(135deg,#5b9dff,#4a86e8)' : gradColors[grads[i % grads.length]];
+    return `
+      <div class="photo-tile ${voted ? 'voted' : ''}" data-photo="${p.id}" style="background:${grad};animation-delay:${i * 40}ms">
+        <div class="votes">${E('❤️', 11)} ${p.votes}</div>
+        <div class="emwrap">${E(p.emoji, 32)}</div>
+        <div class="by">${escapeHtml(p.by)}</div>
+      </div>`;
+  }).join('');
 
-  const bg = BG_MAP[nft.bg];
-  openModal(`
-    <div class="reveal-card">
-      <div class="bg">${bgSVG(bg, uid())}</div>
-      <div class="mdl">${charSVG(nft.char, nft.c1, nft.c2, nft.style, uid())}</div>
-    </div>
-    <div class="res-name">Gift Revealed!</div>
-    <div class="res-sub">${nft.name} · ${bg.rarity}</div>
-    <div class="res-bgline">
-      <span class="bdot" style="background:${bg.sym};color:${bg.sym}"></span>
-      ${bg.name}
-    </div>
-    <div class="res-price">${COIN_ICON} ${nft.price.toLocaleString()} coins</div>
-    <div class="modal-actions">
-      <button class="mbtn primary" id="rClose">Nice!</button>
-    </div>
-  `);
-  $('#rClose').addEventListener('click', closeModal);
+  grid.querySelectorAll('[data-photo]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = +el.dataset.photo;
+      if (id === 99){ toast('Can\'t vote for yourself 🙂', 'info'); return; }
+      if (state.votes.has(id)){ toast('Already voted', 'info'); return; }
+      state.votes.add(id);
+      const p = PHOTO_DATA.find(x => x.id === id);
+      if (p) p.votes++;
+      save();
+      haptic('medium');
+      renderPhotoGrid();
+    });
+  });
 }
 
-$('#buyGiftBtn').addEventListener('click', () => {
-  if(state.busy) return;
-  state.gifts.push({ id: 'g' + (++GIFT_ID) });
-  renderGifts();
-  vibe([14, 18, 22]);
-  toast('Gift added');
-});
+/* ==================================================================
+   RENDER: ECHO
+   ================================================================== */
+function renderEcho(){
+  const page = $('#page-echo');
+  const friends = [...state.friends].map(id => CONTACTS.find(c => c.id === id)).filter(Boolean);
 
-$('#revealAllBtn').addEventListener('click', async () => {
-  if(state.busy || !state.gifts.length) return;
-  state.busy = true;
-  vibe([20, 15, 40, 15, 80]);
-  const allGifts = state.gifts.slice();
-  const boxEls = $$('#giftsRow .gift-box');
-  for(let i=0;i<allGifts.length;i++){
-    if(boxEls[i]) boxEls[i].classList.add('shake');
-    await wait(140);
-  }
-  for(let i=0;i<allGifts.length;i++){
-    const nft = makeRandomNFT();
-    state.inventory.unshift(nft);
-  }
-  state.gifts = [];
-  vibe([50, 40, 90, 40, 140]);
-  renderInventory();
-  renderGifts();
-  toast(allGifts.length + ' gifts revealed');
-  state.busy = false;
-});
+  const chips = friends.length
+    ? friends.map(c => `
+      <button class="echo-pick ${state.echoTo === c.id ? 'on' : ''}" data-echo="${c.id}">
+        <div class="av"><img src="${avatarUrl(c.photo)}" alt=""></div>
+        <span class="nm">${escapeHtml(c.name.split(' ')[0])}</span>
+      </button>`).join('')
+    : `<div class="hint" style="padding:8px">Add friends in Circle first to send anonymous messages.</div>`;
 
-/* =========================================================
-   MINT
-   ========================================================= */
-$('#mintBtn').addEventListener('click', () => {
-  if(state.busy) return;
-  const b = pick(BASES);
-  const nft = makeNFT(b.id);
-  state.inventory.unshift(nft);
-  renderInventory();
-  refreshSelectionUI();
-  vibe([14, 18, 22]);
-  toast('Minted ' + nft.name);
-});
+  const inbox = ECHO_INBOX.map(m => {
+    const opened = state.echoOpened.has(m.id);
+    return `
+      <div class="echo-msg">
+        <div class="echo-text">"${escapeHtml(m.text)}"</div>
+        ${opened
+          ? `<div class="echo-from">${E('👤', 12)} — ${escapeHtml(m.from)} · author revealed</div>`
+          : `<button class="echo-btn" data-reveal="${m.id}">${E('🔓', 12)} Reveal author · 50 💎</button>`}
+      </div>`;
+  }).join('');
 
-/* =========================================================
-   CRAFT BUTTON
-   ========================================================= */
-$('#craftBtn').addEventListener('click', craft);
+  const sent = state.echoSent.length
+    ? `<div class="card">
+        <div class="title">Sent</div>
+        ${state.echoSent.map(s => `<div class="care-item"><div class="care-info"><div class="care-name">To ${escapeHtml(s.to)}</div><div class="care-text">${escapeHtml(s.text)}</div></div></div>`).join('')}
+      </div>`
+    : '';
 
-/* =========================================================
-   BOOT
-   ========================================================= */
-function boot(){
-  seedInventory();
-  renderInventory();
-  renderSlots();
-  renderOdds();
-  renderRisk();
-  refreshSelectionUI();
-  updateCoins();
-  setStatus('Ready to forge');
-  buildWheel(0);
+  page.innerHTML = `
+    <div class="card">
+      <div class="title">Send anonymously</div>
+      <div class="echo-friends" id="echo-friends">${chips}</div>
+      <div class="echo-composer">
+        <textarea id="echo-text" placeholder="Write something honest, funny or kind..."></textarea>
+      </div>
+      <button class="btn primary full" id="echo-send" style="margin-top:10px">${E('🔒', 16)} Send anonymously</button>
+    </div>
+
+    <div class="card">
+      <div class="title">Inbox</div>
+      <div class="echo-inbox">${inbox}</div>
+    </div>
+
+    ${sent}`;
+
+  page.querySelectorAll('[data-echo]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.echoTo = +b.dataset.echo;
+      haptic('light');
+      renderEcho();
+    });
+  });
+
+  page.querySelectorAll('[data-reveal]').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = +b.dataset.reveal;
+      if (state.balance < 50){ toast('Not enough diamonds', 'error'); return; }
+      state.balance -= 50;
+      state.echoOpened.add(id);
+      save();
+      haptic('heavy');
+      toast('Author revealed · 50 💎 spent', 'success');
+      renderEcho();
+      renderHeader();
+    });
+  });
+
+  $('#echo-send')?.addEventListener('click', sendEcho);
 }
-boot();
 
-setInterval(() => {
-  $('#serialNum').textContent = String(state.serial).padStart(4,'0');
-}, 400);
+function sendEcho(){
+  const ta = $('#echo-text');
+  const text = (ta?.value || '').trim();
+  if (!state.echoTo){ toast('Pick a friend first', 'info'); return; }
+  if (text.length < 2){ toast('Write at least 2 characters', 'info'); return; }
+  const c = CONTACTS.find(x => x.id === state.echoTo);
+  state.echoSent.unshift({ to: c.name.split(' ')[0], text });
+  state.echoTo = null;
+  save();
+  haptic('heavy');
+  toast('Anonymous message sent 🔒', 'success');
+  renderEcho();
+}
+
+/* ==================================================================
+   RENDER: FIESTA
+   ================================================================== */
+function renderFiesta(){
+  const page = $('#page-fiesta');
+
+  const events = EVENTS.map(ev => `
+    <div class="event">
+      <div class="event-icon" style="background:${ev.grad}">${E(ev.icon, 28)}</div>
+      <div class="event-body">
+        <div class="event-title">${escapeHtml(ev.title)}</div>
+        <div class="event-date">${E('📅', 11)} ${escapeHtml(ev.date)}</div>
+        <div class="event-desc">${escapeHtml(ev.desc)}</div>
+        <div class="event-actions">
+          <button class="btn primary" data-event="${escapeHtml(ev.title)}">${escapeHtml(ev.btn)}</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  page.innerHTML = `
+    <div class="card" style="background:linear-gradient(135deg,rgba(224,85,107,.15),rgba(139,31,44,.05));border-color:rgba(224,85,107,.3)">
+      <div class="title" style="margin-bottom:6px">${E('🎅', 12)} Next up</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Secret Santa</div>
+      <div class="hint" style="margin-bottom:12px">Gather your circle, draw names, and let Orbit handle the dates and wishlists.</div>
+      <button class="btn primary full" id="start-santa">${E('🎁', 16)} Create Secret Santa room</button>
+    </div>
+
+    ${events}
+
+    <div class="hint" style="padding:8px 6px;text-align:center">
+      More events coming: Easter · Halloween · Valentine's · Summer party
+    </div>`;
+
+  $('#start-santa')?.addEventListener('click', () => {
+    haptic('heavy');
+    toast('Secret Santa room created 🎁', 'success');
+  });
+
+  page.querySelectorAll('[data-event]').forEach(b => {
+    b.addEventListener('click', () => {
+      haptic('medium');
+      toast(`"${b.dataset.event}" — room created ✨`, 'success');
+    });
+  });
+}
+
+/* ==================================================================
+   TAB SWITCHING
+   ================================================================== */
+function switchTab(tab, animate){
+  if (animate === undefined) animate = true;
+  if (state.tab === tab) return;
+  haptic('light');
+
+  const oldPage = $('#page-' + state.tab);
+  const newPage = $('#page-' + tab);
+
+  if (animate && oldPage){
+    oldPage.classList.remove('active');
+    oldPage.classList.add('exit');
+    setTimeout(() => oldPage.classList.remove('exit'), 400);
+  } else if (oldPage){
+    oldPage.classList.remove('active');
+  }
+
+  state.tab = tab;
+
+  if (newPage) newPage.classList.add('active');
+
+  $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  updateIndicator();
+
+  // refresh specific tabs
+  if (tab === 'circle') renderCircle();
+  if (tab === 'nova') renderNova();
+  if (tab === 'shots') renderShots();
+  if (tab === 'echo') renderEcho();
+  if (tab === 'fiesta') renderFiesta();
+}
+
+/* ==================================================================
+   RENDER ALL
+   ================================================================== */
+function renderAll(){
+  renderHeader();
+  renderCircle();
+  renderNova();
+  renderShots();
+  renderEcho();
+  renderFiesta();
+}
+
+/* ==================================================================
+   INIT
+   ================================================================== */
+function init(){
+  initUser();
+  load();
+  renderHeader();
+  renderTabs();
+  runLoader();
+}
+
+init();
+
+})();
 </script>
 </body>
 </html>
