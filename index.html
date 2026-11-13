@@ -3,357 +3,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0b0d12">
 <title>Orbit</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 :root{
-  --bg:#0b0d12;--bg-2:#12151c;--bg-3:#181c25;
-  --surface:#151922;--surface-2:#1c2130;--surface-3:#252b3b;
-  --border:rgba(255,255,255,.06);--border-2:rgba(255,255,255,.1);
-  --text:#eef1f7;--text-2:rgba(238,241,247,.62);--text-3:rgba(238,241,247,.4);--text-4:rgba(238,241,247,.24);
-  --accent:#5b9dff;--accent-2:#7ab0ff;
-  --green:#3ecf8e;--red:#f87171;--gold:#fbbf24;--purple:#a78bfa;
-  --r-sm:10px;--r-md:14px;--r-lg:18px;--r-xl:24px;
-  --ease:cubic-bezier(.4,0,.2,1);
-  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+  /* fallback palette — overridden by Telegram theme vars when inside TG */
+  --bg:var(--tg-theme-bg-color, #ffffff);
+  --bg-2:var(--tg-theme-secondary-bg-color, #f1f1f1);
+  --text:var(--tg-theme-text-color, #000000);
+  --hint:var(--tg-theme-hint-color, #8e8e93);
+  --link:var(--tg-theme-link-color, #3390ec);
+  --btn:var(--tg-theme-button-color, #3390ec);
+  --btn-text:var(--tg-theme-button-text-color, #ffffff);
+  --separator:rgba(60,60,67,.12);
+  --danger:#ff3b30;
+  --success:#34c759;
+  --warning:#ff9f0a;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+html[data-scheme="dark"]{
+  --separator:rgba(255,255,255,.1);
 }
 html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Inter',system-ui,sans-serif;
-  -webkit-font-smoothing:antialiased;touch-action:manipulation;font-size:14px}
-.em{display:inline-block;object-fit:contain;vertical-align:-.15em;pointer-events:none}
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:15px;touch-action:manipulation}
 
-/* ============ LOADER ============ */
-#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  background:var(--bg);transition:opacity .35s var(--ease)}
-#loader.out{opacity:0;pointer-events:none}
-#loader-mark{font-size:28px;font-weight:700;letter-spacing:-.5px;color:#fff;opacity:0;transform:translateY(6px);
-  transition:opacity .35s var(--ease),transform .35s var(--ease)}
-#loader-mark.in{opacity:1;transform:translateY(0)}
-#loader-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:0;
-  animation:loaderPulse 1.2s ease-in-out infinite}
-#loader-dot.in{opacity:1}
-@keyframes loaderPulse{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.6);opacity:1}}
+/* ---- header ---- */
+#header{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-t) + 6px) 16px 6px;z-index:100;background:var(--bg);border-bottom:.5px solid var(--separator)}
+.header-left{display:flex;align-items:center;gap:10px;min-width:0}
+.header-av{width:30px;height:30px;border-radius:50%;background:var(--bg-2);overflow:hidden;flex-shrink:0}
+.header-av img{width:100%;height:100%;object-fit:cover;display:block}
+.header-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.header-brand{font-size:15px;font-weight:600;letter-spacing:-.2px}
+.header-right{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--hint);font-weight:500}
 
-/* ============ APP ============ */
-#app{position:relative;width:100%;max-width:480px;height:100dvh;margin:0 auto;overflow:hidden;background:var(--bg)}
+/* ---- main ---- */
+#main{position:absolute;inset:0;padding-top:calc(var(--safe-t) + 52px);padding-bottom:calc(var(--safe-b) + 50px);overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;padding:12px 16px 20px;opacity:0;visibility:hidden;
+  transition:opacity .18s ease,visibility .18s}
+.page.active{opacity:1;visibility:visible}
+.page::-webkit-scrollbar{display:none}
 
-/* ============ HEADER ============ */
-#header{position:absolute;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;
-  padding:calc(var(--safe-t) + 6px) 16px 6px;z-index:100;
-  background:rgba(11,13,18,.85);border-bottom:1px solid var(--border);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-.h-left{display:flex;align-items:center;gap:10px;min-width:0}
-.h-av{position:relative;width:30px;height:30px;border-radius:50%;flex-shrink:0;background:var(--surface-2);overflow:hidden}
-.h-av img{width:100%;height:100%;object-fit:cover;display:block}
-.h-av .dot{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--green);
-  border:2px solid var(--bg);box-shadow:0 0 8px rgba(62,207,142,.6)}
-.h-info{display:flex;flex-direction:column;gap:0;min-width:0}
-.h-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;letter-spacing:-.1px}
-.h-sub{font-size:10.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
-.h-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:700;letter-spacing:-.2px;color:#fff}
-.h-right{display:flex;align-items:center;gap:6px}
-.h-pill{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:99px;
-  background:var(--surface);border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;
-  transition:background .15s var(--ease)}
-.h-pill:active{background:var(--surface-2)}
-.h-pill svg{width:12px;height:12px}
-.h-pill .val{color:var(--gold);font-weight:700}
+/* ---- tabs ---- */
+#tabs{position:absolute;bottom:0;left:0;right:0;height:calc(var(--safe-b) + 50px);
+  display:flex;background:var(--bg);border-top:.5px solid var(--separator);z-index:100;padding-bottom:var(--safe-b)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:none;border:0;color:var(--hint);font-family:inherit;font-size:10px;font-weight:500;cursor:pointer;
+  transition:color .15s}
+.tab-btn.active{color:var(--btn)}
+.tab-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* ============ MAIN ============ */
-#main{position:absolute;inset:0;padding-top:calc(var(--safe-t) + 56px);padding-bottom:calc(var(--safe-b) + 74px);overflow:hidden}
-.tab-page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px;opacity:0;visibility:hidden;transform:translateX(12px);
-  transition:opacity .22s var(--ease),transform .3s var(--ease),visibility .22s}
-.tab-page::-webkit-scrollbar{width:0;display:none}
-.tab-page.active{opacity:1;visibility:visible;transform:translateX(0)}
+/* ---- list rows (Telegram style) ---- */
+.list{background:var(--bg);border-radius:0;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;min-height:64px;cursor:pointer;position:relative}
+.row:active{background:var(--bg-2)}
+.row + .row::before{content:'';position:absolute;top:0;left:56px;right:0;height:.5px;background:var(--separator)}
+.av{width:44px;height:44px;border-radius:50%;background:var(--bg-2);overflow:hidden;flex-shrink:0;position:relative}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.online-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;background:var(--hint);
+  border:2px solid var(--bg)}
+.online-dot.on{background:var(--success)}
+.row-body{flex:1;min-width:0}
+.row-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.row-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-time{font-size:12px;color:var(--hint);flex-shrink:0}
+.row-sub{font-size:13px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.row-sub .handle{color:var(--hint)}
+.row-action{flex-shrink:0}
+.add-btn{background:transparent;border:.5px solid var(--btn);color:var(--btn);border-radius:99px;
+  padding:5px 12px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer}
+.add-btn:active{opacity:.6}
+.added-label{font-size:12px;color:var(--hint);font-weight:500}
 
-/* ============ TABS ============ */
-#tabs{position:absolute;bottom:0;left:0;right:0;padding:6px 12px calc(var(--safe-b) + 10px);z-index:100;
-  background:rgba(11,13,18,.85);border-top:1px solid var(--border);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-#tabs-inner{display:flex;align-items:center;height:50px;position:relative;max-width:440px;margin:0 auto}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  background:none;border:none;color:var(--text-3);padding:6px 4px;cursor:pointer;position:relative;
-  font-family:inherit;transition:color .2s var(--ease)}
-.tab-btn.active{color:var(--accent)}
-.tab-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
-  transition:transform .2s var(--ease)}
-.tab-btn.active svg{transform:scale(1.05)}
-.tab-btn .lbl{font-size:9.5px;font-weight:600;letter-spacing:.1px}
+/* ---- search ---- */
+.search-wrap{position:relative;margin-bottom:8px}
+.search-input{width:100%;padding:8px 12px 8px 36px;background:var(--bg-2);border:none;border-radius:10px;
+  color:var(--text);font-family:inherit;font-size:16px;outline:none}
+.search-input::placeholder{color:var(--hint)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;
+  stroke:var(--hint);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;
+  border:none;background:var(--hint);border-radius:50%;color:var(--bg);font-size:12px;cursor:pointer;
+  display:none;align-items:center;justify-content:center}
+.search-clear.show{display:flex}
 
-/* ============ COMMON ============ */
-.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;margin-bottom:12px}
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.section-title{font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--text-3);text-transform:uppercase}
-.section-action{font-size:11.5px;color:var(--accent);font-weight:600;cursor:pointer;padding:2px 4px}
-.section-action:active{opacity:.7}
+.seg{display:flex;background:var(--bg-2);border-radius:9px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;background:none;border:none;color:var(--hint);font-family:inherit;font-size:13px;
+  font-weight:500;padding:6px;border-radius:7px;cursor:pointer;transition:all .15s}
+.seg button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 
-.hint{font-size:12px;color:var(--text-3);line-height:1.45}
+.hint{font-size:12px;color:var(--hint);line-height:1.4;padding:8px 0;text-align:center}
+.empty{padding:48px 20px;text-align:center;color:var(--hint)}
+.empty svg{width:32px;height:32px;stroke:var(--hint);fill:none;stroke-width:1.5;margin-bottom:12px}
 
-.btn{border:0;border-radius:var(--r-md);padding:11px 14px;font-size:13.5px;font-weight:600;font-family:inherit;
-  cursor:pointer;transition:transform .1s var(--ease),background .15s var(--ease);
-  display:inline-flex;align-items:center;justify-content:center;gap:7px}
-.btn:active{transform:scale(.97)}
-.btn.primary{background:var(--accent);color:#fff}
-.btn.primary:active{background:var(--accent-2)}
-.btn.ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
-.btn.ghost:active{background:var(--surface-3)}
-.btn.full{width:100%}
-.btn.sm{padding:8px 12px;font-size:12px;border-radius:var(--r-sm)}
-.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* ---- profile ---- */
+.profile-hero{display:flex;flex-direction:column;align-items:center;padding:24px 0 20px;text-align:center}
+.profile-av{width:80px;height:80px;border-radius:50%;background:var(--bg-2);overflow:hidden;margin-bottom:12px}
+.profile-av img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-name{font-size:20px;font-weight:600;letter-spacing:-.3px;margin-bottom:2px}
+.profile-handle{font-size:14px;color:var(--hint);margin-bottom:8px}
+.profile-bio{font-size:13px;color:var(--hint);line-height:1.4;max-width:280px}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.stat-card{background:var(--bg-2);border-radius:12px;padding:14px 8px;text-align:center}
+.stat-val{font-size:17px;font-weight:600;color:var(--text);line-height:1}
+.stat-label{font-size:11px;color:var(--hint);margin-top:4px}
 
-.seg{display:flex;background:var(--surface-2);border-radius:11px;padding:3px;margin-bottom:12px;gap:2px}
-.seg button{flex:1;background:transparent;border:0;color:var(--text-3);font-family:inherit;font-size:12.5px;
-  font-weight:600;padding:7px 6px;border-radius:8px;cursor:pointer;transition:all .15s var(--ease)}
-.seg button.on{background:var(--surface-3);color:var(--text)}
-
-.empty{text-align:center;padding:40px 20px;color:var(--text-3)}
-.empty svg{width:32px;height:32px;stroke:var(--text-4);fill:none;stroke-width:1.5;margin-bottom:12px;display:inline-block}
-.empty p{font-size:12.5px;line-height:1.5}
-
-/* ============ FRIENDS PAGE ============ */
-.search-wrap{position:relative;margin-bottom:10px}
-.search-wrap input{width:100%;padding:11px 14px 11px 38px;background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border .15s var(--ease)}
-.search-wrap input:focus{border-color:var(--accent)}
-.search-wrap input::placeholder{color:var(--text-3)}
-.search-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;
-  stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
-.search-wrap .clear-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;
-  background:var(--surface-3);border:0;border-radius:50%;color:var(--text-2);cursor:pointer;display:none;
-  align-items:center;justify-content:center;font-size:11px;font-weight:700}
-.search-wrap .clear-btn.show{display:flex}
-
-.search-badge{display:none;align-items:center;justify-content:space-between;padding:8px 12px;
-  background:rgba(91,157,255,.1);border:1px solid rgba(91,157,255,.25);border-radius:10px;margin-bottom:10px;
-  font-size:12px;color:var(--accent);font-weight:500}
-.search-badge.show{display:flex}
-.search-badge .count{color:var(--text-2);font-weight:600}
-
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 8px;text-align:center}
-.stat-v{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px;line-height:1;font-variant-numeric:tabular-nums}
-.stat-v.green{color:var(--green)}
-.stat-v.accent{color:var(--accent)}
-.stat-l{font-size:9.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--text-3);margin-top:4px}
-
-.add-all-row{display:flex;gap:8px;margin-bottom:12px}
-.add-all-row .btn{flex:1}
-.add-all-row .btn.icon-only{flex:0 0 44px;padding:0}
-
-.friends-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-.friend-row{display:flex;align-items:center;gap:11px;padding:11px 14px;position:relative;
-  transition:background .1s var(--ease);cursor:pointer}
-.friend-row:active{background:var(--surface-2)}
-.friend-row+.friend-row::before{content:'';position:absolute;top:0;left:60px;right:14px;height:1px;background:var(--border)}
-.f-av{position:relative;width:42px;height:42px;flex-shrink:0}
-.f-av img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--surface-2);display:block}
-.f-av .dot{position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;
-  background:var(--text-4);border:2px solid var(--bg)}
-.f-av .dot.on{background:var(--green);box-shadow:0 0 6px rgba(62,207,142,.5)}
-.f-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.f-row1{display:flex;align-items:baseline;gap:6px;min-width:0}
-.f-name{font-size:14px;font-weight:600;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f-handle{font-size:11.5px;color:var(--text-3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
-.f-row2{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.f-bio{font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic}
-.f-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
-.f-time{font-size:10.5px;color:var(--text-3);font-weight:500}
-.add-btn{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:99px;
-  padding:5px 11px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;
-  transition:all .15s var(--ease);white-space:nowrap}
-.add-btn:active{transform:scale(.94);background:rgba(91,157,255,.12)}
-.added-tag{color:var(--green);font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap}
-.added-tag svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-
-/* ============ NOVA PAGE ============ */
-.nova-hero{background:linear-gradient(160deg,rgba(91,157,255,.14),rgba(91,157,255,.02) 70%),var(--surface);
-  border:1px solid rgba(91,157,255,.18);border-radius:var(--r-xl);padding:20px 16px 18px;text-align:center;
-  position:relative;overflow:hidden;margin-bottom:12px}
-.nova-hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:200px;height:200px;
-  background:radial-gradient(circle,rgba(91,157,255,.25),transparent 70%);filter:blur(30px);pointer-events:none}
-.nova-em{position:relative;display:inline-block;margin-bottom:8px;z-index:1}
-.nova-name{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:2px;position:relative;z-index:1}
-.nova-meta{font-size:11.5px;color:var(--text-3);font-weight:500;margin-bottom:18px;position:relative;z-index:1}
-.nova-meta b{color:var(--text-2);font-weight:600}
-.nova-bars{display:flex;flex-direction:column;gap:11px;margin-bottom:16px;position:relative;z-index:1;text-align:left}
-.bar-row{display:flex;flex-direction:column;gap:5px}
-.bar-head{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:var(--text-2)}
-.bar-head .v{color:var(--text);font-variant-numeric:tabular-nums}
-.bar-track{height:6px;background:rgba(0,0,0,.35);border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;border-radius:99px;transition:width .45s var(--ease)}
-.nova-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative;z-index:1}
-.nova-buttons .btn{padding:11px 6px;flex-direction:column;gap:4px;font-size:11.5px;min-height:58px}
-.nova-buttons .btn svg{width:18px;height:18px}
-.level-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 14px;
-  margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.level-label{font-size:12px;color:var(--text-2);font-weight:500}
-.level-value{font-size:13px;color:var(--text);font-weight:700}
-.level-track{flex:1;height:5px;background:rgba(0,0,0,.35);border-radius:99px;overflow:hidden;max-width:120px}
-.level-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  transition:width .45s var(--ease)}
-
-.care-list{display:flex;flex-direction:column}
-.care-item{display:flex;align-items:center;gap:10px;padding:8px 0}
-.care-item+.care-item{border-top:1px solid var(--border)}
-.care-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--surface-2)}
-.care-av img{width:100%;height:100%;object-fit:cover}
-.care-body{flex:1;min-width:0}
-.care-name{font-size:12.5px;font-weight:600}
-.care-text{font-size:11.5px;color:var(--text-3);margin-top:1px}
-
-/* ============ PULSE PAGE ============ */
-.challenge{background:linear-gradient(160deg,rgba(251,191,36,.12),rgba(251,191,36,.02) 70%),var(--surface);
-  border:1px solid rgba(251,191,36,.2);border-radius:var(--r-lg);padding:14px;margin-bottom:12px}
-.challenge-tag{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;
-  letter-spacing:.4px;text-transform:uppercase;color:var(--gold);
-  background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);padding:3px 9px;border-radius:99px;margin-bottom:10px}
-.challenge-title{font-size:16px;font-weight:700;letter-spacing:-.2px;margin-bottom:4px}
-.challenge-sub{font-size:12px;color:var(--text-2);margin-bottom:12px}
-
-.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.photo-tile{position:relative;aspect-ratio:1;border-radius:11px;overflow:hidden;cursor:pointer;
-  display:flex;flex-direction:column;justify-content:space-between;padding:7px;
-  transition:transform .12s var(--ease)}
-.photo-tile:active{transform:scale(.96)}
-.photo-tile .emwrap{flex:1;display:grid;place-items:center}
-.photo-tile .by{font-size:9.5px;font-weight:600;text-align:right;color:rgba(255,255,255,.9);position:relative;z-index:1}
-.photo-tile .votes{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.55);border-radius:99px;
-  padding:2px 6px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:3px;color:#fff}
-.photo-tile.voted .votes{background:rgba(244,114,182,.6)}
-
-.echo-pick-row{display:flex;gap:9px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
-.echo-pick-row::-webkit-scrollbar{display:none}
-.echo-pick{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;
-  background:none;border:0;color:var(--text-3);font-family:inherit;font-size:10.5px;font-weight:600;
-  cursor:pointer;transition:color .15s var(--ease);width:56px}
-.echo-pick .av{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--surface-2);
-  position:relative;transition:box-shadow .15s var(--ease)}
-.echo-pick .av img{width:100%;height:100%;object-fit:cover}
-.echo-pick.on{color:var(--accent)}
-.echo-pick.on .av{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--accent)}
-.echo-pick .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56px}
-
-.echo-input{width:100%;min-height:72px;resize:none;background:var(--bg-2);border:1px solid var(--border);
-  border-radius:11px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:13.5px;outline:none;
-  transition:border .15s var(--ease)}
-.echo-input:focus{border-color:var(--accent)}
-.echo-input::placeholder{color:var(--text-3)}
-
-.echo-inbox{display:flex;flex-direction:column;gap:8px}
-.echo-msg{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:11px 13px}
-.echo-msg-text{font-size:13px;line-height:1.5;font-style:italic;color:var(--text);margin-bottom:9px}
-.echo-msg-from{font-size:11.5px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:5px}
-.echo-reveal-btn{width:100%;padding:8px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);
-  color:var(--accent);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s var(--ease)}
-.echo-reveal-btn:active{background:var(--surface-3)}
-
-/* ============ PROFILE PAGE ============ */
-.profile-hero{display:flex;flex-direction:column;align-items:center;padding:20px 16px 18px;
-  background:linear-gradient(160deg,rgba(91,157,255,.1),rgba(91,157,255,.02) 70%),var(--surface);
-  border:1px solid var(--border);border-radius:var(--r-xl);text-align:center;margin-bottom:12px}
-.profile-avatar{position:relative;width:88px;height:88px;margin-bottom:12px}
-.profile-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--surface-2);display:block}
-.profile-avatar .ring{position:absolute;inset:-3px;border-radius:50%;border:2.5px solid var(--accent);
-  pointer-events:none;opacity:.6}
-.profile-name{font-size:19px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
-.profile-handle{font-size:13px;color:var(--text-3);font-weight:500;margin-bottom:4px}
-.profile-bio{font-size:12.5px;color:var(--text-2);line-height:1.4;max-width:280px;margin-top:6px}
-
-.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.profile-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
-.profile-stat-v{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.3px;line-height:1}
-.profile-stat-l{font-size:10px;font-weight:500;color:var(--text-3);margin-top:4px}
-
-.frames-row{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none}
-.frames-row::-webkit-scrollbar{display:none}
-.frame-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;
-  background:none;border:0;color:var(--text-3);font-family:inherit;font-size:10.5px;font-weight:600;cursor:pointer}
-.frame-btn.on{color:var(--accent)}
-.frame-preview{width:46px;height:46px;border-radius:50%;overflow:hidden;background:var(--surface-2);
-  position:relative;transition:box-shadow .15s var(--ease)}
-.frame-preview img{width:100%;height:100%;object-fit:cover}
-.frame-btn.on .frame-preview{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--accent)}
-.frame-badge{position:absolute;bottom:-2px;right:-2px;font-size:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
-
-.settings-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-.setting-row{display:flex;align-items:center;gap:12px;padding:13px 14px;position:relative;cursor:pointer;
-  transition:background .1s var(--ease)}
-.setting-row:active{background:var(--surface-2)}
-.setting-row+.setting-row::before{content:'';position:absolute;top:0;left:50px;right:0;height:1px;background:var(--border)}
-.setting-icon{width:28px;height:28px;flex-shrink:0;border-radius:8px;background:var(--surface-2);
-  display:flex;align-items:center;justify-content:center}
-.setting-icon svg{width:15px;height:15px;stroke:var(--text-2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.settings{background:var(--bg);border-radius:12px;overflow:hidden;margin-top:8px}
+.setting-row{display:flex;align-items:center;gap:12px;padding:13px 16px;position:relative;cursor:pointer}
+.setting-row:active{background:var(--bg-2)}
+.setting-row + .setting-row::before{content:'';position:absolute;top:0;left:52px;right:16px;height:.5px;background:var(--separator)}
+.setting-icon{width:28px;height:28px;background:var(--bg-2);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.setting-icon svg{width:15px;height:15px;stroke:var(--text);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .setting-body{flex:1;min-width:0}
-.setting-label{font-size:13.5px;font-weight:500;color:var(--text)}
-.setting-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.setting-label{font-size:15px;font-weight:500}
+.setting-sub{font-size:12px;color:var(--hint);margin-top:1px}
 .switch{position:relative;width:38px;height:22px;flex-shrink:0}
 .switch input{opacity:0;width:0;height:0;position:absolute}
-.switch .slider{position:absolute;inset:0;border-radius:99px;background:var(--surface-3);cursor:pointer;
-  transition:background .2s var(--ease)}
-.switch .slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;
-  background:#fff;transition:transform .22s var(--ease);box-shadow:0 2px 4px rgba(0,0,0,.3)}
-.switch input:checked ~ .slider{background:var(--accent)}
-.switch input:checked ~ .slider::before{transform:translateX(16px)}
+.slider{position:absolute;inset:0;border-radius:99px;background:var(--hint);cursor:pointer;transition:background .2s}
+.slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;
+  background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked + .slider{background:var(--btn)}
+.switch input:checked + .slider::before{transform:translateX(16px)}
 
-.logout-row{margin-top:16px}
-.logout-btn{width:100%;padding:13px;border-radius:var(--r-md);background:var(--surface);
-  border:1px solid rgba(248,113,113,.25);color:var(--red);font-family:inherit;font-size:13.5px;font-weight:600;
-  cursor:pointer;transition:background .15s var(--ease)}
-.logout-btn:active{background:rgba(248,113,113,.08)}
+/* ---- Nova ---- */
+.nova-card{background:var(--bg-2);border-radius:16px;padding:20px 16px;text-align:center;margin-bottom:12px}
+.nova-em{font-size:64px;line-height:1;margin-bottom:6px}
+.nova-name{font-size:18px;font-weight:600;margin-bottom:2px}
+.nova-meta{font-size:12px;color:var(--hint);margin-bottom:16px}
+.bar-row{margin-bottom:10px;text-align:left}
+.bar-head{display:flex;justify-content:space-between;font-size:12px;font-weight:500;color:var(--hint);margin-bottom:4px}
+.bar-track{height:5px;background:rgba(0,0,0,.1);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width .3s ease}
+.nova-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.nova-btns button{padding:10px;border-radius:10px;border:none;background:var(--bg);color:var(--text);
+  font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nova-btns button:active{opacity:.6}
+.nova-btns svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* ============ TOAST ============ */
-#toast-wrap{position:fixed;top:calc(var(--safe-t) + 66px);left:50%;transform:translateX(-50%);
-  z-index:10000;display:flex;flex-direction:column;gap:6px;width:calc(100% - 32px);max-width:400px;
-  pointer-events:none;align-items:center}
-.toast{padding:10px 16px;border-radius:99px;background:rgba(28,33,48,.96);border:1px solid var(--border-2);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 8px 24px rgba(0,0,0,.5);
-  color:var(--text);font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:8px;
-  opacity:0;transform:translateY(-10px);transition:opacity .2s var(--ease),transform .3s var(--ease);
-  pointer-events:auto;max-width:100%}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast.success{border-color:rgba(62,207,142,.3);background:rgba(20,45,32,.96)}
-.toast.error{border-color:rgba(248,113,113,.3);background:rgba(50,18,22,.96)}
-.toast svg{width:14px;height:14px;flex-shrink:0;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
-.toast.success svg{stroke:var(--green)}
-.toast.error svg{stroke:var(--red)}
-.toast.info svg{stroke:var(--accent)}
+/* ---- Pulse ---- */
+.challenge{background:var(--bg-2);border-radius:14px;padding:14px;margin-bottom:12px}
+.challenge-tag{font-size:11px;font-weight:600;color:var(--warning);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.challenge-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.challenge-sub{font-size:12px;color:var(--hint);margin-bottom:10px}
+.btn-primary{width:100%;padding:11px;border-radius:10px;border:none;background:var(--btn);color:var(--btn-text);
+  font-family:inherit;font-size:15px;font-weight:500;cursor:pointer}
+.btn-primary:active{opacity:.8}
 
-/* ============ MODAL ============ */
-.modal-back{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);opacity:0;visibility:hidden;
-  transition:opacity .2s var(--ease),visibility .2s;
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.modal-back.show{opacity:1;visibility:visible}
-.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);opacity:0;
-  z-index:9001;width:calc(100% - 40px);max-width:320px;background:var(--bg-3);
-  border:1px solid var(--border-2);border-radius:var(--r-lg);padding:20px 18px 16px;
-  transition:opacity .2s var(--ease),transform .25s var(--ease)}
-.modal.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.modal-title{font-size:15px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
-.modal-text{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:16px}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.photo-tile{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;justify-content:space-between;
+  padding:8px;cursor:pointer;position:relative;overflow:hidden}
+.photo-tile:active{opacity:.8}
+.photo-tile .em{flex:1;display:grid;place-items:center;font-size:28px}
+.photo-tile .by{font-size:10px;color:rgba(255,255,255,.9);text-align:right;font-weight:500}
+.photo-tile .votes{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;
+  border-radius:99px;padding:2px 6px;font-size:10px;font-weight:600}
+
+.anon-list{display:flex;flex-direction:column;gap:8px}
+.anon-msg{background:var(--bg-2);border-radius:12px;padding:12px}
+.anon-text{font-size:13px;line-height:1.4;font-style:italic;margin-bottom:8px}
+.anon-from{font-size:12px;color:var(--success);font-weight:500}
+.reveal-btn{width:100%;padding:8px;border-radius:8px;border:none;background:var(--bg);color:var(--link);
+  font-family:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.reveal-btn:active{opacity:.6}
+
+/* ---- modal ---- */
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9000;display:none}
+.modal-back.show{display:block}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9001;
+  width:calc(100% - 48px);max-width:300px;background:var(--bg);border-radius:14px;padding:18px;
+  display:none;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+.modal.show{display:block}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.modal-text{font-size:14px;color:var(--hint);line-height:1.4;margin-bottom:16px}
 .modal-actions{display:flex;gap:8px}
-.modal-actions .btn{flex:1}
+.modal-actions button{flex:1;padding:10px;border-radius:9px;border:none;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer}
+.modal-cancel{background:var(--bg-2);color:var(--text)}
+.modal-ok{background:var(--btn);color:var(--btn-text)}
+
+/* ---- toast ---- */
+#toast-wrap{position:fixed;top:calc(var(--safe-t) + 60px);left:50%;transform:translateX(-50%);
+  z-index:10000;display:flex;flex-direction:column;gap:6px;width:calc(100% - 32px);max-width:360px;
+  pointer-events:none;align-items:center}
+.toast{padding:10px 16px;border-radius:10px;background:rgba(28,28,30,.92);color:#fff;
+  font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;
+  opacity:0;transform:translateY(-8px);transition:opacity .2s,transform .2s;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:100%}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:rgba(52,199,89,.95)}
+.toast.error{background:rgba(255,59,48,.95)}
+.toast svg{width:14px;height:14px;flex-shrink:0;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <div id="loader-mark">Orbit</div>
-  <div id="loader-dot"></div>
-</div>
-
 <div id="app">
   <header id="header"></header>
   <main id="main">
-    <section class="tab-page" id="page-friends"></section>
-    <section class="tab-page" id="page-nova"></section>
-    <section class="tab-page" id="page-pulse"></section>
-    <section class="tab-page" id="page-profile"></section>
+    <section class="page" id="page-friends"></section>
+    <section class="page" id="page-nova"></section>
+    <section class="page" id="page-pulse"></section>
+    <section class="page" id="page-profile"></section>
   </main>
-  <nav id="tabs"><div id="tabs-inner"></div></nav>
+  <nav id="tabs"></nav>
 </div>
 
 <div id="toast-wrap"></div>
@@ -364,64 +218,59 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 (function(){
 'use strict';
 
-/* =============== EMOJI CDN =============== */
-const EMOJI_CDN = 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.0.1/img/apple/64/';
-function E(char, size){
-  size = size || 18;
-  let code = '';
-  for (const c of char){
-    if (code) code += '-';
-    code += c.codePointAt(0).toString(16).padStart(4, '0');
-  }
-  return `<img class="em" src="${EMOJI_CDN}${code}.png" style="width:${size}px;height:${size}px" alt="${char}" draggable="false">`;
-}
-
-/* =============== SVG ICON HELPER =============== */
-const ICON = {
-  people: `<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-  paw:    `<svg viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><circle cx="9" cy="10" r="2"/><path d="M9 14a4 4 0 0 1 4-4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4z"/></svg>`,
-  pulse:  `<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
-  user:   `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
-  search: `<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
-  check:  `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
-  plus:   `<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-  dice:   `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg>`,
-  diamond:`<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>`,
-  feed:   `<svg viewBox="0 0 24 24"><path d="M4 5h16l-2 4H6zM6 9v10h12V9M9 13h6"/></svg>`,
-  play:   `<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>`,
-  sleep:  `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
-  lock:   `<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`,
-  bell:   `<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>`,
-  palette:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="7" r="1" fill="currentColor"/><circle cx="16" cy="10" r="1" fill="currentColor"/></svg>`,
-  moon:   `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
-  shield: `<svg viewBox="0 0 24 24"><path d="M12 2l9 4v6c0 5-3.5 9-9 10-5.5-1-9-5-9-10V6l9-4z"/></svg>`,
-  logout: `<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
-  x:      `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
-  empty:  `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>`
-};
-
-/* =============== HAPTICS =============== */
+/* ---------- Telegram setup ---------- */
 const tg = window.Telegram?.WebApp;
-function haptic(type){
-  type = type || 'light';
-  try {
-    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
-    else if (navigator.vibrate) navigator.vibrate(type === 'heavy' ? 20 : 8);
-  } catch(_) {}
-}
-
 if (tg){
   try { tg.ready(); } catch(_) {}
   try { tg.expand(); } catch(_) {}
-  try { tg.setHeaderColor?.('#0b0d12'); } catch(_) {}
-  try { tg.setBackgroundColor?.('#0b0d12'); } catch(_) {}
-  try { if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes(); } catch(_) {}
+  try {
+    // apply Telegram theme vars if present
+    const tp = tg.themeParams || {};
+    const root = document.documentElement;
+    if (tp.bg_color) root.style.setProperty('--bg', '#' + tp.bg_color);
+    if (tp.secondary_bg_color) root.style.setProperty('--bg-2', '#' + tp.secondary_bg_color);
+    if (tp.text_color) root.style.setProperty('--text', '#' + tp.text_color);
+    if (tp.hint_color) root.style.setProperty('--hint', '#' + tp.hint_color);
+    if (tp.link_color) root.style.setProperty('--link', '#' + tp.link_color);
+    if (tp.button_color) root.style.setProperty('--btn', '#' + tp.button_color);
+    if (tp.button_text_color) root.style.setProperty('--btn-text', '#' + tp.button_text_color);
+    root.dataset.scheme = tg.colorScheme || 'light';
+    // follow theme changes
+    tg.onEvent && tg.onEvent('themeChanged', () => {
+      const p = tg.themeParams;
+      if (p.bg_color) root.style.setProperty('--bg', '#' + p.bg_color);
+      if (p.secondary_bg_color) root.style.setProperty('--bg-2', '#' + p.secondary_bg_color);
+      if (p.text_color) root.style.setProperty('--text', '#' + p.text_color);
+      if (p.hint_color) root.style.setProperty('--hint', '#' + p.hint_color);
+      root.dataset.scheme = tg.colorScheme || 'light';
+    });
+  } catch(_) {}
 }
 
-/* =============== STATE =============== */
-const STORAGE = 'orbit_v2';
+function haptic(t){ try { tg?.HapticFeedback?.impactOccurred(t || 'light'); } catch(_) {} }
+
+/* ---------- SVG icons ---------- */
+const ICON = {
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+  people: '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  paw: '<svg viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><circle cx="9" cy="10" r="2"/><path d="M9 14a4 4 0 0 1 4-4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4z"/></svg>',
+  pulse: '<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  user: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  feed: '<svg viewBox="0 0 24 24"><path d="M4 5h16l-2 4H6zM6 9v10h12V9M9 13h6"/></svg>',
+  play: '<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>',
+  sleep: '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  bell: '<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  shield: '<svg viewBox="0 0 24 24"><path d="M12 2l9 4v6c0 5-3.5 9-9 10-5.5-1-9-5-9-10V6l9-4z"/></svg>',
+  moon: '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  lock: '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  x: '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  empty: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>'
+};
+
+/* ---------- state ---------- */
+const STORAGE = 'orbit_v3';
 const state = {
-  user: { name: 'You', username: '', photo: '', id: 0 },
   tab: 'friends',
   filter: 'chats',
   search: '',
@@ -438,101 +287,55 @@ const state = {
   hapticsOn: true
 };
 
-/* =============== REALISTIC CONTACTS =============== */
+/* ---------- contact data (REALISTIC MOCK — replace with API later) ---------- */
 const CONTACTS = [
-  { id: 1, name: 'Alexey Petrov',   username: 'alex_p',    photo: 12, online: true,  msgs: 342, prev: 'check this out 👀',   last: 2*60*1000,     bio: 'coding, coffee, chaos' },
-  { id: 2, name: 'Maria Sokolova',  username: 'masha_s',   photo: 45, online: true,  msgs: 128, prev: 'see u at 8',           last: 15*60*1000,    bio: 'design & cats' },
-  { id: 3, name: 'Dmitry Vlasov',   username: 'dmitry_v',  photo: 33, online: false, msgs: 87,  prev: 'ok, going',            last: 2*60*60*1000,  bio: 'music producer' },
-  { id: 4, name: 'Anna Kim',        username: 'anna_kim',  photo: 5,  online: true,  msgs: 456, prev: 'sending now',          last: 30*60*1000,    bio: 'photographer' },
-  { id: 5, name: 'Timur Aliyev',    username: 'timur',     photo: 15, online: false, msgs: 23,  prev: '👍',                    last: 5*60*60*1000,  bio: 'product manager' },
-  { id: 6, name: 'Sofia Ivanova',   username: 'sofia_iv',  photo: 20, online: true,  msgs: 234, prev: 'that meme tho 😂',      last: 5*60*1000,     bio: 'books & memes' },
-  { id: 7, name: 'Nikita Orlov',    username: 'nick_o',    photo: 51, online: false, msgs: 0,   prev: '',                     last: 0,              bio: 'traveler' },
-  { id: 8, name: 'Lisa Smirnova',   username: 'lisa_sm',   photo: 24, online: true,  msgs: 67,  prev: 'happy bday 🎉',        last: 45*60*1000,    bio: 'art student' },
-  { id: 9, name: 'Artem Volkov',    username: 'artem_v',   photo: 40, online: false, msgs: 12,  prev: 'later',                last: 24*60*60*1000, bio: 'gym rat' },
-  { id: 10, name: 'Daria Petrova',  username: 'daria_',    photo: 26, online: true,  msgs: 891, prev: 'yo where u at',        last: 60*1000,       bio: 'food blogger' },
-  { id: 11, name: 'Maxim Lebedev',  username: 'max_l',     photo: 60, online: false, msgs: 0,   prev: '',                     last: 0,              bio: 'developer' },
-  { id: 12, name: 'Katya Morozova', username: 'katya_m',   photo: 9,  online: true,  msgs: 45,  prev: 'cool cool',            last: 3*60*60*1000,  bio: 'illustrator' },
-  { id: 13, name: 'Ivan Fedorov',   username: 'ivan_f',    photo: 22, online: false, msgs: 34,  prev: 'on my way',            last: 20*60*1000,    bio: 'cyclist' },
-  { id: 14, name: 'Olya Kozlova',   username: 'olya_k',    photo: 18, online: true,  msgs: 234, prev: 'yaaas 🙌',              last: 8*60*1000,     bio: 'dance & wine' },
-  { id: 15, name: 'Pavel Novikov',  username: 'pavel_n',   photo: 7,  online: false, msgs: 0,   prev: '',                     last: 0,              bio: 'sports fan' },
-  { id: 16, name: 'Nastya Belova',  username: 'nastya_b',  photo: 28, online: true,  msgs: 156, prev: 'haha nice',            last: 12*60*1000,    bio: 'travel & coffee' },
-  { id: 17, name: 'Igor Smirnov',   username: 'igor_sm',   photo: 8,  online: false, msgs: 89,  prev: 'meet at 6?',           last: 90*60*1000,    bio: 'photography' },
-  { id: 18, name: 'Vika Orlova',    username: 'vika_o',    photo: 30, online: true,  msgs: 5,   prev: 'hello',                last: 4*60*60*1000,  bio: 'loves cooking' },
-  { id: 19, name: 'Ruslan Akhmetov',username: 'rus_a',     photo: 14, online: false, msgs: 0,   prev: '',                     last: 0,              bio: 'gamer' },
-  { id: 20, name: 'Milana Ivanova', username: 'milana_i',  photo: 47, online: true,  msgs: 78,  prev: 'see you soon',         last: 25*60*1000,    bio: 'music lover' },
-  { id: 21, name: 'Sergey Popov',   username: 'sergey_p',  photo: 58, online: false, msgs: 3,   prev: 'ok',                   last: 6*60*60*1000,  bio: 'entrepreneur' },
-  { id: 22, name: 'Alina Fedorova', username: 'alina_f',   photo: 44, online: true,  msgs: 112, prev: 'omg yes!!',            last: 7*60*1000,     bio: 'yoga & wellness' }
+  { id: 1, name: 'Alexey Petrov', username: 'alex_p', photo: 12, online: true, msgs: 342, prev: 'check this out', last: 2*60*1000, bio: 'coding, coffee, chaos' },
+  { id: 2, name: 'Maria Sokolova', username: 'masha_s', photo: 45, online: true, msgs: 128, prev: 'see u at 8', last: 15*60*1000, bio: 'design & cats' },
+  { id: 3, name: 'Dmitry Vlasov', username: 'dmitry_v', photo: 33, online: false, msgs: 87, prev: 'ok, going', last: 2*60*60*1000, bio: 'music producer' },
+  { id: 4, name: 'Anna Kim', username: 'anna_kim', photo: 5, online: true, msgs: 456, prev: 'sending now', last: 30*60*1000, bio: 'photographer' },
+  { id: 5, name: 'Timur Aliyev', username: 'timur', photo: 15, online: false, msgs: 23, prev: 'thumbs up', last: 5*60*60*1000, bio: 'product manager' },
+  { id: 6, name: 'Sofia Ivanova', username: 'sofia_iv', photo: 20, online: true, msgs: 234, prev: 'that meme tho', last: 5*60*1000, bio: 'books & memes' },
+  { id: 7, name: 'Nikita Orlov', username: 'nick_o', photo: 51, online: false, msgs: 0, prev: '', last: 0, bio: 'traveler' },
+  { id: 8, name: 'Lisa Smirnova', username: 'lisa_sm', photo: 24, online: true, msgs: 67, prev: 'happy bday', last: 45*60*1000, bio: 'art student' },
+  { id: 9, name: 'Artem Volkov', username: 'artem_v', photo: 40, online: false, msgs: 12, prev: 'later', last: 24*60*60*1000, bio: 'gym rat' },
+  { id: 10, name: 'Daria Petrova', username: 'daria_', photo: 26, online: true, msgs: 891, prev: 'yo where u at', last: 60*1000, bio: 'food blogger' },
+  { id: 11, name: 'Maxim Lebedev', username: 'max_l', photo: 60, online: false, msgs: 0, prev: '', last: 0, bio: 'developer' },
+  { id: 12, name: 'Katya Morozova', username: 'katya_m', photo: 9, online: true, msgs: 45, prev: 'cool cool', last: 3*60*60*1000, bio: 'illustrator' },
+  { id: 13, name: 'Ivan Fedorov', username: 'ivan_f', photo: 22, online: false, msgs: 34, prev: 'on my way', last: 20*60*1000, bio: 'cyclist' },
+  { id: 14, name: 'Olya Kozlova', username: 'olya_k', photo: 18, online: true, msgs: 234, prev: 'yaaas', last: 8*60*1000, bio: 'dance & wine' },
+  { id: 15, name: 'Pavel Novikov', username: 'pavel_n', photo: 7, online: false, msgs: 0, prev: '', last: 0, bio: 'sports fan' },
+  { id: 16, name: 'Nastya Belova', username: 'nastya_b', photo: 28, online: true, msgs: 156, prev: 'haha nice', last: 12*60*1000, bio: 'travel & coffee' }
 ];
 
-/* =============== PHOTOS =============== */
-const PHOTOS = [
-  { id: 1, emoji: '🖥️', by: 'Anna', photo: 5,  votes: 7,   color: '#f97316' },
-  { id: 2, emoji: '🌵', by: 'Mark', photo: 33, votes: 5,   color: '#22c55e' },
-  { id: 3, emoji: '☕', by: 'Sonya',photo: 20, votes: 4,   color: '#a16207' },
-  { id: 4, emoji: '🎧', by: 'Tim',  photo: 15, votes: 3,   color: '#7c3aed' },
-  { id: 5, emoji: '📚', by: 'Lisa', photo: 24, votes: 2,   color: '#1e40af' },
-  { id: 6, emoji: '🐈', by: 'Nick', photo: 51, votes: 1,   color: '#be185d' }
-];
-
-/* =============== FRAMES =============== */
-const FRAMES = [
-  { id: 'none',    emoji: '',   color: 'transparent', name: 'Default' },
-  { id: 'fire',    emoji: '🔥', color: '#f97316',     name: 'Fire' },
-  { id: 'blossom', emoji: '🌸', color: '#f472b6',     name: 'Bloom' },
-  { id: 'bolt',    emoji: '⚡', color: '#fbbf24',     name: 'Bolt' },
-  { id: 'crown',   emoji: '👑', color: '#a78bfa',     name: 'Royal' }
-];
-
-/* =============== ECHO INBOX =============== */
-const ECHO_INBOX = [
-  { id: 1, text: 'You are building something cool, keep going.', from: 'Maria' },
-  { id: 2, text: 'Stop coding at 3am and sleep. The bugs will wait.', from: 'Alexey' },
-  { id: 3, text: 'The pet is cute lol, I fed it twice today.', from: 'Sofia' }
-];
-
-/* =============== UTIL =============== */
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 const avatarUrl = p => `https://i.pravatar.cc/150?img=${p}`;
-const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function timeAgo(ts){
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const timeAgo = ts => {
   if (!ts) return '';
-  const diff = Date.now() - ts;
-  const m = Math.floor(diff / 60000);
+  const m = Math.floor((Date.now() - ts) / 60000);
   if (m < 1) return 'now';
   if (m < 60) return m + 'm';
   const h = Math.floor(m / 60);
   if (h < 24) return h + 'h';
-  const d = Math.floor(h / 24);
-  return d + 'd';
-}
-function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+  return Math.floor(h / 24) + 'd';
+};
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-/* =============== PERSIST =============== */
+/* ---------- persist ---------- */
 function save(){
-  try {
-    localStorage.setItem(STORAGE, JSON.stringify({
-      friends: [...state.friends],
-      nova: state.nova,
-      frame: state.frame,
-      myPhoto: state.myPhoto,
-      votes: [...state.votes],
-      echoSent: state.echoSent,
-      echoOpened: [...state.echoOpened],
-      balance: state.balance,
-      notifications: state.notifications,
-      hapticsOn: state.hapticsOn
-    }));
-  } catch(_) {}
+  try { localStorage.setItem(STORAGE, JSON.stringify({
+    friends: [...state.friends], nova: state.nova, myPhoto: state.myPhoto,
+    votes: [...state.votes], echoSent: state.echoSent, echoOpened: [...state.echoOpened],
+    balance: state.balance, notifications: state.notifications, hapticsOn: state.hapticsOn
+  })); } catch(_) {}
 }
 function load(){
-  try {
-    const raw = localStorage.getItem(STORAGE);
-    if (!raw) return;
-    const d = JSON.parse(raw);
+  try { const r = localStorage.getItem(STORAGE); if (!r) return;
+    const d = JSON.parse(r);
     if (d.friends) state.friends = new Set(d.friends);
     if (d.nova) state.nova = { ...state.nova, ...d.nova };
-    if (d.frame) state.frame = d.frame;
     if (d.myPhoto) state.myPhoto = d.myPhoto;
     if (d.votes) state.votes = new Set(d.votes);
     if (d.echoSent) state.echoSent = d.echoSent;
@@ -543,767 +346,325 @@ function load(){
   } catch(_) {}
 }
 
-/* =============== USER INIT =============== */
-function initUser(){
-  const u = tg?.initDataUnsafe?.user;
-  if (u){
-    state.user.name = ((u.first_name || '') + (u.last_name ? ' ' + u.last_name : '')).trim() || 'You';
-    state.user.username = u.username || '';
-    state.user.photo = u.photo_url || '';
-    state.user.id = u.id || 0;
-  }
-}
-
-/* =============== TOAST =============== */
+/* ---------- toast ---------- */
 function toast(text, type){
   type = type || 'info';
   const wrap = $('#toast-wrap');
   const el = document.createElement('div');
   el.className = 'toast ' + type;
-  const icon = type === 'success' ? ICON.check : type === 'error' ? ICON.x : ICON.bell;
-  el.innerHTML = icon + `<span>${escapeHtml(text)}</span>`;
+  el.innerHTML = (type === 'success' ? ICON.check : type === 'error' ? ICON.x : ICON.bell) + `<span>${esc(text)}</span>`;
   wrap.appendChild(el);
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
-  setTimeout(() => {
-    el.classList.remove('show');
-    setTimeout(() => el.remove(), 250);
-  }, 2200);
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 200); }, 2200);
   haptic('light');
 }
 
-/* =============== MODAL =============== */
-function showModal(title, text, okText, onOk, cancelText){
-  const back = $('#modal-back');
-  const modal = $('#modal');
+/* ---------- modal ---------- */
+function showModal(title, text, okText, onOk){
+  const back = $('#modal-back'), modal = $('#modal');
   modal.innerHTML = `
-    <div class="modal-title">${escapeHtml(title)}</div>
+    <div class="modal-title">${esc(title)}</div>
     <div class="modal-text">${text}</div>
     <div class="modal-actions">
-      <button class="btn ghost" id="modal-cancel">${escapeHtml(cancelText || 'Cancel')}</button>
-      <button class="btn primary" id="modal-ok">${escapeHtml(okText || 'OK')}</button>
+      <button class="modal-cancel" id="mc">Cancel</button>
+      <button class="modal-ok" id="mo">${esc(okText || 'OK')}</button>
     </div>`;
-  back.classList.add('show');
-  modal.classList.add('show');
-  $('#modal-cancel').onclick = hideModal;
-  $('#modal-ok').onclick = () => { hideModal(); onOk && onOk(); };
+  back.classList.add('show'); modal.classList.add('show');
+  $('#mc').onclick = hideModal;
+  $('#mo').onclick = () => { hideModal(); onOk && onOk(); };
   haptic('medium');
 }
-function hideModal(){
-  $('#modal-back').classList.remove('show');
-  $('#modal').classList.remove('show');
-}
+function hideModal(){ $('#modal-back').classList.remove('show'); $('#modal').classList.remove('show'); }
 
-/* =============== HEADER =============== */
+/* ---------- header ---------- */
 function renderHeader(){
-  const h = $('#header');
-  const u = state.user;
-  const fallback = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.name)}&backgroundColor=5b9dff&textColor=ffffff`;
-  const photo = u.photo || fallback;
-  h.innerHTML = `
-    <div class="h-left">
-      <div class="h-av">
-        <img src="${escapeHtml(photo)}" alt="" onerror="this.src='${fallback}'">
-        <span class="dot"></span>
-      </div>
-      <div class="h-info">
-        <div class="h-name">${escapeHtml(u.name)}</div>
-        <div class="h-sub">${u.username ? '@' + escapeHtml(u.username) : 'online'}</div>
-      </div>
+  const u = tg?.initDataUnsafe?.user;
+  const name = u ? ((u.first_name || '') + (u.last_name ? ' ' + u.last_name : '')).trim() : 'You';
+  const photo = u?.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=3390ec&textColor=ffffff`;
+  $('#header').innerHTML = `
+    <div class="header-left">
+      <div class="header-av"><img src="${esc(photo)}" alt=""></div>
+      <div class="header-name">${esc(name)}</div>
     </div>
-    <div class="h-brand">Orbit</div>
-    <div class="h-right">
-      <div class="h-pill" id="balance-pill">
-        ${ICON.diamond}<span class="val">${state.balance.toLocaleString()}</span>
-      </div>
-    </div>`;
-  $('#balance-pill')?.addEventListener('click', () => {
-    toast(`Balance: ${state.balance.toLocaleString()} diamonds`, 'info');
-  });
+    <div class="header-brand">Orbit</div>
+    <div class="header-right">${state.balance.toLocaleString()} 💎</div>`;
 }
 
-/* =============== TABS =============== */
+/* ---------- tabs ---------- */
 const TABS = [
   { id: 'friends', label: 'Friends', icon: 'people' },
-  { id: 'nova',    label: 'Nova',    icon: 'paw'    },
-  { id: 'pulse',   label: 'Pulse',   icon: 'pulse'  },
-  { id: 'profile', label: 'Profile', icon: 'user'   }
+  { id: 'nova',    label: 'Nova',    icon: 'paw' },
+  { id: 'pulse',   label: 'Pulse',   icon: 'pulse' },
+  { id: 'profile', label: 'Profile', icon: 'user' }
 ];
 function renderTabs(){
-  const wrap = $('#tabs-inner');
-  wrap.innerHTML = '';
+  const nav = $('#tabs');
+  nav.innerHTML = '';
   TABS.forEach(t => {
     const b = document.createElement('button');
-    b.className = 'tab-btn';
-    b.dataset.tab = t.id;
-    b.innerHTML = `${ICON[t.icon]}<span class="lbl">${t.label}</span>`;
+    b.className = 'tab-btn'; b.dataset.tab = t.id;
+    b.innerHTML = `${ICON[t.icon]}<span>${t.label}</span>`;
     b.addEventListener('click', () => switchTab(t.id));
-    wrap.appendChild(b);
+    nav.appendChild(b);
   });
 }
-
-/* =============== TAB SWITCH =============== */
 function switchTab(tab){
   if (state.tab === tab) return;
   haptic('light');
-
-  const oldPage = $('#page-' + state.tab);
-  const newPage = $('#page-' + tab);
-
-  if (oldPage) oldPage.classList.remove('active');
+  $('#page-' + state.tab)?.classList.remove('active');
   state.tab = tab;
-  if (newPage) newPage.classList.add('active');
-
+  $('#page-' + tab).classList.add('active');
   $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-
   if (tab === 'friends') renderFriends();
   if (tab === 'nova') renderNova();
   if (tab === 'pulse') renderPulse();
   if (tab === 'profile') renderProfile();
 }
 
-/* ==================================================================
-   FRIENDS PAGE
-   ================================================================== */
+/* ================= FRIENDS ================= */
 function renderFriends(){
   const page = $('#page-friends');
-  const chattedCount = CONTACTS.filter(c => c.msgs > 0).length;
-  const onlineCount = CONTACTS.filter(c => c.online).length;
+  const chatted = CONTACTS.filter(c => c.msgs > 0).length;
 
   page.innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-v">${CONTACTS.length}</div><div class="stat-l">Contacts</div></div>
-      <div class="stat-card"><div class="stat-v green">${onlineCount}</div><div class="stat-l">Online</div></div>
-      <div class="stat-card"><div class="stat-v accent">${state.friends.size}</div><div class="stat-l">In Orbit</div></div>
-    </div>
-
     <div class="search-wrap">
       ${ICON.search}
-      <input id="search-input" placeholder="Search by name or @username" value="${escapeHtml(state.search)}" autocomplete="off" autocapitalize="none">
-      <button class="clear-btn ${state.search ? 'show' : ''}" id="search-clear">✕</button>
-    </div>
-
-    <div class="search-badge ${state.search ? 'show' : ''}" id="search-badge">
-      <span>Searching all contacts</span>
-      <span class="count" id="search-count">0 results</span>
+      <input class="search-input" id="search" placeholder="Search by name or @username" value="${esc(state.search)}">
+      <button class="search-clear ${state.search ? 'show' : ''}" id="clear">✕</button>
     </div>
 
     <div class="seg">
-      <button class="${state.filter === 'chats' ? 'on' : ''}" data-filter="chats">💬 From chats</button>
-      <button class="${state.filter === 'all' ? 'on' : ''}" data-filter="all">👥 All contacts</button>
+      <button class="${state.filter === 'chats' ? 'on' : ''}" data-f="chats">💬 Chats (${chatted})</button>
+      <button class="${state.filter === 'all' ? 'on' : ''}" data-f="all">👥 All contacts</button>
     </div>
 
-    <div class="add-all-row">
-      <button class="btn primary" id="add-all-btn">${ICON.plus} Add all visible (${getVisibleAddable().length})</button>
-      <button class="btn ghost icon-only" id="add-random-btn">${ICON.dice}</button>
-    </div>
+    <div class="list" id="list"></div>
+    <div class="hint">Search checks all contacts while typing.</div>`;
 
-    <div class="friends-list" id="friends-list"></div>
+  renderList();
 
-    <div class="hint" style="padding:12px 4px 0;text-align:center">
-      "From chats" shows only contacts you've messaged. Search always checks everyone.
-    </div>`;
-
-  renderFriendList();
-
-  $$('.seg button').forEach(b => {
-    b.addEventListener('click', () => {
-      state.filter = b.dataset.filter;
-      haptic('light');
-      renderFriends();
-    });
-  });
-  $('#search-input')?.addEventListener('input', e => {
+  $$('.seg button').forEach(b => b.addEventListener('click', () => {
+    state.filter = b.dataset.f; haptic('light'); renderFriends();
+  }));
+  $('#search')?.addEventListener('input', e => {
     state.search = e.target.value;
-    const clear = $('#search-clear');
-    if (state.search) clear?.classList.add('show');
-    else clear?.classList.remove('show');
-    $('#search-badge')?.classList.toggle('show', !!state.search);
-    renderFriendList();
-    updateSearchBadge();
+    $('#clear').classList.toggle('show', !!state.search);
+    renderList();
   });
-  $('#search-clear')?.addEventListener('click', () => {
-    state.search = '';
-    const inp = $('#search-input');
-    if (inp) inp.value = '';
-    $('#search-clear')?.classList.remove('show');
-    $('#search-badge')?.classList.remove('show');
-    renderFriendList();
-    haptic('light');
+  $('#clear')?.addEventListener('click', () => {
+    state.search = ''; $('#search').value = '';
+    $('#clear').classList.remove('show'); renderList();
   });
-  $('#add-all-btn')?.addEventListener('click', addAllVisible);
-  $('#add-random-btn')?.addEventListener('click', addRandom);
 }
 
-/* SEARCH LOGIC — searches name OR username, overrides filter while typing */
-function getFilteredContacts(){
+function getFiltered(){
   const q = state.search.trim().toLowerCase();
   if (q){
-    const qUser = q.startsWith('@') ? q.slice(1) : q;
-    return CONTACTS.filter(c =>
-      c.name.toLowerCase().includes(q) ||
-      c.username.toLowerCase().includes(qUser)
-    );
+    const qu = q.startsWith('@') ? q.slice(1) : q;
+    return CONTACTS.filter(c => c.name.toLowerCase().includes(q) || c.username.toLowerCase().includes(qu));
   }
   return CONTACTS.filter(c => state.filter === 'chats' ? c.msgs > 0 : true);
 }
 
-function getVisibleAddable(){
-  return getFilteredContacts().filter(c => !state.friends.has(c.id));
-}
-
-function updateSearchBadge(){
-  if (!state.search) return;
-  const count = getFilteredContacts().length;
-  const el = $('#search-count');
-  if (el) el.textContent = count + (count === 1 ? ' result' : ' results');
-}
-
-function renderFriendList(){
-  const list = $('#friends-list');
-  if (!list) return;
-  const visible = getFilteredContacts();
-  updateSearchBadge();
-
+function renderList(){
+  const list = $('#list');
+  const visible = getFiltered();
   if (!visible.length){
-    list.innerHTML = `<div class="empty">${ICON.empty}<p>No contacts found${state.search ? ' for "' + escapeHtml(state.search) + '"' : ''}</p></div>`;
+    list.innerHTML = `<div class="empty">${ICON.empty}<p>No contacts found</p></div>`;
     return;
   }
-
   list.innerHTML = visible.map(c => {
     const added = state.friends.has(c.id);
-    const photo = avatarUrl(c.photo);
-    const lastMsg = c.msgs > 0 ? escapeHtml(c.prev || '') : '';
-    const metaLine = c.msgs > 0
-      ? `<div class="f-row2">${lastMsg}</div>`
-      : `<div class="f-bio">${escapeHtml(c.bio || 'No messages yet')}</div>`;
+    const sub = c.msgs > 0 ? esc(c.prev || '') : `<span class="handle">@${esc(c.username)}</span> · ${esc(c.bio)}`;
     return `
-      <div class="friend-row" data-contact="${c.id}">
-        <div class="f-av">
-          <img src="${photo}" alt="">
-          <span class="dot ${c.online ? 'on' : ''}"></span>
+      <div class="row" data-id="${c.id}">
+        <div class="av">
+          <img src="${avatarUrl(c.photo)}" alt="">
+          <span class="online-dot ${c.online ? 'on' : ''}"></span>
         </div>
-        <div class="f-body">
-          <div class="f-row1">
-            <span class="f-name">${escapeHtml(c.name)}</span>
-            <span class="f-handle">@${escapeHtml(c.username)}</span>
+        <div class="row-body">
+          <div class="row-top">
+            <span class="row-name">${esc(c.name)}</span>
+            <span class="row-time">${timeAgo(c.last)}</span>
           </div>
-          ${metaLine}
+          <div class="row-sub">${sub}</div>
         </div>
-        <div class="f-right">
-          ${c.last ? `<span class="f-time">${timeAgo(c.last)}</span>` : ''}
-          ${added
-            ? `<span class="added-tag">${ICON.check} Added</span>`
-            : `<button class="add-btn" data-add="${c.id}">Add</button>`}
+        <div class="row-action">
+          ${added ? `<span class="added-label">Added</span>` : `<button class="add-btn" data-add="${c.id}">Add</button>`}
         </div>
       </div>`;
   }).join('');
 
-  list.querySelectorAll('[data-add]').forEach(b => {
-    b.addEventListener('click', e => { e.stopPropagation(); addFriend(+b.dataset.add); });
-  });
-  list.querySelectorAll('[data-contact]').forEach(row => {
-    row.addEventListener('click', () => {
-      const c = CONTACTS.find(x => x.id === +row.dataset.contact);
-      if (!c) return;
-      haptic('light');
-      if (!state.friends.has(c.id)){
-        toast(`Add @${c.username} to open a chat`, 'info');
-      } else {
-        toast(`Opening chat with ${c.name.split(' ')[0]}`, 'info');
-      }
-    });
-  });
+  list.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation(); addFriend(+b.dataset.add);
+  }));
 }
 
 function addFriend(id){
   if (state.friends.has(id)) return;
-  state.friends.add(id);
-  save();
-  haptic('medium');
-  const c = CONTACTS.find(x => x.id === id);
-  toast(`${c ? c.name.split(' ')[0] : 'Friend'} added to Orbit`, 'success');
-  renderFriends();
-  const addBtn = $('#add-all-btn');
-  if (addBtn) addBtn.innerHTML = `${ICON.plus} Add all visible (${getVisibleAddable().length})`;
+  state.friends.add(id); save(); haptic('medium');
+  toast('Added to Orbit', 'success'); renderFriends();
 }
 
-function addAllVisible(){
-  const addable = getVisibleAddable();
-  if (!addable.length){ toast('Everyone visible is already added', 'info'); return; }
-  addable.forEach(c => state.friends.add(c.id));
-  save();
-  haptic('heavy');
-  toast(`Added ${addable.length} contacts to Orbit`, 'success');
-  renderFriends();
-}
-
-function addRandom(){
-  const addable = getVisibleAddable();
-  if (!addable.length){ toast('Everyone visible is already added', 'info'); return; }
-  const pick = addable[Math.floor(Math.random() * addable.length)];
-  addFriend(pick.id);
-}
-
-/* ==================================================================
-   NOVA PAGE
-   ================================================================== */
-const CARE_LOG = [];
+/* ================= NOVA ================= */
 function renderNova(){
-  const page = $('#page-nova');
   const n = state.nova;
-  const friendCount = state.friends.size;
-  const levelPct = Math.min(100, (n.xp / n.xpMax) * 100);
-
-  page.innerHTML = `
-    <div class="nova-hero">
-      <div class="nova-em">${E('🦊', 72)}</div>
+  const pct = Math.min(100, (n.xp / n.xpMax) * 100);
+  $('#page-nova').innerHTML = `
+    <div class="nova-card">
+      <div class="nova-em">🦊</div>
       <div class="nova-name">Nova</div>
-      <div class="nova-meta">Level <b>${n.level}</b> · cared for by <b>${friendCount}</b> ${friendCount === 1 ? 'friend' : 'friends'}</div>
-
-      <div class="nova-bars">
-        ${renderBar('Food', n.food, '#3ecf8e')}
-        ${renderBar('Mood', n.happy, '#fbbf24')}
-        ${renderBar('Energy', n.energy, '#5b9dff')}
+      <div class="nova-meta">Level ${n.level} · ${state.friends.size} friends caring</div>
+      <div class="bar-row">
+        <div class="bar-head"><span>Food</span><span>${n.food}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${n.food}%;background:#34c759"></div></div>
       </div>
-
-      <div class="nova-buttons">
-        <button class="btn primary" data-care="feed">${ICON.feed}<span>Feed</span></button>
-        <button class="btn ghost" data-care="play">${ICON.play}<span>Play</span></button>
-        <button class="btn ghost" data-care="sleep">${ICON.sleep}<span>Sleep</span></button>
+      <div class="bar-row">
+        <div class="bar-head"><span>Mood</span><span>${n.happy}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${n.happy}%;background:#ff9f0a"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-head"><span>Energy</span><span>${n.energy}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${n.energy}%;background:#3390ec"></div></div>
+      </div>
+      <div class="nova-btns">
+        <button data-care="feed">${ICON.feed}<span>Feed</span></button>
+        <button data-care="play">${ICON.play}<span>Play</span></button>
+        <button data-care="sleep">${ICON.sleep}<span>Sleep</span></button>
       </div>
     </div>
-
-    <div class="level-bar">
-      <span class="level-label">Level ${n.level}</span>
-      <div class="level-track"><div class="level-fill" style="width:${levelPct}%"></div></div>
-      <span class="level-value">${n.xp}/${n.xpMax}</span>
-    </div>
-
-    <div class="section">
-      <div class="section-head"><div class="section-title">Recent care</div></div>
-      <div class="care-list" id="care-list"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head"><div class="section-title">Grow together</div></div>
-      <div class="hint" style="margin-bottom:12px">Friends you add can occasionally feed, play and put Nova to sleep. The bigger your Orbit, the faster Nova levels up.</div>
-      <button class="btn ghost full" id="nova-invite">${ICON.people}<span>Invite more friends</span></button>
-    </div>`;
-
-  renderCareList();
-
-  page.querySelectorAll('[data-care]').forEach(b => {
-    b.addEventListener('click', () => care(b.dataset.care));
-  });
-  $('#nova-invite')?.addEventListener('click', () => {
-    haptic('medium');
-    if (state.friends.size === 0){ toast('Add friends from the Friends tab first', 'info'); switchTab('friends'); return; }
-    toast('Invite link ready to share', 'success');
-  });
-}
-
-function renderBar(label, value, color){
-  return `
     <div class="bar-row">
-      <div class="bar-head"><span>${label}</span><span class="v">${Math.round(value)}%</span></div>
-      <div class="bar-track"><div class="bar-fill" style="width:${value}%;background:${color}"></div></div>
+      <div class="bar-head"><span>Level progress</span><span>${n.xp}/${n.xpMax}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#3390ec"></div></div>
     </div>`;
-}
-
-function renderCareList(){
-  const el = $('#care-list');
-  if (!el) return;
-
-  if (!CARE_LOG.length){
-    const friendIds = [...state.friends].slice(0, 3);
-    friendIds.forEach(id => {
-      const c = CONTACTS.find(x => x.id === id);
-      if (c) CARE_LOG.push({
-        name: c.name.split(' ')[0],
-        photo: avatarUrl(c.photo),
-        text: ['fed Nova', 'played with Nova', 'put Nova to sleep'][Math.floor(Math.random() * 3)],
-        time: Math.floor(Math.random() * 20) + 1 + 'm ago'
-      });
-    });
-  }
-
-  if (!CARE_LOG.length){
-    el.innerHTML = `<div class="hint">No care yet. Add friends to let them help.</div>`;
-    return;
-  }
-
-  el.innerHTML = CARE_LOG.slice(0, 6).map(l => `
-    <div class="care-item">
-      <div class="care-av"><img src="${l.photo}" alt=""></div>
-      <div class="care-body">
-        <div class="care-name">${escapeHtml(l.name)}</div>
-        <div class="care-text">${escapeHtml(l.text)} · ${l.time}</div>
-      </div>
-    </div>`).join('');
+  $$('[data-care]').forEach(b => b.addEventListener('click', () => care(b.dataset.care)));
 }
 
 function care(kind){
   const n = state.nova;
-  if (kind === 'feed'){
-    n.food = clamp(n.food + 18, 0, 100);
-    n.energy = clamp(n.energy - 5, 0, 100);
-    n.xp += 15;
-    CARE_LOG.unshift({ name: 'You', photo: state.user.photo || avatarUrl(12), text: 'fed Nova', time: 'now' });
-  } else if (kind === 'play'){
-    n.happy = clamp(n.happy + 16, 0, 100);
-    n.energy = clamp(n.energy - 12, 0, 100);
-    n.food = clamp(n.food - 5, 0, 100);
-    n.xp += 20;
-    CARE_LOG.unshift({ name: 'You', photo: state.user.photo || avatarUrl(12), text: 'played with Nova', time: 'now' });
-  } else if (kind === 'sleep'){
-    n.energy = clamp(n.energy + 22, 0, 100);
-    n.food = clamp(n.food - 4, 0, 100);
-    n.xp += 10;
-    CARE_LOG.unshift({ name: 'You', photo: state.user.photo || avatarUrl(12), text: 'put Nova to sleep', time: 'now' });
-  }
-
-  if (state.friends.size && Math.random() < 0.5){
-    const fids = [...state.friends];
-    const pick = CONTACTS.find(x => x.id === fids[Math.floor(Math.random() * fids.length)]);
-    if (pick){
-      n.happy = clamp(n.happy + 4, 0, 100);
-      CARE_LOG.unshift({ name: pick.name.split(' ')[0], photo: avatarUrl(pick.photo), text: 'helped Nova too', time: 'now' });
-    }
-  }
-
-  if (n.xp >= n.xpMax){
-    n.level++;
-    n.xp = 0;
-    n.xpMax = Math.round(n.xpMax * 1.2);
-    n.food = n.happy = n.energy = 60;
-    toast(`Nova leveled up to level ${n.level}`, 'success');
-    haptic('heavy');
-  } else {
-    haptic('light');
-  }
-
-  save();
-  renderNova();
+  if (kind === 'feed'){ n.food = clamp(n.food + 18, 0, 100); n.energy = clamp(n.energy - 5, 0, 100); n.xp += 15; }
+  if (kind === 'play'){ n.happy = clamp(n.happy + 16, 0, 100); n.energy = clamp(n.energy - 12, 0, 100); n.xp += 20; }
+  if (kind === 'sleep'){ n.energy = clamp(n.energy + 22, 0, 100); n.food = clamp(n.food - 4, 0, 100); n.xp += 10; }
+  if (n.xp >= n.xpMax){ n.level++; n.xp = 0; n.xpMax = Math.round(n.xpMax * 1.2); toast('Nova leveled up', 'success'); }
+  else haptic('light');
+  save(); renderNova();
 }
 
-/* ==================================================================
-   PULSE PAGE
-   ================================================================== */
+/* ================= PULSE ================= */
 function renderPulse(){
-  const page = $('#page-pulse');
   const friends = [...state.friends].map(id => CONTACTS.find(c => c.id === id)).filter(Boolean);
+  const chips = friends.length
+    ? friends.map(c => `<button class="add-btn" data-echo="${c.id}" style="margin-right:6px">${esc(c.name.split(' ')[0])}</button>`).join('')
+    : `<div class="hint">Add friends first to send anonymous messages.</div>`;
 
-  const echoChips = friends.length
-    ? friends.map(c => `
-      <button class="echo-pick ${state.echoTo === c.id ? 'on' : ''}" data-echo="${c.id}">
-        <div class="av"><img src="${avatarUrl(c.photo)}" alt=""></div>
-        <span class="nm">${escapeHtml(c.name.split(' ')[0])}</span>
-      </button>`).join('')
-    : `<div class="hint" style="padding:4px 0">Add friends to send anonymous messages.</div>`;
-
-  const inbox = ECHO_INBOX.map(m => {
+  const inbox = [
+    { id: 1, text: 'You are building something cool, keep going.', from: 'Maria' },
+    { id: 2, text: 'Stop coding at 3am and sleep.', from: 'Alexey' }
+  ].map(m => {
     const opened = state.echoOpened.has(m.id);
-    return `
-      <div class="echo-msg">
-        <div class="echo-msg-text">"${escapeHtml(m.text)}"</div>
-        ${opened
-          ? `<div class="echo-msg-from">${ICON.check} ${escapeHtml(m.from)} · revealed</div>`
-          : `<button class="echo-reveal-btn" data-reveal="${m.id}">Reveal author · 50 diamonds</button>`}
-      </div>`;
+    return `<div class="anon-msg">
+      <div class="anon-text">"${esc(m.text)}"</div>
+      ${opened ? `<div class="anon-from">— ${esc(m.from)}</div>` : `<button class="reveal-btn" data-reveal="${m.id}">Reveal author · 50 💎</button>`}
+    </div>`;
   }).join('');
 
-  page.innerHTML = `
+  $('#page-pulse').innerHTML = `
     <div class="challenge">
-      <span class="challenge-tag">${E('🔥', 11)} Daily challenge</span>
+      <div class="challenge-tag">🔥 Daily challenge</div>
       <div class="challenge-title">"My desk setup"</div>
-      <div class="challenge-sub">Ends in 6h 12m · ${PHOTOS.length + (state.myPhoto ? 1 : 0)} joined</div>
-      <button class="btn primary full" id="join-challenge">${state.myPhoto ? 'You\'re in' : 'Join the challenge'}</button>
+      <div class="challenge-sub">Ends in 6h · ${state.myPhoto ? 'You joined' : 'Join now'}</div>
+      <button class="btn-primary" id="join">${state.myPhoto ? "You're in" : 'Join challenge'}</button>
     </div>
 
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">Community feed</div>
-        <div class="section-action" style="pointer-events:none;color:var(--text-3)">Tap to vote</div>
-      </div>
-      <div class="photo-grid" id="photo-grid"></div>
+    <div class="challenge">
+      <div class="challenge-tag">Anonymous</div>
+      <div style="margin-bottom:8px">${chips}</div>
+      <textarea id="echo-text" placeholder="Write something honest..." style="width:100%;min-height:60px;padding:8px;border-radius:8px;border:1px solid var(--separator);background:var(--bg-2);color:var(--text);font-family:inherit;font-size:13px;outline:none;resize:none"></textarea>
+      <button class="btn-primary" id="echo-send" style="margin-top:8px">Send anonymously</button>
     </div>
 
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">Anonymous</div>
-      </div>
-      <div class="echo-pick-row" id="echo-row">${echoChips}</div>
-      <textarea class="echo-input" id="echo-text" placeholder="Write something honest or kind..." style="margin-top:8px"></textarea>
-      <button class="btn primary full" id="echo-send" style="margin-top:8px">${ICON.lock}<span>Send anonymously</span></button>
-    </div>
+    <div class="anon-list">${inbox}</div>`;
 
-    <div class="section">
-      <div class="section-head"><div class="section-title">Your inbox</div></div>
-      <div class="echo-inbox" id="echo-inbox">${inbox}</div>
-    </div>
-
-    ${state.echoSent.length ? `
-      <div class="section">
-        <div class="section-head"><div class="section-title">Sent</div></div>
-        <div class="care-list">
-          ${state.echoSent.map(s => `<div class="care-item"><div class="care-av" style="background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">A</div><div class="care-body"><div class="care-name">To ${escapeHtml(s.to)}</div><div class="care-text">${escapeHtml(s.text)}</div></div></div>`).join('')}
-        </div>
-      </div>` : ''}`;
-
-  renderPhotoGrid();
-
-  $('#join-challenge')?.addEventListener('click', () => {
-    if (state.myPhoto){ toast('You are already in', 'info'); return; }
-    state.myPhoto = true;
-    save();
-    haptic('heavy');
-    toast('Your photo joined the challenge', 'success');
-    renderPulse();
+  $('#join')?.addEventListener('click', () => {
+    if (state.myPhoto) return toast('Already joined', 'info');
+    state.myPhoto = true; save(); haptic('heavy'); toast('Joined challenge', 'success'); renderPulse();
   });
-
-  page.querySelectorAll('[data-echo]').forEach(b => {
-    b.addEventListener('click', () => {
-      state.echoTo = +b.dataset.echo;
-      haptic('light');
-      renderPulse();
-    });
-  });
-  page.querySelectorAll('[data-reveal]').forEach(b => {
-    b.addEventListener('click', () => {
-      const id = +b.dataset.reveal;
-      if (state.balance < 50){ toast('Not enough diamonds', 'error'); return; }
-      state.balance -= 50;
-      state.echoOpened.add(id);
-      save();
-      haptic('heavy');
-      toast('Author revealed · 50 diamonds', 'success');
-      renderHeader();
-      renderPulse();
-    });
-  });
+  $$('[data-echo]').forEach(b => b.addEventListener('click', () => {
+    state.echoTo = +b.dataset.echo; haptic('light');
+    toast('Friend selected', 'info');
+  }));
+  $$('[data-reveal]').forEach(b => b.addEventListener('click', () => {
+    if (state.balance < 50) return toast('Not enough diamonds', 'error');
+    state.balance -= 50; state.echoOpened.add(+b.dataset.reveal); save();
+    haptic('heavy'); toast('Author revealed', 'success'); renderHeader(); renderPulse();
+  }));
   $('#echo-send')?.addEventListener('click', () => {
-    const ta = $('#echo-text');
-    const text = (ta?.value || '').trim();
-    if (!state.echoTo){ toast('Pick a friend first', 'info'); return; }
-    if (text.length < 2){ toast('Write at least 2 characters', 'info'); return; }
-    const c = CONTACTS.find(x => x.id === state.echoTo);
-    state.echoSent.unshift({ to: c.name.split(' ')[0], text });
-    state.echoTo = null;
-    save();
-    haptic('heavy');
-    toast('Anonymous message sent', 'success');
-    renderPulse();
+    const t = $('#echo-text').value.trim();
+    if (!state.echoTo) return toast('Pick a friend', 'info');
+    if (t.length < 2) return toast('Write something', 'info');
+    state.echoSent.unshift({ to: 'friend', text: t }); save(); haptic('heavy');
+    toast('Sent anonymously', 'success'); renderPulse();
   });
 }
 
-function renderPhotoGrid(){
-  const grid = $('#photo-grid');
-  if (!grid) return;
-  const all = [...PHOTOS];
-  if (state.myPhoto) all.push({ id: 99, emoji: '😎', by: 'You', photo: null, votes: 0, color: '#5b9dff', mine: true });
-
-  grid.innerHTML = all.map(p => {
-    const voted = state.votes.has(p.id);
-    return `
-      <div class="photo-tile ${voted ? 'voted' : ''}" data-photo="${p.id}" style="background:linear-gradient(160deg,${p.color}dd,${p.color}99)">
-        <div class="votes">${E('❤️', 10)} ${p.votes}</div>
-        <div class="emwrap">${E(p.emoji, 28)}</div>
-        <div class="by">${escapeHtml(p.by)}</div>
-      </div>`;
-  }).join('');
-
-  grid.querySelectorAll('[data-photo]').forEach(el => {
-    el.addEventListener('click', () => {
-      const id = +el.dataset.photo;
-      if (id === 99){ toast('Can\'t vote for yourself', 'info'); return; }
-      if (state.votes.has(id)){ toast('Already voted', 'info'); return; }
-      state.votes.add(id);
-      const p = PHOTOS.find(x => x.id === id);
-      if (p) p.votes++;
-      save();
-      haptic('light');
-      renderPhotoGrid();
-    });
-  });
-}
-
-/* ==================================================================
-   PROFILE PAGE
-   ================================================================== */
+/* ================= PROFILE ================= */
 function renderProfile(){
-  const page = $('#page-profile');
-  const u = state.user;
-  const fallback = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.name)}&backgroundColor=5b9dff&textColor=ffffff`;
-  const photo = u.photo || fallback;
-  const curFrame = FRAMES.find(f => f.id === state.frame) || FRAMES[0];
+  const u = tg?.initDataUnsafe?.user;
+  const name = u ? ((u.first_name || '') + (u.last_name ? ' ' + u.last_name : '')).trim() : 'You';
+  const handle = u?.username ? '@' + u.username : 'no username';
+  const photo = u?.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=3390ec&textColor=ffffff`;
 
-  page.innerHTML = `
+  $('#page-profile').innerHTML = `
     <div class="profile-hero">
-      <div class="profile-avatar">
-        <img src="${escapeHtml(photo)}" alt="" onerror="this.src='${fallback}'">
-        <div class="ring" style="${state.frame === 'none' ? 'display:none' : 'border-color:' + curFrame.color}"></div>
-      </div>
-      <div class="profile-name">${escapeHtml(u.name)}</div>
-      <div class="profile-handle">${u.username ? '@' + escapeHtml(u.username) : 'no username'}</div>
-      ${u.username ? '' : '<div class="profile-bio">Open this mini app inside Telegram to show your real account.</div>'}
+      <div class="profile-av"><img src="${esc(photo)}" alt=""></div>
+      <div class="profile-name">${esc(name)}</div>
+      <div class="profile-handle">${esc(handle)}</div>
+      <div class="profile-bio">Building Orbit. Add friends, raise Nova, send anonymous messages.</div>
     </div>
 
     <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat-v">${state.friends.size}</div><div class="profile-stat-l">Friends</div></div>
-      <div class="profile-stat"><div class="profile-stat-v">${state.nova.level}</div><div class="profile-stat-l">Nova Lvl</div></div>
-      <div class="profile-stat"><div class="profile-stat-v">${state.balance.toLocaleString()}</div><div class="profile-stat-l">Diamonds</div></div>
+      <div class="stat-card"><div class="stat-val">${state.friends.size}</div><div class="stat-label">Friends</div></div>
+      <div class="stat-card"><div class="stat-val">${state.nova.level}</div><div class="stat-label">Nova</div></div>
+      <div class="stat-card"><div class="stat-val">${state.balance.toLocaleString()}</div><div class="stat-label">Diamonds</div></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><div class="section-title">Avatar frame</div></div>
-      <div class="frames-row" id="frames-row"></div>
-    </div>
-
-    <div class="settings-list">
+    <div class="settings">
       <div class="setting-row">
         <div class="setting-icon">${ICON.bell}</div>
-        <div class="setting-body">
-          <div class="setting-label">Notifications</div>
-          <div class="setting-sub">Get updates from friends</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="notif-toggle" ${state.notifications ? 'checked' : ''}>
-          <span class="slider"></span>
-        </label>
+        <div class="setting-body"><div class="setting-label">Notifications</div><div class="setting-sub">Updates from friends</div></div>
+        <label class="switch"><input type="checkbox" id="notif" ${state.notifications ? 'checked' : ''}><span class="slider"></span></label>
       </div>
       <div class="setting-row">
         <div class="setting-icon">${ICON.paw}</div>
-        <div class="setting-body">
-          <div class="setting-label">Haptic feedback</div>
-          <div class="setting-sub">Vibrate on actions</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="haptic-toggle" ${state.hapticsOn ? 'checked' : ''}>
-          <span class="slider"></span>
-        </label>
+        <div class="setting-body"><div class="setting-label">Haptics</div><div class="setting-sub">Vibrate on actions</div></div>
+        <label class="switch"><input type="checkbox" id="hap" ${state.hapticsOn ? 'checked' : ''}><span class="slider"></span></label>
       </div>
       <div class="setting-row">
         <div class="setting-icon">${ICON.moon}</div>
-        <div class="setting-body">
-          <div class="setting-label">Dark theme</div>
-          <div class="setting-sub">Always on</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" checked disabled>
-          <span class="slider"></span>
-        </label>
+        <div class="setting-body"><div class="setting-label">Theme</div><div class="setting-sub">Follows Telegram</div></div>
+        <span style="font-size:13px;color:var(--hint)">Auto</span>
       </div>
       <div class="setting-row">
         <div class="setting-icon">${ICON.shield}</div>
-        <div class="setting-body">
-          <div class="setting-label">Privacy</div>
-          <div class="setting-sub">Who can message you anonymously</div>
-        </div>
-        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 18l6-6-6-6"/></svg>
+        <div class="setting-body"><div class="setting-label">Privacy</div><div class="setting-sub">Who can message anonymously</div></div>
+        <span style="font-size:13px;color:var(--hint)">Friends</span>
       </div>
     </div>
 
-    <div class="logout-row">
-      <button class="logout-btn" id="reset-btn">Reset all data</button>
-    </div>
+    <div style="padding:20px 0;text-align:center;font-size:11px;color:var(--hint)">Orbit · v1.0</div>`;
 
-    <div class="hint" style="padding:16px 8px;text-align:center">Orbit · v1.0 · made for Telegram</div>`;
-
-  // frames
-  const fr = $('#frames-row');
-  FRAMES.forEach(f => {
-    const btn = document.createElement('button');
-    btn.className = 'frame-btn' + (state.frame === f.id ? ' on' : '');
-    btn.dataset.frame = f.id;
-    btn.innerHTML = `
-      <div class="frame-preview">
-        <img src="${escapeHtml(photo)}" alt="" onerror="this.src='${fallback}'">
-        ${f.emoji ? `<span class="frame-badge">${E(f.emoji, 13)}</span>` : ''}
-      </div>
-      <span>${f.name}</span>`;
-    btn.addEventListener('click', () => {
-      state.frame = f.id;
-      save();
-      haptic('medium');
-      renderProfile();
-      renderHeader();
-      toast(f.id === 'none' ? 'Default frame' : f.name + ' frame applied', 'success');
-    });
-    fr.appendChild(btn);
-  });
-
-  $('#notif-toggle')?.addEventListener('change', e => {
-    state.notifications = e.target.checked;
-    save();
-    haptic('light');
-    toast(state.notifications ? 'Notifications on' : 'Notifications off', 'success');
-  });
-  $('#haptic-toggle')?.addEventListener('change', e => {
-    state.hapticsOn = e.target.checked;
-    save();
-    haptic('medium');
-  });
-  $('#reset-btn')?.addEventListener('click', () => {
-    showModal(
-      'Reset all data?',
-      'This will remove your friends, Nova progress, and messages. This can\'t be undone.',
-      'Reset',
-      () => {
-        try { localStorage.removeItem(STORAGE); } catch(_) {}
-        state.friends = new Set();
-        state.nova = { food: 68, happy: 54, energy: 41, level: 3, xp: 340, xpMax: 500 };
-        state.myPhoto = false;
-        state.votes = new Set();
-        state.frame = 'none';
-        state.echoSent = [];
-        state.echoOpened = new Set();
-        state.balance = 1250;
-        CARE_LOG.length = 0;
-        renderHeader();
-        renderProfile();
-        toast('All data reset', 'success');
-        haptic('heavy');
-      },
-      'Cancel'
-    );
-  });
+  $('#notif')?.addEventListener('change', e => { state.notifications = e.target.checked; save(); });
+  $('#hap')?.addEventListener('change', e => { state.hapticsOn = e.target.checked; save(); });
 }
 
-/* ==================================================================
-   LOADER
-   ================================================================== */
-function runLoader(){
-  const loader = $('#loader');
-  const mark = $('#loader-mark');
-  const dot = $('#loader-dot');
-  setTimeout(() => { mark.classList.add('in'); dot.classList.add('in'); }, 100);
-  setTimeout(() => {
-    loader.classList.add('out');
-    setTimeout(() => {
-      renderHeader();
-      renderTabs();
-      renderFriends();
-      switchTab('friends');
-      setTimeout(() => loader.remove(), 400);
-    }, 300);
-  }, 700);
-}
-
-/* ==================================================================
-   INIT
-   ================================================================== */
+/* ================= INIT ================= */
 function init(){
-  initUser();
   load();
-  runLoader();
-  document.addEventListener('click', e => {
-    if (e.target.id === 'modal-back') hideModal();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') hideModal();
-  });
+  renderHeader();
+  renderTabs();
+  switchTab('friends');
+  document.addEventListener('click', e => { if (e.target.id === 'modal-back') hideModal(); });
 }
-
 init();
 
 })();
