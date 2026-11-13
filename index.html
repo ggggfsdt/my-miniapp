@@ -3,39 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Orbit</title>
+<title>xDll</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#000;--surface:#0a0a0a;--surface-2:#141414;--surface-3:#1e1e1e;
   --text:#fff;--text-2:#a0a0a0;--text-3:#5a5a5a;
-  --border:rgba(255,255,255,.07);--border-2:rgba(255,255,255,.14);
+  --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.16);
   --accent:#4d9fff;--accent-2:#6eb0ff;
   --green:#34d399;--gold:#fbbf24;--red:#f87171;
   --safe-top:max(env(safe-area-inset-top,0px),24px);
   --safe-bottom:max(env(safe-area-inset-bottom,0px),10px);
   --header-h:54px;--tabs-h:68px;
+  --r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:26px;
   --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.4,0,.2,1);
 }
 html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',Inter,system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;font-size:15px;touch-action:manipulation}
 
+/* LOADING */
+#loading{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:20px;
+  background:radial-gradient(circle at 50% 40%,#0d1117 0%,#000 70%);
+  transition:opacity .5s ease,visibility .5s ease}
+#loading.out{opacity:0;visibility:hidden;pointer-events:none}
+.loading-logo{font-size:42px;font-weight:900;letter-spacing:-1.5px;
+  background:linear-gradient(135deg,#4d9fff,#a78bfa);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;transform:scale(.85);animation:logoIn .7s var(--spring) .15s forwards}
+@keyframes logoIn{to{opacity:1;transform:scale(1)}}
+.loading-spinner{width:28px;height:28px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,.1);border-top-color:#4d9fff;
+  animation:spin .8s linear infinite;opacity:0;
+  animation:spin .8s linear infinite, fadeIn .4s ease .5s forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{to{opacity:1}}
+
 /* HEADER */
 #header{position:fixed;top:0;left:0;right:0;height:calc(var(--safe-top) + var(--header-h));
   display:flex;align-items:center;justify-content:space-between;
   padding:var(--safe-top) 16px 0;z-index:100;
   background:rgba(0,0,0,.94);border-bottom:.5px solid var(--border);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.03)}
 .h-left{display:flex;align-items:center;gap:10px;min-width:0;height:var(--header-h)}
-.h-av{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface-2)}
+.h-av{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  background:var(--surface-2);position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,.1),inset 0 1px 0 rgba(255,255,255,.1)}
 .h-av img{width:100%;height:100%;object-fit:cover;display:block}
-.h-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.h-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:130px}
 .h-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + var(--safe-top)/2));
-  font-size:17px;font-weight:800;letter-spacing:-.5px;
-  background:linear-gradient(135deg,#4d9fff,#a78bfa);-webkit-background-clip:text;background-clip:text;
-  color:transparent;pointer-events:none}
+  font-size:18px;font-weight:900;letter-spacing:-.5px;
+  background:linear-gradient(135deg,#4d9fff,#a78bfa);-webkit-background-clip:text;
+  background-clip:text;color:transparent;pointer-events:none}
 .h-right{font-size:12.5px;font-weight:600;color:var(--gold);height:var(--header-h);
   display:flex;align-items:center;gap:4px}
 
@@ -43,24 +66,29 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 #main{position:fixed;top:calc(var(--safe-top) + var(--header-h));
   left:0;right:0;bottom:calc(var(--safe-bottom) + var(--tabs-h));overflow:hidden}
 .page{position:absolute;inset:0;overflow-y:auto;padding:16px;opacity:0;visibility:hidden;
-  transform:translateY(10px);transition:opacity .25s var(--ease),transform .3s var(--spring),visibility .25s}
+  transform:translateY(10px);
+  transition:opacity .25s var(--ease),transform .3s var(--spring),visibility .25s}
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;visibility:visible;transform:translateY(0)}
 
-/* TABS - draggable slider */
+/* TABS */
 #tabs{position:fixed;bottom:0;left:0;right:0;height:calc(var(--safe-bottom) + var(--tabs-h));
   padding:8px 12px calc(var(--safe-bottom) + 8px);background:rgba(0,0,0,.94);
   border-top:.5px solid var(--border);z-index:100;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   touch-action:none;user-select:none;-webkit-user-select:none}
 #tabs-inner{position:relative;display:flex;align-items:center;height:52px;
-  background:rgba(20,20,20,.7);border:1px solid var(--border);border-radius:16px;
-  padding:5px;touch-action:none;overflow:hidden}
+  background:rgba(20,20,20,.7);border:1px solid var(--border);border-radius:18px;
+  padding:5px;touch-action:none;overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 -1px 0 rgba(0,0,0,.5)}
 .tab-indicator{position:absolute;top:5px;bottom:5px;left:5px;
-  width:calc((100% - 10px) / 4);background:rgba(77,159,255,.16);
-  border:1px solid rgba(77,159,255,.35);border-radius:12px;pointer-events:none;
-  transition:transform .45s var(--spring);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 14px rgba(77,159,255,.18);z-index:1}
+  width:calc((100% - 10px) / 4);
+  background:linear-gradient(180deg,rgba(77,159,255,.22),rgba(77,159,255,.12));
+  border:1px solid rgba(77,159,255,.4);border-radius:14px;pointer-events:none;
+  transition:transform .45s var(--spring);z-index:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),
+    inset 0 -1px 0 rgba(0,0,0,.2),
+    0 4px 16px rgba(77,159,255,.25)}
 .tab-indicator.dragging{transition:none}
 .tab-btn{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:3px;background:none;border:0;
@@ -77,7 +105,8 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 @keyframes bellWobble{0%,100%{transform:rotate(0)}8%{transform:rotate(14deg)}
   16%{transform:rotate(-12deg)}24%{transform:rotate(8deg)}32%{transform:rotate(-4deg)}40%{transform:rotate(0)}}
 .tab-bell::before{content:'';position:absolute;top:-1px;right:-1px;width:5px;height:5px;
-  background:var(--red);border-radius:50%;border:1px solid #000;box-shadow:0 0 6px rgba(248,113,113,.8)}
+  background:var(--red);border-radius:50%;border:1px solid #000;
+  box-shadow:0 0 6px rgba(248,113,113,.8)}
 
 /* SEARCH */
 .search-hero{margin-bottom:16px}
@@ -85,10 +114,12 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .search-sub{font-size:13px;color:var(--text-2);margin-bottom:14px;line-height:1.4}
 .search-wrap{position:relative}
 .search-input{width:100%;padding:13px 44px 13px 44px;background:var(--surface);
-  border:1px solid var(--border);border-radius:14px;color:var(--text);
+  border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);
   font-family:inherit;font-size:16px;outline:none;
-  transition:border .2s var(--ease),background .2s var(--ease)}
-.search-input:focus{border-color:var(--accent);background:var(--surface-2)}
+  transition:border .2s var(--ease),background .2s var(--ease);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.search-input:focus{border-color:var(--accent);background:var(--surface-2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 3px rgba(77,159,255,.12)}
 .search-input::placeholder{color:var(--text-3)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);
   width:20px;height:20px;stroke:var(--text-3);fill:none;stroke-width:2;
@@ -99,10 +130,6 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   color:var(--text-2);font-size:12px;cursor:pointer;display:none;
   align-items:center;justify-content:center}
 .search-clear.show{display:flex}
-.search-status{position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  font-size:11px;color:var(--text-3);font-weight:600;display:none}
-.search-status.show{display:block}
-
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chip{padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--border);
   color:var(--text-2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
@@ -112,16 +139,19 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 
 /* RESULT */
 .results{margin-top:18px}
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;
-  padding:18px;margin-bottom:14px;animation:resultIn .5s var(--spring) both}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:18px;margin-bottom:14px;position:relative;overflow:hidden;
+  animation:resultIn .5s var(--spring) both;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.result-card::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(77,159,255,.4),transparent);pointer-events:none}
 @keyframes resultIn{from{opacity:0;transform:translateY(12px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}}
 .result-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .result-av{width:64px;height:64px;border-radius:50%;overflow:hidden;flex-shrink:0;
-  background:var(--surface-2);position:relative}
+  background:var(--surface-2);position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,.1),inset 0 1px 0 rgba(255,255,255,.15)}
 .result-av img{width:100%;height:100%;object-fit:cover;display:block}
-.result-av::after{content:'';position:absolute;inset:0;border-radius:50%;
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08)}
 .result-info{flex:1;min-width:0}
 .result-name-row{display:flex;align-items:center;gap:6px}
 .result-name{font-size:18px;font-weight:700;letter-spacing:-.3px;
@@ -130,90 +160,90 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
 .result-verified svg{width:10px;height:10px;stroke:#fff;stroke-width:3;fill:none}
 .result-handle{font-size:13px;color:var(--text-3);margin-top:3px;font-weight:500}
-
-/* PENDING / CONNECTED */
 .pending-badge{padding:14px;background:rgba(251,191,36,.1);
-  border:1px solid rgba(251,191,36,.3);border-radius:12px;text-align:center;
+  border:1px solid rgba(251,191,36,.3);border-radius:var(--r-md);text-align:center;
   font-size:13px;font-weight:600;color:var(--gold);
   display:flex;align-items:center;justify-content:center;gap:8px}
 .connected-badge{padding:14px;background:rgba(52,211,153,.12);
-  border:1px solid rgba(52,211,153,.3);border-radius:12px;text-align:center;
+  border:1px solid rgba(52,211,153,.3);border-radius:var(--r-md);text-align:center;
   font-size:13px;font-weight:600;color:var(--green);
   display:flex;align-items:center;justify-content:center;gap:8px}
 .spin{animation:spin 1s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* LIQUID GLASS SLIDER */
-.lg-slider{position:relative;height:58px;border-radius:29px;
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
-  overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;
-  cursor:pointer;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.4),
-    inset 0 0 20px rgba(255,255,255,.02)}
+.lg-slider{position:relative;height:60px;border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.1);overflow:hidden;touch-action:none;
+  user-select:none;-webkit-user-select:none;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -1px 0 rgba(0,0,0,.4),
+    inset 0 0 30px rgba(255,255,255,.03),
+    0 4px 20px rgba(0,0,0,.4)}
 .lg-slider::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 60% 50% at 20% 0%,rgba(255,255,255,.1),transparent 70%),
-    radial-gradient(ellipse 60% 50% at 80% 100%,rgba(77,159,255,.15),transparent 70%);
-  border-radius:29px}
-.lg-slider::after{content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle at 25% 30%,rgba(255,255,255,.03) 1px,transparent 1px),
-    radial-gradient(circle at 75% 70%,rgba(255,255,255,.03) 1px,transparent 1px);
-  background-size:8px 8px;border-radius:29px;opacity:.5;mix-blend-mode:overlay}
+  background:radial-gradient(ellipse 70% 60% at 15% 0%,rgba(255,255,255,.12),transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 100%,rgba(77,159,255,.18),transparent 60%);
+  border-radius:30px}
 .lg-fill{position:absolute;top:0;left:0;bottom:0;width:0;
-  background:linear-gradient(90deg,rgba(77,159,255,.3),rgba(77,159,255,.6),rgba(140,190,255,.7));
-  border-radius:29px;pointer-events:none;
-  box-shadow:0 0 30px rgba(77,159,255,.5),inset 0 0 20px rgba(255,255,255,.2)}
+  background:linear-gradient(90deg,rgba(77,159,255,.35),rgba(77,159,255,.65),rgba(140,190,255,.8));
+  border-radius:30px;pointer-events:none;
+  box-shadow:0 0 30px rgba(77,159,255,.55),inset 0 0 20px rgba(255,255,255,.25)}
 .lg-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.3px;
   pointer-events:none;transition:opacity .2s var(--ease)}
-.lg-knob{position:absolute;left:4px;top:4px;width:50px;height:50px;
+.lg-knob{position:absolute;left:5px;top:5px;width:50px;height:50px;
   will-change:transform;z-index:2}
 .lg-knob-inner{width:100%;height:100%;border-radius:50%;
   background:
-    radial-gradient(circle at 30% 25%,rgba(255,255,255,.5),transparent 45%),
-    radial-gradient(circle at 70% 80%,rgba(255,255,255,.15),transparent 55%),
-    linear-gradient(135deg,rgba(255,255,255,.3),rgba(255,255,255,.05) 60%,rgba(200,220,255,.15));
+    radial-gradient(circle at 32% 28%,rgba(255,255,255,.55),transparent 42%),
+    radial-gradient(circle at 68% 78%,rgba(255,255,255,.18),transparent 50%),
+    linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.06) 55%,rgba(200,220,255,.18));
   backdrop-filter:blur(40px) saturate(200%);-webkit-backdrop-filter:blur(40px) saturate(200%);
-  border:1px solid rgba(255,255,255,.45);
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.7),
-    inset 0 -3px 6px rgba(0,0,0,.15),
-    inset -1px 0 2px rgba(255,255,255,.3),
-    0 6px 20px rgba(0,0,0,.5),
-    0 2px 8px rgba(0,0,0,.3),
-    0 0 0 1px rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.5);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.75),
+    inset 0 -3px 6px rgba(0,0,0,.2),
+    inset -1px 0 2px rgba(255,255,255,.35),
+    0 6px 24px rgba(0,0,0,.55),
+    0 2px 8px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;cursor:grab;
   transition:transform .35s var(--spring);
   transform-origin:center center;position:relative;overflow:hidden}
-.lg-knob-inner::before{content:'';position:absolute;top:15%;left:20%;right:20%;height:30%;
-  background:radial-gradient(ellipse,rgba(255,255,255,.5),transparent 70%);
+.lg-knob-inner::before{content:'';position:absolute;top:10%;left:18%;right:18%;height:35%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.6),transparent 70%);
   border-radius:50%;filter:blur(2px);pointer-events:none}
 .lg-knob-inner svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.6;
   stroke-linecap:round;stroke-linejoin:round;pointer-events:none;position:relative;z-index:1;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
-.lg-knob.dragging .lg-knob-inner{cursor:grabbing;animation:knobJiggle .5s ease-in-out infinite}
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.lg-knob.dragging .lg-knob-inner{animation:knobJiggle .55s ease-in-out infinite}
 @keyframes knobJiggle{
-  0%,100%{transform:scale(1.18) rotate(-4deg) skewX(2deg)}
-  25%{transform:scale(1.22) rotate(4deg) skewX(-2deg)}
-  50%{transform:scale(1.18) rotate(-2deg) skewX(1deg)}
-  75%{transform:scale(1.22) rotate(3deg) skewX(-1deg)}
+  0%,100%{transform:scale(1.2) rotate(-5deg) skewX(3deg)}
+  25%{transform:scale(1.24) rotate(5deg) skewX(-3deg)}
+  50%{transform:scale(1.2) rotate(-3deg) skewX(2deg)}
+  75%{transform:scale(1.24) rotate(4deg) skewX(-2deg)}
 }
 .lg-knob.dragging .lg-knob-inner svg{transform:scale(1.15);
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.6))}
 .lg-slider.completed .lg-knob-inner{
-  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.5),transparent 45%),
+  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.55),transparent 42%),
     linear-gradient(135deg,#34d399,#22c55e);
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.7),
-    0 6px 20px rgba(52,211,153,.6),
-    0 0 0 1px rgba(255,255,255,.15)}
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.7),
+    0 6px 24px rgba(52,211,153,.65),
+    0 0 0 1px rgba(255,255,255,.2)}
 
-/* CONNECTIONS - chat style */
-.chat-list{background:var(--surface);border:1px solid var(--border);border-radius:18px;
-  overflow:hidden;margin-bottom:14px}
+/* CHAT-STYLE CONNECTIONS */
+.chat-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  overflow:hidden;margin-bottom:14px;position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.chat-list::before{content:'';position:absolute;top:0;left:12%;right:12%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+  pointer-events:none;z-index:1}
 .chat-list-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between}
 .chat-list-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
   color:var(--text-3)}
-.chat-list-count{font-size:11px;color:var(--text-3);font-weight:600}
+.chat-list-count{font-size:11px;color:var(--text-3);font-weight:600;
+  background:var(--surface-2);padding:2px 8px;border-radius:99px;
+  border:1px solid var(--border)}
 .chat-row{display:flex;align-items:center;gap:12px;padding:11px 16px;position:relative;
   cursor:pointer;transition:background .15s var(--ease);
   animation:chatIn .35s var(--spring) both}
@@ -223,10 +253,11 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .chat-row+.chat-row::before{content:'';position:absolute;top:0;left:68px;right:16px;
   height:.5px;background:var(--border)}
 .chat-av{width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;
-  background:var(--surface-2);position:relative}
+  background:var(--surface-2);position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08)}
 .chat-av img{width:100%;height:100%;object-fit:cover;display:block}
-.chat-online{position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;
-  background:var(--green);border:2px solid var(--surface);
+.chat-online{position:absolute;bottom:1px;right:1px;width:12px;height:12px;
+  border-radius:50%;background:var(--green);border:2px solid var(--surface);
   box-shadow:0 0 8px rgba(52,211,153,.6)}
 .chat-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .chat-name-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -235,17 +266,8 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .chat-time{font-size:11px;color:var(--text-3);font-weight:500;flex-shrink:0}
 .chat-preview{font-size:12.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
-.chat-preview .you{color:var(--accent);font-weight:600}
-.chat-preview .dot{width:3px;height:3px;border-radius:50%;background:var(--text-3);flex-shrink:0}
-.chat-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;
-  min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;
-  justify-content:center;padding:0 5px;flex-shrink:0}
 .chat-empty{padding:32px 18px;text-align:center;font-size:13px;color:var(--text-3);
   line-height:1.5}
-
-/* PENDING list */
-.pending-list{background:var(--surface);border:1px solid var(--border);border-radius:18px;
-  overflow:hidden;margin-bottom:14px}
 .pend-row{display:flex;align-items:center;gap:12px;padding:11px 16px;position:relative}
 .pend-row+.pend-row::before{content:'';position:absolute;top:0;left:68px;right:16px;
   height:.5px;background:var(--border)}
@@ -256,7 +278,8 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .pend-name{font-size:14px;font-weight:600;opacity:.85}
 .pend-handle{font-size:12px;color:var(--text-3);margin-top:1px}
 .pend-status{font-size:11px;color:var(--gold);font-weight:600;
-  display:flex;align-items:center;gap:4px}
+  display:flex;align-items:center;gap:4px;background:rgba(251,191,36,.1);
+  padding:3px 8px;border-radius:99px;border:1px solid rgba(251,191,36,.2)}
 
 /* STATE MSG */
 .state-msg{text-align:center;padding:32px 20px;color:var(--text-3)}
@@ -266,112 +289,96 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .state-msg .state-text{font-size:13px;line-height:1.5}
 
 /* NOVA / 3D ROOM */
-.room-scene{position:relative;width:100%;height:420px;margin:0 auto 16px;
-  perspective:900px;perspective-origin:50% 35%;
-  overflow:hidden;border-radius:20px;
-  background:radial-gradient(ellipse at 50% 25%,rgba(60,45,80,.35),rgba(0,0,0,.7) 75%);
+.room-scene{position:relative;width:100%;height:400px;margin:0 auto 16px;
+  perspective:900px;perspective-origin:50% 42%;overflow:hidden;
+  border-radius:var(--r-xl);
+  background:radial-gradient(ellipse at 50% 30%,rgba(40,30,60,.55),rgba(0,0,0,.95) 70%);
   touch-action:none;user-select:none;-webkit-user-select:none;
-  border:1px solid var(--border)}
-.room-scene::after{content:'drag to rotate';position:absolute;bottom:8px;left:50%;
-  transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.25);
-  letter-spacing:.8px;text-transform:uppercase;pointer-events:none;font-weight:600}
-
-.room{position:absolute;left:50%;top:55%;width:340px;height:340px;
-  margin-left:-170px;margin-top:-100px;transform-style:preserve-3d;
-  transform:rotateX(-18deg) rotateY(0deg);will-change:transform}
-
-.wall{position:absolute;width:340px;height:170px;
-  background:linear-gradient(180deg,#1a1d2a 0%,#0f1220 100%);
-  border:1px solid rgba(255,255,255,.05)}
-.wall::before{content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(90deg,transparent 0 40px,
-    rgba(255,255,255,.015) 40px 41px)}
-
-.wall-back{transform:translate3d(0,85px,-170px)}
-.wall-left{transform:translate3d(-170px,85px,0) rotateY(90deg)}
-.wall-right{transform:translate3d(170px,85px,0) rotateY(-90deg)}
-
-.floor{position:absolute;width:340px;height:340px;
-  background:radial-gradient(ellipse at 50% 50%,#3a2c1e 0%,#1f1810 80%);
-  transform:translate3d(0,170px,0) rotateX(90deg);
-  transform-origin:center center}
-.floor::before{content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(45deg,transparent 0 30px,
-    rgba(255,255,255,.02) 30px 31px),
-    repeating-linear-gradient(-45deg,transparent 0 30px,
-    rgba(255,255,255,.02) 30px 31px)}
-
-.rug{position:absolute;width:180px;height:180px;
-  background:radial-gradient(circle,rgba(160,100,80,.65) 0%,rgba(100,60,50,.45) 70%,transparent 100%);
-  border:2px solid rgba(200,150,120,.25);border-radius:50%;
-  transform:translate3d(80px,169px,80px) rotateX(90deg);
-  transform-origin:center center;pointer-events:none}
-.rug::after{content:'';position:absolute;inset:20px;border-radius:50%;
-  border:1px dashed rgba(255,200,150,.2)}
-
-.window{position:absolute;width:80px;height:90px;
-  background:linear-gradient(180deg,#0a1428 0%,#162a4a 100%);
-  border:3px solid rgba(40,50,70,.9);border-radius:2px;
-  transform:translate3d(-130px,60px,-169px);
-  box-shadow:inset 0 0 30px rgba(100,150,255,.3),0 0 40px rgba(100,150,255,.15)}
-.window::before{content:'';position:absolute;top:0;left:50%;width:2px;height:100%;
-  background:rgba(40,50,70,.9);transform:translateX(-50%)}
-.window::after{content:'';position:absolute;top:50%;left:0;width:100%;height:2px;
-  background:rgba(40,50,70,.9);transform:translateY(-50%)}
-.window-stars{position:absolute;inset:0;pointer-events:none}
-.window-star{position:absolute;width:2px;height:2px;border-radius:50%;
-  background:rgba(200,220,255,.9);animation:twinkle 3s ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
-
-.poster{position:absolute;width:70px;height:70px;
-  background:linear-gradient(135deg,#f472b6 0%,#a78bfa 100%);
-  border:2px solid rgba(255,255,255,.15);border-radius:2px;
-  transform:translate3d(100px,50px,-169px);
-  box-shadow:0 4px 20px rgba(244,114,182,.3)}
-.poster::after{content:'♥';position:absolute;inset:0;display:flex;
-  align-items:center;justify-content:center;font-size:24px;color:rgba(255,255,255,.6)}
-
-.shelf{position:absolute;width:60px;height:8px;
-  background:linear-gradient(180deg,#3a2c20 0%,#1f1810 100%);
-  transform:translate3d(-160px,120px,60px) rotateY(90deg);pointer-events:none}
-
-.bowl{position:absolute;width:36px;height:36px;font-size:28px;line-height:36px;
-  text-align:center;transform:translate3d(120px,152px,120px);
-  transform-origin:center bottom;
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));pointer-events:none}
-.ball{position:absolute;width:28px;height:28px;font-size:22px;line-height:28px;
-  text-align:center;transform:translate3d(-120px,156px,-100px);
-  transform-origin:center bottom;
-  filter:drop-shadow(0 3px 5px rgba(0,0,0,.6));pointer-events:none;
-  animation:ballRoll 4s ease-in-out infinite}
-@keyframes ballRoll{0%,100%{transform:translate3d(-120px,156px,-100px) rotate(0)}
-  50%{transform:translate3d(-100px,156px,-80px) rotate(180deg)}}
-
-/* PET */
-.pet-wrap{position:absolute;left:50%;top:55%;width:100px;height:100px;
-  margin-left:-50px;margin-top:-100px;
+  border:1px solid var(--border);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 24px rgba(0,0,0,.5)}
+.room-scene::after{content:'drag background to rotate · drag Nova to move';
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  font-size:9.5px;color:rgba(255,255,255,.25);letter-spacing:.5px;
+  text-transform:uppercase;pointer-events:none;font-weight:600;white-space:nowrap}
+.room{position:absolute;left:50%;top:52%;width:0;height:0;
   transform-style:preserve-3d;
-  transform:translate3d(var(--px,0),160px,var(--pz,0))
-    rotateY(calc(-1 * var(--ry,0deg)))
-    rotateX(18deg);
-  transform-origin:center bottom;
-  cursor:grab;z-index:10;will-change:transform;transition:filter .2s ease}
-.pet-wrap:active{cursor:grabbing}
-.pet-wrap.dragging{filter:drop-shadow(0 12px 20px rgba(0,0,0,.8))}
-.pet-wrap.dragging .pet-img{animation:petSquish .3s ease-in-out infinite}
-@keyframes petSquish{0%,100%{transform:scale(1.15,1.15)}50%{transform:scale(1.22,1.08)}}
+  transform:rotateX(-20deg) rotateY(0deg);will-change:transform;
+  transition:transform 0s}
+.face{position:absolute;transform-style:preserve-3d;backface-visibility:visible}
+.face-floor{left:-100px;top:-100px;width:200px;height:200px;
+  transform:translateY(100px) rotateX(90deg);
+  background:linear-gradient(135deg,#3a2818,#241608);
+  border:1px solid rgba(0,0,0,.4)}
+.face-floor::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0 38px,
+    rgba(0,0,0,.18) 38px 39px),
+    repeating-linear-gradient(0deg,transparent 0 38px,
+    rgba(255,255,255,.02) 38px 39px)}
+.face-back{left:-100px;top:-70px;width:200px;height:140px;
+  transform:translateZ(-100px) translateY(30px);
+  background:linear-gradient(180deg,#262040,#1a1428);
+  border:1px solid rgba(0,0,0,.4);
+  border-bottom:none;
+  box-shadow:inset 0 0 40px rgba(80,60,140,.15)}
+.face-left{left:-100px;top:-70px;width:200px;height:140px;
+  transform:translateX(-100px) rotateY(90deg) translateY(30px);
+  background:linear-gradient(180deg,#1a1424,#120c1a);
+  border:1px solid rgba(0,0,0,.4);
+  box-shadow:inset 0 0 30px rgba(0,0,0,.4)}
+.face-right{left:-100px;top:-70px;width:200px;height:140px;
+  transform:translateX(100px) rotateY(-90deg) translateY(30px);
+  background:linear-gradient(180deg,#1e1828,#14101c);
+  border:1px solid rgba(0,0,0,.4);
+  box-shadow:inset 0 0 30px rgba(0,0,0,.35)}
+.face-window{left:-70px;top:-40px;width:55px;height:48px;
+  transform:translateZ(-99px);
+  background:linear-gradient(180deg,#0a1428 0%,#1a2a4a 60%,#2a3a5a 100%);
+  border:2px solid #1a1a28;border-radius:3px;
+  box-shadow:inset 0 0 20px rgba(100,150,255,.4),0 0 25px rgba(100,150,255,.2)}
+.face-window::before{content:'';position:absolute;top:0;left:50%;width:1.5px;height:100%;
+  background:#1a1a28;transform:translateX(-50%)}
+.face-window::after{content:'';position:absolute;top:50%;left:0;width:100%;height:1.5px;
+  background:#1a1a28;transform:translateY(-50%)}
+.star{position:absolute;width:1.5px;height:1.5px;border-radius:50%;
+  background:rgba(200,220,255,.9);animation:twinkle 3s ease-in-out infinite;
+  box-shadow:0 0 4px rgba(200,220,255,.8)}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+.face-poster{left:35px;top:-30px;width:48px;height:52px;
+  transform:translateZ(-99px);
+  background:linear-gradient(135deg,#f472b6,#a78bfa);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:3px;
+  box-shadow:0 4px 12px rgba(244,114,182,.3)}
+.face-poster::after{content:'♥';position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;font-size:20px;
+  color:rgba(255,255,255,.7)}
+.face-rug{left:-65px;top:-65px;width:130px;height:130px;
+  transform:translateY(99px) rotateX(90deg);
+  background:radial-gradient(ellipse at 50% 50%,
+    rgba(160,100,80,.85) 0%,rgba(120,70,60,.6) 50%,rgba(80,40,30,.4) 80%,transparent 100%);
+  border-radius:50%;pointer-events:none}
+.face-rug::after{content:'';position:absolute;inset:20px;border-radius:50%;
+  border:1.5px dashed rgba(255,200,150,.25)}
+.face-bowl{left:60px;top:-15px;width:38px;height:38px;
+  transform:translateY(85px) rotateX(90deg);
+  font-size:26px;line-height:38px;text-align:center;pointer-events:none;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.7))}
+.pet-overlay{position:absolute;left:50%;top:52%;width:90px;height:90px;
+  margin-left:-45px;margin-top:-90px;pointer-events:none;z-index:10;
+  will-change:transform}
 .pet-img{width:100%;height:100%;object-fit:contain;display:block;
-  filter:drop-shadow(0 6px 8px rgba(0,0,0,.6));
-  animation:petBreathe 3s ease-in-out infinite;
-  transition:transform .2s var(--spring);pointer-events:none}
-@keyframes petBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
-.pet-shadow{position:absolute;width:70px;height:20px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);
-  left:50%;bottom:-4px;transform:translateX(-50%);pointer-events:none;
-  filter:blur(3px);transition:opacity .2s ease}
-.pet-wrap.dragging .pet-shadow{opacity:.4}
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.65));
+  cursor:grab;pointer-events:auto;
+  transition:filter .2s ease}
+.pet-img:active{cursor:grabbing}
+.pet-img.dragging{filter:drop-shadow(0 12px 20px rgba(0,0,0,.8))
+  drop-shadow(0 0 20px rgba(77,159,255,.4))}
 
-/* HAND CURSOR */
+/* NOVA INFO */
+.nova-info{text-align:center;margin-bottom:16px}
+.nova-name{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:2px}
+.nova-meta{font-size:12px;color:var(--text-3);font-weight:500}
+
+/* HAND */
 #hand-cursor{position:fixed;pointer-events:none;z-index:99999;display:none;
   transform:translate(-8px,-8px);filter:drop-shadow(0 4px 10px rgba(0,0,0,.7))}
 #hand-cursor.active{display:block;animation:handAppear .25s var(--spring)}
@@ -385,33 +392,18 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   animation:handGrab 1.5s ease-in-out infinite}
 @keyframes handGrab{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(2deg)}}
 
-/* NOVA INFO */
-.nova-info{text-align:center;margin-bottom:16px}
-.nova-name{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
-.nova-meta{font-size:12px;color:var(--text-3);font-weight:500}
-.nova-bars{margin:16px 0}
-.bar-row{margin-bottom:11px;text-align:left}
-.bar-head{display:flex;justify-content:space-between;font-size:12px;font-weight:600;
-  color:var(--text-2);margin-bottom:5px}
-.bar-track{height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;border-radius:99px;transition:width .5s var(--spring)}
-.nova-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
-.nova-btns button{padding:12px 4px;border-radius:12px;border:none;background:var(--surface-2);
-  color:var(--text);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  transition:transform .15s var(--spring)}
-.nova-btns button:active{transform:scale(.94)}
-.nova-btns svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;
-  stroke-linecap:round;stroke-linejoin:round}
-
 /* PULSE */
-.anon-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:16px;margin-bottom:10px}
+.anon-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:16px;margin-bottom:10px;position:relative;
+  overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.anon-card::before{content:'';position:absolute;top:0;left:12%;right:12%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,.4),transparent);
+  pointer-events:none}
 .anon-text{font-size:13.5px;line-height:1.55;font-style:italic;margin-bottom:10px;
   min-height:22px;color:var(--text)}
-.reveal-btn{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);
+.reveal-btn{width:100%;padding:9px;border-radius:12px;border:1px solid var(--border);
   background:var(--surface-2);color:var(--accent);font-family:inherit;font-size:12.5px;
-  font-weight:600;cursor:pointer}
+  font-weight:600;cursor:pointer;transition:opacity .2s}
 .reveal-btn:active{opacity:.7}
 .type-char{display:inline-block;opacity:0;
   animation:typeIn .4s cubic-bezier(.34,1.56,.64,1) forwards}
@@ -425,28 +417,39 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 /* PROFILE */
 .profile-hero{display:flex;flex-direction:column;align-items:center;padding:24px 0 20px;
   text-align:center}
-.profile-av{width:88px;height:88px;border-radius:50%;overflow:hidden;background:var(--surface-2);
-  margin-bottom:14px;box-shadow:0 0 0 3px var(--accent),0 0 0 6px rgba(77,159,255,.12)}
+.profile-av{width:88px;height:88px;border-radius:50%;overflow:hidden;
+  background:var(--surface-2);margin-bottom:14px;position:relative;
+  box-shadow:0 0 0 3px var(--accent),0 0 0 6px rgba(77,159,255,.12)}
 .profile-av img{width:100%;height:100%;object-fit:cover;display:block}
 .profile-name{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:3px}
 .profile-handle{font-size:13.5px;color:var(--text-3);font-weight:500}
 .profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:14px 8px;text-align:center}
+.stat-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px 8px;text-align:center;position:relative;
+  overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.stat-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+  pointer-events:none}
 .stat-val{font-size:18px;font-weight:700;line-height:1}
 .stat-lbl{font-size:11px;color:var(--text-3);margin-top:4px;font-weight:500}
-.settings{background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  overflow:hidden}
+.settings{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);overflow:hidden;position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.settings::before{content:'';position:absolute;top:0;left:12%;right:12%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+  pointer-events:none;z-index:1}
 .setting-row{display:flex;align-items:center;gap:12px;padding:14px 16px;position:relative}
 .setting-row+.setting-row::before{content:'';position:absolute;top:0;left:16px;right:16px;
   height:.5px;background:var(--border)}
 .setting-lbl{font-size:14px;font-weight:500;flex:1}
-.switch{position:relative;width:38px;height:22px;flex-shrink:0}
+.switch{position:relative;width:40px;height:24px;flex-shrink:0}
 .switch input{opacity:0;width:0;height:0;position:absolute}
 .slider{position:absolute;inset:0;border-radius:99px;background:var(--surface-3);
-  cursor:pointer;transition:background .2s}
-.slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;
-  border-radius:50%;background:#fff;transition:transform .22s var(--spring)}
+  cursor:pointer;transition:background .2s;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4)}
+.slider::before{content:'';position:absolute;width:20px;height:20px;left:2px;top:2px;
+  border-radius:50%;background:#fff;transition:transform .22s var(--spring);
+  box-shadow:0 2px 4px rgba(0,0,0,.3)}
 .switch input:checked+.slider{background:var(--accent)}
 .switch input:checked+.slider::before{transform:translateX(16px)}
 
@@ -454,11 +457,12 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 #toast-wrap{position:fixed;top:calc(var(--safe-top) + var(--header-h) + 12px);left:50%;
   transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:6px;
   width:calc(100% - 32px);max-width:360px;align-items:center;pointer-events:none}
-.toast{padding:11px 16px;border-radius:12px;background:rgba(20,20,20,.96);
+.toast{padding:11px 16px;border-radius:14px;background:rgba(20,20,20,.96);
   border:1px solid var(--border-2);font-size:13px;font-weight:600;display:flex;
   align-items:center;gap:9px;opacity:0;transform:translateY(-10px);
   transition:opacity .2s,transform .3s var(--spring);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);max-width:100%}
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);max-width:100%;
+  box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.success{border-color:rgba(52,211,153,.35);color:var(--green)}
 .toast.error{border-color:rgba(248,113,113,.35);color:var(--red)}
@@ -467,6 +471,11 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 </style>
 </head>
 <body>
+
+<div id="loading">
+  <div class="loading-logo">xDll</div>
+  <div class="loading-spinner"></div>
+</div>
 
 <div id="header"></div>
 <main id="main">
@@ -499,25 +508,31 @@ const I = {
   check:'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
   x:'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   arrow:'<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
-  feed:'<svg viewBox="0 0 24 24"><path d="M4 5h16l-2 4H6zM6 9v10h12V9M9 13h6"/></svg>',
-  play:'<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>',
-  sleep:'<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
   empty:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
 };
 
-const LS_KEY = 'orbit_v7';
+/* SAFE INITIAL AVATAR (data URI, never fails) */
+function initialAvatar(name, size){
+  size = size || 96;
+  const initial = (name || '?').trim().charAt(0).toUpperCase() || '?';
+  const palette = ['#4d9fff','#34d399','#fbbf24','#f472b6','#a78bfa','#f87171'];
+  const color = palette[initial.charCodeAt(0) % palette.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" fill="${color}"/><text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="${size*0.44}" font-weight="800">${initial}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* STATE */
+const LS_KEY = 'xdll_v1';
 const state = {
   tab: 'friends', query: '', result: null, error: null,
-  connections: [], pending: new Map(), // username -> {name, photo, requestedAt}
-  nova: { food: 68, happy: 54, energy: 41, level: 3, xp: 340, xpMax: 500,
-    x: 0, y: 0 }, // floor coords
+  connections: [], pending: new Map(),
   balance: 1250, notifications: true
 };
 function save(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify({
     connections: state.connections,
     pending: [...state.pending.entries()],
-    nova: state.nova, balance: state.balance, notifications: state.notifications
+    balance: state.balance, notifications: state.notifications
   })) }catch(_){}
 }
 function load(){
@@ -525,7 +540,6 @@ function load(){
     const d = JSON.parse(r);
     if (Array.isArray(d.connections)) state.connections = d.connections;
     if (Array.isArray(d.pending)) state.pending = new Map(d.pending);
-    if (d.nova) state.nova = { ...state.nova, ...d.nova };
     if (typeof d.balance === 'number') state.balance = d.balance;
     if (typeof d.notifications === 'boolean') state.notifications = d.notifications;
   }catch(_){}
@@ -539,7 +553,8 @@ const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
 function getUserInfo(){
   const u = tg?.initDataUnsafe?.user;
   const name = u ? ((u.first_name||'')+(u.last_name?' '+u.last_name:'')).trim() : 'You';
-  const photo = u?.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=4d9fff&textColor=ffffff`;
+  let photo = u?.photo_url || '';
+  if (!photo) photo = initialAvatar(name, 128);
   return { name, photo, username: u?.username || '' };
 }
 
@@ -554,18 +569,18 @@ function search(q){
   if (clean.length < 2) return { error: 'too_short' };
   if (!/^[a-z0-9_]{2,32}$/i.test(clean)) return { error: 'invalid' };
   const isKnown = clean in KNOWN;
+  const name = isKnown ? KNOWN[clean] : clean.charAt(0).toUpperCase() + clean.slice(1);
   return { ok: true, user: {
-    username: clean,
-    name: isKnown ? KNOWN[clean] : clean.charAt(0).toUpperCase() + clean.slice(1),
+    username: clean, name: name,
     photo: `https://unavatar.io/telegram/${clean}`,
-    fallbackPhoto: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(clean)}&backgroundColor=4d9fff&textColor=ffffff`,
     verified: isKnown
   }};
 }
 
 /* TYPEWRITER */
-function typeText(el, text, speed = 40, onDone){
+function typeText(el, text, speed, onDone){
   if (!el) return;
+  speed = speed || 40;
   el.innerHTML = '';
   let i = 0;
   const bar = document.createElement('span');
@@ -596,16 +611,23 @@ function toast(text, type){
   haptic('light');
 }
 
-/* HEADER */
+/* HEADER — with bulletproof avatar */
 function renderHeader(){
   const u = getUserInfo();
   $('#header').innerHTML = `
     <div class="h-left">
-      <div class="h-av"><img src="${esc(u.photo)}" alt=""></div>
+      <div class="h-av"><img id="h-av-img" src="${esc(u.photo)}" alt=""></div>
       <div class="h-name">${esc(u.name)}</div>
     </div>
-    <div class="h-brand">Orbit</div>
+    <div class="h-brand">xDll</div>
     <div class="h-right">${state.balance.toLocaleString()} 💎</div>`;
+  const img = $('#h-av-img');
+  if (img){
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = initialAvatar(u.name, 128);
+    };
+  }
 }
 
 /* TABS */
@@ -650,13 +672,12 @@ function switchTab(tab){
   $('#page-'+tab).classList.add('active');
   $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
   setTabIndicator(TABS.findIndex(t => t.id === tab), true);
-  if (tab==='friends') renderFriends();
+  if (tab==='friends') mountFriendsPage();
   if (tab==='nova') renderNova();
   if (tab==='pulse') renderPulse();
   if (tab==='profile') renderProfile();
 }
 
-/* TAB SLIDER - fixed for mobile */
 function initTabSlider(){
   const inner = $('#tabs-inner');
   const ind = $('#tab-indicator');
@@ -667,57 +688,34 @@ function initTabSlider(){
     if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
     return e.clientX;
   }
-  function getY(e){
-    if (e.touches && e.touches.length) return e.touches[0].clientY;
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
-    return e.clientY;
-  }
 
   function onDown(e){
-    const x = getX(e);
-    const y = getY(e);
-    dragging = true;
-    moved = false;
-    startX = x;
+    dragging = true; moved = false;
+    startX = getX(e);
     startIdx = TABS.findIndex(t => t.id === state.tab);
     ind.classList.add('dragging');
   }
-
   function onMove(e){
     if (!dragging) return;
-    const x = getX(e);
-    const dx = x - startX;
+    const dx = getX(e) - startX;
     if (Math.abs(dx) > 6) moved = true;
     if (moved){
       e.preventDefault();
-      const w = tabWidth;
-      const maxX = (TABS.length - 1) * w;
-      const target = clamp(startIdx * w + dx, 0, maxX);
-      ind.style.transform = `translateX(${target}px)`;
+      const maxX = (TABS.length - 1) * tabWidth;
+      ind.style.transform = `translateX(${clamp(startIdx * tabWidth + dx, 0, maxX)}px)`;
     }
   }
-
   function onUp(e){
     if (!dragging) return;
     dragging = false;
     ind.classList.remove('dragging');
-    const x = getX(e);
     const innerRect = inner.getBoundingClientRect();
-    const relX = x - innerRect.left - 5;
-    let idx;
-    if (!moved){
-      idx = Math.floor(relX / tabWidth);
-    } else {
-      idx = Math.round(relX / tabWidth);
-    }
+    const relX = getX(e) - innerRect.left - 5;
+    let idx = moved ? Math.round(relX / tabWidth) : Math.floor(relX / tabWidth);
     idx = clamp(idx, 0, TABS.length - 1);
     ind.style.transform = `translateX(${idx * tabWidth}px)`;
-    if (TABS[idx].id !== state.tab){
-      haptic('medium');
-      switchTab(TABS[idx].id);
-    } else {
-      setTabIndicator(idx, true);
-    }
+    if (TABS[idx].id !== state.tab){ haptic('medium'); switchTab(TABS[idx].id); }
+    else setTabIndicator(idx, true);
   }
 
   inner.addEventListener('pointerdown', onDown);
@@ -729,7 +727,6 @@ function initTabSlider(){
     ind.classList.remove('dragging');
     setTabIndicator(TABS.findIndex(t => t.id === state.tab), true);
   });
-  // Fallback for browsers without pointer events
   inner.addEventListener('touchstart', onDown, { passive: true });
   document.addEventListener('touchmove', onMove, { passive: false });
   document.addEventListener('touchend', onUp);
@@ -739,91 +736,17 @@ function initTabSlider(){
   });
 }
 
-/* FRIENDS PAGE */
-let lastResultUsername = null;
+/* ============================================================
+   FRIENDS PAGE — mounts ONCE, updates REGIONS separately
+   so input stays focused while typing.
+   ============================================================ */
 let searchTimer = null;
-let searchPending = false;
+let mounted = false;
 
-function renderFriends(){
+function mountFriendsPage(){
+  if (mounted){ refreshFriendsRegions(); return; }
+  mounted = true;
   const page = $('#page-friends');
-
-  let resultHtml = '';
-  if (state.error){
-    const t = {empty:'Type a username',too_short:'Too short',invalid:'Invalid username'};
-    const x = {empty:'Enter a @username.',too_short:'At least 2 characters.',
-      invalid:'Only letters, numbers, underscore.'};
-    resultHtml = `<div class="results"><div class="state-msg">${I.empty}
-      <div class="state-title">${t[state.error]||'Error'}</div>
-      <div class="state-text">${x[state.error]||''}</div></div></div>`;
-  } else if (state.result){
-    resultHtml = `<div class="results">${renderResultCard(state.result)}</div>`;
-  }
-
-  // Pending list
-  const pendingArr = [...state.pending.entries()];
-  const pendingHtml = pendingArr.length
-    ? `<div class="pending-list">
-        <div class="chat-list-head">
-          <div class="chat-list-title">Pending requests</div>
-          <div class="chat-list-count">${pendingArr.length}</div>
-        </div>
-        ${pendingArr.map(([username, data]) => `
-          <div class="pend-row">
-            <div class="pend-av"><img src="${esc(data.photo)}" alt=""
-              onerror="this.src='${esc(data.fallbackPhoto||'')}'"></div>
-            <div class="pend-body">
-              <div class="pend-name">${esc(data.name)}</div>
-              <div class="pend-handle">@${esc(username)}</div>
-            </div>
-            <div class="pend-status"><span class="spin">⏳</span> Waiting</div>
-          </div>`).join('')}
-      </div>`
-    : '';
-
-  // Chat-style connections
-  const connHtml = state.connections.length
-    ? `<div class="chat-list">
-        <div class="chat-list-head">
-          <div class="chat-list-title">Your connections</div>
-          <div class="chat-list-count">${state.connections.length}</div>
-        </div>
-        ${state.connections.map((c, i) => {
-          const previews = [
-            'Tap to open chat',
-            'Say hi 👋',
-            'Message on Telegram',
-            'Start a conversation'
-          ];
-          const preview = previews[i % previews.length];
-          const isOnline = Math.random() > 0.5;
-          const timeAgo = ['now', '2m', '5m', '12m', '1h'][i % 5];
-          return `
-          <div class="chat-row" data-open="${esc(c.username)}" style="animation-delay:${i*50}ms">
-            <div class="chat-av">
-              <img src="${esc(c.photo)}" alt=""
-                onerror="this.src='${esc(c.fallbackPhoto||'')}'">
-              ${isOnline ? '<span class="chat-online"></span>' : ''}
-            </div>
-            <div class="chat-body">
-              <div class="chat-name-row">
-                <div class="chat-name">${esc(c.name)}</div>
-                <div class="chat-time">${timeAgo}</div>
-              </div>
-              <div class="chat-preview">
-                <span>${esc(preview)}</span>
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>`
-    : `<div class="chat-list">
-        <div class="chat-list-head">
-          <div class="chat-list-title">Your connections</div>
-          <div class="chat-list-count">0</div>
-        </div>
-        <div class="chat-empty">Nobody yet.<br>Search a username above to send your first request.</div>
-      </div>`;
-
   page.innerHTML = `
     <div class="search-hero">
       <div class="search-title">Find people</div>
@@ -834,7 +757,6 @@ function renderFriends(){
           value="${esc(state.query)}" autocomplete="off" autocapitalize="none"
           autocorrect="off" spellcheck="false">
         <button class="search-clear ${state.query?'show':''}" id="search-clear">✕</button>
-        <div class="search-status" id="search-status">typing…</div>
       </div>
       <div class="chips">
         <button class="chip" data-try="durov">⭐ @durov</button>
@@ -842,21 +764,14 @@ function renderFriends(){
         <button class="chip" data-try="botfather">🤖 @botfather</button>
       </div>
     </div>
-    ${resultHtml}
-    ${pendingHtml}
-    ${connHtml}`;
-
-  wireFriends();
-
-  if (state.result && state.result.username !== lastResultUsername){
-    lastResultUsername = state.result.username;
-    const nameEl = document.getElementById('result-name');
-    if (nameEl) typeText(nameEl, state.result.name, 55);
-  }
-  if (!state.result) lastResultUsername = null;
+    <div id="region-results"></div>
+    <div id="region-pending"></div>
+    <div id="region-connections"></div>`;
+  wireFriendsInput();
+  refreshFriendsRegions();
 }
 
-function wireFriends(){
+function wireFriendsInput(){
   const input = $('#search-input');
   if (!input) return;
 
@@ -864,60 +779,74 @@ function wireFriends(){
     state.query = e.target.value;
     $('#search-clear')?.classList.toggle('show', !!state.query);
     clearTimeout(searchTimer);
-
-    // Show "typing…" indicator while waiting
-    const status = $('#search-status');
-    if (status) status.classList.toggle('show', !!state.query.trim());
-
     if (!state.query.trim()){
       state.result = null; state.error = null;
-      renderFriends();
+      refreshResults();
       return;
     }
-
-    // Longer debounce (700ms) so user can finish typing without result flashing
-    searchTimer = setTimeout(() => {
-      if (status) status.classList.remove('show');
-      doSearch(state.query);
-    }, 700);
+    searchTimer = setTimeout(() => doSearch(state.query), 700);
   });
 
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter'){
       clearTimeout(searchTimer);
-      $('#search-status')?.classList.remove('show');
       doSearch(state.query);
-      input.blur();
     }
   });
 
   $('#search-clear')?.addEventListener('click', () => {
     state.query = ''; state.result = null; state.error = null;
-    renderFriends();
+    $('#search-input').value = '';
+    $('#search-clear')?.classList.remove('show');
+    refreshResults();
   });
 
   $$('[data-try]').forEach(chip => chip.addEventListener('click', () => {
     clearTimeout(searchTimer);
     state.query = '@' + chip.dataset.try;
+    $('#search-input').value = state.query;
     doSearch(chip.dataset.try);
   }));
-
-  $$('[data-open]').forEach(row => row.addEventListener('click', () => openChat(row.dataset.open)));
-
-  const sliderEl = $('#lg-slider');
-  if (sliderEl) setupLiquidSlider(sliderEl, () => sendRequest(state.result));
 }
 
 function doSearch(q){
   const r = search(q);
   if (r.error){ state.error = r.error; state.result = null; }
   else { state.result = r.user; state.error = null; haptic('medium'); }
-  renderFriends();
+  refreshResults();
+}
+
+function refreshFriendsRegions(){
+  refreshResults();
+  refreshPending();
+  refreshConnections();
+}
+
+function refreshResults(){
+  const region = $('#region-results');
+  if (!region) return;
+  if (state.error){
+    const titles = {empty:'Type a username',too_short:'Too short',invalid:'Invalid username'};
+    const texts = {empty:'Enter a @username.',too_short:'At least 2 characters.',
+      invalid:'Only letters, numbers, underscore.'};
+    region.innerHTML = `<div class="results"><div class="state-msg">${I.empty}
+      <div class="state-title">${titles[state.error]||'Error'}</div>
+      <div class="state-text">${texts[state.error]||''}</div></div></div>`;
+    return;
+  }
+  if (!state.result){ region.innerHTML = ''; return; }
+  region.innerHTML = `<div class="results">${renderResultCard(state.result)}</div>`;
+  const nameEl = document.getElementById('result-name');
+  if (nameEl) typeText(nameEl, state.result.name, 55);
+  const sliderEl = $('#lg-slider');
+  if (sliderEl) setupLiquidSlider(sliderEl, () => sendRequest(state.result));
 }
 
 function renderResultCard(u){
   const isPending = state.pending.has(u.username);
-  const isConnected = state.connections.some(c => c.username.toLowerCase() === u.username.toLowerCase());
+  const isConnected = state.connections.some(c =>
+    c.username.toLowerCase() === u.username.toLowerCase());
+  const fb = initialAvatar(u.name, 96);
 
   let actionHtml;
   if (isConnected){
@@ -937,7 +866,7 @@ function renderResultCard(u){
       <div class="result-header">
         <div class="result-av">
           <img src="${esc(u.photo)}" alt=""
-            onerror="this.onerror=null;this.src='${esc(u.fallbackPhoto)}'">
+            onerror="this.onerror=null;this.src='${fb}'">
         </div>
         <div class="result-info">
           <div class="result-name-row">
@@ -951,7 +880,79 @@ function renderResultCard(u){
     </div>`;
 }
 
-/* SEND REQUEST */
+function refreshPending(){
+  const region = $('#region-pending');
+  if (!region) return;
+  const arr = [...state.pending.entries()];
+  if (!arr.length){ region.innerHTML = ''; return; }
+  region.innerHTML = `<div class="chat-list">
+    <div class="chat-list-head">
+      <div class="chat-list-title">Pending requests</div>
+      <div class="chat-list-count">${arr.length}</div>
+    </div>
+    ${arr.map(([username, data]) => {
+      const fb = initialAvatar(data.name, 96);
+      return `<div class="pend-row">
+        <div class="pend-av"><img src="${esc(data.photo)}" alt=""
+          onerror="this.onerror=null;this.src='${fb}'"></div>
+        <div class="pend-body">
+          <div class="pend-name">${esc(data.name)}</div>
+          <div class="pend-handle">@${esc(username)}</div>
+        </div>
+        <div class="pend-status"><span class="spin">⏳</span> Waiting</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function refreshConnections(){
+  const region = $('#region-connections');
+  if (!region) return;
+  if (!state.connections.length){
+    region.innerHTML = `<div class="chat-list">
+      <div class="chat-list-head">
+        <div class="chat-list-title">Your connections</div>
+        <div class="chat-list-count">0</div>
+      </div>
+      <div class="chat-empty">Nobody yet.<br>Search a username above to send your first request.</div>
+    </div>`;
+    return;
+  }
+
+  const previews = ['Tap to open chat', 'Say hi 👋', 'Message on Telegram', 'Start a conversation'];
+  const times = ['now', '2m', '12m', '1h', '3h'];
+
+  region.innerHTML = `<div class="chat-list">
+    <div class="chat-list-head">
+      <div class="chat-list-title">Your connections</div>
+      <div class="chat-list-count">${state.connections.length}</div>
+    </div>
+    ${state.connections.map((c, i) => {
+      const fb = initialAvatar(c.name, 96);
+      const isOnline = i % 3 !== 1;
+      return `
+        <div class="chat-row" data-open="${esc(c.username)}" style="animation-delay:${i*50}ms">
+          <div class="chat-av">
+            <img src="${esc(c.photo)}" alt=""
+              onerror="this.onerror=null;this.src='${fb}'">
+            ${isOnline ? '<span class="chat-online"></span>' : ''}
+          </div>
+          <div class="chat-body">
+            <div class="chat-name-row">
+              <div class="chat-name">${esc(c.name)}</div>
+              <div class="chat-time">${times[i % times.length]}</div>
+            </div>
+            <div class="chat-preview">${previews[i % previews.length]}</div>
+          </div>
+        </div>`;
+    }).join('')}
+  </div>`;
+
+  region.querySelectorAll('[data-open]').forEach(row => {
+    row.addEventListener('click', () => openChat(row.dataset.open));
+  });
+}
+
 function sendRequest(user){
   if (!user) return;
   if (state.connections.some(c => c.username.toLowerCase() === user.username.toLowerCase())){
@@ -960,32 +961,26 @@ function sendRequest(user){
   if (state.pending.has(user.username)){ toast('Request already sent', 'info'); return; }
 
   state.pending.set(user.username, {
-    name: user.name,
-    photo: user.photo,
-    fallbackPhoto: user.fallbackPhoto,
+    name: user.name, photo: user.photo,
     requestedAt: Date.now()
   });
   save();
   haptic('heavy');
   toast(`Request sent to @${user.username}`, 'success');
-  renderFriends();
+  refreshFriendsRegions();
 
-  // Simulate acceptance
   const delay = 8000 + Math.random() * 7000;
   setTimeout(() => {
     if (!state.pending.has(user.username)) return;
     state.pending.delete(user.username);
     state.connections.unshift({
-      username: user.username,
-      name: user.name,
-      photo: user.photo,
-      fallbackPhoto: user.fallbackPhoto,
+      username: user.username, name: user.name, photo: user.photo,
       connectedAt: Date.now()
     });
     save();
     haptic('heavy');
     toast(`@${user.username} accepted your request`, 'success');
-    if (state.tab === 'friends') renderFriends();
+    if (state.tab === 'friends') refreshFriendsRegions();
     if (state.tab === 'profile') renderProfile();
   }, delay);
 }
@@ -1006,7 +1001,7 @@ function setupLiquidSlider(el, onComplete){
   const text = el.querySelector('.lg-text');
   let dragging = false, startX = 0, currentX = 0, maxX = 0;
 
-  function measure(){ maxX = el.offsetWidth - knob.offsetWidth - 8; }
+  function measure(){ maxX = el.offsetWidth - knob.offsetWidth - 10; }
   requestAnimationFrame(measure);
   window.addEventListener('resize', measure);
 
@@ -1029,7 +1024,7 @@ function setupLiquidSlider(el, onComplete){
     e.preventDefault();
     currentX = clamp(getX(e) - startX, 0, maxX);
     knob.style.transform = `translateX(${currentX}px)`;
-    fill.style.width = (currentX + knob.offsetWidth + 4) + 'px';
+    fill.style.width = (currentX + knob.offsetWidth + 5) + 'px';
     text.style.opacity = String(Math.max(0, 1 - currentX / (maxX * 0.4)));
   }
   function onUp(){
@@ -1062,86 +1057,89 @@ function setupLiquidSlider(el, onComplete){
   el.addEventListener('touchend', onUp);
 }
 
-/* ============================================
-   NOVA - 3D rotatable room + GIF pet
-   ============================================ */
+/* ============================================================
+   NOVA — 3D rotatable room + GIF pet
+   ============================================================ */
 const PET_GIF = 'https://i.postimg.cc/fRqXk2SR/ezgif-21ab08378515e1ba.gif';
+const ROOM_RX = -20;
+const FLOOR_Y = 100;
+const PERSPECTIVE = 900;
+
 let roomY = 0;
-let rotating = false;
+let petX = 0, petZ = 0;
+let rotatingRoom = false;
+let draggingPet = false;
 let rotateStartX = 0, rotateStartY = 0, rotateStartVal = 0;
+let petStartX = 0, petStartY = 0, petStartPX = 0, petStartPZ = 0;
+
+function project(px, py, pz, rxDeg, ryDeg){
+  const rx = rxDeg * Math.PI / 180;
+  const ry = ryDeg * Math.PI / 180;
+  const cosY = Math.cos(ry), sinY = Math.sin(ry);
+  const x1 = px * cosY + pz * sinY;
+  const z1 = -px * sinY + pz * cosY;
+  const y1 = py;
+  const cosX = Math.cos(rx), sinX = Math.sin(rx);
+  const y2 = y1 * cosX - z1 * sinX;
+  const z2 = y1 * sinX + z1 * cosX;
+  const scale = PERSPECTIVE / (PERSPECTIVE + z2);
+  return { x: x1 * scale, y: y2 * scale, scale };
+}
 
 function renderNova(){
-  const n = state.nova;
-  const pct = Math.min(100, (n.xp / n.xpMax) * 100);
-  $('#page-nova').innerHTML = `
+  const page = $('#page-nova');
+  page.innerHTML = `
     <div class="room-scene" id="room-scene">
       <div class="room" id="room">
-        <div class="wall wall-back"></div>
-        <div class="wall wall-left"></div>
-        <div class="wall wall-right"></div>
-        <div class="floor"></div>
-        <div class="rug"></div>
-        <div class="window">
-          <div class="window-stars">
-            <div class="window-star" style="top:20%;left:30%"></div>
-            <div class="window-star" style="top:40%;left:70%;animation-delay:.5s"></div>
-            <div class="window-star" style="top:65%;left:25%;animation-delay:1s"></div>
-            <div class="window-star" style="top:75%;left:65%;animation-delay:1.5s"></div>
-          </div>
+        <div class="face face-floor"></div>
+        <div class="face face-back"></div>
+        <div class="face face-left"></div>
+        <div class="face face-right"></div>
+        <div class="face face-window">
+          <span class="star" style="top:20%;left:25%"></span>
+          <span class="star" style="top:35%;left:70%;animation-delay:.5s"></span>
+          <span class="star" style="top:65%;left:30%;animation-delay:1s"></span>
+          <span class="star" style="top:75%;left:65%;animation-delay:1.5s"></span>
         </div>
-        <div class="poster"></div>
-        <div class="bowl">🍖</div>
-        <div class="ball">⚽</div>
+        <div class="face face-poster"></div>
+        <div class="face face-rug"></div>
+        <div class="face face-bowl">🍖</div>
       </div>
-      <div class="pet-wrap" id="pet-wrap" style="--px:${n.x}px;--pz:${n.y}px;--ry:${roomY}deg">
-        <div class="pet-shadow"></div>
+      <div class="pet-overlay" id="pet-overlay">
         <img class="pet-img" id="pet-img" src="${PET_GIF}" alt="Nova">
       </div>
     </div>
 
     <div class="nova-info">
       <div class="nova-name">Nova</div>
-      <div class="nova-meta">Level ${n.level} · ${state.connections.length} friends</div>
-    </div>
-
-    <div class="nova-bars">
-      ${['food','happy','energy'].map((k,i)=>`
-        <div class="bar-row">
-          <div class="bar-head"><span>${k[0].toUpperCase()+k.slice(1)}</span><span>${n[k]}%</span></div>
-          <div class="bar-track"><div class="bar-fill" style="width:${n[k]}%;background:${['#34d399','#fbbf24','#4d9fff'][i]}"></div></div>
-        </div>`).join('')}
-    </div>
-
-    <div class="nova-btns">
-      <button data-care="feed">${I.feed}<span>Feed</span></button>
-      <button data-care="play">${I.play}<span>Play</span></button>
-      <button data-care="sleep">${I.sleep}<span>Sleep</span></button>
-    </div>
-
-    <div class="chat-list" style="margin-top:16px">
-      <div class="chat-list-head">
-        <div class="chat-list-title">Level progress</div>
-        <div class="chat-list-count">${n.xp}/${n.xpMax}</div>
-      </div>
-      <div style="padding:0 18px 16px">
-        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--accent)"></div></div>
-      </div>
+      <div class="nova-meta">Level 3 · ${state.connections.length} friends</div>
     </div>`;
 
-  $$('[data-care]').forEach(b => b.addEventListener('click', () => care(b.dataset.care)));
-  initRoomInteraction();
+  // Restore rotation
+  roomY = 0;
+  petX = 0;
+  petZ = 0;
+  applyRoomTransform();
   updatePetPosition();
+  initRoomInteraction();
+}
+
+function applyRoomTransform(){
+  const room = $('#room');
+  if (room) room.style.transform = `rotateX(${ROOM_RX}deg) rotateY(${roomY}deg)`;
+}
+
+function updatePetPosition(){
+  const overlay = $('#pet-overlay');
+  if (!overlay) return;
+  const p = project(petX, FLOOR_Y, petZ, ROOM_RX, roomY);
+  overlay.style.transform = `translate(${p.x}px, ${p.y}px)`;
 }
 
 function initRoomInteraction(){
   const scene = $('#room-scene');
-  const room = $('#room');
-  const pet = $('#pet-wrap');
-  if (!scene || !room || !pet) return;
-
-  let petDragging = false;
-  let petStartX = 0, petStartY = 0;
-  let petStartPX = state.nova.x, petStartPZ = state.nova.y;
+  const pet = $('#pet-img');
+  if (!scene || !pet) return;
 
   function getPt(e){
     if (e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -1149,27 +1147,28 @@ function initRoomInteraction(){
     return { x: e.clientX, y: e.clientY };
   }
 
-  // Room rotation - drag anywhere on scene except pet
+  // Scene drag → rotate room
   scene.addEventListener('pointerdown', e => {
-    if (e.target.closest('#pet-wrap')) return;
-    rotating = true;
+    if (e.target.closest('#pet-img')) return;
+    rotatingRoom = true;
     const p = getPt(e);
     rotateStartX = p.x;
     rotateStartY = p.y;
     rotateStartVal = roomY;
     scene.style.cursor = 'grabbing';
+    haptic('light');
   });
 
   // Pet drag
   pet.addEventListener('pointerdown', e => {
     e.preventDefault();
     e.stopPropagation();
-    petDragging = true;
+    draggingPet = true;
     const p = getPt(e);
     petStartX = p.x;
     petStartY = p.y;
-    petStartPX = state.nova.x;
-    petStartPZ = state.nova.y;
+    petStartPX = petX;
+    petStartPZ = petZ;
     pet.classList.add('dragging');
     showHand(p.x, p.y);
     haptic('medium');
@@ -1178,46 +1177,46 @@ function initRoomInteraction(){
   document.addEventListener('pointermove', e => {
     const p = getPt(e);
 
-    if (rotating){
+    if (rotatingRoom){
       const dx = p.x - rotateStartX;
       roomY = clamp(rotateStartVal + dx * 0.45, -50, 50);
-      room.style.transform = `rotateX(-18deg) rotateY(${roomY}deg)`;
+      applyRoomTransform();
       updatePetPosition();
     }
 
-    if (petDragging){
+    if (draggingPet){
       updateHandPos(p.x, p.y);
       const dx = p.x - petStartX;
       const dy = p.y - petStartY;
-      const theta = roomY * Math.PI / 180;
-      // Inverse rotation to convert screen delta to floor coords
-      const dfx = dx * Math.cos(theta) + (dy / 0.45) * Math.sin(theta);
-      const dfz = -dx * Math.sin(theta) + (dy / 0.45) * Math.cos(theta);
-      state.nova.x = clamp(petStartPX + dfx, -100, 100);
-      state.nova.y = clamp(petStartPZ + dfz, -100, 100);
-      pet.style.setProperty('--px', state.nova.x + 'px');
-      pet.style.setProperty('--pz', state.nova.y + 'px');
+      // Approximate inverse projection → floor delta
+      const rx = ROOM_RX * Math.PI / 180;
+      const ry = roomY * Math.PI / 180;
+      const cosY = Math.cos(ry), sinY = Math.sin(ry);
+      const S = Math.max(0.15, Math.abs(Math.sin(rx)));
+      const proj = project(petStartPX, FLOOR_Y, petStartPZ, ROOM_RX, roomY);
+      const sc = proj.scale || 1;
+      const dfx = (dx * cosY - dy * sinY / S) / sc;
+      const dfz = (dx * sinY + dy * cosY / S) / sc;
+      petX = clamp(petStartPX + dfx, -75, 75);
+      petZ = clamp(petStartPZ + dfz, -75, 75);
+      updatePetPosition();
     }
   }, { passive: false });
 
   document.addEventListener('pointerup', () => {
-    if (rotating){
-      rotating = false;
-      scene.style.cursor = '';
-    }
-    if (petDragging){
-      petDragging = false;
+    if (rotatingRoom){ rotatingRoom = false; scene.style.cursor = ''; }
+    if (draggingPet){
+      draggingPet = false;
       pet.classList.remove('dragging');
       hideHand();
-      save();
       haptic('light');
     }
   });
 
   // Touch fallback
   scene.addEventListener('touchstart', e => {
-    if (e.target.closest('#pet-wrap')) return;
-    rotating = true;
+    if (e.target.closest('#pet-img')) return;
+    rotatingRoom = true;
     const p = getPt(e);
     rotateStartX = p.x;
     rotateStartY = p.y;
@@ -1225,60 +1224,60 @@ function initRoomInteraction(){
   }, { passive: true });
   pet.addEventListener('touchstart', e => {
     e.preventDefault();
-    petDragging = true;
+    e.stopPropagation();
+    draggingPet = true;
     const p = getPt(e);
     petStartX = p.x;
     petStartY = p.y;
-    petStartPX = state.nova.x;
-    petStartPZ = state.nova.y;
+    petStartPX = petX;
+    petStartPZ = petZ;
     pet.classList.add('dragging');
     showHand(p.x, p.y);
     haptic('medium');
   }, { passive: false });
   document.addEventListener('touchmove', e => {
     const p = getPt(e);
-    if (rotating){
+    if (rotatingRoom){
       e.preventDefault();
       const dx = p.x - rotateStartX;
       roomY = clamp(rotateStartVal + dx * 0.45, -50, 50);
-      room.style.transform = `rotateX(-18deg) rotateY(${roomY}deg)`;
+      applyRoomTransform();
       updatePetPosition();
     }
-    if (petDragging){
+    if (draggingPet){
       e.preventDefault();
       updateHandPos(p.x, p.y);
       const dx = p.x - petStartX;
       const dy = p.y - petStartY;
-      const theta = roomY * Math.PI / 180;
-      const dfx = dx * Math.cos(theta) + (dy / 0.45) * Math.sin(theta);
-      const dfz = -dx * Math.sin(theta) + (dy / 0.45) * Math.cos(theta);
-      state.nova.x = clamp(petStartPX + dfx, -100, 100);
-      state.nova.y = clamp(petStartPZ + dfz, -100, 100);
-      pet.style.setProperty('--px', state.nova.x + 'px');
-      pet.style.setProperty('--pz', state.nova.y + 'px');
+      const rx = ROOM_RX * Math.PI / 180;
+      const ry = roomY * Math.PI / 180;
+      const cosY = Math.cos(ry), sinY = Math.sin(ry);
+      const S = Math.max(0.15, Math.abs(Math.sin(rx)));
+      const proj = project(petStartPX, FLOOR_Y, petStartPZ, ROOM_RX, roomY);
+      const sc = proj.scale || 1;
+      const dfx = (dx * cosY - dy * sinY / S) / sc;
+      const dfz = (dx * sinY + dy * cosY / S) / sc;
+      petX = clamp(petStartPX + dfx, -75, 75);
+      petZ = clamp(petStartPZ + dfz, -75, 75);
+      updatePetPosition();
     }
   }, { passive: false });
   document.addEventListener('touchend', () => {
-    if (rotating){ rotating = false; }
-    if (petDragging){
-      petDragging = false;
+    if (rotatingRoom){ rotatingRoom = false; scene.style.cursor = ''; }
+    if (draggingPet){
+      draggingPet = false;
       pet.classList.remove('dragging');
       hideHand();
-      save();
     }
   });
-}
-
-function updatePetPosition(){
-  const pet = $('#pet-wrap');
-  if (!pet) return;
-  pet.style.setProperty('--ry', roomY + 'deg');
 }
 
 function showHand(x, y){
   const h = $('#hand-cursor');
   const u = getUserInfo();
-  $('#hand-avatar-img').src = u.photo;
+  const img = $('#hand-avatar-img');
+  img.src = u.photo;
+  img.onerror = () => { img.onerror = null; img.src = initialAvatar(u.name, 96); };
   h.classList.add('active');
   updateHandPos(x, y);
 }
@@ -1287,44 +1286,25 @@ function updateHandPos(x, y){
   h.style.left = (x + 12) + 'px';
   h.style.top = (y + 12) + 'px';
 }
-function hideHand(){
-  $('#hand-cursor').classList.remove('active');
-}
-
-/* NOVA actions */
-function care(kind){
-  const n = state.nova;
-  if (kind==='feed'){ n.food=clamp(n.food+18,0,100); n.energy=clamp(n.energy-5,0,100); n.xp+=15; }
-  if (kind==='play'){ n.happy=clamp(n.happy+16,0,100); n.energy=clamp(n.energy-12,0,100); n.xp+=20; }
-  if (kind==='sleep'){ n.energy=clamp(n.energy+22,0,100); n.food=clamp(n.food-4,0,100); n.xp+=10; }
-  if (n.xp >= n.xpMax){ n.level++; n.xp=0; n.xpMax=Math.round(n.xpMax*1.2);
-    toast('Nova leveled up', 'success'); haptic('heavy'); }
-  else haptic('light');
-  save(); renderNova();
-}
+function hideHand(){ $('#hand-cursor').classList.remove('active'); }
 
 /* PULSE */
 function renderPulse(){
   $('#page-pulse').innerHTML = `
-    <div class="chat-list">
-      <div class="chat-list-head">
-        <div class="chat-list-title">Anonymous messages</div>
-      </div>
-      <div style="padding:0 16px 16px">
-        <div class="anon-card">
-          <div class="anon-text" id="anon1"></div>
-          <button class="reveal-btn" data-reveal="50">Reveal author · 50 💎</button>
-        </div>
-        <div class="anon-card">
-          <div class="anon-text" id="anon2"></div>
-          <button class="reveal-btn" data-reveal="50">Reveal author · 50 💎</button>
-        </div>
-      </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:24px;font-weight:800;letter-spacing:-.7px;margin-bottom:4px">Anonymous</div>
+      <div style="font-size:13px;color:var(--text-2)">Messages from your connections</div>
+    </div>
+    <div class="anon-card">
+      <div class="anon-text" id="anon1"></div>
+      <button class="reveal-btn" data-reveal="50">Reveal author · 50 💎</button>
+    </div>
+    <div class="anon-card">
+      <div class="anon-text" id="anon2"></div>
+      <button class="reveal-btn" data-reveal="50">Reveal author · 50 💎</button>
     </div>`;
-  const m1 = "You're building something cool. Keep going.";
-  const m2 = "Bro it's 3am, close the laptop and sleep.";
-  setTimeout(() => typeText($('#anon1'), m1, 35), 200);
-  setTimeout(() => typeText($('#anon2'), m2, 35), 1700);
+  setTimeout(() => typeText($('#anon1'), "You're building something cool. Keep going.", 35), 200);
+  setTimeout(() => typeText($('#anon2'), "Bro it's 3am, close the laptop and sleep.", 35), 1700);
 
   $$('[data-reveal]').forEach(b => b.addEventListener('click', () => {
     const cost = +b.dataset.reveal;
@@ -1339,16 +1319,19 @@ function renderPulse(){
 function renderProfile(){
   const u = getUserInfo();
   const handle = u.username ? '@'+u.username : 'no username';
+  const fb = initialAvatar(u.name, 200);
   $('#page-profile').innerHTML = `
     <div class="profile-hero">
-      <div class="profile-av"><img src="${esc(u.photo)}" alt=""></div>
+      <div class="profile-av">
+        <img id="prof-img" src="${esc(u.photo)}" alt="">
+      </div>
       <div class="profile-name">${esc(u.name)}</div>
       <div class="profile-handle">${esc(handle)}</div>
     </div>
     <div class="profile-stats">
       <div class="stat-card"><div class="stat-val">${state.connections.length}</div><div class="stat-lbl">Connections</div></div>
       <div class="stat-card"><div class="stat-val">${state.pending.size}</div><div class="stat-lbl">Pending</div></div>
-      <div class="stat-card"><div class="stat-val">${state.nova.level}</div><div class="stat-lbl">Nova</div></div>
+      <div class="stat-card"><div class="stat-val">${state.balance.toLocaleString()}</div><div class="stat-lbl">Diamonds</div></div>
     </div>
     <div class="settings">
       <div class="setting-row"><span class="setting-lbl">Notifications</span>
@@ -1358,7 +1341,11 @@ function renderProfile(){
         <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
       </div>
     </div>
-    <div style="padding:20px;text-align:center;font-size:11px;color:var(--text-3)">Orbit · v1.2</div>`;
+    <div style="padding:20px;text-align:center;font-size:11px;color:var(--text-3)">xDll · v1.0</div>`;
+  const img = $('#prof-img');
+  if (img){
+    img.onerror = () => { img.onerror = null; img.src = fb; };
+  }
   $('#notif')?.addEventListener('change', e => { state.notifications = e.target.checked; save(); });
 }
 
@@ -1369,8 +1356,20 @@ function init(){
   renderTabs();
   initTabSlider();
   switchTab('friends');
+
+  // Hide loader after content is mounted
+  setTimeout(() => {
+    const loading = $('#loading');
+    if (loading) loading.classList.add('out');
+  }, 900);
 }
-init();
+
+// Wait for DOM
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 })();
 </script>
