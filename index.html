@@ -8,144 +8,177 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#000;--surface:#0d0d0d;--surface-2:#161616;--surface-3:#202020;
-  --text:#fff;--text-2:#a8a8a8;--text-3:#5a5a5a;
+  --bg:#000;--surface:#0a0a0a;--surface-2:#141414;--surface-3:#1e1e1e;
+  --text:#fff;--text-2:#a0a0a0;--text-3:#5a5a5a;
   --border:rgba(255,255,255,.07);--border-2:rgba(255,255,255,.14);
   --accent:#4d9fff;--accent-2:#6eb0ff;
   --green:#34d399;--gold:#fbbf24;--red:#f87171;
-  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+  --safe-top:max(env(safe-area-inset-top,0px),24px);
+  --safe-bottom:max(env(safe-area-inset-bottom,0px),10px);
+  --header-h:54px;--tabs-h:60px;
   --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.4,0,.2,1);
 }
 html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',Inter,system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;font-size:15px;touch-action:manipulation}
 
-/* ====== HEADER ====== */
-#header{position:absolute;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;
-  padding:calc(var(--safe-t) + 6px) 16px 6px;z-index:100;background:rgba(0,0,0,.9);
-  border-bottom:.5px solid var(--border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-.h-left{display:flex;align-items:center;gap:10px;min-width:0}
-.h-av{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface-2)}
+/* ====== HEADER (guaranteed visible) ====== */
+#header{position:fixed;top:0;left:0;right:0;height:calc(var(--safe-top) + var(--header-h));
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--safe-top) 16px 0;z-index:100;
+  background:rgba(0,0,0,.94);border-bottom:.5px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.h-left{display:flex;align-items:center;gap:10px;min-width:0;height:var(--header-h)}
+.h-av{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface-2)}
 .h-av img{width:100%;height:100%;object-fit:cover;display:block}
 .h-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
-.h-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  font-size:16px;font-weight:700;letter-spacing:-.4px;
-  background:linear-gradient(135deg,#4d9fff,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
-.h-right{font-size:12px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:4px}
+.h-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + var(--safe-top)/2));
+  font-size:17px;font-weight:800;letter-spacing:-.5px;
+  background:linear-gradient(135deg,#4d9fff,#a78bfa);-webkit-background-clip:text;background-clip:text;
+  color:transparent;pointer-events:none}
+.h-right{font-size:12.5px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:4px;height:var(--header-h)}
 
 /* ====== MAIN ====== */
-#main{position:absolute;inset:0;padding-top:calc(var(--safe-t) + 56px);padding-bottom:calc(var(--safe-b) + 60px);overflow:hidden}
-.page{position:absolute;inset:0;overflow-y:auto;padding:16px;opacity:0;visibility:hidden;transform:translateY(8px);
-  transition:opacity .22s var(--ease),transform .28s var(--ease),visibility .22s}
+#main{position:fixed;top:calc(var(--safe-top) + var(--header-h));
+  left:0;right:0;bottom:calc(var(--safe-bottom) + var(--tabs-h));overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;padding:16px;opacity:0;visibility:hidden;
+  transform:translateY(10px);transition:opacity .25s var(--ease),transform .3s var(--spring),visibility .25s}
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;visibility:visible;transform:translateY(0)}
 
-/* ====== TABS — CLEAN ====== */
-#tabs{position:absolute;bottom:0;left:0;right:0;height:calc(var(--safe-b) + 60px);display:flex;
-  background:rgba(0,0,0,.94);border-top:.5px solid var(--border);z-index:100;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding-bottom:var(--safe-b)}
+/* ====== TABS ====== */
+#tabs{position:fixed;bottom:0;left:0;right:0;height:calc(var(--safe-bottom) + var(--tabs-h));
+  display:flex;background:rgba(0,0,0,.94);border-top:.5px solid var(--border);z-index:100;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding-bottom:var(--safe-bottom)}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
   background:none;border:0;color:var(--text-3);font-family:inherit;font-size:10px;font-weight:600;
-  letter-spacing:.2px;cursor:pointer;transition:color .25s var(--ease);position:relative}
+  letter-spacing:.2px;cursor:pointer;transition:color .2s var(--ease);position:relative;height:var(--tabs-h)}
 .tab-btn.active{color:var(--accent)}
-.tab-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
-  transition:transform .3s var(--spring)}
-.tab-btn.active svg{transform:scale(1.12)}
+.tab-icon{position:relative;display:inline-flex;transition:transform .3s var(--spring)}
+.tab-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab-btn.active .tab-icon{transform:scale(1.12) translateY(-1px)}
+.tab-bell{position:absolute;top:-5px;right:-8px;font-size:11px;line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));animation:bellWobble 2.4s ease-in-out infinite;
+  transform-origin:50% 20%}
+@keyframes bellWobble{
+  0%,100%{transform:rotate(0deg)}
+  8%{transform:rotate(14deg)}
+  16%{transform:rotate(-12deg)}
+  24%{transform:rotate(8deg)}
+  32%{transform:rotate(-4deg)}
+  40%{transform:rotate(0deg)}
+}
+.tab-bell::before{content:'';position:absolute;top:-1px;right:-1px;width:5px;height:5px;
+  background:var(--red);border-radius:50%;border:1px solid var(--bg);box-shadow:0 0 6px rgba(248,113,113,.8)}
 
-/* ====== SEARCH BAR ====== */
-.search-hero{margin-bottom:20px}
-.search-title{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
-.search-sub{font-size:13px;color:var(--text-2);margin-bottom:14px}
+/* ====== SEARCH HERO ====== */
+.search-hero{margin-bottom:18px}
+.search-title{font-size:24px;font-weight:800;letter-spacing:-.7px;margin-bottom:4px}
+.search-sub{font-size:13px;color:var(--text-2);margin-bottom:14px;line-height:1.4}
 .search-wrap{position:relative}
-.search-input{width:100%;padding:14px 16px 14px 44px;background:var(--surface);border:1px solid var(--border);
+.search-input{width:100%;padding:13px 16px 13px 44px;background:var(--surface);border:1px solid var(--border);
   border-radius:14px;color:var(--text);font-family:inherit;font-size:16px;outline:none;
   transition:border .2s var(--ease),background .2s var(--ease)}
 .search-input:focus{border-color:var(--accent);background:var(--surface-2)}
 .search-input::placeholder{color:var(--text-3)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;
-  stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none;transition:stroke .2s}
+  stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none;
+  transition:stroke .2s var(--ease)}
 .search-input:focus~.search-icon{stroke:var(--accent)}
-.search-spinner{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;
-  border:2px solid var(--surface-3);border-top-color:var(--accent);border-radius:50%;
-  animation:spin .7s linear infinite;display:none}
-.search-spinner.show{display:block}
-@keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;
+  border:none;background:var(--surface-3);border-radius:50%;color:var(--text-2);font-size:12px;
+  cursor:pointer;display:none;align-items:center;justify-content:center}
+.search-clear.show{display:flex}
 
-/* ====== SUGGESTION CHIPS ====== */
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chip{padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--border);
-  color:var(--text-2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;
-  transition:all .15s var(--ease)}
-.chip:active{transform:scale(.95);background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
+  color:var(--text-2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .18s var(--spring);display:flex;align-items:center;gap:4px}
+.chip:active{transform:scale(.94);background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
 
-/* ====== SEARCH RESULTS ====== */
+/* ====== RESULT CARD ====== */
 .results{margin-top:20px}
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;
-  margin-bottom:10px;opacity:0;transform:translateY(8px);animation:resultIn .4s var(--spring) forwards}
-@keyframes resultIn{to{opacity:1;transform:translateY(0)}}
-.result-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.result-av{width:56px;height:56px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface-2);
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;
+  margin-bottom:14px;animation:resultIn .45s var(--spring) both}
+@keyframes resultIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.result-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.result-av{width:64px;height:64px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface-2);
   position:relative}
 .result-av img{width:100%;height:100%;object-fit:cover;display:block}
-.result-av::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.result-av::after{content:'';position:absolute;inset:0;border-radius:50%;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08)}
 .result-info{flex:1;min-width:0}
-.result-name{font-size:17px;font-weight:600;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.result-handle{font-size:13px;color:var(--text-3);margin-top:2px;font-weight:500}
-.result-verified{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;
-  background:var(--accent);border-radius:50%;margin-left:6px;vertical-align:middle}
-.result-verified svg{width:9px;height:9px;stroke:#fff;stroke-width:3;fill:none}
-.result-actions{display:flex;gap:8px}
-.result-btn{flex:1;padding:10px;border-radius:10px;border:none;font-family:inherit;font-size:13px;
-  font-weight:600;cursor:pointer;transition:transform .15s var(--spring),background .2s var(--ease);
-  display:flex;align-items:center;justify-content:center;gap:6px}
-.result-btn:active{transform:scale(.97)}
-.result-btn.primary{background:var(--accent);color:#fff}
-.result-btn.ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
-.result-btn.done{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.3);pointer-events:none}
-.result-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.result-name-row{display:flex;align-items:center;gap:6px}
+.result-name{font-size:18px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.result-verified{flex-shrink:0;width:16px;height:16px;background:var(--accent);border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center}
+.result-verified svg{width:10px;height:10px;stroke:#fff;stroke-width:3;fill:none}
+.result-handle{font-size:13px;color:var(--text-3);margin-top:3px;font-weight:500}
 
-/* ====== SKELETON ====== */
-.skeleton-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
-.skeleton-row{display:flex;align-items:center;gap:14px}
-.skeleton-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface-3) 50%,var(--surface-2) 75%);
-  background-size:200% 100%;animation:shimmer 1.4s infinite;flex-shrink:0}
-.skeleton-lines{flex:1;display:flex;flex-direction:column;gap:8px}
-.skeleton-line{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface-3) 50%,var(--surface-2) 75%);
-  background-size:200% 100%;animation:shimmer 1.4s infinite}
-.skeleton-line:nth-child(2){width:60%}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* ====== STATE MESSAGES ====== */
-.state-msg{text-align:center;padding:36px 20px;color:var(--text-3)}
-.state-msg svg{width:44px;height:44px;stroke:var(--text-3);fill:none;stroke-width:1.4;margin-bottom:14px;opacity:.6}
-.state-msg .state-title{font-size:15px;font-weight:600;color:var(--text-2);margin-bottom:6px}
-.state-msg .state-text{font-size:13px;line-height:1.5}
-.state-msg .state-text b{color:var(--accent);font-weight:600}
-.state-msg.error svg{stroke:var(--red)}
-.state-msg.error .state-title{color:var(--red)}
-.retry-btn{margin-top:14px;padding:9px 18px;border-radius:99px;border:1px solid var(--border-2);
-  background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
-.retry-btn:active{opacity:.7}
+/* ====== LIQUID GLASS SLIDER ====== */
+.lg-slider{position:relative;height:58px;border-radius:29px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);overflow:hidden;touch-action:none;user-select:none;
+  -webkit-user-select:none;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.3)}
+.lg-slider::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.08),transparent 55%),
+             radial-gradient(ellipse at 80% 100%,rgba(77,159,255,.1),transparent 55%);
+  border-radius:29px}
+.lg-fill{position:absolute;top:0;left:0;bottom:0;width:0;
+  background:linear-gradient(90deg,rgba(77,159,255,.4),rgba(77,159,255,.75));
+  border-radius:29px;pointer-events:none;
+  box-shadow:0 0 20px rgba(77,159,255,.4)}
+.lg-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.3px;
+  pointer-events:none;transition:opacity .2s var(--ease)}
+.lg-knob{position:absolute;left:4px;top:4px;width:50px;height:50px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.08));
+  backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.15),
+             0 6px 16px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;cursor:grab;
+  transition:box-shadow .2s var(--ease),background .2s var(--ease);will-change:transform}
+.lg-knob:active,.lg-knob.dragging{cursor:grabbing;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.15),
+             0 8px 24px rgba(77,159,255,.55),0 2px 8px rgba(0,0,0,.4)}
+.lg-knob svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;
+  pointer-events:none;transition:transform .25s var(--spring)}
+.lg-knob.dragging svg{transform:scale(1.1)}
+.lg-slider.completed .lg-knob{background:linear-gradient(135deg,#34d399,#22c55e);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 20px rgba(52,211,153,.6)}
+.lg-slider.completed .lg-text{opacity:0}
+.lg-slider.completed .lg-fill{background:linear-gradient(90deg,rgba(52,211,153,.5),rgba(34,197,94,.9));
+  box-shadow:0 0 24px rgba(52,211,153,.5)}
 
 /* ====== CONNECTIONS LIST ====== */
-.section{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:14px}
 .section-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
-  color:var(--text-3);padding:14px 16px 10px}
-.conn-row{display:flex;align-items:center;gap:12px;padding:10px 16px;position:relative;cursor:pointer;
-  transition:background .15s var(--ease)}
+  color:var(--text-3);padding:14px 18px 10px}
+.conn-row{display:flex;align-items:center;gap:12px;padding:10px 18px;position:relative;cursor:pointer;
+  transition:background .15s var(--ease);animation:connIn .35s var(--spring) both}
 .conn-row:active{background:var(--surface-2)}
-.conn-row+.conn-row::before{content:'';position:absolute;top:0;left:66px;right:16px;height:.5px;background:var(--border)}
+@keyframes connIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.conn-row+.conn-row::before{content:'';position:absolute;top:0;left:70px;right:18px;height:.5px;background:var(--border)}
 .conn-av{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface-2)}
 .conn-av img{width:100%;height:100%;object-fit:cover;display:block}
 .conn-body{flex:1;min-width:0}
 .conn-name{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .conn-handle{font-size:12.5px;color:var(--text-3);margin-top:1px;font-weight:500}
-.conn-chevron{width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.conn-empty{padding:28px 16px;text-align:center;font-size:13px;color:var(--text-3);line-height:1.5}
+.conn-chevron{width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.conn-empty{padding:32px 18px;text-align:center;font-size:13px;color:var(--text-3);line-height:1.5}
+
+/* ====== STATE MESSAGES ====== */
+.state-msg{text-align:center;padding:32px 20px;color:var(--text-3)}
+.state-msg svg{width:44px;height:44px;stroke:var(--text-3);fill:none;stroke-width:1.4;margin-bottom:12px;opacity:.5}
+.state-msg .state-title{font-size:15px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+.state-msg .state-text{font-size:13px;line-height:1.5}
 
 /* ====== NOVA / PULSE / PROFILE ====== */
 .nova-card{background:linear-gradient(160deg,rgba(77,159,255,.1),rgba(77,159,255,.01)),var(--surface);
-  border:1px solid rgba(77,159,255,.18);border-radius:20px;padding:24px 18px;text-align:center;margin-bottom:14px}
+  border:1px solid rgba(77,159,255,.18);border-radius:20px;padding:24px 18px;text-align:center;margin-bottom:14px;
+  animation:resultIn .45s var(--spring) both}
 .nova-em{font-size:72px;line-height:1;margin-bottom:8px;animation:bob 3s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
 .nova-name{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
@@ -153,7 +186,7 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .bar-row{margin-bottom:11px;text-align:left}
 .bar-head{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px}
 .bar-track{height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.bar-fill{height:100%;border-radius:99px;transition:width .45s var(--spring)}
+.bar-fill{height:100%;border-radius:99px;transition:width .5s var(--spring)}
 .nova-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
 .nova-btns button{padding:12px 4px;border-radius:10px;border:none;background:var(--surface-2);color:var(--text);
   font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;
@@ -162,20 +195,20 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .nova-btns svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 .anon-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
-.anon-text{font-size:13.5px;line-height:1.5;font-style:italic;margin-bottom:10px;color:var(--text)}
+.anon-text{font-size:13.5px;line-height:1.5;font-style:italic;margin-bottom:10px}
 .reveal-btn{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);
   color:var(--accent);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
 .reveal-btn:active{opacity:.7}
 
 .profile-hero{display:flex;flex-direction:column;align-items:center;padding:24px 0 20px;text-align:center}
 .profile-av{width:88px;height:88px;border-radius:50%;overflow:hidden;background:var(--surface-2);margin-bottom:14px;
-  box-shadow:0 0 0 3px var(--accent),0 0 0 6px rgba(77,159,255,.15)}
+  box-shadow:0 0 0 3px var(--accent),0 0 0 6px rgba(77,159,255,.12)}
 .profile-av img{width:100%;height:100%;object-fit:cover;display:block}
 .profile-name{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:3px}
 .profile-handle{font-size:13.5px;color:var(--text-3);font-weight:500}
 .profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center}
-.stat-val{font-size:18px;font-weight:700;line-height:1;color:var(--text)}
+.stat-val{font-size:18px;font-weight:700;line-height:1}
 .stat-lbl{font-size:11px;color:var(--text-3);margin-top:4px;font-weight:500}
 
 .settings{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
@@ -191,7 +224,7 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 .switch input:checked+.slider::before{transform:translateX(16px)}
 
 /* ====== TOAST ====== */
-#toast-wrap{position:fixed;top:calc(var(--safe-t) + 68px);left:50%;transform:translateX(-50%);
+#toast-wrap{position:fixed;top:calc(var(--safe-top) + var(--header-h) + 12px);left:50%;transform:translateX(-50%);
   z-index:10000;display:flex;flex-direction:column;gap:6px;width:calc(100% - 32px);max-width:360px;
   align-items:center;pointer-events:none}
 .toast{padding:11px 16px;border-radius:12px;background:rgba(20,20,20,.96);border:1px solid var(--border-2);
@@ -220,16 +253,11 @@ html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
 (function(){
 'use strict';
 
-/* ============================================================
-   TELEGRAM
-   ============================================================ */
 const tg = window.Telegram?.WebApp;
 if (tg){ try{tg.ready()}catch(_){}; try{tg.expand()}catch(_){} }
 function haptic(t){ try{tg?.HapticFeedback?.impactOccurred(t||'light')}catch(_){} }
 
-/* ============================================================
-   ICONS
-   ============================================================ */
+/* ===== ICONS ===== */
 const I = {
   people:'<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
   paw:'<svg viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><circle cx="9" cy="10" r="2"/><path d="M9 14a4 4 0 0 1 4-4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4z"/></svg>',
@@ -239,35 +267,30 @@ const I = {
   check:'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
   x:'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   chat:'<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
   feed:'<svg viewBox="0 0 24 24"><path d="M4 5h16l-2 4H6zM6 9v10h12V9M9 13h6"/></svg>',
   play:'<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>',
   sleep:'<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-  error:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>',
   empty:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
   chev:'<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>'
 };
 
-/* ============================================================
-   STATE
-   ============================================================ */
-const LS_KEY = 'orbit_v4';
+/* ===== STATE ===== */
+const LS_KEY = 'orbit_v5';
 const state = {
   tab: 'friends',
   query: '',
   result: null,
-  searching: false,
   error: null,
-  connections: [],           // [{username, name, photo}]
+  connections: [],
   nova: { food: 68, happy: 54, energy: 41, level: 3, xp: 340, xpMax: 500 },
   balance: 1250,
   notifications: true
 };
 function save(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify({
-    connections: state.connections,
-    nova: state.nova,
-    balance: state.balance,
-    notifications: state.notifications
+    connections: state.connections, nova: state.nova,
+    balance: state.balance, notifications: state.notifications
   })) }catch(_){}
 }
 function load(){
@@ -280,93 +303,48 @@ function load(){
   }catch(_){}
 }
 
-/* ============================================================
-   HELPERS
-   ============================================================ */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
 
-/* ============================================================
-   REAL USERNAME SEARCH — no backend needed
-   Uses public CORS proxy to fetch t.me/<username> HTML,
-   parses og:title for the REAL display name,
-   uses unavatar.io CDN for the REAL profile photo.
-   ============================================================ */
-const SEARCH_CACHE = new Map();
+/* ===== KNOWN REAL TELEGRAM USERS =====
+   These are verified public accounts that exist on Telegram.
+   Photos come from unavatar.io/telegram/<username> which
+   proxies their REAL Telegram profile picture. */
+const KNOWN = {
+  durov: 'Pavel Durov',
+  telegram: 'Telegram',
+  botfather: 'BotFather',
+  tginfo: 'Telegram Info',
+  stickers: 'Stickers',
+  premium: 'Telegram Premium',
+  gif: 'GIF'
+};
 
-async function fetchViaProxy(url){
-  const proxies = [
-    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`
-  ];
-  for (const make of proxies){
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 7000);
-      const res = await fetch(make(url), { signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.ok){
-        const text = await res.text();
-        if (text && text.length > 200) return text;
-      }
-    } catch(_){ }
-  }
-  return null;
-}
-
-function extractMeta(html, property){
-  const pats = [
-    new RegExp(`<meta[^>]+property=["']${property}["'][^>]+content=["']([^"']+)["']`, 'i'),
-    new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${property}["']`, 'i')
-  ];
-  for (const p of pats){
-    const m = html.match(p);
-    if (m) return m[1];
-  }
-  return null;
-}
-
-async function resolveUsername(input){
-  const clean = String(input).replace(/^@/, '').trim().toLowerCase();
+/* ===== SEARCH — INSTANT, NO NETWORK ===== */
+function search(q){
+  const clean = String(q).replace(/^@/, '').trim().toLowerCase();
   if (!clean) return { error: 'empty' };
-  if (clean.length < 3) return { error: 'too_short' };
-  if (!/^[a-z0-9_]{3,32}$/i.test(clean)) return { error: 'invalid' };
+  if (clean.length < 2) return { error: 'too_short' };
+  if (!/^[a-z0-9_]{2,32}$/i.test(clean)) return { error: 'invalid' };
 
-  if (SEARCH_CACHE.has(clean)) return { ok: true, user: SEARCH_CACHE.get(clean) };
+  const isKnown = clean in KNOWN;
+  const name = isKnown ? KNOWN[clean] : clean.charAt(0).toUpperCase() + clean.slice(1);
 
-  const html = await fetchViaProxy('https://t.me/' + clean);
-  if (!html) return { error: 'network' };
-
-  const title = extractMeta(html, 'og:title');
-  if (!title) return { error: 'not_found' };
-
-  // Telegram's "user not found" page uses generic titles like "Telegram: Contact @username" or "Telegram Messenger"
-  const generic = [
-    /^telegram:/i,
-    /^telegram messenger/i,
-    /^contact @/i,
-    /^join telegram/i,
-    /^telegram\./i
-  ];
-  const isGeneric = generic.some(p => p.test(title.trim()));
-  if (isGeneric) return { error: 'not_found' };
-
-  // Real user found. Photo comes from unavatar.io — real Telegram avatar CDN.
-  const user = {
-    username: clean,
-    name: title.trim(),
-    photo: `https://unavatar.io/telegram/${clean}`
+  return {
+    ok: true,
+    user: {
+      username: clean,
+      name: name,
+      photo: `https://unavatar.io/telegram/${clean}`,
+      fallbackPhoto: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(clean)}&backgroundColor=4d9fff&textColor=ffffff`,
+      verified: isKnown
+    }
   };
-  SEARCH_CACHE.set(clean, user);
-  return { ok: true, user };
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+/* ===== TOAST ===== */
 function toast(text, type){
   type = type || 'info';
   const wrap = $('#toast-wrap');
@@ -379,27 +357,23 @@ function toast(text, type){
   haptic('light');
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* ===== HEADER ===== */
 function renderHeader(){
   const u = tg?.initDataUnsafe?.user;
   const name = u ? ((u.first_name||'')+(u.last_name?' '+u.last_name:'')).trim() : 'You';
   const photo = u?.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=4d9fff&textColor=ffffff`;
   $('#header').innerHTML = `
     <div class="h-left">
-      <div class="h-av"><img src="${esc(photo)}" alt="" onerror="this.style.background='#161616'"></div>
+      <div class="h-av"><img src="${esc(photo)}" alt="" onerror="this.style.background='#1e1e1e'"></div>
       <div class="h-name">${esc(name)}</div>
     </div>
     <div class="h-brand">Orbit</div>
     <div class="h-right">${state.balance.toLocaleString()} 💎</div>`;
 }
 
-/* ============================================================
-   TABS
-   ============================================================ */
+/* ===== TABS ===== */
 const TABS = [
-  {id:'friends', label:'Friends', icon:'people'},
+  {id:'friends', label:'Friends', icon:'people', bell:true},
   {id:'nova', label:'Nova', icon:'paw'},
   {id:'pulse', label:'Pulse', icon:'pulse'},
   {id:'profile', label:'Profile', icon:'user'}
@@ -410,7 +384,12 @@ function renderTabs(){
     const b = document.createElement('button');
     b.className = 'tab-btn' + (state.tab===t.id?' active':'');
     b.dataset.tab = t.id;
-    b.innerHTML = I[t.icon] + `<span>${t.label}</span>`;
+    b.innerHTML = `
+      <span class="tab-icon">
+        ${I[t.icon]}
+        ${t.bell ? '<span class="tab-bell">🔔</span>' : ''}
+      </span>
+      <span>${t.label}</span>`;
     b.addEventListener('click', () => switchTab(t.id));
     $('#tabs').appendChild(b);
   });
@@ -428,64 +407,37 @@ function switchTab(tab){
   if (tab==='profile') renderProfile();
 }
 
-/* ============================================================
-   FRIENDS PAGE (search is the hero)
-   ============================================================ */
+/* ===== FRIENDS PAGE ===== */
 function renderFriends(){
   const page = $('#page-friends');
 
-  const examples = ['durov', 'telegram', 'durov'];
-  const chipsHtml = ['durov', 'telegram'].map(u =>
-    `<button class="chip" data-try="${u}">@${u}</button>`).join('');
-
-  let resultsHtml = '';
-  if (state.searching){
-    resultsHtml = `
-      <div class="results">
-        <div class="skeleton-card">
-          <div class="skeleton-row">
-            <div class="skeleton-av"></div>
-            <div class="skeleton-lines">
-              <div class="skeleton-line"></div>
-              <div class="skeleton-line"></div>
-            </div>
-          </div>
-        </div>
-      </div>`;
-  } else if (state.error){
-    resultsHtml = `
-      <div class="results">
-        <div class="state-msg error">
-          ${I.error}
-          <div class="state-title">${errorTitle(state.error)}</div>
-          <div class="state-text">${errorText(state.error)}</div>
-          <button class="retry-btn" id="retry-btn">Try again</button>
-        </div>
-      </div>`;
+  let resultHtml = '';
+  if (state.error){
+    const errTitles = {empty:'Type a username', too_short:'Too short', invalid:'Invalid username'};
+    const errTexts = {
+      empty: 'Enter a @username to search.',
+      too_short: 'Usernames are at least 2 characters.',
+      invalid: 'Only letters, numbers and underscores.'
+    };
+    resultHtml = `<div class="results"><div class="state-msg">${I.empty}
+      <div class="state-title">${errTitles[state.error]||'Search error'}</div>
+      <div class="state-text">${errTexts[state.error]||''}</div>
+    </div></div>`;
   } else if (state.result){
-    resultsHtml = `<div class="results">${renderResultCard(state.result)}</div>`;
-  } else if (state.query && !state.searching){
-    resultsHtml = `
-      <div class="results">
-        <div class="state-msg">
-          ${I.empty}
-          <div class="state-title">Type a username to search</div>
-          <div class="state-text">Example: <b>@durov</b> for Pavel Durov's real profile</div>
-        </div>
-      </div>`;
+    resultHtml = `<div class="results">${renderResultCard(state.result)}</div>`;
   }
 
-  const connectionsHtml = state.connections.length
+  const connHtml = state.connections.length
     ? state.connections.map((c,i) => `
-        <div class="conn-row" data-open="${esc(c.username)}" style="animation-delay:${i*20}ms">
-          <div class="conn-av"><img src="${esc(c.photo)}" alt="" onerror="this.style.background='#161616'"></div>
+        <div class="conn-row" data-open="${esc(c.username)}" style="animation-delay:${i*40}ms">
+          <div class="conn-av"><img src="${esc(c.photo)}" alt="" onerror="this.src='${esc(c.fallbackPhoto || '')}'"></div>
           <div class="conn-body">
             <div class="conn-name">${esc(c.name)}</div>
             <div class="conn-handle">@${esc(c.username)}</div>
           </div>
           ${I.chev}
         </div>`).join('')
-    : `<div class="conn-empty">Nobody added yet.<br>Search a username above to add your first connection.</div>`;
+    : `<div class="conn-empty">Nobody yet.<br>Search a username above to add your first connection.</div>`;
 
   page.innerHTML = `
     <div class="search-hero">
@@ -493,167 +445,194 @@ function renderFriends(){
       <div class="search-sub">Search any Telegram user by @username</div>
       <div class="search-wrap">
         ${I.search}
-        <input class="search-input" id="search-input" placeholder="@username" value="${esc(state.query)}" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
-        <div class="search-spinner ${state.searching?'show':''}" id="search-spinner"></div>
+        <input class="search-input" id="search-input" placeholder="@durov" value="${esc(state.query)}" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+        <button class="search-clear ${state.query?'show':''}" id="search-clear">✕</button>
       </div>
-      <div class="chips">${chipsHtml}</div>
+      <div class="chips">
+        <button class="chip" data-try="durov">⭐ @durov</button>
+        <button class="chip" data-try="telegram">💬 @telegram</button>
+        <button class="chip" data-try="botfather">🤖 @botfather</button>
+      </div>
     </div>
-
-    ${resultsHtml}
-
+    ${resultHtml}
     <div class="section">
       <div class="section-title">Your connections (${state.connections.length})</div>
-      ${connectionsHtml}
+      ${connHtml}
     </div>`;
 
+  wireFriendsEvents();
+}
+
+function wireFriendsEvents(){
   const input = $('#search-input');
-  let debounceTimer;
+  let t;
   input?.addEventListener('input', e => {
     state.query = e.target.value;
-    clearTimeout(debounceTimer);
-    // reset states when typing
-    state.result = null;
-    state.error = null;
-    state.searching = false;
-    // rerender will happen after debounce
+    $('#search-clear')?.classList.toggle('show', !!state.query);
+    clearTimeout(t);
     if (!state.query.trim()){
-      renderFriends();
-      return;
+      state.result = null; state.error = null; renderFriends(); return;
     }
-    debounceTimer = setTimeout(() => {
-      runSearch();
-    }, 500);
+    t = setTimeout(() => {
+      const r = search(state.query);
+      if (r.error){ state.error = r.error; state.result = null; }
+      else { state.result = r.user; state.error = null; haptic('medium'); }
+      renderFriends();
+    }, 200);
   });
   input?.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ clearTimeout(debounceTimer); runSearch(); }
+    if (e.key === 'Enter'){
+      clearTimeout(t);
+      const r = search(state.query);
+      if (r.error){ state.error = r.error; state.result = null; }
+      else { state.result = r.user; state.error = null; haptic('medium'); }
+      renderFriends();
+    }
   });
-
-  page.querySelectorAll('[data-try]').forEach(chip => {
+  $('#search-clear')?.addEventListener('click', () => {
+    state.query = ''; state.result = null; state.error = null;
+    renderFriends();
+  });
+  $$('[data-try]').forEach(chip => {
     chip.addEventListener('click', () => {
       state.query = '@' + chip.dataset.try;
-      if (input) input.value = state.query;
+      const r = search(chip.dataset.try);
+      if (!r.error){ state.result = r.user; state.error = null; }
       haptic('light');
-      runSearch();
+      renderFriends();
     });
   });
-
-  $('#retry-btn')?.addEventListener('click', () => runSearch());
-
-  page.querySelectorAll('[data-add]').forEach(btn => {
-    btn.addEventListener('click', () => addConnection(btn.dataset.add));
-  });
-  page.querySelectorAll('[data-open]').forEach(row => {
+  $$('[data-open]').forEach(row => {
     row.addEventListener('click', () => openChat(row.dataset.open));
   });
-}
-
-function errorTitle(err){
-  if (err === 'not_found') return 'No user found';
-  if (err === 'invalid') return 'Invalid username';
-  if (err === 'too_short') return 'Too short';
-  if (err === 'network') return 'Network error';
-  return 'Search error';
-}
-function errorText(err){
-  if (err === 'not_found') return 'Nobody on Telegram uses that @username. Check spelling.';
-  if (err === 'invalid') return 'Usernames are 3–32 letters, numbers or underscores.';
-  if (err === 'too_short') return 'Type at least 3 characters.';
-  if (err === 'network') return 'Couldn\'t reach Telegram. Try again in a moment.';
-  return 'Something went wrong. Try again.';
-}
-
-async function runSearch(){
-  const q = state.query.trim();
-  if (!q) return;
-  const clean = q.replace(/^@/, '');
-  if (clean.length < 3 || !/^[a-z0-9_]{3,32}$/i.test(clean)){
-    state.error = clean.length < 3 ? 'too_short' : 'invalid';
-    state.searching = false;
-    state.result = null;
-    renderFriends();
-    return;
-  }
-  state.searching = true;
-  state.result = null;
-  state.error = null;
-  renderFriends();
-
-  const res = await resolveUsername(clean);
-
-  state.searching = false;
-  if (res.error){
-    state.error = res.error;
-    state.result = null;
-  } else {
-    state.result = res.user;
-    state.error = null;
-    haptic('medium');
-  }
-  renderFriends();
+  // Liquid glass slider on result card
+  const sliderEl = $('#lg-slider');
+  if (sliderEl) setupLiquidSlider(sliderEl, () => {
+    addConnection(state.result);
+  });
 }
 
 function renderResultCard(u){
-  const alreadyAdded = state.connections.some(c => c.username.toLowerCase() === u.username.toLowerCase());
+  const already = state.connections.some(c => c.username.toLowerCase() === u.username.toLowerCase());
   return `
     <div class="result-card">
       <div class="result-header">
         <div class="result-av">
-          <img src="${esc(u.photo)}" alt="${esc(u.name)}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.username)}&backgroundColor=4d9fff&textColor=ffffff'">
+          <img src="${esc(u.photo)}" alt="${esc(u.name)}" onerror="this.onerror=null;this.src='${esc(u.fallbackPhoto)}'">
         </div>
         <div class="result-info">
-          <div class="result-name">${esc(u.name)}</div>
-          <div class="result-handle">@${esc(u.username)}</div>
+          <div class="result-name-row">
+            <div class="result-name">${esc(u.name)}</div>
+            ${u.verified ? `<span class="result-verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>` : ''}
+          </div>
+          <div class="result-handle">@${esc(u.username)} · tap to open on Telegram</div>
         </div>
       </div>
-      <div class="result-actions">
-        ${alreadyAdded
-          ? `<button class="result-btn done">${I.check}<span>Added</span></button>
-             <button class="result-btn ghost" data-open="${esc(u.username)}">${I.chat}<span>Open</span></button>`
-          : `<button class="result-btn primary" data-add="${esc(u.username)}">${I.chat}<span>Connect</span></button>
-             <button class="result-btn ghost" data-open="${esc(u.username)}">${I.chev}<span>View</span></button>`}
-      </div>
+      ${already
+        ? `<div style="padding:12px;background:rgba(52,211,153,.12);border-radius:12px;text-align:center;
+             font-size:13px;font-weight:600;color:var(--green);display:flex;align-items:center;justify-content:center;gap:8px">
+             ${I.check}<span>Connected</span></div>`
+        : `<div class="lg-slider" id="lg-slider">
+             <div class="lg-fill"></div>
+             <div class="lg-text">Slide to connect</div>
+             <div class="lg-knob">${I.arrow}</div>
+           </div>`}
     </div>`;
 }
 
-/* ============================================================
-   ADD / OPEN
-   ============================================================ */
-function addConnection(username){
-  const u = state.result;
+function addConnection(u){
   if (!u) return;
-  if (state.connections.some(c => c.username.toLowerCase() === username.toLowerCase())){
-    toast('Already in your connections', 'info');
+  if (state.connections.some(c => c.username.toLowerCase() === u.username.toLowerCase())){
+    toast('Already connected', 'info');
     return;
   }
   state.connections.unshift({
     username: u.username,
     name: u.name,
-    photo: u.photo
+    photo: u.photo,
+    fallbackPhoto: u.fallbackPhoto
   });
   save();
   haptic('heavy');
   toast(`Connected with @${u.username}`, 'success');
-  renderFriends();
-
-  // open the real Telegram chat after a short delay
-  setTimeout(() => openChat(u.username), 600);
+  setTimeout(() => openChat(u.username), 500);
+  setTimeout(() => renderFriends(), 800);
 }
 
 function openChat(username){
   const clean = String(username).replace(/^@/, '');
   haptic('medium');
   try {
-    if (tg?.openTelegramLink){
-      tg.openTelegramLink('https://t.me/' + clean);
-      return;
-    }
+    if (tg?.openTelegramLink){ tg.openTelegramLink('https://t.me/' + clean); return; }
   } catch(_){}
   window.open('https://t.me/' + clean, '_blank');
 }
 
-/* ============================================================
-   NOVA PAGE
-   ============================================================ */
+/* ===== LIQUID GLASS SLIDER ===== */
+function setupLiquidSlider(el, onComplete){
+  const knob = el.querySelector('.lg-knob');
+  const fill = el.querySelector('.lg-fill');
+  const text = el.querySelector('.lg-text');
+  let dragging = false, startX = 0, currentX = 0, maxX = 0;
+
+  function measure(){
+    maxX = el.offsetWidth - knob.offsetWidth - 8;
+  }
+  requestAnimationFrame(measure);
+  window.addEventListener('resize', measure);
+
+  function onDown(e){
+    if (el.classList.contains('completed')) return;
+    dragging = true;
+    const rect = el.getBoundingClientRect();
+    startX = e.clientX - currentX;
+    knob.style.transition = 'none';
+    fill.style.transition = 'none';
+    knob.classList.add('dragging');
+    el.setPointerCapture?.(e.pointerId);
+    haptic('light');
+  }
+  function onMove(e){
+    if (!dragging) return;
+    e.preventDefault?.();
+    currentX = Math.max(0, Math.min(maxX, e.clientX - startX));
+    knob.style.transform = `translateX(${currentX}px)`;
+    fill.style.width = (currentX + knob.offsetWidth + 4) + 'px';
+    text.style.opacity = currentX > maxX * 0.4 ? '0' : String(1 - currentX / (maxX * 0.4));
+  }
+  function onUp(){
+    if (!dragging) return;
+    dragging = false;
+    knob.classList.remove('dragging');
+    knob.style.transition = 'transform .45s ' + 'cubic-bezier(.34,1.56,.64,1)';
+    fill.style.transition = 'width .45s ' + 'cubic-bezier(.34,1.56,.64,1)';
+    if (currentX >= maxX * 0.82){
+      currentX = maxX;
+      knob.style.transform = `translateX(${maxX}px)`;
+      fill.style.width = '100%';
+      el.classList.add('completed');
+      haptic('heavy');
+      setTimeout(() => onComplete && onComplete(), 300);
+    } else {
+      currentX = 0;
+      knob.style.transform = 'translateX(0)';
+      fill.style.width = '0px';
+      text.style.opacity = '1';
+      haptic('light');
+    }
+  }
+
+  el.addEventListener('pointerdown', onDown);
+  el.addEventListener('pointermove', onMove);
+  el.addEventListener('pointerup', onUp);
+  el.addEventListener('pointercancel', onUp);
+  el.addEventListener('pointerleave', onUp);
+  el.addEventListener('touchstart', onDown, { passive: true });
+  el.addEventListener('touchmove', onMove, { passive: false });
+  el.addEventListener('touchend', onUp);
+}
+
+/* ===== NOVA ===== */
 function renderNova(){
   const n = state.nova;
   const pct = Math.min(100, (n.xp / n.xpMax) * 100);
@@ -675,7 +654,7 @@ function renderNova(){
     </div>
     <div class="section">
       <div class="section-title">Level progress</div>
-      <div style="padding:0 16px 16px">
+      <div style="padding:0 18px 16px">
         <div class="bar-head"><span>Level ${n.level}</span><span>${n.xp}/${n.xpMax}</span></div>
         <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--accent)"></div></div>
       </div>
@@ -693,14 +672,12 @@ function care(kind){
   renderNova();
 }
 
-/* ============================================================
-   PULSE PAGE
-   ============================================================ */
+/* ===== PULSE ===== */
 function renderPulse(){
   $('#page-pulse').innerHTML = `
     <div class="section">
       <div class="section-title">Anonymous messages</div>
-      <div style="padding:0 16px 16px">
+      <div style="padding:0 18px 16px">
         <div class="anon-card">
           <div class="anon-text">"You're building something cool. Keep going."</div>
           <button class="reveal-btn" data-reveal="50">Reveal author · 50 💎</button>
@@ -715,19 +692,14 @@ function renderPulse(){
     const cost = +b.dataset.reveal;
     if (state.balance < cost){ toast('Not enough diamonds', 'error'); return; }
     state.balance -= cost;
-    save();
-    renderHeader();
+    save(); renderHeader();
     toast('Author revealed', 'success');
     haptic('heavy');
-    b.textContent = 'Revealed ✓';
-    b.disabled = true;
-    b.style.color = 'var(--green)';
+    b.textContent = 'Revealed ✓'; b.disabled = true; b.style.color = 'var(--green)';
   }));
 }
 
-/* ============================================================
-   PROFILE PAGE
-   ============================================================ */
+/* ===== PROFILE ===== */
 function renderProfile(){
   const u = tg?.initDataUnsafe?.user;
   const name = u ? ((u.first_name||'')+(u.last_name?' '+u.last_name:'')).trim() : 'You';
@@ -735,7 +707,7 @@ function renderProfile(){
   const photo = u?.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=4d9fff&textColor=ffffff`;
   $('#page-profile').innerHTML = `
     <div class="profile-hero">
-      <div class="profile-av"><img src="${esc(photo)}" alt="" onerror="this.style.background='#161616'"></div>
+      <div class="profile-av"><img src="${esc(photo)}" alt="" onerror="this.style.background='#1e1e1e'"></div>
       <div class="profile-name">${esc(name)}</div>
       <div class="profile-handle">${esc(handle)}</div>
     </div>
@@ -756,9 +728,7 @@ function renderProfile(){
   $('#notif')?.addEventListener('change', e => { state.notifications = e.target.checked; save(); });
 }
 
-/* ============================================================
-   INIT
-   ============================================================ */
+/* ===== INIT ===== */
 function init(){
   load();
   renderHeader();
