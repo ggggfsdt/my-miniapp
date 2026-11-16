@@ -6,11 +6,7 @@
 <title>🦆 Duck Assistant</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-  }
-}
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
 </script>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,15 +17,18 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
     overflow: hidden;
     overscroll-behavior: none;
+    touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
-    background-color: #05070a;
+    background-color: #0a0e14;
     display: flex;
     align-items: stretch;
     justify-content: center;
   }
 
-  /* Themed background */
+  /* ============================================================
+     Background (brighter now — much more visible on phone)
+     ============================================================ */
   body::before {
     content: '';
     position: fixed;
@@ -38,21 +37,21 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: brightness(0.42) saturate(0.85);
+    filter: brightness(0.72) saturate(1.05);
     z-index: -2;
   }
   body::after {
     content: '';
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 50% 30%, rgba(10,14,20,0.55) 0%, rgba(5,7,10,0.92) 75%);
+    background: radial-gradient(ellipse 130% 90% at 50% 30%,
+                rgba(10,14,20,0.28) 0%,
+                rgba(5,7,10,0.55) 55%,
+                rgba(5,7,10,0.8) 100%);
     z-index: -1;
     pointer-events: none;
   }
 
-  /* ==========================================================
-     FULL-SCREEN LAYOUT — mobile fills, desktop capped
-     ========================================================== */
   #app {
     position: relative;
     display: flex;
@@ -63,17 +62,14 @@
     max-width: 100%;
     overflow: hidden;
   }
-
   @media (min-width: 720px) {
     #app {
       max-width: 500px;
-      height: 100vh;
-      height: 100dvh;
       box-shadow: 0 0 80px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.04);
     }
   }
 
-  /* ============ 3D STAGE ============ */
+  /* ============ STAGE ============ */
   #stage { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
   #canvas-holder {
     position: absolute; inset: 0;
@@ -83,7 +79,7 @@
   #canvas-holder.dragging { cursor: grabbing; }
   #canvas-holder canvas { display: block; width: 100% !important; height: 100% !important; pointer-events: none; }
 
-  /* ============ FLOATING WORDS + hand-drawn circles ============ */
+  /* ============ WORDS LAYER ============ */
   #words-layer {
     position: absolute; inset: 0;
     display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center;
@@ -95,13 +91,10 @@
   }
   .word {
     position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex; align-items: center; justify-content: center;
     padding: 7px 12px;
     border-radius: 999px;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 15px; font-weight: 600;
     letter-spacing: .2px;
     color: #8b95a5;
     background: rgba(255,255,255,.045);
@@ -118,21 +111,16 @@
     inset: -5px -7px;
     width: calc(100% + 14px);
     height: calc(100% + 10px);
-    pointer-events: none;
-    overflow: visible;
+    pointer-events: none; overflow: visible;
   }
   .circle-path {
-    fill: none;
-    stroke-width: 2.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 460;
-    stroke-dashoffset: 460;
+    fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 460; stroke-dashoffset: 460;
     transition: stroke-dashoffset 0.58s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .word.circled .circle-path { stroke-dashoffset: 0; }
 
-  /* ============ SPEECH BUBBLE ============ */
+  /* ============ SPEECH ============ */
   #speech {
     position: absolute;
     left: 50%; top: 4%;
@@ -140,7 +128,7 @@
     max-height: 48%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 12px 15px 32px;
+    padding: 12px 15px 28px;
     border-radius: 22px;
     background: linear-gradient(180deg, rgba(24,29,39,.96), rgba(17,21,29,.96));
     border: 1px solid rgba(120,170,255,.18);
@@ -161,67 +149,51 @@
   #speech::-webkit-scrollbar { width: 0; }
 
   #speech-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; padding-bottom: 10px;
     border-bottom: 1px solid rgba(255,255,255,.07);
   }
   #speech-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    overflow: hidden;
+    width: 44px; height: 44px;
+    border-radius: 12px; overflow: hidden;
     flex-shrink: 0;
     background: rgba(0,0,0,.4);
     border: 1px solid rgba(255,255,255,.1);
-    position: relative;
   }
-  #speech-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-  }
+  #speech-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   #speech-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #2AABEE;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-    flex: 1;
+    font-size: 13px; font-weight: 700; color: #2AABEE;
+    letter-spacing: .5px; text-transform: uppercase; flex: 1;
   }
-  #speech-body {
-    white-space: pre-wrap;
-    word-break: break-word;
-    padding-right: 2px;
-  }
+  #speech-body { white-space: pre-wrap; word-break: break-word; padding-right: 2px; }
   #speech-hint {
-    position: absolute;
-    bottom: 8px; right: 12px;
-    font-size: 10.5px;
-    color: rgba(180,195,215,.55);
-    letter-spacing: .3px;
-    pointer-events: none;
+    position: absolute; bottom: 10px; right: 12px;
+    font-size: 10.5px; color: rgba(180,195,215,.55);
+    letter-spacing: .3px; pointer-events: none;
   }
   #speech-close {
-    position: absolute;
-    top: 8px; right: 8px;
-    width: 24px; height: 24px;
-    border: none;
-    background: rgba(255,255,255,.08);
-    color: #8b95a5;
-    border-radius: 50%;
-    font-size: 15px;
-    line-height: 1;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2;
-    pointer-events: auto;
+    position: absolute; top: 8px; right: 8px;
+    width: 24px; height: 24px; border: none;
+    background: rgba(255,255,255,.08); color: #8b95a5;
+    border-radius: 50%; font-size: 15px; line-height: 1;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 2; pointer-events: auto;
   }
   #speech-close:hover { background: rgba(255,255,255,.16); color: #fff; }
+
+  /* Progress bar that drains over readTime */
+  #speech-progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4ea1ff, #34d399);
+    border-radius: 0 0 0 22px;
+    width: 100%;
+    transform-origin: left;
+    z-index: 3;
+    pointer-events: none;
+    transition: none;
+  }
 
   /* highlight classes */
   .hl-warn   { color: #f87171; font-weight: 700; }
@@ -233,27 +205,238 @@
   .hl-link   { color: #60a5fa; text-decoration: underline; font-weight: 600; }
   .hl-step   { color: #fbbf24; font-weight: 700; }
 
-  /* ============ VARIANT BTN ============ */
-  #variant-btn {
-    position: absolute; top: 12px; right: 12px;
+  /* ============ TOP BUTTONS ============ */
+  #settings-btn {
+    position: absolute; top: 12px; left: 12px;
     width: 44px; height: 44px;
     display: grid; place-items: center;
-    font-size: 21px;
+    font-size: 20px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,.09);
     background: rgba(22,27,36,.85);
     box-shadow: 0 8px 22px rgba(0,0,0,.45);
     backdrop-filter: blur(8px);
     cursor: pointer;
+    z-index: 8;
+    transition: transform .18s cubic-bezier(.2,.9,.3,1.4), border-color .25s;
+  }
+  #settings-btn:active { transform: scale(.88); }
+  #agent-badge {
+    position: absolute; top: 12px; left: 64px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ff6b6b, #f06595);
+    color: #fff;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .5px; text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
     z-index: 7;
-    transition: transform .18s cubic-bezier(.2,.9,.3,1.4), border-color .25s, background .25s;
+    display: flex; align-items: center; gap: 5px;
+    box-shadow: 0 4px 14px rgba(240,101,149,.5);
   }
-  #variant-btn:active { transform: scale(.88); }
-  #variant-btn.active {
-    border-color: rgba(78,161,255,.55);
-    background: rgba(38,52,74,.9);
-    box-shadow: 0 0 0 4px rgba(78,161,255,.12), 0 8px 22px rgba(0,0,0,.45);
+  #agent-badge.show { opacity: 1; transform: translateY(0); }
+  #agent-badge::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #fff;
+    animation: agentPulse 1.2s infinite;
   }
+  @keyframes agentPulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.4);} }
+
+  /* ============ SETTINGS PANEL ============ */
+  #settings-panel {
+    position: absolute; top: 66px; left: 12px;
+    width: min(320px, calc(100% - 24px));
+    max-height: calc(100% - 90px);
+    background: linear-gradient(180deg, rgba(24,29,39,.98), rgba(17,21,29,.98));
+    border: 1px solid rgba(120,170,255,.22);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.7);
+    z-index: 20;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    transform: translateY(-8px) scale(.96);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .28s cubic-bezier(.2,.9,.3,1.25);
+  }
+  #settings-panel.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  #settings-panel::-webkit-scrollbar { width: 0; }
+
+  .settings-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .settings-section:last-child { border-bottom: none; }
+  .settings-title {
+    font-size: 11px; font-weight: 700;
+    color: #8b95a5; letter-spacing: .8px; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .settings-row:last-child { margin-bottom: 0; }
+  .settings-label { font-size: 13.5px; color: #e8eefb; flex: 1; }
+  .settings-label small { display: block; font-size: 11px; color: #8b95a5; margin-top: 2px; font-weight: 400; }
+  .settings-pills {
+    display: flex; gap: 4px;
+    background: rgba(255,255,255,.05);
+    padding: 3px; border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .settings-pill {
+    padding: 6px 11px;
+    font-size: 11px; font-weight: 600;
+    background: transparent; color: #8b95a5;
+    border: none; border-radius: 9px;
+    cursor: pointer; font-family: inherit;
+    transition: background .2s, color .2s;
+    white-space: nowrap;
+  }
+  .settings-pill.active { background: #2AABEE; color: #fff; }
+  .settings-toggle {
+    width: 44px; height: 26px;
+    border-radius: 13px;
+    background: rgba(255,255,255,.1);
+    border: none; cursor: pointer;
+    position: relative; flex-shrink: 0;
+    transition: background .2s;
+  }
+  .settings-toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .25s cubic-bezier(.2,.9,.3,1.4);
+  }
+  .settings-toggle.on { background: linear-gradient(135deg, #ff6b6b, #f06595); }
+  .settings-toggle.on::after { transform: translateX(18px); }
+  .settings-button {
+    width: 100%;
+    padding: 10px;
+    background: rgba(42,171,238,.12);
+    border: 1px solid rgba(42,171,238,.3);
+    border-radius: 10px;
+    color: #2AABEE; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: background .2s;
+    margin-top: 6px;
+  }
+  .settings-button:hover { background: rgba(42,171,238,.22); }
+  #memory-count {
+    font-size: 11px; color: #8b95a5;
+    padding: 6px 10px; background: rgba(255,255,255,.04);
+    border-radius: 8px; margin-top: 6px;
+  }
+
+  /* ============ INLINE QUESTION PANEL (above input) ============ */
+  #question-panel {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 14px; right: 14px;
+    background: linear-gradient(180deg, rgba(24,29,39,.99), rgba(17,21,29,.99));
+    border: 1px solid rgba(120,170,255,.3);
+    border-radius: 18px;
+    padding: 14px 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.7);
+    z-index: 25;
+    opacity: 0;
+    transform: translateY(10px) scale(.97);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .3s cubic-bezier(.2,.9,.3,1.2);
+    max-height: 65vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #question-panel.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  #question-panel::-webkit-scrollbar { width: 0; }
+
+  .q-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .q-progress-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,.08);
+    border-radius: 2px; overflow: hidden;
+  }
+  .q-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ea1ff, #34d399);
+    border-radius: 2px; width: 0%;
+    transition: width .35s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .q-count {
+    font-size: 11px; font-weight: 700;
+    color: #8b95a5;
+    padding: 3px 8px;
+    background: rgba(255,255,255,.06);
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .q-close {
+    width: 24px; height: 24px;
+    border: none; border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    color: #8b95a5;
+    font-size: 16px; line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .q-close:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .q-question {
+    font-size: 15px; font-weight: 600;
+    color: #fff; line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .q-options {
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .q-option {
+    padding: 11px 14px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 11px;
+    color: #e8eefb;
+    font-size: 13.5px; font-family: inherit;
+    text-align: left; cursor: pointer;
+    transition: background .15s, border-color .15s, transform .1s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .q-option:hover { background: rgba(78,161,255,.1); border-color: rgba(78,161,255,.4); }
+  .q-option:active { transform: scale(.98); }
+  .q-option .opt-emoji { font-size: 16px; flex-shrink: 0; }
+  .q-input {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 11px;
+    color: #fff; font-size: 13.5px;
+    font-family: inherit; outline: none;
+    margin-bottom: 8px;
+    transition: border-color .2s;
+    user-select: text; -webkit-user-select: text;
+  }
+  .q-input:focus { border-color: #4ea1ff; }
+  .q-next {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, #4ea1ff 0%, #2f6fe0 100%);
+    border: none; border-radius: 11px;
+    color: #fff; font-size: 13.5px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    transition: transform .12s;
+  }
+  .q-next:active { transform: scale(.97); }
+  .q-next:disabled { opacity: .4; cursor: default; }
 
   /* ============ INPUT DOCK ============ */
   #dock {
@@ -261,33 +444,26 @@
     padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
     padding-left: calc(14px + env(safe-area-inset-left, 0px));
     padding-right: calc(14px + env(safe-area-inset-right, 0px));
+    position: relative;
   }
   #input-shell {
     position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; align-items: center; gap: 8px;
     padding: 6px 6px 6px 20px;
     border-radius: 999px;
     background: linear-gradient(180deg, rgba(24,29,39,0.95) 0%, rgba(18,22,30,0.95) 100%);
     backdrop-filter: blur(18px);
     border: 1px solid rgba(255,255,255,.1);
     box-shadow: 0 12px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
-    transition: transform .28s cubic-bezier(.2,.9,.3,1.2),
-                border-color .28s ease,
-                box-shadow .28s ease;
-    will-change: transform;
+    transition: transform .28s cubic-bezier(.2,.9,.3,1.2), border-color .28s ease, box-shadow .28s ease;
   }
   #input-shell::after {
     content: '';
-    position: absolute;
-    inset: -1px;
+    position: absolute; inset: -1px;
     border-radius: 999px;
     background: linear-gradient(90deg, #4ea1ff, #34d399, #4ea1ff);
-    filter: blur(14px);
-    opacity: 0;
-    z-index: -1;
-    transition: opacity .32s ease;
+    filter: blur(14px); opacity: 0;
+    z-index: -1; transition: opacity .32s ease;
   }
   #input-shell:focus-within {
     transform: scale(1.014);
@@ -295,56 +471,42 @@
     box-shadow: 0 0 0 4px rgba(78,161,255,.1), 0 16px 36px rgba(0,0,0,.55);
   }
   #input-shell:focus-within::after { opacity: .42; }
-
+  #input-shell.agent-active {
+    border-color: rgba(255,107,107,.5);
+    box-shadow: 0 0 0 4px rgba(255,107,107,.12), 0 16px 36px rgba(0,0,0,.55);
+  }
   #user-input {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 auto; min-width: 0;
     padding: 9px 2px;
-    border: none;
-    outline: none;
-    background: transparent;
-    color: #eef4ff;
-    font-size: 16px;
-    font-family: inherit;
-    user-select: text;
-    -webkit-user-select: text;
+    border: none; outline: none; background: transparent;
+    color: #eef4ff; font-size: 16px; font-family: inherit;
+    user-select: text; -webkit-user-select: text;
   }
   #user-input::placeholder { color: #67717f; }
 
-  /* SEND BUTTON — Telegram plane icon, swaps to thinking GIF */
   #send-btn {
     flex: 0 0 auto;
     width: 44px; height: 44px;
-    border: none;
-    border-radius: 50%;
+    border: none; border-radius: 50%;
     background: linear-gradient(135deg, #4ea1ff 0%, #2f6fe0 100%);
     box-shadow: 0 6px 18px rgba(47,111,224,.45);
     cursor: pointer;
     transition: transform .16s cubic-bezier(.2,.9,.3,1.5), box-shadow .25s, opacity .2s, background .2s;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
   }
   #send-btn:active { transform: scale(.9); }
   #send-btn:disabled { opacity: .55; cursor: default; }
-
   #send-icon {
-    width: 22px;
-    height: 22px;
-    fill: white;
+    width: 22px; height: 22px; fill: white;
     margin-left: -2px;
     transition: opacity .2s ease;
   }
   #send-thinking {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
     object-fit: contain;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0; pointer-events: none;
     transition: opacity .25s ease;
     background: rgba(24,29,39,.9);
   }
@@ -359,7 +521,6 @@
     80% { transform: translateX(4px); }
   }
   .shake { animation: shake .38s cubic-bezier(.36,.07,.19,.97); }
-
   @keyframes ripple {
     from { box-shadow: 0 0 0 0 rgba(78,161,255,.45); }
     to   { box-shadow: 0 0 0 22px rgba(78,161,255,0); }
@@ -367,34 +528,25 @@
   .ripple { animation: ripple .6s ease-out; }
 
   #drag-hint {
-    position: absolute;
-    bottom: 8px; left: 50%;
+    position: absolute; bottom: 8px; left: 50%;
     transform: translateX(-50%);
-    font-size: 11.5px;
-    color: rgba(180,195,215,.4);
-    letter-spacing: .5px;
-    pointer-events: none;
-    z-index: 4;
+    font-size: 11.5px; color: rgba(180,195,215,.4);
+    letter-spacing: .5px; pointer-events: none; z-index: 4;
     transition: opacity .5s;
   }
 
-  /* ============ GENERIC MODAL STYLES ============ */
+  /* ============ MODALS ============ */
   .modal-backdrop {
     position: fixed; inset: 0;
     background: rgba(0,0,0,.78);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     z-index: 100;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0; pointer-events: none;
     transition: opacity .25s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding: 16px;
   }
   .modal-backdrop.show { opacity: 1; pointer-events: auto; }
-
   .modal-box {
     background: linear-gradient(180deg, rgba(24,29,39,.99), rgba(17,21,29,.99));
     border: 1px solid rgba(120,170,255,.25);
@@ -402,195 +554,61 @@
     box-shadow: 0 30px 80px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.06);
     color: #e8eefb;
     overflow: hidden;
-    opacity: 0;
-    transform: scale(.94);
+    opacity: 0; transform: scale(.94);
     transition: opacity .28s ease, transform .28s cubic-bezier(.2,.9,.3,1.25);
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 440px;
+    display: flex; flex-direction: column;
+    width: 100%; max-width: 440px;
     max-height: calc(100dvh - 32px);
-  }
-  .modal-backdrop.show .modal-box {
-    opacity: 1; transform: scale(1);
-  }
-
-  /* ============ WIZARD (question flow) ============ */
-  #wizard-modal .modal-box {
-    padding: 18px;
-  }
-  .wiz-progress-track {
-    height: 4px;
-    background: rgba(255,255,255,.08);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 14px;
-  }
-  .wiz-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4ea1ff, #34d399);
-    border-radius: 2px;
-    width: 0%;
-    transition: width .35s cubic-bezier(.2,.9,.3,1.2);
-  }
-  .wiz-question-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .wiz-question {
-    font-size: 16px;
-    font-weight: 600;
-    color: #fff;
-    line-height: 1.4;
-    flex: 1;
-  }
-  .wiz-count {
-    font-size: 11px;
-    font-weight: 600;
-    color: #8b95a5;
-    padding: 3px 8px;
-    background: rgba(255,255,255,.06);
-    border-radius: 8px;
-    white-space: nowrap;
-  }
-  .wiz-options {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 8px;
-    max-height: 55vh;
-    overflow-y: auto;
-  }
-  .wiz-option {
-    padding: 12px 14px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 12px;
-    color: #e8eefb;
-    font-size: 14px;
-    font-family: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition: background .15s, border-color .15s, transform .1s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .wiz-option:hover { background: rgba(78,161,255,.1); border-color: rgba(78,161,255,.4); }
-  .wiz-option:active { transform: scale(.98); }
-  .wiz-option .opt-emoji {
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .wiz-input {
-    width: 100%;
-    padding: 12px 14px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 12px;
-    color: #fff;
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    margin-bottom: 8px;
-    transition: border-color .2s;
-    user-select: text;
-    -webkit-user-select: text;
-  }
-  .wiz-input:focus { border-color: #4ea1ff; }
-  .wiz-next {
-    width: 100%;
-    padding: 13px;
-    background: linear-gradient(135deg, #4ea1ff 0%, #2f6fe0 100%);
-    border: none;
-    border-radius: 12px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: transform .12s, opacity .2s;
-  }
-  .wiz-next:active { transform: scale(.97); }
-  .wiz-next:disabled { opacity: .4; cursor: default; }
-  .wiz-close-btn {
-    width: 30px;
-    height: 30px;
-    border: none;
-    background: rgba(255,255,255,.06);
-    color: #8b95a5;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .wiz-close-btn:hover { background: rgba(255,255,255,.14); color: #fff; }
-
-  /* ============ READER MODAL (click speech to expand) ============ */
-  #reader-modal .modal-box {
-    max-width: min(500px, calc(100vw - 24px));
-    height: min(520px, calc(100dvh - 60px));
     position: relative;
-    min-width: 260px;
-    min-height: 240px;
+  }
+  .modal-backdrop.show .modal-box { opacity: 1; transform: scale(1); }
+
+  /* Reader */
+  #reader-modal .modal-box {
+    max-width: min(520px, calc(100vw - 24px));
+    height: min(540px, calc(100dvh - 60px));
+    min-width: 260px; min-height: 240px;
   }
   #reader-header {
     padding: 12px 44px 10px 18px;
     border-bottom: 1px solid rgba(255,255,255,.07);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    user-select: none;
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0; user-select: none;
   }
   #reader-header .hdr-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #2AABEE;
-    letter-spacing: .5px;
-    text-transform: uppercase;
+    font-size: 13px; font-weight: 700; color: #2AABEE;
+    letter-spacing: .5px; text-transform: uppercase;
   }
-  #reader-close {
+  #reader-close, #draft-close-x, #mem-close, #profile-close {
     position: absolute;
     top: 10px; right: 10px;
     width: 30px; height: 30px;
-    border: none;
-    border-radius: 50%;
+    border: none; border-radius: 50%;
     background: rgba(255,255,255,.06);
     color: #cbd6e6;
-    font-size: 18px;
-    cursor: pointer;
+    font-size: 18px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     z-index: 3;
     transition: background .15s;
   }
-  #reader-close:hover { background: rgba(255,255,255,.14); color: #fff; }
+  #reader-close:hover, #draft-close-x:hover, #mem-close:hover, #profile-close:hover {
+    background: rgba(255,255,255,.14); color: #fff;
+  }
   #reader-content {
-    flex: 1 1 auto;
-    overflow-y: auto;
+    flex: 1 1 auto; overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 16px 18px 18px;
-    font-size: 14.5px;
-    line-height: 1.62;
-    white-space: pre-wrap;
-    word-break: break-word;
-    user-select: text;
-    -webkit-user-select: text;
+    font-size: 14.5px; line-height: 1.62;
+    white-space: pre-wrap; word-break: break-word;
+    user-select: text; -webkit-user-select: text;
   }
   #reader-content::-webkit-scrollbar { width: 5px; }
   #reader-content::-webkit-scrollbar-thumb { background: rgba(42,171,238,.3); border-radius: 999px; }
 
   .resize-handle {
     position: absolute;
-    width: 18px; height: 18px;
-    z-index: 4;
-    touch-action: none;
+    width: 20px; height: 20px;
+    z-index: 4; touch-action: none;
     opacity: .55;
     transition: opacity .15s, background .15s;
     border-radius: 4px;
@@ -612,91 +630,157 @@
   .resize-handle.bl::after { bottom: 5px; left: 5px; border-right: none; border-top: none; }
   .resize-handle.br::after { bottom: 5px; right: 5px; border-left: none; border-top: none; }
 
-  /* ============ DRAFT MODAL ============ */
-  #draft-modal .modal-box {
-    padding: 18px;
-  }
+  /* Draft modal */
+  #draft-modal .modal-box { padding: 18px; }
   #draft-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 12px;
   }
-  #draft-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  #draft-title { font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
   #draft-text {
-    background: rgba(0,0,0,.5);
-    padding: 14px;
+    background: rgba(0,0,0,.5); padding: 14px;
     border-radius: 12px;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 12.5px;
-    line-height: 1.6;
+    font-size: 12.5px; line-height: 1.6;
     color: #b8c4d0;
     white-space: pre-wrap;
     overflow-y: auto;
     flex: 1 1 auto;
-    min-height: 180px;
-    max-height: 50vh;
+    min-height: 180px; max-height: 55vh;
     margin-bottom: 12px;
     border: 1px solid rgba(255,255,255,.05);
-    user-select: text;
-    -webkit-user-select: text;
+    user-select: text; -webkit-user-select: text;
   }
   #draft-text::-webkit-scrollbar { width: 4px; }
   #draft-text::-webkit-scrollbar-thumb { background: rgba(42,171,238,.3); border-radius: 999px; }
-  #draft-actions {
-    display: flex;
-    gap: 8px;
-  }
+  #draft-actions { display: flex; gap: 8px; }
   #draft-actions button {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-size: 13px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: transform .12s, background .15s;
+    flex: 1; padding: 12px;
+    border-radius: 12px; border: none;
+    font-size: 13px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    transition: transform .12s;
   }
   #draft-actions button:active { transform: scale(.97); }
-  #draft-copy {
-    background: linear-gradient(135deg, #4ea1ff 0%, #2f6fe0 100%);
-    color: #fff;
+  #draft-copy { background: linear-gradient(135deg, #4ea1ff 0%, #2f6fe0 100%); color: #fff; }
+  #draft-close { background: rgba(255,255,255,.08); color: #e8eefb; }
+
+  /* Memory modal */
+  #mem-modal .modal-box { padding: 18px; max-height: 70vh; }
+  #mem-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
   }
-  #draft-close {
-    background: rgba(255,255,255,.08);
-    color: #e8eefb;
+  #mem-title { font-size: 15px; font-weight: 700; color: #fff; }
+  #mem-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: 50vh;
+    margin-bottom: 12px;
+  }
+  #mem-list::-webkit-scrollbar { width: 4px; }
+  #mem-list::-webkit-scrollbar-thumb { background: rgba(42,171,238,.3); border-radius: 999px; }
+  .mem-item {
+    padding: 10px 12px;
+    background: rgba(255,255,255,.04);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 12.5px;
+    color: #b8c4d0;
+    border-left: 3px solid #4ea1ff;
+    user-select: text; -webkit-user-select: text;
+  }
+  .mem-item .mem-key { color: #2AABEE; font-weight: 700; }
+  .mem-empty {
+    text-align: center; padding: 30px 10px;
+    color: #8b95a5; font-size: 13px;
+  }
+  #mem-input-wrap { display: flex; gap: 8px; margin-top: 10px; }
+  #mem-input {
+    flex: 1; padding: 10px 12px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    color: #fff; font-size: 13px;
+    font-family: inherit; outline: none;
+    user-select: text; -webkit-user-select: text;
+  }
+  #mem-input:focus { border-color: #4ea1ff; }
+  #mem-add {
+    padding: 10px 16px;
+    background: #2AABEE; color: #fff;
+    border: none; border-radius: 10px;
+    font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit;
   }
 
-  /* ============ DRAFT CTA on speech bubble ============ */
-  #speech-draft-btn {
-    display: none;
-    margin-top: 12px;
-    padding: 11px 14px;
-    width: 100%;
-    background: rgba(78,161,255,.14);
-    border: 1px solid rgba(78,161,255,.4);
-    border-radius: 12px;
-    color: #2AABEE;
-    font-size: 13.5px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background .15s, transform .1s;
+  /* Profile modal (mock) */
+  #profile-modal .modal-box {
+    padding: 24px 20px 20px;
+    max-width: 340px;
   }
-  #speech-draft-btn.show { display: flex; }
-  #speech-draft-btn:hover { background: rgba(78,161,255,.24); }
-  #speech-draft-btn:active { transform: scale(.98); }
+  #profile-avatar-wrap {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    background: linear-gradient(135deg, #4ea1ff, #2AABEE);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; color: #fff;
+    box-shadow: 0 10px 30px rgba(42,171,238,.4);
+  }
+  #profile-name {
+    text-align: center;
+    font-size: 20px; font-weight: 700;
+    color: #fff; margin-bottom: 4px;
+  }
+  #profile-username {
+    text-align: center;
+    font-size: 14px; color: #2AABEE;
+    margin-bottom: 14px;
+  }
+  #profile-bio {
+    text-align: center;
+    font-size: 13px; color: #8b95a5;
+    padding: 10px;
+    background: rgba(255,255,255,.04);
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  #profile-actions {
+    display: flex; gap: 8px;
+  }
+  #profile-actions button {
+    flex: 1; padding: 10px;
+    background: rgba(42,171,238,.15);
+    border: 1px solid rgba(42,171,238,.3);
+    color: #2AABEE; font-weight: 700;
+    font-size: 12.5px; border-radius: 10px;
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* Agent action visual (fly-to-click) */
+  #agent-cursor {
+    position: fixed;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,107,107,.35), transparent 70%);
+    border: 2px solid rgba(255,107,107,.7);
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.3);
+    transition: opacity .2s;
+  }
+  #agent-cursor.show {
+    opacity: 1;
+  }
+  #agent-cursor.pulse {
+    animation: agentRipple .6s ease-out;
+  }
+  @keyframes agentRipple {
+    0%   { transform: translate(-50%,-50%) scale(.3); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1.6); opacity: 0; }
+  }
 </style>
 </head>
 <body>
@@ -710,22 +794,69 @@
       <button id="speech-close" aria-label="Dismiss">×</button>
       <div id="speech-header">
         <div id="speech-avatar">
-          <img id="speech-avatar-img" alt="duck" src="" />
+          <img id="speech-avatar-img" alt="duck" src="https://i.postimg.cc/Vkf1MYx8/ezgif-58a5791573ed3718.gif" />
         </div>
         <div id="speech-title">Duck</div>
       </div>
       <div id="speech-body"></div>
-      <button id="speech-draft-btn">
-        <span>✍️</span><span>Do you need a text?</span>
-      </button>
+      <div id="speech-progress"></div>
       <div id="speech-hint">tap to expand ⤢</div>
     </div>
 
-    <button id="variant-btn" type="button" aria-label="Switch duck">🦆</button>
+    <button id="settings-btn" type="button" aria-label="Settings">⚙️</button>
+    <div id="agent-badge">🤖 Agent</div>
+
+    <div id="settings-panel">
+      <div class="settings-section">
+        <div class="settings-title">🧠 Think Level</div>
+        <div class="settings-pills" id="think-pills">
+          <button class="settings-pill" data-val="fast">Fast</button>
+          <button class="settings-pill" data-val="medium">Medium</button>
+          <button class="settings-pill" data-val="slow">Slow</button>
+          <button class="settings-pill active" data-val="auto">Auto</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">🎨 Interface Style</div>
+        <div class="settings-pills" id="style-pills">
+          <button class="settings-pill active" data-val="default">Default</button>
+          <button class="settings-pill" data-val="midnight">Midnight</button>
+          <button class="settings-pill" data-val="aurora">Aurora</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-row">
+          <div class="settings-label">
+            🤖 Agent Mode
+            <small>Duck becomes your autonomous helper</small>
+          </div>
+          <button class="settings-toggle" id="agent-toggle"></button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">💾 Memory Mode</div>
+        <div class="settings-pills" id="memory-pills">
+          <button class="settings-pill active" data-val="auto">Auto</button>
+          <button class="settings-pill" data-val="manual">Manual</button>
+        </div>
+        <div id="memory-count">0 memories stored</div>
+        <button class="settings-button" id="open-memories">📂 View memories</button>
+      </div>
+    </div>
+
     <div id="drag-hint">drag the duck to rotate</div>
   </div>
 
   <div id="dock">
+    <div id="question-panel">
+      <div class="q-header">
+        <div class="q-progress-track"><div class="q-progress-fill" id="q-progress-fill"></div></div>
+        <div class="q-count" id="q-count">1/3</div>
+        <button class="q-close" id="q-close">×</button>
+      </div>
+      <div class="q-question" id="q-question"></div>
+      <div class="q-options" id="q-options"></div>
+    </div>
     <div id="input-shell">
       <input id="user-input" type="text" placeholder="Ask about your Telegram account…"
              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
@@ -737,7 +868,7 @@
   </div>
 </div>
 
-<!-- Reader modal (click speech to expand) -->
+<!-- Reader modal -->
 <div id="reader-modal" class="modal-backdrop">
   <div class="modal-box" id="reader-box">
     <div class="resize-handle tl"></div>
@@ -753,25 +884,12 @@
   </div>
 </div>
 
-<!-- Wizard modal (question flow) -->
-<div id="wizard-modal" class="modal-backdrop">
-  <div class="modal-box">
-    <div class="wiz-progress-track"><div class="wiz-progress-fill" id="wiz-progress-fill"></div></div>
-    <div class="wiz-question-row">
-      <div class="wiz-question" id="wiz-question">Question</div>
-      <div class="wiz-count" id="wiz-count">1/3</div>
-      <button class="wiz-close-btn" id="wiz-close">×</button>
-    </div>
-    <div class="wiz-options" id="wiz-options"></div>
-  </div>
-</div>
-
-<!-- Draft modal (generated text) -->
+<!-- Draft modal -->
 <div id="draft-modal" class="modal-backdrop">
   <div class="modal-box">
     <div id="draft-header">
       <div id="draft-title">✨ Your draft</div>
-      <button class="wiz-close-btn" id="draft-close-x">×</button>
+      <button id="draft-close-x">×</button>
     </div>
     <div id="draft-text"></div>
     <div id="draft-actions">
@@ -781,19 +899,69 @@
   </div>
 </div>
 
+<!-- Memory modal -->
+<div id="mem-modal" class="modal-backdrop">
+  <div class="modal-box">
+    <div id="mem-header">
+      <div id="mem-title">💾 Your memories</div>
+      <button id="mem-close">×</button>
+    </div>
+    <div id="mem-list"></div>
+    <div id="mem-input-wrap">
+      <input id="mem-input" placeholder="Name:Dll or Account status:Banned…" />
+      <button id="mem-add">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile modal (mock, for agent mode) -->
+<div id="profile-modal" class="modal-backdrop">
+  <div class="modal-box">
+    <button id="profile-close">×</button>
+    <div id="profile-avatar-wrap">👤</div>
+    <div id="profile-name">User</div>
+    <div id="profile-username">@username</div>
+    <div id="profile-bio">This profile is shown by Duck Agent 🦆</div>
+    <div id="profile-actions">
+      <button id="profile-message">💬 Message</button>
+      <button id="profile-open">📂 Open chat</button>
+    </div>
+  </div>
+</div>
+
+<div id="agent-cursor"></div>
+
 <script type="module">
 /* ================================================================
-   TELEGRAM INIT
+   TELEGRAM INIT + disable swipe-to-close
    ================================================================ */
 const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) {
   try {
     tg.ready();
     tg.expand();
-    tg.setHeaderColor && tg.setHeaderColor('#0b0d12');
-    tg.setBackgroundColor && tg.setBackgroundColor('#0b0d12');
+    if (tg.setHeaderColor) tg.setHeaderColor('#0a0e14');
+    if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0e14');
+    if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+    if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
   } catch (e) {}
 }
+
+/* Aggressive touch-action + overscroll blocks */
+document.addEventListener('touchmove', (e) => {
+  /* allow scrolling inside scrollable panels/modals */
+  const path = e.composedPath ? e.composedPath() : [];
+  const scrollable = path.some(el => el && el.classList && (
+    el.classList.contains('modal-box') ||
+    el.classList.contains('q-options') ||
+    el.classList.contains('q-input') ||
+    el.id === 'reader-content' ||
+    el.id === 'draft-text' ||
+    el.id === 'mem-list' ||
+    el.id === 'speech'
+  ));
+  if (!scrollable) e.preventDefault();
+}, { passive: false });
 
 /* ================================================================
    SOUND + HAPTIC
@@ -825,7 +993,6 @@ const SoundFX = (() => {
   }
   return { tick };
 })();
-
 function haptic(type = 'light') {
   try {
     if (tg && tg.HapticFeedback) {
@@ -839,7 +1006,7 @@ function haptic(type = 'light') {
 }
 
 /* ================================================================
-   DUCK REACTION GIFs
+   GIFs
    ================================================================ */
 const GIFS = {
   thinking:  'https://i.postimg.cc/d1HJQgHh/ezgif-594d3c52443e27c4.gif',
@@ -850,34 +1017,27 @@ const GIFS = {
   shocked:   'https://i.postimg.cc/J03VDgKj/ezgif-5703449c91f77300.gif',
   dontknow:  'https://i.postimg.cc/t44QJB6J/ezgif-553888e1d7512f21.gif'
 };
-
-/* Preload GIFs so they show up instantly */
 Object.values(GIFS).forEach(url => { const i = new Image(); i.src = url; });
 
-/* Map intent ids -> reaction GIF */
-const INTENT_REACTIONS = {
-  scam_lost:         'crying',
-  scam_general:      'shocked',
-  hacked_lost:       'crying',
-  hacked_threat:     'knife',
-  hacked_general:    'waving',
-  doxx_lost:         'shocked',
-  doxx_threat:       'knife',
-  nft_scam_lost:     'crying',
-  nft_scam_general:  'shocked',
-  nft_protect:       'angry',
-  nft_trade:         'waving',
-  nft_general:       'waving',
-  ban:               'angry',
-  deleted:           'crying',
-  login:             'waving',
-  gift_scam:         'shocked',
-  report:            'waving',
-  group:             'waving',
-  premium:           'waving',
-  support:           'waving',
-  fallback:          'dontknow'
+/* ================================================================
+   SETTINGS STATE + PERSISTENCE
+   ================================================================ */
+const DEFAULT_SETTINGS = {
+  thinkLevel: 'auto',
+  interfaceStyle: 'default',
+  agentMode: false,
+  memoryMode: 'auto',
+  memories: []
 };
+
+let settings = { ...DEFAULT_SETTINGS };
+try {
+  const stored = localStorage.getItem('duck_settings_v1');
+  if (stored) settings = { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+} catch (e) {}
+function saveSettings() {
+  try { localStorage.setItem('duck_settings_v1', JSON.stringify(settings)); } catch (e) {}
+}
 
 /* ================================================================
    THREE.JS SETUP
@@ -890,12 +1050,16 @@ const wordsEl = document.getElementById('words-layer');
 const speechEl= document.getElementById('speech');
 const speechBody = document.getElementById('speech-body');
 const speechAvatarImg = document.getElementById('speech-avatar-img');
-const speechDraftBtn = document.getElementById('speech-draft-btn');
+const speechProgress = document.getElementById('speech-progress');
 const input   = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const shell   = document.getElementById('input-shell');
-const varBtn  = document.getElementById('variant-btn');
 const dragHint= document.getElementById('drag-hint');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsPanel = document.getElementById('settings-panel');
+const agentBadge = document.getElementById('agent-badge');
+const questionPanel = document.getElementById('question-panel');
+const agentCursor = document.getElementById('agent-cursor');
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -914,12 +1078,11 @@ const fillLight = new THREE.DirectionalLight(0xffd9a8, 0.7);
 fillLight.position.set(0, 0.5, 5); scene.add(fillLight);
 
 /* ================================================================
-   DUCK MODEL (with rigged leg pivots)
+   DUCK MODEL (no cap — clean yellow duck only)
    ================================================================ */
 const MAT = {
   body:  new THREE.MeshStandardMaterial({ color: 0xffd23f, roughness: 0.55, metalness: 0.02 }),
   beak:  new THREE.MeshStandardMaterial({ color: 0xff8a3d, roughness: 0.6 }),
-  dark:  new THREE.MeshStandardMaterial({ color: 0x14171d, roughness: 0.82, metalness: 0.05 }),
   black: new THREE.MeshStandardMaterial({ color: 0x0a0b0e, roughness: 0.22, metalness: 0.1 }),
   white: new THREE.MeshBasicMaterial({ color: 0xffffff })
 };
@@ -955,7 +1118,6 @@ const wingL = makeWing(-1);
 const wingR = makeWing(1);
 bodyGroup.add(wingL, wingR);
 
-/* Rigged legs */
 function makeLeg(side) {
   const pivot = new THREE.Group();
   pivot.position.set(side * 0.2, -0.35, 0.06);
@@ -1010,48 +1172,6 @@ beakBottom.scale.set(0.95, 0.42, 1.05);
 beakBottom.position.set(0, -0.01, 0.1);
 jaw.add(beakBottom);
 
-function makeTelegramTexture() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const ctx = c.getContext('2d');
-  ctx.clearRect(0, 0, 256, 256);
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.moveTo(236, 34); ctx.lineTo(26, 116); ctx.lineTo(104, 146); ctx.closePath(); ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(104, 146); ctx.lineTo(140, 224); ctx.lineTo(168, 132); ctx.closePath(); ctx.fill();
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
-  return tex;
-}
-
-const cap = new THREE.Group();
-cap.visible = false;
-headPivot.add(cap);
-
-const dome = new THREE.Mesh(
-  new THREE.SphereGeometry(0.42, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.52),
-  MAT.dark
-);
-dome.position.set(0, 0.32, 0);
-dome.scale.set(1.04, 1.0, 1.04);
-cap.add(dome);
-
-const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.04, 40), MAT.dark);
-brim.position.set(0, 0.3, 0.3);
-brim.rotation.x = 0.22;
-brim.scale.set(1.3, 1, 0.9);
-cap.add(brim);
-
-const logo = new THREE.Mesh(
-  new THREE.PlaneGeometry(0.19, 0.19),
-  new THREE.MeshBasicMaterial({ map: makeTelegramTexture(), transparent: true, depthWrite: false })
-);
-logo.position.set(0, 0.44, 0.405);
-logo.rotation.x = -0.1;
-cap.add(logo);
-
 /* ================================================================
    RESIZE
    ================================================================ */
@@ -1079,7 +1199,6 @@ const st = {
   yaw: 0, pitch: 0, roll: 0, jaw: 0,
   followYaw: 0, followPitch: 0.32,
   blink: 0, blinkT: 2.4,
-  variant: 0, variantTarget: 0,
   idlePhase: 'calm',
   idleTime: 0,
   idleNext: 2.5 + Math.random() * 2.5,
@@ -1090,17 +1209,31 @@ const st = {
   legL_rot: 0, legR_rot: 0,
   eyeExtra: 0,
   dragY: 0, dragX: 0, targetDragY: 0, targetDragX: 0,
-  fov: 34, targetFov: 34
+  fov: 34, targetFov: 34,
+  /* agent mode */
+  duckPosX: 0, duckPosY: -0.1, duckPosZ: 0,
+  targetDuckPosX: 0, targetDuckPosY: -0.1, targetDuckPosZ: 0,
+  scale: 1, targetScale: 1,
+  agentDragging: false
 };
 
 /* ================================================================
-   DRAG-TO-ROTATE
+   POINTER HANDLING (rotate + agent drag)
    ================================================================ */
 let dragging = false;
 let lastX = 0, lastY = 0;
 
 holder.addEventListener('pointerdown', (e) => {
   if (busy) return;
+  if (settings.agentMode) {
+    /* agent mode: drag the duck anywhere on screen */
+    st.agentDragging = true;
+    holder.classList.add('dragging');
+    lastX = e.clientX; lastY = e.clientY;
+    try { holder.setPointerCapture(e.pointerId); } catch (err) {}
+    return;
+  }
+  /* normal: rotate */
   dragging = true;
   holder.classList.add('dragging');
   lastX = e.clientX; lastY = e.clientY;
@@ -1110,6 +1243,16 @@ holder.addEventListener('pointerdown', (e) => {
 });
 
 holder.addEventListener('pointermove', (e) => {
+  if (st.agentDragging) {
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    st.targetDuckPosX += dx * 0.008;
+    st.targetDuckPosY -= dy * 0.008;
+    st.targetDuckPosX = Math.max(-1.5, Math.min(1.5, st.targetDuckPosX));
+    st.targetDuckPosY = Math.max(-0.9, Math.min(1.2, st.targetDuckPosY));
+    return;
+  }
   if (!dragging) return;
   const dx = e.clientX - lastX;
   const dy = e.clientY - lastY;
@@ -1121,6 +1264,12 @@ holder.addEventListener('pointermove', (e) => {
 });
 
 function endDrag(e) {
+  if (st.agentDragging) {
+    st.agentDragging = false;
+    holder.classList.remove('dragging');
+    try { holder.releasePointerCapture(e.pointerId); } catch (err) {}
+    return;
+  }
   if (!dragging) return;
   dragging = false;
   holder.classList.remove('dragging');
@@ -1131,7 +1280,9 @@ function endDrag(e) {
 }
 holder.addEventListener('pointerup', endDrag);
 holder.addEventListener('pointercancel', endDrag);
-holder.addEventListener('pointerleave', (e) => { if (dragging) endDrag(e); });
+holder.addEventListener('pointerleave', (e) => {
+  if (dragging || st.agentDragging) endDrag(e);
+});
 
 /* ================================================================
    ANIMATION LOOP
@@ -1145,13 +1296,6 @@ function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
   time += dt;
 
-  st.variant += (st.variantTarget - st.variant) * Math.min(1, dt * 7);
-  const v = st.variant;
-  cap.visible = v > 0.02;
-  cap.scale.setScalar(Math.max(0.001, v));
-  headPivot.scale.setScalar(1 + 0.12 * v);
-  bodyGroup.scale.setScalar(1 - 0.07 * v);
-
   let ty = 0, tp = 0, tr = 0, jawT = 0;
   let bob = Math.sin(time * 1.5) * 0.018;
   let wingLT = 0.12, wingRT = -0.12;
@@ -1160,8 +1304,7 @@ function tick() {
   let legLLift = 0, legRLift = 0, legLRot = 0, legRRot = 0;
 
   if (st.mode === 'follow') {
-    ty = st.followYaw;
-    tp = st.followPitch;
+    ty = st.followYaw; tp = st.followPitch;
     tr = st.followYaw * 0.18;
     bob *= 0.6;
   } else if (st.mode === 'think') {
@@ -1179,6 +1322,19 @@ function tick() {
     bob += Math.sin(time * 7) * 0.014;
     wingLT = 0.30 + Math.sin(time * 4) * 0.08;
     wingRT = -0.30 - Math.sin(time * 4) * 0.08;
+  } else if (st.mode === 'wave') {
+    /* Special wave greeting */
+    wingRT = -1.5 + Math.sin(time * 12) * 0.35;
+    ty = Math.sin(time * 2) * 0.08;
+    tp = 0.02;
+    bob += Math.sin(time * 5) * 0.02;
+    jawT = 0.15 + Math.sin(time * 8) * 0.1;
+  } else if (st.mode === 'agent-action') {
+    /* Agent pointing toward a target */
+    jawT = 0.55 + Math.sin(time * 15) * 0.2;
+    wingRT = -1.2;
+    tp = -0.05;
+    bob += Math.sin(time * 8) * 0.03;
   } else {
     st.idleTime += dt;
     st.idleNext -= dt;
@@ -1192,42 +1348,13 @@ function tick() {
       st.idleNext = 2.2 + Math.random() * 3.2;
     }
     switch (st.idlePhase) {
-      case 'calm':
-        ty = Math.sin(time * 0.8) * 0.10;
-        tp = 0.04 + Math.sin(time * 1.1) * 0.03;
-        tr = Math.sin(time * 0.6) * 0.04;
-        break;
-      case 'look':
-        ty = Math.sin(st.idleTime * 1.6) * 0.35;
-        tp = 0.05;
-        tr = Math.sin(st.idleTime * 1.6) * 0.04;
-        break;
-      case 'tilt':
-        ty = 0.08; tp = 0.02;
-        tr = 0.20 + Math.sin(st.idleTime * 1.2) * 0.05;
-        break;
-      case 'stretch':
-        wingLT = 0.85 + Math.sin(st.idleTime * 4) * 0.05;
-        wingRT = -0.85 - Math.sin(st.idleTime * 4) * 0.05;
-        ty = 0; tp = -0.12; tr = 0;
-        break;
-      case 'tail':
-        tailYT = Math.sin(st.idleTime * 9) * 0.22;
-        ty = Math.sin(st.idleTime * 1.8) * 0.08;
-        tp = 0.06;
-        break;
-      case 'sleepy':
-        ty = Math.sin(st.idleTime * 0.5) * 0.05;
-        tp = 0.17 + Math.sin(st.idleTime * 0.9) * 0.03;
-        tr = 0.08;
-        eyeExtra = 0.35 + Math.sin(st.idleTime * 1.2) * 0.08;
-        bob *= 0.5;
-        break;
-      case 'curious':
-        ty = Math.sin(st.idleTime * 1.3) * 0.22;
-        tp = -0.18 + Math.sin(st.idleTime * 1.6) * 0.06;
-        tr = 0.16;
-        break;
+      case 'calm': ty = Math.sin(time * 0.8) * 0.10; tp = 0.04 + Math.sin(time * 1.1) * 0.03; tr = Math.sin(time * 0.6) * 0.04; break;
+      case 'look': ty = Math.sin(st.idleTime * 1.6) * 0.35; tp = 0.05; tr = Math.sin(st.idleTime * 1.6) * 0.04; break;
+      case 'tilt': ty = 0.08; tp = 0.02; tr = 0.20 + Math.sin(st.idleTime * 1.2) * 0.05; break;
+      case 'stretch': wingLT = 0.85 + Math.sin(st.idleTime * 4) * 0.05; wingRT = -0.85 - Math.sin(st.idleTime * 4) * 0.05; ty = 0; tp = -0.12; tr = 0; break;
+      case 'tail': tailYT = Math.sin(st.idleTime * 9) * 0.22; ty = Math.sin(st.idleTime * 1.8) * 0.08; tp = 0.06; break;
+      case 'sleepy': ty = Math.sin(st.idleTime * 0.5) * 0.05; tp = 0.17 + Math.sin(st.idleTime * 0.9) * 0.03; tr = 0.08; eyeExtra = 0.35 + Math.sin(st.idleTime * 1.2) * 0.08; bob *= 0.5; break;
+      case 'curious': ty = Math.sin(st.idleTime * 1.3) * 0.22; tp = -0.18 + Math.sin(st.idleTime * 1.6) * 0.06; tr = 0.16; break;
       case 'bounce': {
         const speed = 5.5;
         const jump = Math.abs(Math.sin(st.idleTime * speed));
@@ -1235,21 +1362,12 @@ function tick() {
         const legPhase = st.idleTime * speed * 1.15;
         const liftL = Math.max(0, Math.sin(legPhase));
         const liftR = Math.max(0, Math.sin(legPhase + Math.PI));
-        legLLift = liftL * 0.14;
-        legRLift = liftR * 0.14;
-        legLRot = -liftL * 0.7;
-        legRRot = -liftR * 0.7;
-        ty = Math.sin(st.idleTime * 4) * 0.06;
-        tp = 0.02;
+        legLLift = liftL * 0.14; legRLift = liftR * 0.14;
+        legLRot = -liftL * 0.7; legRRot = -liftR * 0.7;
+        ty = Math.sin(st.idleTime * 4) * 0.06; tp = 0.02;
         break;
       }
-      case 'preen':
-        ty = 0.42 + Math.sin(st.idleTime * 2) * 0.04;
-        tp = 0.10;
-        tr = 0.22;
-        wingLT = 0.55 + Math.sin(st.idleTime * 3) * 0.08;
-        wingRT = -0.55 - Math.sin(st.idleTime * 3) * 0.08;
-        break;
+      case 'preen': ty = 0.42 + Math.sin(st.idleTime * 2) * 0.04; tp = 0.10; tr = 0.22; wingLT = 0.55 + Math.sin(st.idleTime * 3) * 0.08; wingRT = -0.55 - Math.sin(st.idleTime * 3) * 0.08; break;
     }
   }
 
@@ -1291,12 +1409,24 @@ function tick() {
   const eyeScale = Math.max(0.1, 1 - st.blink * 0.9 - eyeExtra);
   eyeGroups.forEach(g => { g.scale.y = eyeScale; });
 
+  /* drag rotate */
   const kd = Math.min(1, dt * 8);
   st.dragY += (st.targetDragY - st.dragY) * kd;
   st.dragX += (st.targetDragX - st.dragX) * kd;
   duck.rotation.y = st.dragY;
   duck.rotation.x = st.dragX;
 
+  /* agent mode position */
+  const kap = Math.min(1, dt * 6);
+  st.duckPosX += (st.targetDuckPosX - st.duckPosX) * kap;
+  st.duckPosY += (st.targetDuckPosY - st.duckPosY) * kap;
+  duck.position.set(st.duckPosX, st.duckPosY + Math.sin(time * 2) * 0.03, 0);
+
+  /* scale */
+  st.scale += (st.targetScale - st.scale) * kap;
+  duck.scale.setScalar(st.scale);
+
+  /* FOV */
   const kf = Math.min(1, dt * 6);
   st.fov += (st.targetFov - st.fov) * kf;
   if (Math.abs(camera.fov - st.fov) > 0.02) {
@@ -1338,54 +1468,59 @@ function updateCaret() {
 }
 
 /* ================================================================
-   SMART THEMES + ACTIONS
+   MASSIVE DATABASE
    ================================================================ */
 const THEMES = {
   scam:   { words: ['scam','scams','scammed','scamming','scammer','scammers','fraud','fraudulent',
                     'phishing','phish','phished','fake','faker','impersonation','impersonator',
-                    'impersonating','impersonated','cheated','con'] },
+                    'impersonating','impersonated','cheated','con','rug','rugpull','rugpulled'] },
   hacked: { words: ['hacked','hack','hacker','hackers','hacking','compromised','compromise',
                     'hijacked','hijack','stolen','steal','stealing','stole','unauthorized',
-                    'intruder','infiltrated'] },
+                    'intruder','infiltrated','breach','breached'] },
   doxx:   { words: ['doxx','doxxed','doxxing','dox','doxed','doxing','leaked','leak','leaking',
                     'exposed','exposing','doxxer','address','threats','threatening','blackmail',
-                    'extortion','sextortion'] },
+                    'extortion','sextortion','doxxer'] },
   nft:    { words: ['nft','nfts','mint','minted','minting','collectible','collectibles',
-                    'opensea','fragment','blockchain','tokens','token'] },
+                    'opensea','fragment','blockchain','tokens','token','getgems','tonkeeper'] },
   crypto: { words: ['crypto','wallet','wallets','ton','toncoin','btc','bitcoin','usdt','eth',
-                    'ethereum','seed','phrase','private','key','metamask','tonkeeper','coinbase'] },
+                    'ethereum','seed','phrase','private','key','metamask','coinbase','airdrop'] },
   ban:    { words: ['ban','banned','blocked','suspended','restricted','frozen','deactivated',
-                    'disabled','terminated','spambot','unban','appeal'] },
+                    'disabled','terminated','spambot','unban','appeal','limited','restricted'] },
   deleted:{ words: ['deleted','delete','deleting','erased','erase','gone','removed',
-                    'self-destruct','selfdestruct'] },
+                    'self-destruct','selfdestruct','inactive'] },
   login:  { words: ['login','sms','otp','verification','code','password','2fa','two-step',
-                    'passcode','signin','signed','locked'] },
+                    'passcode','signin','signed','locked','verification'] },
   premium:{ words: ['premium','stars','star','subscription','fragment','collectible',
-                    'username','usernames'] },
-  support:{ words: ['support','contact','help','recover','restore','official'] },
-  report: { words: ['report','abuse','dmca','copyright','illegal','complaint','notoscam'] },
-  group:  { words: ['group','channel','admin','muted','kicked','removed','supergroup'] },
-  gift:   { words: ['gift','gifts','giveaway','airdrop'] }
+                    'username','usernames','subscribed','billing','refund'] },
+  support:{ words: ['support','contact','help','recover','restore','official','email'] },
+  report: { words: ['report','abuse','dmca','copyright','illegal','complaint','notoscam','dmca'] },
+  group:  { words: ['group','channel','admin','muted','kicked','removed','supergroup',
+                    'chat','owner','mod','moderator'] },
+  gift:   { words: ['gift','gifts','giveaway','airdrop','claimed'] },
+  business:{ words: ['business','company','shop','store','auto-reply','invoice'] },
+  bot:    { words: ['bot','botfather','token','api','developer','bot'] },
+  privacy:{ words: ['privacy','private','hidden','last-seen','lastseen','sessions','devices',
+                    'active','visible','invisible'] },
+  number: { words: ['number','phone','sim','carrier','new','switch','change','migrate'] }
 };
 
 const ACTIONS = {
   lost:    { words: ['lost','drained','stole','stolen','already','got scammed','was scammed',
-                     'been scammed','got hacked','was hacked','been hacked','happened'] },
+                     'been scammed','got hacked','was hacked','been hacked','happened','taken'] },
   protect: { words: ['protect','prevent','avoid','safe','safety','secure','security',
-                     'stay safe','how do i','how to','tips','warning','warn'] },
+                     'stay safe','how do i','how to','tips','warning','warn','stop'] },
   sell:    { words: ['sell','selling','sold','trade','trading','marketplace','exchange',
-                     'where to sell','where to trade','safely sell'] },
-  buy:     { words: ['buy','buying','purchase','mint','minting','getting','obtain'] },
-  recover: { words: ['recover','restore','get back','bring back','recover my','restore my'] },
-  report:  { words: ['report','reporting','file complaint','notify telegram','tell telegram'] }
+                     'where to sell','where to trade','safely sell','list'] },
+  buy:     { words: ['buy','buying','purchase','mint','minting','getting','obtain','acquire'] },
+  recover: { words: ['recover','restore','get back','bring back','recover my','restore my','revert'] },
+  report:  { words: ['report','reporting','file complaint','notify telegram','tell telegram','flag'] },
+  want:    { words: ['want','wants','wanted','going to','about to','threaten','threatens','will'] }
 };
 
 const THEME_WORDS_SET = new Set();
 for (const theme of Object.values(THEMES)) for (const w of theme.words) THEME_WORDS_SET.add(w);
-
 const ACTION_WORDS_SET = new Set();
 for (const action of Object.values(ACTIONS)) for (const w of action.words) ACTION_WORDS_SET.add(w);
-
 const DANGER_WORDS_SET = new Set([
   'drained','stolen','steal','stole','leaked','doxxed','exposed','hacked','compromised',
   'threat','threats','threatened','blackmail','extort','extortion','sextortion','urgent','emergency'
@@ -1406,43 +1541,29 @@ function classifyWord(word) {
   if (THEME_WORDS_SET.has(clean)) return { type: 'theme', color: '#34d399' };
   if (ACTION_WORDS_SET.has(clean)) return { type: 'action', color: '#60a5fa' };
   for (const t of THEME_WORDS_SET) {
-    if (clean.length >= 4 && clean.startsWith(t) && clean.length <= t.length + 4)
-      return { type: 'theme', color: '#34d399' };
+    if (clean.length >= 4 && clean.startsWith(t) && clean.length <= t.length + 4) return { type: 'theme', color: '#34d399' };
   }
   for (const a of ACTION_WORDS_SET) {
-    if (clean.length >= 4 && clean.startsWith(a) && clean.length <= a.length + 4)
-      return { type: 'action', color: '#60a5fa' };
+    if (clean.length >= 4 && clean.startsWith(a) && clean.length <= a.length + 4) return { type: 'action', color: '#60a5fa' };
   }
   return { type: 'neutral', color: '#8b95a5' };
 }
 
-/* ================================================================
-   INTENT RESOLVER
-   ================================================================ */
 function resolveSmartIntent(text) {
   const lower = text.toLowerCase();
-
   const themesFound = [];
   for (const [key, theme] of Object.entries(THEMES)) {
-    for (const w of theme.words) {
-      if (lower.includes(w)) { themesFound.push(key); break; }
-    }
+    for (const w of theme.words) if (lower.includes(w)) { themesFound.push(key); break; }
   }
-
   const actionsFound = [];
   for (const [key, action] of Object.entries(ACTIONS)) {
-    for (const w of action.words) {
-      if (lower.includes(w)) { actionsFound.push(key); break; }
-    }
+    for (const w of action.words) if (lower.includes(w)) { actionsFound.push(key); break; }
   }
-
   const isPast = /\b(got|was|already|were|lost|stole|stolen|drained|happened|been)\b/.test(lower);
   const isProtect = /\b(protect|prevent|avoid|safety|secure|safe)\b/.test(lower);
-  const isHowTo = /\b(how|what|where|should)\b/.test(lower);
 
   if (themesFound.includes('nft') || themesFound.includes('crypto')) {
-    if (actionsFound.includes('sell') || actionsFound.includes('buy') ||
-        /\b(sell|trade|marketplace|where to sell|where to buy)\b/.test(lower)) return INTENTS.nft_trade;
+    if (actionsFound.includes('sell') || actionsFound.includes('buy') || /\b(sell|trade|marketplace|where to sell|where to buy)\b/.test(lower)) return INTENTS.nft_trade;
     if (isProtect || actionsFound.includes('protect')) return INTENTS.nft_protect;
     if ((isPast || actionsFound.includes('lost')) && themesFound.includes('scam')) return INTENTS.nft_scam_lost;
     if (themesFound.includes('scam')) return INTENTS.nft_scam_general;
@@ -1450,12 +1571,11 @@ function resolveSmartIntent(text) {
   }
   if (themesFound.includes('hacked')) {
     if (isPast || actionsFound.includes('lost')) return INTENTS.hacked_lost;
-    if (/\b(want|wants|will|going|trying|threaten)\b/.test(lower)) return INTENTS.hacked_threat;
+    if (actionsFound.includes('want') || /\b(want|wants|will|going|trying|threaten)\b/.test(lower)) return INTENTS.hacked_threat;
     return INTENTS.hacked_general;
   }
   if (themesFound.includes('doxx')) {
-    if (isPast || actionsFound.includes('lost') || /\b(leaked|exposed|posted)\b/.test(lower))
-      return INTENTS.doxx_lost;
+    if (isPast || actionsFound.includes('lost') || /\b(leaked|exposed|posted)\b/.test(lower)) return INTENTS.doxx_lost;
     return INTENTS.doxx_threat;
   }
   if (themesFound.includes('ban')) return INTENTS.ban;
@@ -1465,6 +1585,10 @@ function resolveSmartIntent(text) {
   if (themesFound.includes('report')) return INTENTS.report;
   if (themesFound.includes('group')) return INTENTS.group;
   if (themesFound.includes('premium')) return INTENTS.premium;
+  if (themesFound.includes('business')) return INTENTS.business;
+  if (themesFound.includes('bot')) return INTENTS.bot;
+  if (themesFound.includes('privacy')) return INTENTS.privacy;
+  if (themesFound.includes('number')) return INTENTS.number;
   if (themesFound.includes('scam')) {
     if (actionsFound.includes('lost') || isPast) return INTENTS.scam_lost;
     return INTENTS.scam_general;
@@ -1474,384 +1598,414 @@ function resolveSmartIntent(text) {
 }
 
 /* ================================================================
-   INTENTS
+   INTENTS (with inline emojis woven naturally)
    ================================================================ */
 const INTENTS = {
   nft_scam_lost: {
-    id: 'nft_scam_lost',
-    draftType: 'nft_scam_report',
-    answer: `🖼️ <b>NFT scam — here's what to do RIGHT NOW:</b>
+    id: 'nft_scam_lost', draftType: 'nft_scam_report', reaction: 'crying',
+    answer: `😢 <b>NFT scam — here's what to do RIGHT NOW:</b>
 
-<span class="hl-danger">Drained wallets</span> and <span class="hl-danger">stolen NFTs</span> can't be reversed — the blockchain is final. But you can still act:
+<span class="hl-danger">Drained wallets</span> and <span class="hl-danger">stolen NFTs</span> can't be reversed — the blockchain is final 🔒. But you can still act:
 
-<span class="hl-step">1️⃣</span> <span class="hl-action">Revoke all approvals</span> immediately — go to <span class="hl-link">revoke.cash</span> or your wallet's revoke tool
-<span class="hl-step">2️⃣</span> <span class="hl-action">Move remaining funds</span> to a <b>fresh, clean wallet</b>
-<span class="hl-step">3️⃣</span> <span class="hl-action">Never reuse</span> the compromised seed phrase
-<span class="hl-step">4️⃣</span> <span class="hl-action">Report</span> the scammer to <span class="hl-mention">@notoscam</span> with transaction hashes
-<span class="hl-step">5️⃣</span> Email <span class="hl-email">abuse@telegram.org</span> with the phishing message
-<span class="hl-step">6️⃣</span> <span class="hl-action">Trace the funds</span> on <span class="hl-link">tonviewer.com</span> or <span class="hl-link">etherscan.io</span>
+<span class="hl-step">1️⃣</span> <span class="hl-action">Revoke approvals</span> immediately 🔓 → go to <span class="hl-link">revoke.cash</span>
+<span class="hl-step">2️⃣</span> <span class="hl-action">Move remaining funds</span> 💸 to a fresh clean wallet 🆕
+<span class="hl-step">3️⃣</span> <span class="hl-action">Never reuse</span> 🚫 the compromised seed phrase
+<span class="hl-step">4️⃣</span> <span class="hl-action">Report</span> 📢 the scammer to <span class="hl-mention">@notoscam</span> with transaction hashes
+<span class="hl-step">5️⃣</span> Email 📧 <span class="hl-email">abuse@telegram.org</span> with the phishing message
+<span class="hl-step">6️⃣</span> <span class="hl-action">Trace the funds</span> 🔍 on <span class="hl-link">tonviewer.com</span>
 
-⚠️ <span class="hl-warn">Telegram can't refund crypto.</span> Report the phishing link — the wallet loss is out of Telegram's hands.`
+⚠️ <span class="hl-warn">Telegram can't refund crypto</span> — report the phishing link to help others stay safe 🛡️.`
   },
   nft_protect: {
-    id: 'nft_protect',
-    draftType: null,
-    answer: `🛡️ <b>How to protect yourself from NFT scams:</b>
+    id: 'nft_protect', draftType: null, reaction: 'knife',
+    answer: `🛡️ <b>How to protect yourself from NFT scams</b> 🔐
 
-<span class="hl-step">✅</span> <span class="hl-action">Never share your seed phrase</span> — not with "support", not with "mint bots", not ever
-<span class="hl-step">✅</span> <span class="hl-action">Verify contracts</span> before signing — check the mint address on the project's official X/Twitter, not on Telegram
-<span class="hl-step">✅</span> <span class="hl-action">Use a separate wallet</span> for minting — keep your valuable NFTs in a cold/hardware wallet
-<span class="hl-step">✅</span> <span class="hl-action">Revoke approvals</span> after every mint on <span class="hl-link">revoke.cash</span>
-<span class="hl-step">✅</span> <span class="hl-action">Ignore DMs</span> — legitimate teams NEVER DM first
-<span class="hl-step">✅</span> <span class="hl-action">Bookmark real sites</span> — fake "mint.xyz-claim" domains are #1 attack
+✅ <span class="hl-action">Never share your seed phrase</span> — not with support 🙅, not with mint bots 🤖, not ever
+✅ <span class="hl-action">Verify contracts</span> 🔎 before signing — check the project's official X, not Telegram
+✅ <span class="hl-action">Use a separate wallet</span> 👛 for minting, keep valuables cold
+✅ <span class="hl-action">Revoke approvals</span> 🧹 after every mint on <span class="hl-link">revoke.cash</span>
+✅ <span class="hl-action">Ignore DMs</span> 📥 — legit teams NEVER DM first
+✅ <span class="hl-action">Bookmark real sites</span> 🔖 — fake "mint-claim" domains are #1 attack
 
-🚨 <span class="hl-warn">If a Telegram "admin" asks you to connect a wallet to "verify" or "unlock" something — it's a scam, 100%.</span>
+🚨 <span class="hl-warn">If a Telegram "admin" asks to connect a wallet to verify or unlock something — it's a scam, 100%</span>
 
-Report scams: <span class="hl-mention">@notoscam</span> · <span class="hl-email">abuse@telegram.org</span>`
+📢 Report scams: <span class="hl-mention">@notoscam</span> · 📧 <span class="hl-email">abuse@telegram.org</span>`
   },
   nft_trade: {
-    id: 'nft_trade',
-    draftType: null,
-    answer: `💱 <b>Where to safely sell / trade NFTs:</b>
+    id: 'nft_trade', draftType: null, reaction: 'waving',
+    answer: `💱 <b>Where to safely sell / trade NFTs</b> 🛒
 
-<span class="hl-step">🏛️</span> <b>Legit marketplaces:</b>
-· <span class="hl-link">getgems.io</span> — largest TON NFT marketplace
-· <span class="hl-link">fragment.com</span> — Telegram usernames & collectibles (official)
-· <span class="hl-link">opensea.io</span> — Ethereum / multi-chain
-· <span class="hl-link">blur.io</span> — pro trading, Ethereum
+🏛️ <b>Legit marketplaces</b>
+· <span class="hl-link">getgems.io</span> 🟢 — biggest TON NFT marketplace
+· <span class="hl-link">fragment.com</span> ✈️ — official Telegram collectibles
+· <span class="hl-link">opensea.io</span> 🌊 — Ethereum / multi-chain
+· <span class="hl-link">blur.io</span> ⚡ — pro trading
 
-<span class="hl-step">⚠️</span> <b>Avoid:</b>
-· "DM me to buy" — 100% scam
-· Telegram bots asking for wallet connection to "list" your NFT
-· P2P trades without an escrow
-· Anyone offering above-market prices to rush you
+⚠️ <b>Avoid these</b>
+· "DM me to buy" 📥 — 100% scam
+· Bots asking for wallet connection to list 🔗
+· P2P trades without escrow 🚫
+· "Above market price, hurry!" 🏃 — classic scam
 
-<span class="hl-step">🔒</span> <b>Safe trading rules:</b>
-· Use a dedicated wallet (not your main one)
-· Double-check the contract address before approving
-· Never sign "setApprovalForAll" unless on a trusted marketplace
-· Revoke old approvals after selling
+🔒 <b>Safe trading rules</b>
+· Use a dedicated wallet 👛
+· Double-check contract before approving ✅
+· Never sign <code>setApprovalForAll</code> on unknown sites
+· Revoke old approvals 🔓
 
-<span class="hl-mention">@notoscam</span> to report fake marketplaces · <span class="hl-email">abuse@telegram.org</span> for scams`
+📢 <span class="hl-mention">@notoscam</span> to report fakes · 📧 <span class="hl-email">abuse@telegram.org</span>`
   },
   nft_scam_general: {
-    id: 'nft_scam_general',
-    draftType: 'nft_scam_report',
-    answer: `🖼️ <b>NFT scams — know the red flags:</b>
+    id: 'nft_scam_general', draftType: 'nft_scam_report', reaction: 'shocked',
+    answer: `😱 <b>NFT scams — know the red flags</b> 🚩
 
-<span class="hl-danger">🚩 Common NFT scams on Telegram:</span>
-· Fake "mint" pages (phishing — steals your wallet access)
-· "Airdrop claim" links in groups
-· DMs from fake "project admins"
-· Fake OpenSea / GetGems login pages
-· "Double your NFT" or "free mint" offers
+🚩 <b>Common NFT scams on Telegram</b>
+· Fake "mint" pages 🎨 — phishing that steals wallet access
+· "Airdrop claim" links in groups 🎁
+· DMs from fake "project admins" 👤
+· Fake OpenSea / GetGems login pages 🌐
+· "Double your NFT" offers 💸
 
-<span class="hl-action">✅ Protect yourself:</span>
-· <span class="hl-key">Never</span> share your seed phrase — ever
-· <span class="hl-key">Never</span> sign wallet transactions from links in DMs
-· <span class="hl-key">Always</span> verify the contract before minting
-· Use a burner wallet for risky mints
-· Revoke approvals after each mint on <span class="hl-link">revoke.cash</span>
+✅ <b>Protect yourself</b>
+· <span class="hl-key">Never</span> share your seed phrase 🚫
+· <span class="hl-key">Never</span> sign wallet transactions from DM links 🚫
+· <span class="hl-key">Always</span> verify the contract before minting 🔎
+· Use a burner wallet 🔥 for risky mints
+· Revoke approvals on <span class="hl-link">revoke.cash</span> 🧹
 
-Report: <span class="hl-mention">@notoscam</span> · <span class="hl-email">abuse@telegram.org</span>`
+📢 Report: <span class="hl-mention">@notoscam</span> · 📧 <span class="hl-email">abuse@telegram.org</span>`
   },
   nft_general: {
-    id: 'nft_general',
-    draftType: null,
-    answer: `🖼️ <b>NFTs on Telegram — quick guide:</b>
+    id: 'nft_general', draftType: null, reaction: 'waving',
+    answer: `🖼️ <b>NFTs on Telegram — quick guide</b> 📚
 
-<span class="hl-step">🛒</span> <b>Where to buy / sell:</b>
-· <span class="hl-link">getgems.io</span> — TON NFTs (Telegram-native)
-· <span class="hl-link">fragment.com</span> — official Telegram collectibles & usernames
+🛒 <b>Where to buy/sell</b>
+· <span class="hl-link">getgems.io</span> — TON NFTs
+· <span class="hl-link">fragment.com</span> — official Telegram collectibles
 · <span class="hl-link">opensea.io</span> — Ethereum / Polygon
 
-<span class="hl-step">🛡️</span> <b>Safety rules:</b>
-· Never share your seed phrase
-· Verify mint contracts before signing
-· Use a separate wallet from your main one
-· Never click "mint" links from DMs or random groups
+🛡️ <b>Safety rules</b>
+· Never share your seed phrase 🚫
+· Verify mint contracts before signing ✅
+· Use a separate wallet 👛
+· Never click "mint" links from DMs 📥
 
-⚠️ <span class="hl-warn">Telegram Gift NFTs / collectibles ARE legit</span> — bought on <span class="hl-link">fragment.com</span>. But the fake "claim your free NFT" messages are all scams.
+⚠️ <span class="hl-warn">Telegram Gift NFTs ARE legit</span> — bought on <span class="hl-link">fragment.com</span>. But fake "claim your free NFT" messages are scams 🚨.
 
-Need specifics? Ask "how do I protect my NFTs" or "where to sell safely".`
+Ask me "how do I protect my NFTs" 🛡️ or "where to sell safely" 💱.`
   },
   hacked_lost: {
-    id: 'hacked_lost',
-    draftType: 'hacked_report',
-    answer: `🔓 <b>Account hacked — act fast:</b>
+    id: 'hacked_lost', draftType: 'hacked_report', reaction: 'crying',
+    answer: `😢 <b>Account hacked — act fast</b> 🚨
 
-<span class="hl-step">1️⃣</span> Log back in with your number + <span class="hl-key">SMS code</span>
-<span class="hl-step">2️⃣</span> Open <b>Settings → Devices</b> → tap <span class="hl-action">Terminate All Other Sessions</span>
-<span class="hl-step">3️⃣</span> Enable <span class="hl-action">Two-Step Verification</span> with a strong password
-<span class="hl-step">4️⃣</span> Change the password on your <span class="hl-key">linked email</span> too
-<span class="hl-step">5️⃣</span> Check <b>Settings → Privacy</b> for anything changed
+<span class="hl-step">1️⃣</span> Log back in with your number + <span class="hl-key">SMS code</span> 📱
+<span class="hl-step">2️⃣</span> <b>Settings → Devices</b> → tap <span class="hl-action">Terminate All Other Sessions</span> 🔓
+<span class="hl-step">3️⃣</span> Enable <span class="hl-action">Two-Step Verification</span> with a strong password 🔐
+<span class="hl-step">4️⃣</span> Change the password on your linked email 📧 too
+<span class="hl-step">5️⃣</span> Check <b>Settings → Privacy</b> for anything changed 👀
 
-<span class="hl-warn">Can't log in?</span> The attacker may have enabled 2FA.
-📧 Email <span class="hl-email">recover@telegram.org</span> — include the number, exact time, and situation
+😰 <span class="hl-warn">Can't log in?</span> The attacker may have enabled 2FA.
+📧 Email <span class="hl-email">recover@telegram.org</span> — include the number, exact time, and situation 📝
 
-🚫 <span class="hl-danger">Never share your login code</span> — not even with "Telegram Support". Real support never DMs you first.`
+🚫 <span class="hl-danger">Never share your login code</span> — not even with "Telegram Support". Real support never DMs first 🙅.`
   },
   hacked_threat: {
-    id: 'hacked_threat',
-    draftType: 'hacked_report',
-    answer: `🛡️ <b>Someone threatening to hack you — preventive actions:</b>
+    id: 'hacked_threat', draftType: 'hacked_report', reaction: 'knife',
+    answer: `🔪 <b>Someone threatening to hack you — preventive actions</b> 🛡️
 
-<span class="hl-step">✅</span> <span class="hl-action">Enable Two-Step Verification</span> NOW — Settings → Privacy → Two-Step
-<span class="hl-step">✅</span> <span class="hl-action">Add a recovery email</span> — so you can reset 2FA if needed
-<span class="hl-step">✅</span> <span class="hl-action">Check Active Sessions</span> — kick any device you don't recognize
-<span class="hl-step">✅</span> <span class="hl-action">Log out unknown sessions</span> regularly
-<span class="hl-step">✅</span> <span class="hl-action">Never click links</span> they send you
-<span class="hl-step">✅</span> <span class="hl-action">Never share codes</span> — even a "verification code" sent to you is a scam attempt
+✅ <span class="hl-action">Enable Two-Step Verification</span> NOW 🔐
+✅ <span class="hl-action">Add a recovery email</span> 📧
+✅ <span class="hl-action">Check Active Sessions</span> 🔍 — kick unknown devices
+✅ <span class="hl-action">Never click links</span> they send 🚫
+✅ <span class="hl-action">Never share codes</span> — even a "verification code" is a scam attempt 🎣
 
-🚨 <span class="hl-warn">Block + Report</span> the threatening user:
-· <span class="hl-action">Profile → ⋮ → Report</span>
-· Send screenshots to <span class="hl-email">abuse@telegram.org</span>
+🚨 <span class="hl-warn">Block + Report</span> the threatening user
+· <span class="hl-action">Profile → ⋮ → Report</span> 📢
+· Screenshots to 📧 <span class="hl-email">abuse@telegram.org</span>
 
-<span class="hl-key">Remember:</span> without your SMS code or 2FA password, they can't take your account.`
+💡 <span class="hl-key">Remember:</span> without your SMS code or 2FA password, they can't take your account 🔒.`
   },
   hacked_general: {
-    id: 'hacked_general',
-    draftType: null,
-    answer: `🔐 <b>Account security — protect yourself:</b>
+    id: 'hacked_general', draftType: null, reaction: 'waving',
+    answer: `🔐 <b>Account security — protect yourself</b> 🛡️
 
-<span class="hl-step">1️⃣</span> <span class="hl-action">Two-Step Verification</span> — Settings → Privacy → Two-Step
-<span class="hl-step">2️⃣</span> <span class="hl-action">Recovery email</span> set as backup
-<span class="hl-step">3️⃣</span> <span class="hl-action">Active Sessions</span> — review + kick unknown devices
-<span class="hl-step">4️⃣</span> <span class="hl-action">Privacy settings</span> — Phone Number → Nobody, Messages → Contacts
+<span class="hl-step">1️⃣</span> <span class="hl-action">Two-Step Verification</span> → Settings → Privacy → Two-Step 🔑
+<span class="hl-step">2️⃣</span> <span class="hl-action">Recovery email</span> set as backup 📧
+<span class="hl-step">3️⃣</span> <span class="hl-action">Active Sessions</span> — review and kick unknown devices 🔍
+<span class="hl-step">4️⃣</span> <span class="hl-action">Privacy settings</span> — Phone Number → Nobody, Messages → Contacts 🔒
 
-<span class="hl-warn">Already compromised?</span>
-· Log in with SMS code
-· Terminate all sessions
-· Enable 2FA
+😰 <span class="hl-warn">Already compromised?</span>
+· Log in with SMS code 📱
+· Terminate all sessions 🚫
+· Enable 2FA 🔐
 · Email <span class="hl-email">recover@telegram.org</span> if locked out
 
-🚫 <span class="hl-danger">Nobody legit ever asks for your login code.</span> Not support, not admins, not friends.`
+🚫 <span class="hl-danger">Nobody legit ever asks for your login code</span> 🚫. Not support, not admins, not friends.`
   },
   doxx_lost: {
-    id: 'doxx_lost',
-    draftType: 'doxx_report',
-    answer: `🚨 <b>Doxxing — you've been exposed:</b>
+    id: 'doxx_lost', draftType: 'doxx_report', reaction: 'shocked',
+    answer: `😱 <b>Doxxing — you've been exposed</b> 🚨
 
-<span class="hl-step">1️⃣</span> <span class="hl-action">Screenshot EVERYTHING</span> immediately — before they delete it
-<span class="hl-step">2️⃣</span> <span class="hl-action">Report the account</span> → Profile → ⋮ → Report
-<span class="hl-step">3️⃣</span> Email <span class="hl-email">abuse@telegram.org</span> — subject: <b>"URGENT: DOXXING"</b>
-<span class="hl-step">4️⃣</span> Report to <span class="hl-mention">@notoscam</span>
-<span class="hl-step">5️⃣</span> If real threats / address public → <span class="hl-key">contact local police</span> and file a report
+<span class="hl-step">1️⃣</span> <span class="hl-action">Screenshot EVERYTHING</span> immediately 📸 — before they delete
+<span class="hl-step">2️⃣</span> <span class="hl-action">Report</span> → Profile → ⋮ → Report 📢
+<span class="hl-step">3️⃣</span> Email 📧 <span class="hl-email">abuse@telegram.org</span> — subject: <b>"URGENT: DOXXING"</b>
+<span class="hl-step">4️⃣</span> Send to <span class="hl-mention">@notoscam</span> 🛡️
+<span class="hl-step">5️⃣</span> Real threats? Contact <span class="hl-key">local police</span> 👮 and file a report
 
-<span class="hl-action">Lockdown Telegram:</span>
-· Settings → Privacy → Phone Number → <b>Nobody</b>
+🔒 <b>Lockdown Telegram now</b>
+· Phone Number → <b>Nobody</b>
 · Last Seen → <b>My Contacts</b>
 · Profile Photo → <b>My Contacts</b>
 · Messages → <b>My Contacts</b>
 · Groups → <b>My Contacts</b>
 
-<span class="hl-warn">Change any passwords tied to your leaked info</span> — email, banking, socials.`
+⚠️ <span class="hl-warn">Change any passwords tied to your leaked info</span> — email, banking, socials 🔑.`
   },
   doxx_threat: {
-    id: 'doxx_threat',
-    draftType: 'doxx_report',
-    answer: `🛡️ <b>Someone threatening to doxx you — prevention now:</b>
+    id: 'doxx_threat', draftType: 'doxx_report', reaction: 'knife',
+    answer: `🔪 <b>Someone threatening to doxx you — prevention now</b> 🛡️
 
-<span class="hl-step">🔒</span> <span class="hl-action">Lock your Telegram privacy</span> immediately:
+🔒 <span class="hl-action">Lock Telegram privacy</span> immediately
 · Phone Number → <b>Nobody</b>
-· Last Seen & Online → <b>My Contacts</b>
+· Last Seen → <b>My Contacts</b>
 · Profile Photo → <b>My Contacts</b>
-· Forwarded Messages → hide link
-· Groups & Channels → <b>My Contacts</b>
+· Forwarded → hide link
+· Groups → <b>My Contacts</b>
 
-<span class="hl-step">🧹</span> <span class="hl-action">Clean up public info:</span>
-· Remove your name from public group chats
-· Check what comes up when you search your username on Google
-· Don't share your real phone number
+🧹 <span class="hl-action">Clean public info</span>
+· Remove your name from group chats
+· Google your username
+· Don't share your real phone number 📵
 
-<span class="hl-step">📸</span> <span class="hl-action">If they threaten you</span> — screenshot everything, then:
-· Block + Report → <span class="hl-action">Profile → ⋮ → Report</span>
-· Email <span class="hl-email">abuse@telegram.org</span>
-· Local police if real threats
+📸 <span class="hl-action">If they threaten you</span> — screenshot everything, then:
+· Block + Report → Profile → ⋮ → Report 📢
+· Email 📧 <span class="hl-email">abuse@telegram.org</span>
+· Local police if real threats 👮
 
-<span class="hl-warn">Don't engage.</span> Replying gives them more material.`
+💡 <span class="hl-warn">Don't engage</span> — replying gives them more material 🚫.`
   },
   ban: {
-    id: 'ban',
-    draftType: 'ban_appeal',
-    answer: `🚫 <b>Account limited / banned — appeal path:</b>
+    id: 'ban', draftType: 'ban_appeal', reaction: 'angry',
+    answer: `😠 <b>Account limited or banned — appeal path</b> 🚫
 
-<span class="hl-step">1️⃣</span> Open <span class="hl-mention">@SpamBot</span> — it's official Telegram
-<span class="hl-step">2️⃣</span> Tap <b>Start</b> → follow the prompts
-<span class="hl-step">3️⃣</span> If it was a mistake → pick <b>"This is a mistake"</b> and send your number in <span class="hl-key">+country format</span>
+<span class="hl-step">1️⃣</span> Open <span class="hl-mention">@SpamBot</span> 🤖 — it's official
+<span class="hl-step">2️⃣</span> Tap <b>Start</b> → follow prompts 👆
+<span class="hl-step">3️⃣</span> If it was a mistake → pick <b>"This is a mistake"</b> and send your number in <span class="hl-key">+country format</span> 📱
 
-<span class="hl-warn">Frozen account?</span> There's a deadline — appeal before it ends via @SpamBot, then email <span class="hl-email">recover@telegram.org</span>
+❄️ <span class="hl-warn">Frozen account?</span> There's a deadline ⏰ — appeal before it ends via @SpamBot, then email 📧 <span class="hl-email">recover@telegram.org</span>
 
-<span class="hl-danger">⚠️ Never use third-party Telegram clients</span> — that makes the ban permanent.
+🚫 <span class="hl-danger">Never use third-party Telegram clients</span> — that makes the ban permanent ⚠️.
 
-<span class="hl-key">Support email:</span> <span class="hl-email">recover@telegram.org</span>`
+📧 <span class="hl-key">Support email:</span> <span class="hl-email">recover@telegram.org</span>`
   },
   deleted: {
-    id: 'deleted',
-    draftType: null,
-    answer: `🗑️ <b>Deleted account — recovery rules:</b>
+    id: 'deleted', draftType: null, reaction: 'crying',
+    answer: `😢 <b>Deleted account — recovery rules</b> 🗑️
 
-<span class="hl-warn">Deleted = permanently erased.</span> All chats, media, cloud data — gone. No restore possible.
+⚠️ <span class="hl-warn">Deleted = permanently erased</span> 💀. All chats, media, cloud data — gone 🚫.
 
-<span class="hl-step">🆕</span> You <b>can</b> sign up again with the same number, but:
-· It starts from zero
-· Repeated deletions trigger a multi-day cooldown
+🆕 <b>You can sign up again</b> with the same number, but:
+· Starts from zero 🆕
+· Repeated deletions trigger cooldown ⏳
 
-<span class="hl-step">🤖</span> <span class="hl-key">Not sure if it was deleted vs banned?</span>
-Check <span class="hl-mention">@SpamBot</span> — if you see a limit, it's a ban, not a deletion.
+🤖 <span class="hl-key">Not sure if deleted vs banned?</span> Check <span class="hl-mention">@SpamBot</span> — if you see a limit, it's a ban 🚫.
 
-<span class="hl-step">💡</span> Set the <b>self-destruct timer</b> so an inactive account deletes automatically: Settings → Privacy → If Away For → 12/18 months.`
+💡 Set <b>self-destruct timer</b> ⏰ so inactive accounts auto-delete: Settings → Privacy → If Away For → 12/18 months.`
   },
   login: {
-    id: 'login',
-    draftType: null,
-    answer: `📱 <b>Login code / 2FA issues:</b>
+    id: 'login', draftType: null, reaction: 'waving',
+    answer: `📱 <b>Login code / 2FA issues</b> 🔑
 
-<span class="hl-step">1️⃣</span> Codes arrive <b>inside Telegram</b> first — check other logged-in devices
-<span class="hl-step">2️⃣</span> Wait 1-2 minutes for SMS — <span class="hl-warn">don't spam resend</span>
-<span class="hl-step">3️⃣</span> Use the <b>official app</b> — not a web browser
-<span class="hl-step">4️⃣</span> With 2FA on: tap <b>"Forgot password?"</b> → recovery email
+<span class="hl-step">1️⃣</span> Codes arrive <b>inside Telegram</b> first 💬 — check other logged-in devices
+<span class="hl-step">2️⃣</span> Wait 1-2 minutes for SMS ⏰ — <span class="hl-warn">don't spam resend</span> 🚫
+<span class="hl-step">3️⃣</span> Use the <b>official app</b> — not a web browser 📲
+<span class="hl-step">4️⃣</span> With 2FA on: tap <b>"Forgot password?"</b> → recovery email 📧
 
-<span class="hl-warn">No recovery email?</span> Email <span class="hl-email">recover@telegram.org</span> with your number
+😰 <span class="hl-warn">No recovery email?</span> Email 📧 <span class="hl-email">recover@telegram.org</span>
 
-<span class="hl-step">💡</span> Add a recovery email NOW: Settings → Privacy → Two-Step Verification`
+💡 Add a recovery email NOW: Settings → Privacy → Two-Step Verification 🔐`
   },
   gift_scam: {
-    id: 'gift_scam',
-    draftType: 'scam_report',
-    answer: `🎁 <b>Gift / airdrop messages — 99% scam:</b>
+    id: 'gift_scam', draftType: 'scam_report', reaction: 'shocked',
+    answer: `🎁 <b>Gift / airdrop messages — 99% scam</b> 🚨
 
-<span class="hl-danger">Real gifts NEVER arrive as messages with links.</span>
-· Gifts come from real users — they appear in your profile
-· "You received a gift, claim here" → <b>phishing</b>
-· "Free airdrop, connect wallet" → <b>wallet drain</b>
+<span class="hl-danger">Real gifts NEVER arrive as messages with links</span> 🚫
+· Gifts come from real users 👥 — they appear in your profile
+· "You received a gift, claim here" → <b>phishing</b> 🎣
+· "Free airdrop, connect wallet" → <b>wallet drain</b> 💸
 
-<span class="hl-action">Report every one:</span>
-· Screenshot the message
+📢 <b>Report every one</b>
+· Screenshot the message 📸
 · Report the sender: <span class="hl-action">Profile → ⋮ → Report</span>
 · Send to <span class="hl-mention">@notoscam</span>
-· Email <span class="hl-email">abuse@telegram.org</span>
+· Email 📧 <span class="hl-email">abuse@telegram.org</span>
 
-🚫 <span class="hl-warn">Never</span> click a link to "claim" a gift. Never connect a wallet.`
+⚠️ <span class="hl-warn">Never</span> click a link to "claim" a gift. Never connect a wallet 🔒.`
   },
   report: {
-    id: 'report',
-    draftType: 'scam_report',
-    answer: `🚩 <b>How to report content / users:</b>
+    id: 'report', draftType: 'scam_report', reaction: 'waving',
+    answer: `🚩 <b>How to report content / users</b> 📢
 
-<span class="hl-step">👤</span> <b>User:</b> Profile → ⋮ → Report
-<span class="hl-step">📢</span> <b>Channel / Group:</b> open → ⋮ → Report
-<span class="hl-step">💬</span> <b>Message:</b> long-press → Report
-<span class="hl-step">🎨</span> <b>Stickers:</b> <span class="hl-email">sticker@telegram.org</span>
-<span class="hl-step">©️</span> <b>Copyright / DMCA:</b> <span class="hl-email">dmca@telegram.org</span>
-<span class="hl-step">🚨</span> <b>Urgent / illegal:</b> <span class="hl-email">abuse@telegram.org</span>
+👤 <b>User:</b> Profile → ⋮ → Report
+📢 <b>Channel / Group:</b> open → ⋮ → Report
+💬 <b>Message:</b> long-press → Report
+🎨 <b>Stickers:</b> 📧 <span class="hl-email">sticker@telegram.org</span>
+©️ <b>Copyright / DMCA:</b> 📧 <span class="hl-email">dmca@telegram.org</span>
+🚨 <b>Urgent / illegal:</b> 📧 <span class="hl-email">abuse@telegram.org</span>
 
-Attach <span class="hl-key">screenshots + links</span> for faster action.`
+📎 Attach <span class="hl-key">screenshots + links</span> for faster action ⚡.`
   },
   group: {
-    id: 'group',
-    draftType: null,
-    answer: `👥 <b>Group / channel issues:</b>
+    id: 'group', draftType: null, reaction: 'waving',
+    answer: `👥 <b>Group / channel issues</b> 🛡️
 
-<span class="hl-key">Important:</span> Group and channel rules are controlled by <b>admins</b>, not Telegram.
+💡 <span class="hl-key">Important:</span> Group and channel rules are controlled by <b>admins</b> 👮, not Telegram.
 
-<span class="hl-step">🚪</span> Removed? Only an admin can unban and re-invite you
-<span class="hl-step">🔇</span> Muted? Ask an admin to check your permissions
-<span class="hl-step">❌</span> Channel gone? The owner deleted it or removed you
+🚪 Removed? Only an admin can unban and re-invite you
+🔇 Muted? Ask an admin to check your permissions
+❌ Channel gone? The owner deleted it or removed you
 
-<span class="hl-warn">Telegram support can't override an admin's decision.</span>
+⚠️ <span class="hl-warn">Telegram support can't override an admin's decision</span>
 
-If the <b>channel itself</b> is banned: <span class="hl-mention">@SpamBot</span> → Start → follow appeal.`
+📢 If the <b>channel itself</b> is banned: <span class="hl-mention">@SpamBot</span> → Start → follow appeal 🤖.`
   },
   premium: {
-    id: 'premium',
-    draftType: 'premium_support',
-    answer: `⭐ <b>Premium / Stars / Fragment:</b>
+    id: 'premium', draftType: 'premium_support', reaction: 'waving',
+    answer: `⭐ <b>Premium / Stars / Fragment</b> 💎
 
-<span class="hl-step">💳</span> <b>Refunds:</b> Must go through the ORIGINAL payment provider
-· Apple App Store → reportaproblem.apple.com
-· Google Play → play.google.com/store/account
-· Fragment purchases → contact Fragment support
+💳 <b>Refunds</b> — must go through the ORIGINAL payment provider
+· Apple App Store → reportaproblem.apple.com 🍎
+· Google Play → play.google.com/store/account 🤖
+· Fragment purchases → contact Fragment support ✈️
 
-<span class="hl-step">🔁</span> <b>Cancel auto-renew:</b> App Store / Google Play subscriptions
-<span class="hl-step">🌟</span> <b>Stars:</b> Settings → My Stars
-<span class="hl-step">🖼️</span> <b>Collectible usernames:</b> <span class="hl-link">fragment.com</span>
+🔁 <b>Cancel auto-renew:</b> App Store / Google Play subscriptions
+🌟 <b>Stars:</b> Settings → My Stars
+🖼️ <b>Collectible usernames:</b> <span class="hl-link">fragment.com</span>
 
-<span class="hl-email">premium@telegram.org</span> for billing questions.`
+📧 <span class="hl-email">premium@telegram.org</span> for billing questions 💳.`
+  },
+  business: {
+    id: 'business', draftType: null, reaction: 'waving',
+    answer: `💼 <b>Telegram Business</b> 🏢
+
+⚙️ <b>Setup:</b> Settings → Telegram Business
+📍 Add a business location, hours, auto-replies
+🤖 Connect business bots (auto-replies, invoices)
+⭐ Requires Premium subscription
+
+📚 <b>Features:</b> quick replies, away messages, custom start page, linked bot
+
+💡 <span class="hl-key">Tip:</span> A business bot can auto-reply to new customers 24/7 ⏰.`
+  },
+  bot: {
+    id: 'bot', draftType: null, reaction: 'waving',
+    answer: `🤖 <b>Telegram Bots & BotFather</b> 🛠️
+
+🆕 <b>Create:</b> open <span class="hl-mention">@BotFather</span> → <code>/newbot</code>
+🔄 <b>Regenerate token:</b> <span class="hl-mention">@BotFather</span> → <code>/revoke</code>
+🗑️ <b>Delete bot:</b> <span class="hl-mention">@BotFather</span> → <code>/deletebot</code>
+📚 <b>API docs:</b> <span class="hl-link">core.telegram.org/bots</span>
+🐛 <b>Bug?</b> 📧 <span class="hl-email">botsupport@telegram.org</span>
+
+⚠️ <span class="hl-warn">NEVER share your bot token</span> — anyone with it controls your bot 🔒.`
+  },
+  privacy: {
+    id: 'privacy', draftType: null, reaction: 'waving',
+    answer: `🔒 <b>Privacy settings</b> 👀
+
+⚙️ Settings → Privacy and Security
+
+· Phone Number → <b>Nobody</b> 📱
+· Last Seen & Online → <b>My Contacts</b> 👤
+· Profile Photo → <b>My Contacts</b> 🖼️
+· Calls → <b>My Contacts</b> 📞
+· Messages → <b>My Contacts</b> 💬
+· Forwarded Messages → hide link 🔗
+· Groups & Channels → <b>My Contacts</b> 👥
+
+💡 Use "Delete for Everyone" default: Privacy → Delete for Everyone 🗑️`
+  },
+  number: {
+    id: 'number', draftType: null, reaction: 'waving',
+    answer: `📱 <b>Change phone number</b> 🔄
+
+⚙️ Settings → Edit Profile → Change Number
+
+✅ All chats & groups move with you 💬
+✅ Requires access to the NEW number 📲
+✅ Old number freed after 7 days ⏰
+
+⚠️ <span class="hl-warn">Old number already gone?</span> Log in with the new number and confirm via SMS 📱.`
   },
   scam_lost: {
-    id: 'scam_lost',
-    draftType: 'scam_report',
-    answer: `🛡️ <b>Scammed — what to do now:</b>
+    id: 'scam_lost', draftType: 'scam_report', reaction: 'crying',
+    answer: `😢 <b>Scammed — what to do now</b> 🛡️
 
-<span class="hl-step">1️⃣</span> <span class="hl-action">Stop all contact</span> — don't reply, don't negotiate
-<span class="hl-step">2️⃣</span> <span class="hl-action">Screenshot EVERYTHING</span> — messages, usernames, wallet addresses
-<span class="hl-step">3️⃣</span> <span class="hl-action">Report</span> → Profile → ⋮ → Report
-<span class="hl-step">4️⃣</span> Send to <span class="hl-mention">@notoscam</span> with proof
-<span class="hl-step">5️⃣</span> Email <span class="hl-email">abuse@telegram.org</span>
-<span class="hl-step">6️⃣</span> If money involved → <span class="hl-key">contact your bank + local police</span>
+<span class="hl-step">1️⃣</span> <span class="hl-action">Stop all contact</span> 🛑 — don't reply, don't negotiate
+<span class="hl-step">2️⃣</span> <span class="hl-action">Screenshot EVERYTHING</span> 📸 — messages, usernames, wallet addresses
+<span class="hl-step">3️⃣</span> <span class="hl-action">Report</span> → Profile → ⋮ → Report 📢
+<span class="hl-step">4️⃣</span> Send to <span class="hl-mention">@notoscam</span> with proof 🛡️
+<span class="hl-step">5️⃣</span> Email 📧 <span class="hl-email">abuse@telegram.org</span>
+<span class="hl-step">6️⃣</span> Money involved → <span class="hl-key">contact your bank + local police</span> 🏦👮
 
-<span class="hl-danger">⚠️ Never pay "unblock fees" or "recovery fees"</span> — the first scammer is usually working with a second.`
+⚠️ <span class="hl-danger">Never pay "unblock fees"</span> — the first scammer usually works with a second 🚨.`
   },
   scam_general: {
-    id: 'scam_general',
-    draftType: null,
-    answer: `⚠️ <b>Spot & report Telegram scams:</b>
+    id: 'scam_general', draftType: null, reaction: 'shocked',
+    answer: `😱 <b>Spot & report Telegram scams</b> 🚨
 
-<span class="hl-danger">🚩 Red flags:</span>
-· "Your account is limited, click here"
-· Admin/support DMs you first
-· "Free airdrop / gift / double your crypto"
-· Fake login pages (look-alike URLs)
-· Requests for your <span class="hl-key">login code</span> or <span class="hl-key">2FA password</span>
+🚩 <b>Red flags</b>
+· "Your account is limited, click here" 🔗
+· Admin/support DMs you first 📥
+· "Free airdrop / gift / double crypto" 🎁
+· Fake login pages 🌐
+· Requests for login code or 2FA password 🔑
 
-<span class="hl-action">🛡️ Report:</span>
-· In-app: <span class="hl-action">Profile → ⋮ → Report</span>
-· <span class="hl-mention">@notoscam</span> — official report bot
-· <span class="hl-email">abuse@telegram.org</span> — with screenshots
+🛡️ <b>Report</b>
+· In-app: <span class="hl-action">Profile → ⋮ → Report</span> 📢
+· <span class="hl-mention">@notoscam</span> — official report bot 🤖
+· 📧 <span class="hl-email">abuse@telegram.org</span> with screenshots
 
-<span class="hl-key">Golden rule:</span> Telegram will NEVER ask for your login code or password.`
+💡 <span class="hl-key">Golden rule:</span> Telegram will NEVER ask for your login code or password 🔒.`
   },
   support: {
-    id: 'support',
-    draftType: null,
-    answer: `📬 <b>Official Telegram support:</b>
+    id: 'support', draftType: null, reaction: 'waving',
+    answer: `📬 <b>Official Telegram support</b> ✈️
 
-<span class="hl-step">🆘</span> <span class="hl-email">support@telegram.org</span> — general
-<span class="hl-step">🔁</span> <span class="hl-email">recover@telegram.org</span> — bans & account recovery
-<span class="hl-step">📱</span> <span class="hl-email">sms@telegram.org</span> — login / SMS codes
-<span class="hl-step">🚫</span> <span class="hl-email">abuse@telegram.org</span> — scams & illegal content
-<span class="hl-step">🔐</span> <span class="hl-email">security@telegram.org</span> — security issues
-<span class="hl-step">💳</span> <span class="hl-email">premium@telegram.org</span> — Premium billing
-<span class="hl-step">📦</span> <span class="hl-email">gdpr@telegram.org</span> — data requests
-<span class="hl-step">🤖</span> <span class="hl-mention">@SpamBot</span> · <span class="hl-mention">@notoscam</span>
+🆘 📧 <span class="hl-email">support@telegram.org</span> — general
+🔁 📧 <span class="hl-email">recover@telegram.org</span> — bans & recovery
+📱 📧 <span class="hl-email">sms@telegram.org</span> — login codes
+🚫 📧 <span class="hl-email">abuse@telegram.org</span> — scams & illegal
+🔐 📧 <span class="hl-email">security@telegram.org</span> — security
+💳 📧 <span class="hl-email">premium@telegram.org</span> — billing
+📦 📧 <span class="hl-email">gdpr@telegram.org</span> — data requests
+🤖 <span class="hl-mention">@SpamBot</span> · <span class="hl-mention">@notoscam</span>
 
-<span class="hl-warn">Include your phone number, screenshots, and clear description</span> for faster help.`
+📎 <span class="hl-warn">Include your phone number, screenshots, and clear description</span> for faster help.`
   }
 };
 
 const FALLBACK = {
-  id: 'fallback',
-  draftType: null,
-  answer: `🤔 <b>I didn't quite catch that.</b>
+  id: 'fallback', draftType: null, reaction: 'dontknow',
+  answer: `🤔 <b>Hmm, I didn't quite catch that</b> 🤷
 
-Try asking me something like:
-· <span class="hl-key">"I got scammed for NFT"</span> — recovery steps
-· <span class="hl-key">"How to protect my NFT"</span> — prevention tips
-· <span class="hl-key">"Where to safely sell NFT"</span> — marketplaces
-· <span class="hl-key">"Someone wants to hack me"</span> — preventive
-· <span class="hl-key">"Someone wants to doxx me"</span> — lockdown
-· <span class="hl-key">"My account is banned"</span> — appeal path
+Try asking something like:
+· <span class="hl-key">"I got scammed for NFT"</span> 😢
+· <span class="hl-key">"How to protect my NFT"</span> 🛡️
+· <span class="hl-key">"Where to safely sell NFT"</span> 💱
+· <span class="hl-key">"Someone wants to hack me"</span> 🔪
+· <span class="hl-key">"Someone wants to doxx me"</span> 🚨
+· <span class="hl-key">"My account is banned"</span> 🚫
 
-Or email <span class="hl-email">support@telegram.org</span> for anything not covered.`
+Or email 📧 <span class="hl-email">support@telegram.org</span> for anything not covered.`
 };
 
 /* ================================================================
-   QUESTION FLOWS — asked before certain answers
+   QUESTION FLOWS (inline)
    ================================================================ */
 const QUESTION_FLOWS = {
   scam_lost: [
-    { id: 'kind', q: 'What kind of scam was it?', options: [
+    { id: 'kind', q: 'What kind of scam was it? 🤔', options: [
       { emoji: '🖼️', text: 'NFT / crypto' },
       { emoji: '🎁', text: 'Fake giveaway / airdrop' },
       { emoji: '👤', text: 'Impersonation' },
@@ -1859,50 +2013,46 @@ const QUESTION_FLOWS = {
       { emoji: '💕', text: 'Romance scam' },
       { emoji: '❓', text: 'Other' }
     ]},
-    { id: 'lost', q: 'What did you lose?', options: [
-      { emoji: '💸', text: 'Money' },
+    { id: 'lost', q: 'What did you lose? 💸', options: [
+      { emoji: '💰', text: 'Money' },
       { emoji: '💎', text: 'NFTs / crypto' },
       { emoji: '📞', text: 'Just personal info' },
       { emoji: '🤷', text: 'Nothing yet' }
     ]},
-    { id: 'proof', q: 'Do you have screenshots?', options: [
+    { id: 'proof', q: 'Do you have screenshots? 📸', options: [
       { emoji: '📸', text: 'Yes, plenty' },
       { emoji: '📷', text: 'A few' },
       { emoji: '🚫', text: 'No, none' }
     ]}
   ],
   hacked_lost: [
-    { id: 'status', q: 'Can you still log in?', options: [
+    { id: 'status', q: 'Can you still log in? 🔐', options: [
       { emoji: '✅', text: 'Yes, but I see unknown sessions' },
       { emoji: '🚫', text: 'No, locked out' },
       { emoji: '🤔', text: 'Not sure' }
     ]},
-    { id: 'tfa', q: 'Did they change your 2FA?', options: [
+    { id: 'tfa', q: 'Did they change your 2FA? 🔑', options: [
       { emoji: '🔐', text: 'Yes, changed' },
       { emoji: '🟢', text: 'No, still mine' },
       { emoji: '❓', text: 'Not sure' }
     ]}
   ],
   hacked_threat: [
-    { id: 'threat', q: 'What did they threaten?', options: [
+    { id: 'threat', q: 'What did they threaten? 🔪', options: [
       { emoji: '🔓', text: 'Hacking my account' },
       { emoji: '💰', text: 'Stealing money / crypto' },
       { emoji: '📸', text: 'Leaking private info' },
       { emoji: '🚨', text: 'Multiple threats' }
-    ]},
-    { id: 'proof', q: 'Do you have proof of the threats?', options: [
-      { emoji: '📸', text: 'Yes, screenshots' },
-      { emoji: '❌', text: 'No' }
     ]}
   ],
   doxx_lost: [
-    { id: 'what', q: 'What was leaked?', options: [
+    { id: 'what', q: 'What was leaked? 🚨', options: [
       { emoji: '📱', text: 'Phone number' },
       { emoji: '🏠', text: 'Home address' },
       { emoji: '📸', text: 'Photos / ID' },
       { emoji: '🗂️', text: 'Multiple things' }
     ]},
-    { id: 'where', q: 'Where was it posted?', options: [
+    { id: 'where', q: 'Where was it posted? 🌐', options: [
       { emoji: '📢', text: 'Public channel' },
       { emoji: '💬', text: 'Group chat' },
       { emoji: '📨', text: 'Sent to my contacts' },
@@ -1910,7 +2060,7 @@ const QUESTION_FLOWS = {
     ]}
   ],
   doxx_threat: [
-    { id: 'type', q: 'What are they threatening to leak?', options: [
+    { id: 'type', q: 'What are they threatening to leak? 🚨', options: [
       { emoji: '📱', text: 'Phone number' },
       { emoji: '🏠', text: 'Address' },
       { emoji: '📸', text: 'Photos' },
@@ -1918,13 +2068,13 @@ const QUESTION_FLOWS = {
     ]}
   ],
   nft_scam_lost: [
-    { id: 'what', q: 'What was lost?', options: [
+    { id: 'what', q: 'What was lost? 💎', options: [
       { emoji: '💎', text: 'NFTs' },
       { emoji: '💰', text: 'Crypto / TON' },
       { emoji: '🔑', text: 'Wallet access' },
       { emoji: '📱', text: 'Telegram account' }
     ]},
-    { id: 'wallet', q: 'Which wallet was affected?', options: [
+    { id: 'wallet', q: 'Which wallet was affected? 👛', options: [
       { emoji: '💙', text: 'TON Wallet' },
       { emoji: '🦊', text: 'MetaMask' },
       { emoji: '🔷', text: 'Other' },
@@ -1932,7 +2082,7 @@ const QUESTION_FLOWS = {
     ]}
   ],
   nft_scam_general: [
-    { id: 'kind', q: 'What type of NFT scam?', options: [
+    { id: 'kind', q: 'What type of NFT scam? 🖼️', options: [
       { emoji: '🎨', text: 'Fake mint' },
       { emoji: '🎁', text: 'Airdrop claim' },
       { emoji: '👤', text: 'Fake admin DM' },
@@ -1940,13 +2090,13 @@ const QUESTION_FLOWS = {
     ]}
   ],
   ban: [
-    { id: 'kind', q: 'What kind of restriction?', options: [
+    { id: 'kind', q: 'What kind of restriction? 🚫', options: [
       { emoji: '🚫', text: 'Cannot send messages' },
       { emoji: '❄️', text: 'Frozen account' },
       { emoji: '⛔', text: 'Permanently banned' },
       { emoji: '❓', text: 'Not sure' }
     ]},
-    { id: 'tried', q: 'Have you tried @SpamBot?', options: [
+    { id: 'tried', q: 'Have you tried @SpamBot? 🤖', options: [
       { emoji: '✅', text: 'Yes, rejected' },
       { emoji: '⏳', text: 'Yes, no reply' },
       { emoji: '🆕', text: 'No, first time' }
@@ -1965,128 +2115,89 @@ const NEEDS_QUESTIONS = {
   ban: 'ban'
 };
 
-/* ================================================================
-   DRAFT QUESTION FLOWS (for "Do you need a text?")
-   ================================================================ */
+/* Draft flows */
 const DRAFT_FLOWS = {
   scam_report: [
-    { id: 'username', q: 'Your Telegram username?', type: 'text', placeholder: '@username' },
-    { id: 'phone', q: 'Your phone number (optional)', type: 'text', placeholder: '+1 555 123 4567' },
-    { id: 'scammer', q: 'Scammer username (if known)', type: 'text', placeholder: '@scammer' },
-    { id: 'reason', q: 'What happened briefly?', type: 'text', placeholder: 'e.g. fake mint stole 50 TON' },
-    { id: 'length', q: 'How long should the text be?', type: 'choice', options: [
-      { emoji: '📝', text: 'Short' },
-      { emoji: '📄', text: 'Medium' },
-      { emoji: '📚', text: 'Detailed' }
+    { id: 'username', q: 'Your Telegram username? 📱', type: 'text', placeholder: '@username' },
+    { id: 'scammer', q: 'Scammer username? 👤', type: 'text', placeholder: '@scammer' },
+    { id: 'reason', q: 'What happened briefly? 📝', type: 'text', placeholder: 'e.g. fake mint stole 50 TON' },
+    { id: 'length', q: 'How long should the text be? 📏', type: 'choice', options: [
+      { emoji: '📝', text: 'Short' }, { emoji: '📄', text: 'Medium' }, { emoji: '📚', text: 'Detailed' }
     ]}
   ],
   hacked_report: [
-    { id: 'username', q: 'Your Telegram username?', type: 'text', placeholder: '@username' },
-    { id: 'phone', q: 'Your phone number', type: 'text', placeholder: '+1 555 123 4567' },
-    { id: 'when', q: 'When did it happen?', type: 'choice', options: [
-      { emoji: '⏰', text: 'Just now' },
-      { emoji: '📅', text: 'Today' },
-      { emoji: '📆', text: 'This week' },
-      { emoji: '🗓️', text: 'Longer ago' }
-    ]},
-    { id: 'length', q: 'How long should the text be?', type: 'choice', options: [
-      { emoji: '📝', text: 'Short' },
-      { emoji: '📄', text: 'Medium' },
-      { emoji: '📚', text: 'Detailed' }
+    { id: 'username', q: 'Your Telegram username? 📱', type: 'text', placeholder: '@username' },
+    { id: 'phone', q: 'Your phone number 📞', type: 'text', placeholder: '+1 555 123 4567' },
+    { id: 'length', q: 'How long should the text be? 📏', type: 'choice', options: [
+      { emoji: '📝', text: 'Short' }, { emoji: '📄', text: 'Medium' }, { emoji: '📚', text: 'Detailed' }
     ]}
   ],
   doxx_report: [
-    { id: 'username', q: 'Your Telegram username?', type: 'text', placeholder: '@username' },
-    { id: 'leaked', q: 'What was leaked / threatened?', type: 'text', placeholder: 'phone, address, photos…' },
-    { id: 'length', q: 'How long should the text be?', type: 'choice', options: [
-      { emoji: '📝', text: 'Short' },
-      { emoji: '📄', text: 'Medium' },
-      { emoji: '📚', text: 'Detailed' }
+    { id: 'username', q: 'Your Telegram username? 📱', type: 'text', placeholder: '@username' },
+    { id: 'leaked', q: 'What was leaked? 🚨', type: 'text', placeholder: 'phone, address, photos…' },
+    { id: 'length', q: 'How long should the text be? 📏', type: 'choice', options: [
+      { emoji: '📝', text: 'Short' }, { emoji: '📄', text: 'Medium' }, { emoji: '📚', text: 'Detailed' }
     ]}
   ],
   ban_appeal: [
-    { id: 'username', q: 'Your Telegram username?', type: 'text', placeholder: '@username' },
-    { id: 'phone', q: 'Your phone number', type: 'text', placeholder: '+1 555 123 4567' },
-    { id: 'reason', q: 'Reason given (if any)', type: 'choice', options: [
-      { emoji: '📧', text: 'Spam' },
-      { emoji: '🚫', text: 'Inappropriate content' },
-      { emoji: '🤔', text: 'Unknown' }
-    ]},
-    { id: 'length', q: 'How long should the text be?', type: 'choice', options: [
-      { emoji: '📝', text: 'Short' },
-      { emoji: '📄', text: 'Medium' },
-      { emoji: '📚', text: 'Detailed' }
+    { id: 'username', q: 'Your Telegram username? 📱', type: 'text', placeholder: '@username' },
+    { id: 'phone', q: 'Your phone number 📞', type: 'text', placeholder: '+1 555 123 4567' },
+    { id: 'length', q: 'How long should the text be? 📏', type: 'choice', options: [
+      { emoji: '📝', text: 'Short' }, { emoji: '📄', text: 'Medium' }, { emoji: '📚', text: 'Detailed' }
     ]}
   ],
   nft_scam_report: [
-    { id: 'username', q: 'Your Telegram username?', type: 'text', placeholder: '@username' },
-    { id: 'scammer', q: 'Scammer / fake project username?', type: 'text', placeholder: '@fake_project' },
-    { id: 'wallet', q: 'Your wallet address (optional)', type: 'text', placeholder: 'UQ... or 0x...' },
-    { id: 'lost', q: 'What was lost?', type: 'choice', options: [
-      { emoji: '💎', text: 'NFTs' },
-      { emoji: '💰', text: 'Crypto' },
-      { emoji: '🔑', text: 'Wallet access' },
-      { emoji: '🤷', text: 'Nothing yet' }
-    ]},
-    { id: 'length', q: 'How long should the text be?', type: 'choice', options: [
-      { emoji: '📝', text: 'Short' },
-      { emoji: '📄', text: 'Medium' },
-      { emoji: '📚', text: 'Detailed' }
+    { id: 'username', q: 'Your Telegram username? 📱', type: 'text', placeholder: '@username' },
+    { id: 'scammer', q: 'Scammer / fake project? 👤', type: 'text', placeholder: '@fake_project' },
+    { id: 'wallet', q: 'Your wallet address? (optional) 👛', type: 'text', placeholder: 'UQ... or 0x...' },
+    { id: 'length', q: 'How long should the text be? 📏', type: 'choice', options: [
+      { emoji: '📝', text: 'Short' }, { emoji: '📄', text: 'Medium' }, { emoji: '📚', text: 'Detailed' }
     ]}
   ],
   premium_support: [
-    { id: 'username', q: 'Your Telegram username?', type: 'text', placeholder: '@username' },
-    { id: 'issue', q: 'What is the issue?', type: 'text', placeholder: 'refund, billing, etc.' },
-    { id: 'length', q: 'How long should the text be?', type: 'choice', options: [
-      { emoji: '📝', text: 'Short' },
-      { emoji: '📄', text: 'Medium' },
-      { emoji: '📚', text: 'Detailed' }
+    { id: 'username', q: 'Your Telegram username? 📱', type: 'text', placeholder: '@username' },
+    { id: 'issue', q: 'What is the issue? 💳', type: 'text', placeholder: 'refund, billing, etc.' },
+    { id: 'length', q: 'How long should the text be? 📏', type: 'choice', options: [
+      { emoji: '📝', text: 'Short' }, { emoji: '📄', text: 'Medium' }, { emoji: '📚', text: 'Detailed' }
     ]}
   ]
 };
 
 /* ================================================================
-   WORD ANIMATION (hand-drawn SVG circles)
+   WORD ANIMATION
    ================================================================ */
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
 const SVG_NS = 'http://www.w3.org/2000/svg';
-
 const CIRCLE_PATHS = [
   'M 9,18 C 7,5 91,4 93,18 C 95,32 11,33 9,18 Z',
   'M 11,16 C 15,4 87,5 92,19 C 96,31 12,35 7,20 C 5,14 13,10 19,10',
   'M 7,19 C 9,5 93,6 93,17 C 93,30 14,34 8,21 C 5,15 15,9 22,9',
   'M 10,17 C 12,5 90,3 94,18 C 97,31 10,33 8,19 Z'
 ];
-
 function playWordFoundSound(type) {
   if (type === 'theme' || type === 'mention') SoundFX.tick(760, 0.045, 0.028);
   else if (type === 'action' || type === 'email' || type === 'link') SoundFX.tick(590, 0.04, 0.024);
   else if (type === 'danger') SoundFX.tick(340, 0.05, 0.024);
   else SoundFX.tick(440, 0.03, 0.015);
 }
-
 async function showWords(words) {
   wordsEl.innerHTML = '';
   wordsEl.style.opacity = '1';
-
   const els = words.map((w, i) => {
     const el = document.createElement('span');
     el.className = 'word';
     el.style.color = w.color;
-
     const textSpan = document.createElement('span');
     textSpan.className = 'word-text';
     textSpan.textContent = w.raw;
     el.appendChild(textSpan);
-
     if (w.type !== 'neutral') {
       const svg = document.createElementNS(SVG_NS, 'svg');
       svg.setAttribute('class', 'circle-overlay');
       svg.setAttribute('viewBox', '0 0 100 36');
       svg.setAttribute('preserveAspectRatio', 'none');
-      const angle = ((i % 5) - 2) * 1.5;
-      svg.style.transform = `rotate(${angle}deg)`;
+      svg.style.transform = `rotate(${((i % 5) - 2) * 1.5}deg)`;
       const path = document.createElementNS(SVG_NS, 'path');
       path.setAttribute('class', 'circle-path');
       path.setAttribute('d', CIRCLE_PATHS[i % CIRCLE_PATHS.length]);
@@ -2097,10 +2208,7 @@ async function showWords(words) {
     wordsEl.appendChild(el);
     return el;
   });
-
-  await nextFrame();
-  await nextFrame();
-
+  await nextFrame(); await nextFrame();
   for (let i = 0; i < els.length; i++) {
     els[i].classList.add('show');
     await wait(70);
@@ -2112,14 +2220,13 @@ async function showWords(words) {
   }
   await wait(520);
 }
-
 function clearOverlays() {
   wordsEl.style.opacity = '0';
   setTimeout(() => { wordsEl.innerHTML = ''; }, 420);
 }
 
 /* ================================================================
-   ANSWER RENDERING + HIGHLIGHTS
+   ANSWER HIGHLIGHTS
    ================================================================ */
 function highlightAnswerText(text) {
   let html = text;
@@ -2136,43 +2243,48 @@ function highlightAnswerText(text) {
   return html;
 }
 
+/* ================================================================
+   SPEECH + PROGRESS BAR
+   ================================================================ */
 let currentAnswerHTML = '';
 let currentIntent = null;
-let currentAnswers = null;
+let progressAnim = null;
 
-function showSpeech(html, intentId) {
+function showSpeech(html, intentId, readTime) {
   currentAnswerHTML = html;
   currentIntent = INTENTS[intentId] || FALLBACK;
   speechBody.innerHTML = highlightAnswerText(html);
 
-  /* Set reaction avatar */
-  const reactionKey = INTENT_REACTIONS[intentId] || 'waving';
+  const reactionKey = currentIntent.reaction || 'waving';
   speechAvatarImg.src = GIFS[reactionKey] || GIFS.waving;
 
-  /* Show draft CTA if intent supports it */
-  if (currentIntent && currentIntent.draftType) {
-    speechDraftBtn.classList.add('show');
-  } else {
-    speechDraftBtn.classList.remove('show');
-  }
+  /* Progress bar drains over readTime */
+  if (progressAnim) cancelAnimationFrame(progressAnim);
+  speechProgress.style.transition = 'none';
+  speechProgress.style.transform = 'scaleX(1)';
+  speechProgress.style.width = '100%';
+  void speechProgress.offsetWidth;
+  speechProgress.style.transition = `transform ${readTime}ms linear`;
+  speechProgress.style.transformOrigin = 'left';
+  speechProgress.style.transform = 'scaleX(0)';
 
   speechEl.classList.add('show');
   speechEl.scrollTop = 0;
+
+  /* Auto-hide after readTime */
+  setTimeout(() => {
+    if (speechEl.classList.contains('show')) hideSpeech();
+  }, readTime);
 }
 
 function hideSpeech() {
   speechEl.classList.remove('show');
+  speechProgress.style.transition = 'none';
+  speechProgress.style.transform = 'scaleX(0)';
 }
 
 /* ================================================================
-   SEND BUTTON THINKING STATE
-   ================================================================ */
-function setThinking(active) {
-  sendBtn.classList.toggle('thinking', active);
-}
-
-/* ================================================================
-   READER MODAL (tap speech to expand)
+   SPEECH CLICK → READER MODAL (with pointer-capture resize fix)
    ================================================================ */
 const readerModal = document.getElementById('reader-modal');
 const readerBox = document.getElementById('reader-box');
@@ -2183,107 +2295,140 @@ function openReader() {
   if (!currentAnswerHTML) return;
   readerContent.innerHTML = highlightAnswerText(currentAnswerHTML);
   if (speechAvatarImg.src) readerAvatarImg.src = speechAvatarImg.src;
+  /* Reset any inline position/size so modal centers cleanly */
+  readerBox.style.left = '';
+  readerBox.style.top = '';
+  readerBox.style.width = '';
+  readerBox.style.height = '';
+  readerBox.style.maxWidth = '';
+  readerBox.style.maxHeight = '';
   readerModal.classList.add('show');
   haptic('light');
   SoundFX.tick(700, 0.04);
 }
 function closeReader() { readerModal.classList.remove('show'); }
-
 document.getElementById('reader-close').addEventListener('click', closeReader);
 readerModal.addEventListener('click', (e) => { if (e.target === readerModal) closeReader(); });
 
 speechEl.addEventListener('click', (e) => {
   if (e.target.id === 'speech-close') return;
-  if (e.target.id === 'speech-draft-btn' || e.target.closest('#speech-draft-btn')) return;
   if (!speechEl.classList.contains('show')) return;
   openReader();
 });
-
 document.getElementById('speech-close').addEventListener('click', (e) => {
   e.stopPropagation();
   hideSpeech();
 });
 
-/* Resize handles for reader modal */
+/* FIXED RESIZE — uses pointer capture so it never flies off */
 document.querySelectorAll('#reader-box .resize-handle').forEach(handle => {
   handle.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     e.stopPropagation();
+    handle.setPointerCapture(e.pointerId);
+
     const rect = readerBox.getBoundingClientRect();
     const startX = e.clientX, startY = e.clientY;
     const startL = rect.left, startT = rect.top;
     const startW = rect.width, startH = rect.height;
+
     const isTL = handle.classList.contains('tl');
     const isTR = handle.classList.contains('tr');
     const isBL = handle.classList.contains('bl');
     const isBR = handle.classList.contains('br');
+
     const minW = 260, minH = 240;
     const maxW = window.innerWidth - 24;
     const maxH = window.innerHeight - 24;
 
+    /* Switch to absolute positioning before first move */
+    readerBox.style.position = 'fixed';
+    readerBox.style.left = startL + 'px';
+    readerBox.style.top = startT + 'px';
+    readerBox.style.width = startW + 'px';
+    readerBox.style.height = startH + 'px';
+    readerBox.style.maxWidth = 'none';
+    readerBox.style.maxHeight = 'none';
+
     function onMove(ev) {
-      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (ev.pointerId !== e.pointerId) return;
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
       let newL = startL, newT = startT, newW = startW, newH = startH;
+
       if (isBR) { newW = startW + dx; newH = startH + dy; }
       else if (isBL) { newL = startL + dx; newW = startW - dx; newH = startH + dy; }
       else if (isTR) { newT = startT + dy; newW = startW + dx; newH = startH - dy; }
       else if (isTL) { newL = startL + dx; newT = startT + dy; newW = startW - dx; newH = startH - dy; }
+
       newW = Math.max(minW, Math.min(maxW, newW));
       newH = Math.max(minH, Math.min(maxH, newH));
+
       if (isBL || isTL) newL = Math.max(12, Math.min(window.innerWidth - newW - 12, newL));
       if (isBR || isTR) if (newL + newW > window.innerWidth - 12) newW = window.innerWidth - newL - 12;
       if (isTL || isTR) newT = Math.max(12, Math.min(window.innerHeight - newH - 12, newT));
       if (isBL || isBR) if (newT + newH > window.innerHeight - 12) newH = window.innerHeight - newT - 12;
+
       readerBox.style.left = newL + 'px';
       readerBox.style.top = newT + 'px';
       readerBox.style.width = newW + 'px';
       readerBox.style.height = newH + 'px';
-      readerBox.style.maxWidth = 'none';
-      readerBox.style.maxHeight = 'none';
     }
-    function onUp() {
+    function onUp(ev) {
+      if (ev.pointerId !== e.pointerId) return;
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
     }
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   });
 });
 
 /* ================================================================
-   WIZARD (question flow)
+   INLINE QUESTION PANEL
    ================================================================ */
-const wizardModal = document.getElementById('wizard-modal');
-const wizProgress = document.getElementById('wiz-progress-fill');
-const wizQuestion = document.getElementById('wiz-question');
-const wizCount = document.getElementById('wiz-count');
-const wizOptions = document.getElementById('wiz-options');
+const qProgressFill = document.getElementById('q-progress-fill');
+const qCount = document.getElementById('q-count');
+const qQuestion = document.getElementById('q-question');
+const qOptions = document.getElementById('q-options');
+const qClose = document.getElementById('q-close');
+
+let qFlowResolve = null;
+
+qClose.addEventListener('click', () => {
+  questionPanel.classList.remove('show');
+  if (qFlowResolve) { qFlowResolve(null); qFlowResolve = null; }
+});
 
 function runQuestionFlow(flowKey) {
   return new Promise((resolve) => {
+    qFlowResolve = resolve;
     const questions = QUESTION_FLOWS[flowKey] || [];
     const answers = {};
     let index = 0;
 
-    wizardModal.classList.add('show');
+    questionPanel.classList.add('show');
     haptic('light');
 
     function render() {
       if (index >= questions.length) {
-        wizardModal.classList.remove('show');
+        questionPanel.classList.remove('show');
         resolve(answers);
+        qFlowResolve = null;
         return;
       }
       const q = questions[index];
-      wizProgress.style.width = `${(index / questions.length) * 100}%`;
-      wizCount.textContent = `${index + 1}/${questions.length}`;
-      wizQuestion.textContent = q.q;
-      wizOptions.innerHTML = '';
+      qProgressFill.style.width = `${(index / questions.length) * 100}%`;
+      qCount.textContent = `${index + 1}/${questions.length}`;
+      qQuestion.textContent = q.q;
+      qOptions.innerHTML = '';
 
       if (q.options) {
         q.options.forEach(opt => {
           const btn = document.createElement('button');
-          btn.className = 'wiz-option';
+          btn.className = 'q-option';
           btn.innerHTML = `<span class="opt-emoji">${opt.emoji || '·'}</span><span>${opt.text}</span>`;
           btn.onclick = () => {
             answers[q.id] = opt.text;
@@ -2291,17 +2436,17 @@ function runQuestionFlow(flowKey) {
             index++;
             render();
           };
-          wizOptions.appendChild(btn);
+          qOptions.appendChild(btn);
         });
       } else {
         const inputEl = document.createElement('input');
-        inputEl.className = 'wiz-input';
+        inputEl.className = 'q-input';
         inputEl.type = 'text';
         inputEl.placeholder = q.placeholder || '';
         inputEl.value = answers[q.id] || '';
-        wizOptions.appendChild(inputEl);
+        qOptions.appendChild(inputEl);
         const nextBtn = document.createElement('button');
-        nextBtn.className = 'wiz-next';
+        nextBtn.className = 'q-next';
         nextBtn.textContent = 'Next →';
         nextBtn.onclick = () => {
           answers[q.id] = inputEl.value.trim();
@@ -2310,7 +2455,7 @@ function runQuestionFlow(flowKey) {
           render();
         };
         inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') nextBtn.click(); });
-        wizOptions.appendChild(nextBtn);
+        qOptions.appendChild(nextBtn);
         setTimeout(() => inputEl.focus(), 100);
       }
     }
@@ -2318,40 +2463,19 @@ function runQuestionFlow(flowKey) {
   });
 }
 
-document.getElementById('wiz-close').addEventListener('click', () => {
-  wizardModal.classList.remove('show');
-});
-
 /* ================================================================
-   DRAFT GENERATOR + MODAL
+   DRAFT GENERATOR
    ================================================================ */
-const draftModal = document.getElementById('draft-modal');
-const draftText = document.getElementById('draft-text');
-
 const DRAFT_PHRASES = {
-  openers: [
-    'Dear Telegram Support Team,',
-    'Hello Telegram Support,',
-    'To the Telegram Support Team,',
-    'Greetings Telegram Team,',
-    'Dear Telegram Support,',
-    'Hello Telegram Team,',
-    'To Whom It May Concern,',
-    'Dear Telegram Moderators,'
-  ],
-  closers: [
-    'Thank you for your time and consideration.',
-    'I appreciate any help you can provide.',
-    'Thank you in advance for reviewing my case.',
-    'I am grateful for your attention to this matter.',
-    'Thank you for your assistance.',
-    'I appreciate your patience and understanding.'
-  ],
+  openers: ['Dear Telegram Support Team,', 'Hello Telegram Support,', 'To the Telegram Support Team,',
+            'Greetings Telegram Team,', 'Dear Telegram Support,', 'Hello Telegram Team,',
+            'To Whom It May Concern,', 'Dear Telegram Moderators,'],
+  closers: ['Thank you for your time and consideration.', 'I appreciate any help you can provide.',
+            'Thank you in advance for reviewing my case.', 'I am grateful for your attention to this matter.',
+            'Thank you for your assistance.', 'I appreciate your patience and understanding.'],
   signoffs: ['Sincerely,','Best regards,','Kind regards,','Respectfully,','Warm regards,','Thank you,']
 };
-
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
 
 function generateDraft(draftType, answers) {
   const opener = pick(DRAFT_PHRASES.openers);
@@ -2360,78 +2484,47 @@ function generateDraft(draftType, answers) {
   const length = (answers.length || 'Medium').toLowerCase();
   const isShort = length.includes('short');
   const isLong = length.includes('detailed') || length.includes('long');
-
   const sign = answers.username || 'A concerned Telegram user';
   const contact = answers.phone ? `\n${answers.phone}` : '';
 
   const bodies = {
     scam_report: {
       subject: 'Report: Scam / Fraud on Telegram',
-      body: [
-        `I am writing to report a scam incident that occurred on Telegram.${answers.scammer ? ` The scammer's username is ${answers.scammer}.` : ''}`,
-        `What happened: ${answers.reason || 'A user attempted to defraud me using deceptive tactics.'}`,
-        isLong ? `I have attached screenshots of the conversation for your review. This experience has left me concerned for other users who may be targeted by the same individual. I hope my report helps prevent further scams on the platform.` : '',
-        isLong ? `I am happy to provide any additional evidence you may require. Please let me know if there is anything else I can do to help with your investigation.` : ''
-      ].filter(Boolean).join('\n\n')
+      body: `I am writing to report a scam incident that occurred on Telegram.${answers.scammer ? ` The scammer's username is ${answers.scammer}.` : ''}\n\nWhat happened: ${answers.reason || 'A user attempted to defraud me using deceptive tactics.'}${isLong ? '\n\nI have attached screenshots of the conversation for your review. This experience has left me concerned for other users who may be targeted by the same individual. I hope my report helps prevent further scams on the platform. I am happy to provide any additional evidence you may require.' : ''}`
     },
     hacked_report: {
       subject: 'URGENT: Account Compromised',
-      body: [
-        `My Telegram account${answers.username ? ` (${answers.username})` : ''} has been compromised.${answers.when ? ` This occurred ${answers.when.toLowerCase()}.` : ''}`,
-        `I am concerned that the attacker may be using my account to scam or harm my contacts. I have already attempted to terminate all other sessions from my device.`,
-        isLong ? `I have changed the password on my linked email account as an additional precaution. Please help me regain full control of my account as soon as possible. I am ready to provide any verification you may need.` : ''
-      ].filter(Boolean).join('\n\n')
+      body: `My Telegram account${answers.username ? ` (${answers.username})` : ''} has been compromised.\n\nI am concerned that the attacker may be using my account to scam or harm my contacts. I have already attempted to terminate all other sessions from my device.${isLong ? '\n\nI have changed the password on my linked email account as an additional precaution. Please help me regain full control of my account as soon as possible. I am ready to provide any verification you may need.' : ''}`
     },
     doxx_report: {
       subject: 'URGENT: Doxxing Report',
-      body: [
-        `I am writing to urgently report that my personal information is being shared without my consent on Telegram.${answers.leaked ? ` What was exposed: ${answers.leaked}.` : ''}`,
-        `This is a serious privacy violation and is causing me significant distress. I have attached screenshots of the offending content along with the username of the responsible account.`,
-        isLong ? `This behavior violates Telegram's Terms of Service and, in many jurisdictions, applicable privacy and harassment laws. I kindly request that the offending account and content be removed as soon as possible. I am ready to provide any additional information or verification.` : ''
-      ].filter(Boolean).join('\n\n')
+      body: `I am writing to urgently report that my personal information is being shared without my consent on Telegram.${answers.leaked ? ` What was exposed: ${answers.leaked}.` : ''}\n\nThis is a serious privacy violation and is causing me significant distress. I have attached screenshots of the offending content along with the username of the responsible account.${isLong ? '\n\nThis behavior violates Telegram\'s Terms of Service and, in many jurisdictions, applicable privacy and harassment laws. I kindly request that the offending account and content be removed as soon as possible. I am ready to provide any additional information or verification.' : ''}`
     },
     ban_appeal: {
       subject: 'Appeal: Account Restriction',
-      body: [
-        `I am writing to respectfully appeal the recent restriction placed on my Telegram account${answers.username ? ` (${answers.username})` : ''}.`,
-        `I believe this restriction was applied in error. I have always used Telegram in full compliance with the Terms of Service and have never engaged in spam, harassment, or any abusive behavior.`,
-        answers.reason && answers.reason !== 'Unknown' ? `The reason mentioned was: "${answers.reason}".` : '',
-        isLong ? `I rely on Telegram daily for both personal and professional communication, and losing access has caused significant inconvenience. I kindly request that you review my case and lift the restriction. I am willing to provide any additional verification you may need.` : ''
-      ].filter(Boolean).join('\n\n')
+      body: `I am writing to respectfully appeal the recent restriction placed on my Telegram account${answers.username ? ` (${answers.username})` : ''}.\n\nI believe this restriction was applied in error. I have always used Telegram in full compliance with the Terms of Service and have never engaged in spam, harassment, or any abusive behavior.${isLong ? '\n\nI rely on Telegram daily for both personal and professional communication, and losing access has caused significant inconvenience. I kindly request that you review my case and lift the restriction. I am willing to provide any additional verification you may need.' : ''}`
     },
     nft_scam_report: {
       subject: 'Report: NFT Scam / Wallet Drain',
-      body: [
-        `I am writing to report an NFT scam incident on Telegram.${answers.scammer ? ` The scammer / fake project is ${answers.scammer}.` : ''}`,
-        answers.lost ? `What was lost: ${answers.lost}.` : '',
-        answers.wallet ? `My affected wallet address: ${answers.wallet}.` : '',
-        `The scammer used a phishing page that drained my wallet / attempted to steal my assets. I have already revoked all approvals and moved remaining funds to a fresh wallet.`,
-        isLong ? `I am attaching screenshots of the phishing page and the scammer's messages. The blockchain transactions are irreversible, but I hope reporting this helps prevent others from being victimized. I have also reported this to @notoscam.` : ''
-      ].filter(Boolean).join('\n\n')
+      body: `I am writing to report an NFT scam incident on Telegram.${answers.scammer ? ` The scammer / fake project is ${answers.scammer}.` : ''}${answers.wallet ? `\n\nMy affected wallet address: ${answers.wallet}.` : ''}\n\nThe scammer used a phishing page that drained my wallet / attempted to steal my assets. I have already revoked all approvals and moved remaining funds to a fresh wallet.${isLong ? '\n\nI am attaching screenshots of the phishing page and the scammer\'s messages. The blockchain transactions are irreversible, but I hope reporting this helps prevent others from being victimized. I have also reported this to @notoscam.' : ''}`
     },
     premium_support: {
       subject: 'Premium / Billing Support Request',
-      body: [
-        `I am writing regarding a Telegram Premium / Stars billing issue.`,
-        `Issue: ${answers.issue || 'I was charged incorrectly or the service I paid for is not working as expected.'}`,
-        isLong ? `I have already attempted to resolve this through the payment provider without success. I would like to understand the correct process for refunds or corrections. I have documentation of the payment and would be happy to provide it.` : ''
-      ].filter(Boolean).join('\n\n')
+      body: `I am writing regarding a Telegram Premium / Stars billing issue.\n\nIssue: ${answers.issue || 'I was charged incorrectly or the service I paid for is not working as expected.'}${isLong ? '\n\nI have already attempted to resolve this through the payment provider without success. I would like to understand the correct process for refunds or corrections. I have documentation of the payment and would be happy to provide it.' : ''}`
     }
   };
 
   const tmpl = bodies[draftType] || bodies.scam_report;
   const recipientMap = {
-    scam_report: 'abuse@telegram.org',
-    hacked_report: 'recover@telegram.org',
-    doxx_report: 'abuse@telegram.org',
-    ban_appeal: 'recover@telegram.org',
-    nft_scam_report: 'abuse@telegram.org',
-    premium_support: 'premium@telegram.org'
+    scam_report: 'abuse@telegram.org', hacked_report: 'recover@telegram.org',
+    doxx_report: 'abuse@telegram.org', ban_appeal: 'recover@telegram.org',
+    nft_scam_report: 'abuse@telegram.org', premium_support: 'premium@telegram.org'
   };
-
   return `To: ${recipientMap[draftType] || 'support@telegram.org'}\nSubject: ${tmpl.subject}\n\n${opener}\n\n${tmpl.body}\n\n${closer}\n\n${signoff}\n${sign}${contact}`;
 }
 
+const draftModal = document.getElementById('draft-modal');
+const draftText = document.getElementById('draft-text');
 function openDraftModal(text) {
   draftText.textContent = text;
   draftModal.classList.add('show');
@@ -2439,7 +2532,6 @@ function openDraftModal(text) {
   SoundFX.tick(880, 0.06, 0.035);
 }
 function closeDraft() { draftModal.classList.remove('show'); }
-
 document.getElementById('draft-close').addEventListener('click', closeDraft);
 document.getElementById('draft-close-x').addEventListener('click', closeDraft);
 draftModal.addEventListener('click', (e) => { if (e.target === draftModal) closeDraft(); });
@@ -2463,44 +2555,39 @@ document.getElementById('draft-copy').addEventListener('click', async () => {
   }
 });
 
-/* ================================================================
-   DRAFT FLOW (from "Do you need a text?" button)
-   ================================================================ */
 async function runDraftFlow() {
   if (!currentIntent || !currentIntent.draftType) return;
   hideSpeech();
   const flow = DRAFT_FLOWS[currentIntent.draftType] || [];
-  const answers = await runWizardFlow(flow);
+  const answers = await runQuestionFlow_Draft(flow);
   if (!answers) return;
   const text = generateDraft(currentIntent.draftType, answers);
   openDraftModal(text);
 }
 
-/* Generic wizard runner for draft flow */
-function runWizardFlow(questions) {
+function runQuestionFlow_Draft(questions) {
   return new Promise((resolve) => {
+    qFlowResolve = resolve;
     const answers = {};
     let index = 0;
-
-    wizardModal.classList.add('show');
+    questionPanel.classList.add('show');
     haptic('light');
-
     function render() {
       if (index >= questions.length) {
-        wizardModal.classList.remove('show');
+        questionPanel.classList.remove('show');
         resolve(answers);
+        qFlowResolve = null;
         return;
       }
       const q = questions[index];
-      wizProgress.style.width = `${(index / questions.length) * 100}%`;
-      wizCount.textContent = `${index + 1}/${questions.length}`;
-      wizQuestion.textContent = q.q;
-      wizOptions.innerHTML = '';
-
+      qProgressFill.style.width = `${(index / questions.length) * 100}%`;
+      qCount.textContent = `${index + 1}/${questions.length}`;
+      qQuestion.textContent = q.q;
+      qOptions.innerHTML = '';
       if (q.type === 'choice' && q.options) {
         q.options.forEach(opt => {
           const btn = document.createElement('button');
-          btn.className = 'wiz-option';
+          btn.className = 'q-option';
           btn.innerHTML = `<span class="opt-emoji">${opt.emoji || '·'}</span><span>${opt.text}</span>`;
           btn.onclick = () => {
             answers[q.id] = opt.text;
@@ -2508,17 +2595,17 @@ function runWizardFlow(questions) {
             index++;
             render();
           };
-          wizOptions.appendChild(btn);
+          qOptions.appendChild(btn);
         });
       } else {
         const inputEl = document.createElement('input');
-        inputEl.className = 'wiz-input';
+        inputEl.className = 'q-input';
         inputEl.type = 'text';
         inputEl.placeholder = q.placeholder || '';
         inputEl.value = answers[q.id] || '';
-        wizOptions.appendChild(inputEl);
+        qOptions.appendChild(inputEl);
         const nextBtn = document.createElement('button');
-        nextBtn.className = 'wiz-next';
+        nextBtn.className = 'q-next';
         nextBtn.textContent = index === questions.length - 1 ? 'Generate ✨' : 'Next →';
         nextBtn.onclick = () => {
           answers[q.id] = inputEl.value.trim();
@@ -2527,7 +2614,7 @@ function runWizardFlow(questions) {
           render();
         };
         inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') nextBtn.click(); });
-        wizOptions.appendChild(nextBtn);
+        qOptions.appendChild(nextBtn);
         setTimeout(() => inputEl.focus(), 100);
       }
     }
@@ -2535,23 +2622,304 @@ function runWizardFlow(questions) {
   });
 }
 
-speechDraftBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  runDraftFlow();
+/* ================================================================
+   SETTINGS PANEL
+   ================================================================ */
+settingsBtn.addEventListener('click', () => {
+  const opening = !settingsPanel.classList.contains('show');
+  settingsPanel.classList.toggle('show', opening);
+  if (opening) { haptic('light'); SoundFX.tick(640, 0.04); }
+});
+document.addEventListener('click', (e) => {
+  if (!settingsPanel.classList.contains('show')) return;
+  if (e.target.closest('#settings-panel') || e.target.closest('#settings-btn')) return;
+  settingsPanel.classList.remove('show');
 });
 
-/* Close wizard without completing → resolve null */
-const originalWizClose = document.getElementById('wiz-close');
-originalWizClose.addEventListener('click', () => {
-  wizardModal.classList.remove('show');
-  // Note: promises will still resolve later via timeout or never — this is a simple cancel
-  // For simplicity, we just close the UI. The promise resolve in each flow still fires
+/* Think level pills */
+document.querySelectorAll('#think-pills .settings-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#think-pills .settings-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    settings.thinkLevel = pill.dataset.val;
+    saveSettings();
+    SoundFX.tick(660, 0.04);
+    haptic('light');
+  });
 });
+/* Style pills */
+document.querySelectorAll('#style-pills .settings-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#style-pills .settings-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    settings.interfaceStyle = pill.dataset.val;
+    saveSettings();
+    applyInterfaceStyle();
+    SoundFX.tick(660, 0.04);
+    haptic('light');
+  });
+});
+/* Memory pills */
+document.querySelectorAll('#memory-pills .settings-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#memory-pills .settings-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    settings.memoryMode = pill.dataset.val;
+    saveSettings();
+    SoundFX.tick(660, 0.04);
+    haptic('light');
+  });
+});
+/* Agent toggle */
+const agentToggle = document.getElementById('agent-toggle');
+agentToggle.addEventListener('click', () => {
+  settings.agentMode = !settings.agentMode;
+  agentToggle.classList.toggle('on', settings.agentMode);
+  shell.classList.toggle('agent-active', settings.agentMode);
+  agentBadge.classList.toggle('show', settings.agentMode);
+  saveSettings();
+  haptic('medium');
+  SoundFX.tick(settings.agentMode ? 880 : 440, 0.06);
+
+  if (settings.agentMode) {
+    /* Agent mode ON — duck comes to center, becomes a bit bigger, flies */
+    st.targetDuckPosX = 0;
+    st.targetDuckPosY = 0.2;
+    st.targetScale = 1.1;
+    settingsPanel.classList.remove('show');
+    input.placeholder = '🤖 Agent mode: try "open settings" or "show @durov"';
+    showSpeech('🤖 <b>Agent mode ON</b><br>I can now fly around, open settings, and show profiles for you!<br>Try: <span class="hl-key">open settings</span> · <span class="hl-key">show @durov</span> · <span class="hl-key">fly up</span>', 'support', 5000);
+  } else {
+    st.targetDuckPosX = 0;
+    st.targetDuckPosY = -0.1;
+    st.targetScale = 1;
+    input.placeholder = 'Ask about your Telegram account…';
+    hideSpeech();
+  }
+});
+function restoreSettingsUI() {
+  document.querySelectorAll('#think-pills .settings-pill').forEach(p => p.classList.toggle('active', p.dataset.val === settings.thinkLevel));
+  document.querySelectorAll('#style-pills .settings-pill').forEach(p => p.classList.toggle('active', p.dataset.val === settings.interfaceStyle));
+  document.querySelectorAll('#memory-pills .settings-pill').forEach(p => p.classList.toggle('active', p.dataset.val === settings.memoryMode));
+  agentToggle.classList.toggle('on', settings.agentMode);
+  shell.classList.toggle('agent-active', settings.agentMode);
+  agentBadge.classList.toggle('show', settings.agentMode);
+  updateMemoryCount();
+}
+function applyInterfaceStyle() {
+  const body = document.body;
+  body.style.background = '';
+  if (settings.interfaceStyle === 'midnight') {
+    body.style.background = 'radial-gradient(ellipse at 50% 30%, #0d1420 0%, #05070a 80%)';
+    document.querySelector('body::before');
+  } else if (settings.interfaceStyle === 'aurora') {
+    body.style.background = 'radial-gradient(ellipse at 30% 20%, #1a2d3d 0%, #0a1020 60%, #05070a 100%)';
+  }
+}
+function updateMemoryCount() {
+  const el = document.getElementById('memory-count');
+  const n = (settings.memories || []).length;
+  el.textContent = `${n} ${n === 1 ? 'memory' : 'memories'} stored`;
+}
+
+/* ================================================================
+   MEMORY MODE
+   ================================================================ */
+function addMemory(key, value) {
+  if (!settings.memories) settings.memories = [];
+  settings.memories.push({ key, value, ts: Date.now() });
+  if (settings.memories.length > 50) settings.memories = settings.memories.slice(-50);
+  saveSettings();
+  updateMemoryCount();
+}
+
+const memModal = document.getElementById('mem-modal');
+const memList = document.getElementById('mem-list');
+const memInput = document.getElementById('mem-input');
+
+function renderMemories() {
+  const list = settings.memories || [];
+  if (list.length === 0) {
+    memList.innerHTML = `<div class="mem-empty">No memories yet.<br>Ask a question and I'll remember important details ✨</div>`;
+    return;
+  }
+  memList.innerHTML = '';
+  [...list].reverse().forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'mem-item';
+    el.innerHTML = `<span class="mem-key">${m.key}</span>: ${m.value}`;
+    memList.appendChild(el);
+  });
+}
+document.getElementById('open-memories').addEventListener('click', () => {
+  renderMemories();
+  memModal.classList.add('show');
+  settingsPanel.classList.remove('show');
+});
+document.getElementById('mem-close').addEventListener('click', () => memModal.classList.remove('show'));
+memModal.addEventListener('click', (e) => { if (e.target === memModal) memModal.classList.remove('show'); });
+
+document.getElementById('mem-add').addEventListener('click', () => {
+  const val = memInput.value.trim();
+  if (!val) return;
+  const idx = val.indexOf(':');
+  if (idx > 0) {
+    addMemory(val.slice(0, idx).trim(), val.slice(idx + 1).trim());
+  } else {
+    addMemory('Note', val);
+  }
+  memInput.value = '';
+  renderMemories();
+  SoundFX.tick(880, 0.06);
+});
+
+/* ================================================================
+   PROFILE MODAL (agent mode)
+   ================================================================ */
+const profileModal = document.getElementById('profile-modal');
+const profileName = document.getElementById('profile-name');
+const profileUsername = document.getElementById('profile-username');
+const profileAvatarWrap = document.getElementById('profile-avatar-wrap');
+
+function showProfile(username) {
+  profileModal.classList.add('show');
+  profileName.textContent = username.replace('@', '').charAt(0).toUpperCase() + username.replace('@', '').slice(1);
+  profileUsername.textContent = username.startsWith('@') ? username : '@' + username;
+  profileAvatarWrap.textContent = username.replace('@', '').charAt(0).toUpperCase();
+  haptic('success');
+  SoundFX.tick(880, 0.06);
+}
+document.getElementById('profile-close').addEventListener('click', () => profileModal.classList.remove('show'));
+profileModal.addEventListener('click', (e) => { if (e.target === profileModal) profileModal.classList.remove('show'); });
+document.getElementById('profile-message').addEventListener('click', () => {
+  profileModal.classList.remove('show');
+  input.value = 'Hello 👋';
+  input.focus();
+});
+document.getElementById('profile-open').addEventListener('click', () => {
+  profileModal.classList.remove('show');
+  showSpeech('📂 <b>Chat opened</b> — this is a demo mini app, so I can\'t open real chats. But you can message the profile by sending them a message in the real Telegram app! 💬', 'support', 4000);
+});
+
+/* ================================================================
+   AGENT VISUAL ACTION (fly duck, then click)
+   ================================================================ */
+async function agentFlyTo(targetEl) {
+  if (!targetEl) return;
+  const stageRect = stage.getBoundingClientRect();
+  const tRect = targetEl.getBoundingClientRect();
+  /* Convert screen coords to stage-relative */
+  const targetScreenX = tRect.left + tRect.width / 2;
+  const targetScreenY = tRect.top + tRect.height / 2;
+  const stageCenterX = stageRect.left + stageRect.width / 2;
+  const stageCenterY = stageRect.top + stageRect.height / 2;
+
+  /* Move duck toward the target horizontally, lift a bit vertically */
+  st.targetDuckPosX = (targetScreenX - stageCenterX) / stageRect.width * 3;
+  st.targetDuckPosY = 0.6;
+  st.mode = 'agent-action';
+
+  /* Show cursor at target */
+  agentCursor.style.left = targetScreenX + 'px';
+  agentCursor.style.top = targetScreenY + 'px';
+  agentCursor.classList.add('show');
+
+  await wait(700);
+
+  /* Pulse click */
+  agentCursor.classList.add('pulse');
+  SoundFX.tick(880, 0.08);
+  haptic('medium');
+
+  await wait(500);
+  agentCursor.classList.remove('pulse', 'show');
+
+  /* Return duck */
+  st.targetDuckPosX = 0;
+  st.targetDuckPosY = 0.2;
+  st.mode = 'idle';
+}
+
+/* ================================================================
+   AGENT MODE COMMAND HANDLER
+   ================================================================ */
+async function handleAgentCommand(text) {
+  const lower = text.toLowerCase().trim();
+
+  /* open settings */
+  if (/\b(open|show)\s+settings\b/.test(lower)) {
+    showSpeech('🤖 <b>Opening settings…</b>', 'support', 1500);
+    await wait(500);
+    await agentFlyTo(settingsBtn);
+    settingsPanel.classList.add('show');
+    return true;
+  }
+  /* close settings */
+  if (/\b(close|hide)\s+settings\b/.test(lower)) {
+    settingsPanel.classList.remove('show');
+    showSpeech('✅ Settings closed', 'support', 1500);
+    return true;
+  }
+  /* show profile */
+  const profileMatch = lower.match(/show\s+(?:the\s+)?(?:profile\s+(?:of\s+)?)?(@?\w{3,})/);
+  if (profileMatch) {
+    const uname = profileMatch[1].startsWith('@') ? profileMatch[1] : '@' + profileMatch[1];
+    showSpeech(`👤 <b>Showing profile ${uname}…</b>`, 'support', 1500);
+    await wait(500);
+    await agentFlyTo(null);
+    showProfile(uname);
+    return true;
+  }
+  /* fly */
+  const flyMatch = lower.match(/\b(fly|go|move)\s+(up|down|left|right)\b/);
+  if (flyMatch) {
+    const dir = flyMatch[2];
+    if (dir === 'up')    { st.targetDuckPosY = 0.9; }
+    if (dir === 'down')  { st.targetDuckPosY = -0.4; }
+    if (dir === 'left')  { st.targetDuckPosX = -1.0; }
+    if (dir === 'right') { st.targetDuckPosX = 1.0; }
+    showSpeech(`🦆 Flying ${dir}! 🛫`, 'support', 1500);
+    return true;
+  }
+  /* bigger / smaller */
+  if (/\b(bigger|larger|grow|big)\b/.test(lower)) {
+    st.targetScale = Math.min(2, st.scale + 0.3);
+    showSpeech('🦆 Making myself bigger! 📈', 'support', 1500);
+    return true;
+  }
+  if (/\b(smaller|shrink|tiny|small)\b/.test(lower)) {
+    st.targetScale = Math.max(0.4, st.scale - 0.3);
+    showSpeech('🦆 Making myself smaller! 📉', 'support', 1500);
+    return true;
+  }
+  /* reset */
+  if (/\b(reset|center|come back|return)\b/.test(lower)) {
+    st.targetDuckPosX = 0;
+    st.targetDuckPosY = 0.2;
+    st.targetScale = 1.1;
+    showSpeech('✅ Coming back to center 🦆', 'support', 1500);
+    return true;
+  }
+  return false;
+}
 
 /* ================================================================
    SUBMIT FLOW
    ================================================================ */
 let busy = false;
+
+function getReadTime(intent, text) {
+  const base = Math.max(2400, Math.min(9000, 1400 + intent.answer.length * 20));
+  if (settings.thinkLevel === 'fast') return base * 0.6;
+  if (settings.thinkLevel === 'slow') return base * 1.5;
+  return base;
+}
+function getThinkDelay(text) {
+  if (settings.thinkLevel === 'fast') return 400;
+  if (settings.thinkLevel === 'slow') return 1400;
+  if (settings.thinkLevel === 'auto') return 500 + Math.min(1200, text.length * 15);
+  return 680;
+}
 
 async function submit() {
   if (busy) return;
@@ -2566,13 +2934,23 @@ async function submit() {
 
   busy = true;
   sendBtn.disabled = true;
-
   shell.classList.remove('ripple');
   void shell.offsetWidth;
   shell.classList.add('ripple');
 
   input.blur();
   input.value = '';
+
+  /* Agent mode command check first */
+  if (settings.agentMode) {
+    const handled = await handleAgentCommand(text);
+    if (handled) {
+      busy = false;
+      sendBtn.disabled = false;
+      return;
+    }
+  }
+
   st.mode = 'think';
   st.targetDragY = 0;
   st.targetDragX = 0;
@@ -2580,10 +2958,13 @@ async function submit() {
   hideSpeech();
   closeReader();
 
-  /* Enable thinking GIF in send button */
   setThinking(true);
 
-  /* Analyze words */
+  /* Save as memory in auto mode */
+  if (settings.memoryMode === 'auto' && text.length > 8) {
+    addMemory('Asked', text.slice(0, 50) + (text.length > 50 ? '…' : ''));
+  }
+
   const rawWords = text.split(/\s+/).filter(Boolean).slice(0, 20);
   const words = rawWords.map(raw => {
     const cls = classifyWord(raw);
@@ -2591,12 +2972,11 @@ async function submit() {
   });
 
   const intent = resolveSmartIntent(text);
+  const thinkDelay = getThinkDelay(text);
 
-  /* Circle words */
-  await wait(680);
+  await wait(thinkDelay);
   await showWords(words);
 
-  /* If this intent needs questions, ask them */
   const flowKey = NEEDS_QUESTIONS[intent.id];
   let answers = null;
 
@@ -2607,25 +2987,43 @@ async function submit() {
     answers = await runQuestionFlow(flowKey);
   }
 
-  /* Back to duck animation */
   st.mode = 'talk';
   clearOverlays();
   await wait(300);
 
-  /* Show the answer */
-  showSpeech(intent.answer, intent.id);
+  const readTime = getReadTime(intent, text);
+  showSpeech(intent.answer, intent.id, readTime);
   haptic('success');
-
-  /* Restore send button icon */
   setThinking(false);
 
-  /* Read time — smaller now since answer stays visible */
-  const readTime = Math.max(2400, Math.min(7000, 1400 + intent.answer.length * 20));
+  /* Save answer memory */
+  if (settings.memoryMode === 'auto' && intent.id !== 'fallback') {
+    addMemory('Topic', intent.id);
+  }
+
   await wait(readTime);
 
   st.mode = 'idle';
   busy = false;
   sendBtn.disabled = false;
+}
+
+function setThinking(active) {
+  sendBtn.classList.toggle('thinking', active);
+}
+
+/* ================================================================
+   GREETING ON LOAD
+   ================================================================ */
+async function waveHello() {
+  st.mode = 'wave';
+  const name = tg?.initDataUnsafe?.user?.first_name || 'friend';
+  const html = `👋 <b>Hey ${name}!</b> 🦆<br><br>I'm your Telegram assistant duck! I can help with <span class="hl-key">scams</span>, <span class="hl-key">hacks</span>, <span class="hl-key">NFTs</span>, <span class="hl-key">bans</span>, and more.<br><br>What can I do for you?`;
+  await wait(800);
+  showSpeech(html, 'support', 6500);
+  haptic('light');
+  await wait(3000);
+  if (st.mode === 'wave') st.mode = 'idle';
 }
 
 /* ================================================================
@@ -2644,25 +3042,21 @@ input.addEventListener('focus', () => {
   st.mode = 'follow';
   updateCaret();
 });
-
 input.addEventListener('blur', () => {
   if (busy) return;
   if (st.mode === 'follow') st.mode = 'idle';
 });
-
 input.addEventListener('click', () => {
   if (busy) return;
   st.mode = 'follow';
   updateCaret();
 });
-
 input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     submit();
   }
 });
-
 document.addEventListener('selectionchange', () => {
   if (busy) return;
   if (document.activeElement === input) {
@@ -2670,25 +3064,19 @@ document.addEventListener('selectionchange', () => {
     updateCaret();
   }
 });
-
 sendBtn.addEventListener('click', submit);
 
-varBtn.addEventListener('click', () => {
-  st.variantTarget = st.variantTarget > 0.5 ? 0 : 1;
-  const durov = st.variantTarget > 0.5;
-  varBtn.textContent = durov ? '🧢' : '🦆';
-  varBtn.classList.toggle('active', durov);
-  haptic('light');
-  SoundFX.tick(640, 0.045);
-  varBtn.animate(
-    [{ transform: 'scale(1)' }, { transform: 'scale(0.82)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }],
-    { duration: 380, easing: 'cubic-bezier(.2,.9,.3,1.4)' }
-  );
-});
-
+/* ================================================================
+   INIT
+   ================================================================ */
 window.addEventListener('load', () => {
+  restoreSettingsUI();
+  applyInterfaceStyle();
+  updateMemoryCount();
   setTimeout(() => input.focus(), 250);
   setTimeout(() => { dragHint.style.opacity = '0'; }, 6000);
+  /* Wave hello after a beat */
+  setTimeout(waveHello, 500);
 });
 </script>
 </body>
