@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pulse Terminal — Institutional Price Action</title>
+    <title>CRYPT UP — Pepe Card Game V17</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter & JetBrains Mono -->
@@ -596,7 +596,7 @@
         .pepe-hidden-card.flipped .pepe-card-inner { transform:rotateY(180deg); }
         .pepe-seat.revealed .pepe-card-fan { opacity:1; filter:none; }
         .pepe-hidden-card.picked {
-          z-index:30 !important; transform:translateY(-43px) scale(1.58) rotate(0deg) !important;
+          z-index:30 !important; transform:translateY(-24px) scale(1.08) rotate(0deg) !important;
           filter:drop-shadow(0 0 14px rgba(255,255,255,.3)) drop-shadow(0 12px 15px rgba(0,0,0,.5));
         }
         .pepe-hidden-card.picked .pepe-card-front { box-shadow:0 0 24px rgba(94,234,142,.74),0 0 48px rgba(94,234,142,.28),inset 0 0 0 2px rgba(255,255,255,.22); }
@@ -617,10 +617,530 @@
           .pepe-card-value { font-size:9px; }
           .pepe-card-suit { font-size:14px; }
           .pepe-card-front.is-tuz .pepe-card-value { font-size:10px; }
-          .pepe-hidden-card.picked { transform:translateY(-34px) scale(1.42) rotate(0deg) !important; }
+          .pepe-hidden-card.picked { transform:translateY(-20px) scale(1.06) rotate(0deg) !important; }
         }
 
-    </style>
+    
+
+        /* CRYPT UP room composition: room backplate, seated players, table foreground, swinging lamp. */
+        .pepe-table-stage {
+          width:100%; min-height:0; flex:1 1 auto; display:flex; align-items:center; justify-content:center;
+          padding:3px 0 7px; overflow:visible;
+        }
+        .pepe-room-scene {
+          position:relative; isolation:isolate; width:min(100%,760px,calc(48vh * 1.52)); aspect-ratio:608 / 400;
+          flex:0 1 auto; overflow:visible; transform-origin:50% 55%;
+          filter:drop-shadow(0 18px 26px rgba(0,0,0,.38));
+          transition:opacity .5s ease,filter .5s ease,transform .7s cubic-bezier(.2,.8,.2,1);
+        }
+        .pepe-room-art,.pepe-table-art,.pepe-lamp-art {
+          position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain;
+          user-select:none; -webkit-user-drag:none; pointer-events:none;
+        }
+        .pepe-room-art { z-index:0; }
+        .pepe-lamp-rig { position:absolute; z-index:5; inset:0; transform-origin:50% 1%; animation:cryptLampSway 4.8s ease-in-out infinite; pointer-events:none; }
+        .pepe-lamp-art { z-index:2; transform-origin:50% 1%; filter:drop-shadow(0 0 7px rgba(255,184,77,.22)); transition:filter .25s ease; }
+        .pepe-lamp-cone {
+          position:absolute; z-index:1; left:50%; top:14%; width:68%; height:76%;
+          transform:translateX(-50%); opacity:.78; pointer-events:none; mix-blend-mode:screen;
+          background:
+            radial-gradient(ellipse at 50% 5%,rgba(255,219,142,.34) 0%,rgba(255,192,98,.16) 28%,transparent 72%),
+            linear-gradient(180deg,rgba(255,190,94,.24),rgba(255,179,77,.08) 42%,transparent 100%);
+          clip-path:polygon(43% 0,57% 0,100% 100%,0 100%); filter:blur(7px);
+          transition:opacity .35s ease,filter .35s ease;
+        }
+        .pepe-lamp-rig.lamp-off .pepe-lamp-cone { opacity:0; filter:blur(14px); }
+        .pepe-lamp-rig.lamp-off .pepe-lamp-art { filter:brightness(.58) saturate(.72) drop-shadow(0 0 0 transparent); }
+        .pepe-lamp-rig.lamp-impact { animation:cryptLampImpact 1.35s cubic-bezier(.18,.8,.22,1) both; }
+        .pepe-lamp-rig.lamp-impact .pepe-lamp-cone { animation:cryptLampFlash .72s ease-out both; }
+        .pepe-players {
+          position:absolute; z-index:2; inset:0; display:block; width:100%; min-height:0; margin:0;
+          pointer-events:none; overflow:visible;
+        }
+        .pepe-seat {
+          position:absolute; left:var(--seat-x); top:var(--seat-y); width:var(--seat-w); height:var(--seat-h);
+          min-height:0; padding:0; display:block; border:1px solid transparent !important;
+          border-radius:20px !important; color:#fff; background:transparent !important;
+          cursor:pointer; pointer-events:auto; transform-origin:50% 88%;
+          transition:transform .22s ease,filter .2s ease,opacity .24s ease;
+          animation:pepeSeatLand .72s cubic-bezier(.18,.82,.22,1) both;
+          animation-delay:var(--seat-delay,0ms);
+        }
+        .pepe-seat[data-seat-slot="0"] { --seat-x:4%; --seat-y:26%; --seat-w:22%; --seat-h:49%; z-index:2; }
+        .pepe-seat[data-seat-slot="1"] { --seat-x:20%; --seat-y:18%; --seat-w:21%; --seat-h:48%; z-index:1; }
+        .pepe-seat[data-seat-slot="2"] { --seat-x:39.5%; --seat-y:16%; --seat-w:21%; --seat-h:48%; z-index:1; }
+        .pepe-seat[data-seat-slot="3"] { --seat-x:59%; --seat-y:18%; --seat-w:21%; --seat-h:48%; z-index:1; }
+        .pepe-seat[data-seat-slot="4"] { --seat-x:74%; --seat-y:26%; --seat-w:22%; --seat-h:49%; z-index:2; }
+        .pepe-seat:hover:not(:disabled),.pepe-seat:focus-visible:not(:disabled) {
+          transform:translateY(-7px) scale(1.045); filter:brightness(1.12) drop-shadow(0 6px 10px rgba(151,255,181,.22)); outline:none;
+        }
+        .pepe-seat:disabled { cursor:default; }
+        .pepe-seat.departing { animation:pepeSeatLeave .52s ease forwards; pointer-events:none; }
+        .pepe-seat-label { position:absolute; top:0; left:50%; transform:translateX(-50%); white-space:nowrap; color:rgba(238,255,242,.72); font:900 clamp(6px,.7vw,8px) Inter,sans-serif; letter-spacing:.13em; text-shadow:0 2px 5px #06150e; }
+        .pepe-character-wrap { position:absolute; left:4%; right:4%; top:12%; bottom:7%; width:auto; height:auto; margin:0; display:flex; align-items:flex-end; justify-content:center; }
+        .pepe-character-shadow { position:absolute; left:18%; right:18%; bottom:1%; width:auto; height:9%; border-radius:50%; background:rgba(0,0,0,.45); filter:blur(5px); }
+        .pepe-character { position:relative; z-index:1; display:block; width:100%; height:100%; max-width:100%; object-fit:contain; object-position:center bottom; filter:drop-shadow(0 5px 6px rgba(0,0,0,.36)); animation:pepeIdle 2.6s ease-in-out infinite; }
+        .pepe-avatar-fallback { position:absolute; inset:18px 0 4px; display:none; place-items:center; color:#c4f2d0; font:900 11px Inter,sans-serif; letter-spacing:.16em; }
+        .pepe-character-wrap.asset-missing .pepe-avatar-fallback { display:grid; }
+        .pepe-card-fan { position:absolute; z-index:3; left:50%; top:8%; height:clamp(32px,5.8vw,52px); margin:0; transform:translateX(-50%); display:flex; align-items:center; justify-content:center; filter:drop-shadow(0 4px 4px rgba(0,0,0,.36)); }
+        .pepe-name { position:absolute; left:50%; bottom:0; transform:translateX(-50%); white-space:nowrap; color:#f1fff4; font:900 clamp(6px,.7vw,8px) Inter,sans-serif; letter-spacing:.12em; text-shadow:0 2px 5px #06150e; }
+        .pepe-reveal { z-index:7; top:47%; }
+        .pepe-table-art { z-index:4; top:8.5%; height:100%; width:100%; }
+        .pepe-scene-vignette { position:absolute; z-index:6; inset:0; pointer-events:none; opacity:0; border-radius:4%; background:radial-gradient(ellipse at 50% 48%,transparent 45%,rgba(0,0,0,.42) 100%); transition:opacity .55s ease; }
+        .pepe-room-scene.walking-away { opacity:0; transform:translateY(24px) scale(.965); filter:blur(5px) drop-shadow(0 18px 26px rgba(0,0,0,.38)); }
+        .pepe-room-scene.walking-away .pepe-lamp-rig { animation-play-state:paused; }
+        .pepe-room-scene.walking-away .pepe-scene-vignette { opacity:.8; }
+        .pepe-room-scene.walking-in { animation:cryptRoomArrive .86s cubic-bezier(.18,.82,.2,1) both; }
+        .pepe-room-scene.walking-in .pepe-scene-vignette { animation:cryptVignetteOut .9s ease both; }
+        .pepe-room-scene.room-arriving .pepe-seat { animation:pepeSeatLand .82s cubic-bezier(.18,.82,.22,1) both; }
+        @keyframes cryptLampSway { 0%,100%{transform:rotate(-1.15deg)} 50%{transform:rotate(1.15deg)} }
+        @keyframes cryptLampImpact { 0%{transform:rotate(0)} 12%{transform:rotate(7deg)} 24%{transform:rotate(-6deg)} 38%{transform:rotate(4.5deg)} 54%{transform:rotate(-3deg)} 72%{transform:rotate(1.7deg)} 86%{transform:rotate(-.8deg)} 100%{transform:rotate(0)} }
+        @keyframes cryptLampFlash { 0%{opacity:.75;filter:blur(7px)} 15%{opacity:1;filter:blur(3px)} 100%{opacity:.78;filter:blur(7px)} }
+        @keyframes cryptRoomArrive { 0%{opacity:0;transform:translateY(24px) scale(.965);filter:blur(5px)} 68%{opacity:1;transform:translateY(-3px) scale(1.008);filter:blur(0)} 100%{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 18px 26px rgba(0,0,0,.38))} }
+        @keyframes cryptVignetteOut { from{opacity:.75} to{opacity:0} }
+        @keyframes pepeSeatLeave {
+          0% { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+          18% { opacity:1; transform:translateY(-13px) scale(1.035); filter:blur(0); }
+          38% { opacity:1; transform:translateY(-5px) scale(1); filter:blur(0); }
+          100% { opacity:0; transform:translateY(68px) scale(.78); filter:blur(3px); }
+        }
+        @media(max-width:720px) {
+          .pepe-table-stage { min-height:235px; padding:4px 0; }
+          .pepe-room-scene { width:min(100%,620px,calc(39vh * 1.52)); }
+          .pepe-seat-label,.pepe-name { font-size:6px; }
+          .pepe-card-fan { height:34px; top:9%; }
+          .pepe-hidden-card { width:25px; height:37px; margin:0 -4px; }
+          .pepe-hidden-card.picked { transform:translateY(-27px) scale(1.3) rotate(0deg) !important; }
+        }
+        @media(max-height:680px) {
+          .pepe-table-stage { min-height:195px; }
+          .pepe-room-scene { width:min(100%,calc(34vh * 1.52)); }
+        }
+
+
+
+        /* V11: refined room sizing, card-in-hand animation, and live scene layout editor. */
+        .pepe-room-art {
+          transform:translate(var(--room-x,0%),var(--room-y,0%)) scale(var(--room-scale,1));
+          transform-origin:50% 50%;
+        }
+        .pepe-table-art {
+          left:calc(50% + var(--table-x,0%)); right:auto; bottom:auto;
+          top:calc(11% + var(--table-y,8%)); width:100%; height:100%;
+          transform:translateX(-50%) scale(var(--table-scale,.88));
+          transform-origin:50% 50%;
+        }
+        .pepe-lamp-layout {
+          position:absolute; z-index:5; inset:0; pointer-events:none;
+          transform:translate(var(--lamp-x,0%),var(--lamp-y,-7%)) scale(var(--lamp-scale,.72));
+          transform-origin:50% 0%;
+        }
+        .pepe-lamp-rig { z-index:auto; }
+        .pepe-lamp-cone { top:12%; width:61%; height:70%; }
+        .pepe-players {
+          transform:translate(var(--pepes-x,0%),var(--pepes-y,0%)) scale(var(--pepes-scale,.96));
+          transform-origin:50% 52%;
+        }
+        /* The cards sit at Pepe chest/hand height, not above their heads. */
+        .pepe-card-fan {
+          top:48%; z-index:6; height:clamp(32px,5.8vw,52px);
+          transform:translateX(-50%); transform-origin:50% 85%;
+          animation:pepeHoldCards 2.35s ease-in-out infinite;
+        }
+        .pepe-card-fan::before,.pepe-card-fan::after {
+          content:""; position:absolute; z-index:5; bottom:0; width:14px; height:12px;
+          border:1px solid rgba(5,42,25,.72); border-radius:65% 45% 58% 46%;
+          background:linear-gradient(145deg,#8bdc75 0%,#3d9a4f 68%,#1d6939 100%);
+          box-shadow:0 2px 4px rgba(0,0,0,.28),inset 0 1px 1px rgba(255,255,255,.28);
+        }
+        .pepe-card-fan::before { left:-7px; transform:rotate(28deg); }
+        .pepe-card-fan::after { right:-7px; transform:rotate(-28deg); }
+        .pepe-hidden-card { z-index:2; }
+        .pepe-seat.pepe-card-trick .pepe-hidden-card:nth-child(1) {
+          animation:pepeCardTrickLeft 2.8s ease-in-out infinite;
+        }
+        .pepe-seat.pepe-card-trick .pepe-hidden-card:nth-child(2) {
+          animation:pepeCardTrickCenter 3.15s ease-in-out infinite .3s;
+        }
+        .pepe-seat.pepe-card-trick .pepe-hidden-card:nth-child(3) {
+          animation:pepeCardTrickRight 2.65s ease-in-out infinite .6s;
+        }
+        .pepe-seat.revealing .pepe-card-fan,
+        .pepe-seat.revealing .pepe-hidden-card { animation-play-state:paused !important; }
+        @keyframes pepeHoldCards {
+          0%,100% { transform:translateX(-50%) translateY(0) rotate(-1deg); }
+          50% { transform:translateX(-50%) translateY(-3px) rotate(1deg); }
+        }
+        @keyframes pepeCardTrickLeft {
+          0%,18%,100% { transform:rotate(-13deg) translateY(4px); }
+          35% { transform:rotate(-28deg) translateY(-13px) translateX(-5px); }
+          52% { transform:rotate(-8deg) translateY(-18px) translateX(-2px); }
+          70% { transform:rotate(-18deg) translateY(-7px); }
+        }
+        @keyframes pepeCardTrickCenter {
+          0%,25%,100% { transform:translateY(-2px) rotate(0); }
+          42% { transform:translateY(-19px) rotate(9deg); }
+          60% { transform:translateY(-9px) rotate(-5deg); }
+        }
+        @keyframes pepeCardTrickRight {
+          0%,22%,100% { transform:rotate(13deg) translateY(4px); }
+          40% { transform:rotate(28deg) translateY(-14px) translateX(5px); }
+          58% { transform:rotate(7deg) translateY(-21px) translateX(1px); }
+          77% { transform:rotate(18deg) translateY(-6px); }
+        }
+        /* Next table is a calm cross-fade, not a walk-away motion. */
+        .pepe-seat.departing { animation:pepeSeatFadeOut .42s ease forwards; pointer-events:none; }
+        .pepe-room-scene.walking-away {
+          opacity:0; transform:none; filter:blur(5px) drop-shadow(0 18px 26px rgba(0,0,0,.38));
+        }
+        .pepe-room-scene.walking-in { animation:cryptRoomFadeIn .62s ease both; }
+        @keyframes pepeSeatFadeOut { to { opacity:0; transform:scale(.94); filter:blur(2px); } }
+        @keyframes cryptRoomFadeIn { from {opacity:0;filter:blur(5px)} to {opacity:1;filter:drop-shadow(0 18px 26px rgba(0,0,0,.38))} }
+
+        .scene-layout-settings { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+        .scene-edit-open,.scene-editor-done,.scene-editor-actions button {
+          border:1px solid rgba(125,211,252,.25); border-radius:999px; color:#eaf5ff;
+          background:linear-gradient(135deg,rgba(37,99,235,.28),rgba(15,23,42,.85));
+          padding:10px 14px; font:850 9px Inter,sans-serif; letter-spacing:.1em; cursor:pointer;
+          box-shadow:0 5px 16px rgba(0,0,0,.22); transition:transform .18s ease,filter .18s ease;
+        }
+        .scene-edit-open:hover,.scene-editor-done:hover,.scene-editor-actions button:hover { transform:translateY(-1px); filter:brightness(1.18); }
+        .scene-editor-dock[hidden] { display:none !important; }
+        .scene-editor-dock {
+          position:fixed; z-index:850; right:14px; bottom:14px; width:min(340px,calc(100vw - 24px));
+          padding:15px; border:1px solid rgba(190,220,255,.2); border-radius:24px;
+          color:#edf4fb; background:linear-gradient(150deg,rgba(20,29,39,.97),rgba(6,11,17,.98));
+          box-shadow:0 22px 65px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07);
+          backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+        }
+        .scene-editor-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+        .scene-editor-head strong { display:block; color:#fff; font:900 11px Inter,sans-serif; letter-spacing:.16em; }
+        .scene-editor-head small { display:block; margin-top:4px; color:#9daebe; font:500 8px Inter,sans-serif; }
+        .scene-editor-done { padding:8px 12px; }
+        .scene-editor-field { display:block; margin:10px 0; color:#c2d1df; font:800 8px Inter,sans-serif; letter-spacing:.11em; }
+        .scene-editor-field span { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .scene-editor-field output { color:#7dd3fc; font:850 9px Inter,sans-serif; letter-spacing:0; }
+        .scene-editor-field select {
+          display:block; width:100%; margin-top:7px; padding:10px 12px; border:1px solid rgba(255,255,255,.13);
+          border-radius:13px; color:#f1f5f9; background:#182433; font:750 10px Inter,sans-serif; outline:none;
+        }
+        .scene-editor-field input[type=range] { width:100%; margin-top:8px; accent-color:#60a5fa; cursor:pointer; }
+        .scene-editor-actions { display:flex; gap:8px; margin-top:13px; }
+        .scene-editor-actions button { flex:1; padding:10px 8px; font-size:8px; }
+        #sceneEditCopy { border-color:rgba(74,222,128,.35); background:linear-gradient(135deg,rgba(21,128,61,.6),rgba(6,40,27,.95)); }
+        .scene-editor-status { min-height:14px; margin-top:9px; color:#95a6b7; font:600 8px/1.45 Inter,sans-serif; }
+        #pepeRoomScene.scene-editing { cursor:move; outline:2px dashed rgba(96,165,250,.82); outline-offset:4px; border-radius:12px; touch-action:none; }
+        #pepeRoomScene.scene-editing #pepePlayers,
+        #pepeRoomScene.scene-editing .pepe-table-art,
+        #pepeRoomScene.scene-editing .pepe-lamp-layout { pointer-events:none !important; }
+        @media(max-width:720px) {
+          .pepe-card-fan { top:47%; height:34px; }
+          .pepe-hidden-card { width:25px; height:37px; margin:0 -4px; }
+          .scene-editor-dock { left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom,0px)); width:auto; padding:12px; }
+        }
+
+
+        /* V12: restrained Pepe hover and five cinematic physical-card reveals. */
+        .pepe-seat:hover:not(:disabled),
+        .pepe-seat:focus-visible:not(:disabled) {
+          transform:scale(1.045) !important;
+          filter:none !important;
+          outline:none !important;
+          border-color:transparent !important;
+          background:transparent !important;
+          box-shadow:none !important;
+        }
+        .pepe-seat:focus-visible:not(:disabled) { outline:none !important; }
+        .pepe-hidden-card.reveal-active {
+          z-index:42 !important;
+          filter:drop-shadow(0 10px 15px rgba(0,0,0,.48));
+        }
+        .pepe-seat.revealing .pepe-hidden-card.reveal-drop-slide,
+        .pepe-seat.revealing .pepe-hidden-card.reveal-edge-bounce {
+          animation-play-state:running !important;
+        }
+        .pepe-flying-card {
+          position:absolute !important; z-index:18 !important; display:block !important;
+          margin:0 !important; flex:none !important; pointer-events:none !important;
+          transform-origin:50% 50%; overflow:visible !important;
+          box-shadow:0 13px 26px rgba(0,0,0,.5) !important;
+          will-change:transform,opacity,filter;
+        }
+        .pepe-flying-card .pepe-card-inner { transition:transform .72s cubic-bezier(.18,.82,.2,1); }
+        .pepe-flying-card.reveal-slow-flip .pepe-card-inner { transition-duration:1.75s; }
+        .pepe-flying-card.flipped .pepe-card-inner { transform:rotateY(180deg); }
+        .pepe-flying-card.reveal-drop-slide { animation:pepeCardTableDrop 1.38s cubic-bezier(.18,.82,.2,1) both; }
+        @keyframes pepeCardTableDrop {
+          0% { transform:translate(0,-5px) rotate(-5deg) scale(1.1); opacity:1; }
+          23% { transform:translate(10px,74px) rotate(22deg) scale(1.2); }
+          42% { transform:translate(29px,88px) rotate(12deg) scale(1.16); }
+          67% { transform:translate(46px,83px) rotate(7deg) scale(1.14); }
+          83% { transform:translate(53px,84px) rotate(5deg) scale(1.14); }
+          100% { transform:translate(57px,84px) rotate(4deg) scale(1.12); opacity:1; }
+        }
+        .pepe-flying-card.reveal-edge-bounce { animation:pepeCardEdgeBounce 2.55s cubic-bezier(.18,.82,.2,1) both; }
+        @keyframes pepeCardEdgeBounce {
+          0% { transform:translate(0,-6px) rotate(-5deg) scale(1.06); }
+          18% { transform:translate(14px,95px) rotate(72deg) scale(1.2); }
+          30% { transform:translate(17px,70px) rotate(112deg) scale(1.17); }
+          41% { transform:translate(18px,91px) rotate(83deg) scale(1.15); }
+          51% { transform:translate(19px,78px) rotate(96deg) scale(1.14); }
+          61% { transform:translate(20px,90px) rotate(88deg) scale(1.13); }
+          72% { transform:translate(21px,83px) rotate(92deg) scale(1.12); }
+          84% { transform:translate(22px,88px) rotate(89deg) scale(1.11); }
+          100% { transform:translate(22px,86px) rotate(90deg) scale(1.1); }
+        }
+        .pepe-room-scene.cinematic-zoom { transform:scale(1.075); transition:transform .9s cubic-bezier(.2,.8,.2,1); }
+        .pepe-room-scene.cinematic-zoom-out { transform:scale(1); transition:transform 1s cubic-bezier(.2,.8,.2,1); }
+        .pepe-flying-card.reveal-wrong-front { animation:pepeWrongCardLift .62s cubic-bezier(.2,.8,.2,1) both; }
+        @keyframes pepeWrongCardLift {
+          0% { transform:translate(0,0) rotate(0) scale(1); }
+          35% { transform:translate(-7px,-39px) rotate(-8deg) scale(1.32); }
+          100% { transform:translate(-9px,-33px) rotate(-7deg) scale(1.28); }
+        }
+        .pepe-flying-card.reveal-tuz-behind {
+          opacity:0; transform:translate(2px,4px) rotate(-4deg) scale(.9);
+          transition:transform .78s cubic-bezier(.18,.82,.2,1),opacity .45s ease;
+        }
+        .pepe-flying-card.reveal-tuz-behind.show {
+          opacity:1; transform:translate(29px,-18px) rotate(16deg) scale(1.18);
+        }
+        .pepe-screen-card {
+          position:fixed !important; z-index:100000 !important; margin:0 !important;
+          pointer-events:none !important; transform-origin:50% 50%;
+          box-shadow:0 22px 60px rgba(0,0,0,.68),0 0 0 1px rgba(255,255,255,.22) !important;
+          will-change:transform,opacity,filter;
+        }
+        .pepe-screen-card .pepe-card-inner { transition:transform 1.15s cubic-bezier(.2,.8,.2,1); }
+        .pepe-screen-card.flipped .pepe-card-inner { transform:rotateY(180deg); }
+        @media(prefers-reduced-motion:reduce) {
+          .pepe-seat:hover:not(:disabled),.pepe-seat:focus-visible:not(:disabled) { transform:scale(1.02) !important; }
+        }
+
+
+
+        /* V13: cinematic card reveal stage. Card transforms are owned by the Web Animations API. */
+        #pepeCardFXLayer {
+          position:fixed; inset:0; z-index:1000000; overflow:visible; pointer-events:none;
+          isolation:isolate; perspective:1400px;
+        }
+        .pepe-fx-card {
+          position:absolute !important; display:block !important; z-index:100 !important;
+          flex:none !important; margin:0 !important; padding:0 !important;
+          transform:none; transform-origin:50% 50%; transform-style:preserve-3d;
+          pointer-events:none !important; overflow:visible !important;
+          box-shadow:0 18px 34px rgba(0,0,0,.48),0 3px 8px rgba(0,0,0,.28) !important;
+          will-change:transform,opacity,filter;
+          backface-visibility:visible;
+        }
+        .pepe-fx-card .pepe-card-inner {
+          transition:none !important; transform-style:preserve-3d;
+          will-change:transform;
+        }
+        .pepe-fx-card .pepe-card-back,
+        .pepe-fx-card .pepe-card-front {
+          border-radius:8px !important;
+          box-shadow:0 10px 18px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.55) !important;
+        }
+        .pepe-fx-card .pepe-card-front:after { pointer-events:none; }
+        .pepe-fx-card .pepe-card-front.is-tuz {
+          box-shadow:0 0 22px rgba(74,222,128,.68),0 0 48px rgba(74,222,128,.25),inset 0 0 0 2px rgba(255,255,255,.22) !important;
+        }
+        .pepe-fx-card.tuz-reveal-glow { filter:drop-shadow(0 0 18px rgba(74,222,128,.86)); }
+        .pepe-card-spark {
+          position:absolute; z-index:120; display:block; border-radius:50%;
+          box-shadow:0 0 9px currentColor,0 0 18px currentColor;
+          pointer-events:none; will-change:transform,opacity;
+        }
+        .pepe-seat:hover:not(:disabled) { transition:transform .28s cubic-bezier(.2,.75,.2,1) !important; }
+        @media(prefers-reduced-motion:reduce) {
+          .pepe-seat:hover:not(:disabled) { transform:scale(1.02) !important; }
+        }
+
+        /* V14: full-visibility 3D playing cards with a crisp bevel and table-settle finish. */
+        #pepeCardFXLayer { perspective:1600px; transform-style:preserve-3d; }
+        .pepe-fx-card {
+          visibility:visible !important;
+          border-radius:9px !important;
+          transform-origin:50% 50% !important;
+          transform-style:preserve-3d !important;
+          backface-visibility:visible !important;
+          filter:drop-shadow(0 15px 16px rgba(0,0,0,.43));
+          box-shadow:0 2px 0 rgba(255,255,255,.76),0 4px 0 rgba(159,143,116,.72),0 18px 25px rgba(0,0,0,.38) !important;
+        }
+        .pepe-fx-card .pepe-card-inner { transform-style:preserve-3d !important; transition:none !important; }
+        .pepe-fx-card { flex:none !important; min-width:0 !important; min-height:0 !important; max-width:none !important; max-height:none !important; }
+        .pepe-fx-card .pepe-card-back,
+        .pepe-fx-card .pepe-card-front {
+          border-width:2px !important;
+          border-radius:9px !important;
+          backface-visibility:hidden !important;
+          -webkit-backface-visibility:hidden !important;
+        }
+        .pepe-fx-card .pepe-card-back {
+          background:
+            linear-gradient(135deg,rgba(255,255,255,.16),transparent 34%),
+            repeating-linear-gradient(135deg,#0d2947 0 5px,#22597e 5px 7px) !important;
+        }
+        .pepe-fx-card .pepe-card-front {
+          background:linear-gradient(145deg,#fffef9 0%,#f2ecdf 62%,#ded5c5 100%) !important;
+        }
+        .pepe-fx-card .pepe-card-front.is-tuz {
+          background:radial-gradient(circle at 45% 27%,#45d783 0%,#12844c 48%,#06452b 100%) !important;
+          box-shadow:inset 0 0 0 2px rgba(228,255,236,.28),0 0 25px rgba(74,222,128,.75),0 0 58px rgba(74,222,128,.25) !important;
+        }
+        .pepe-fx-card.pepe-fx-landed {
+          z-index:260 !important;
+          filter:drop-shadow(0 8px 7px rgba(0,0,0,.34));
+        }
+        .pepe-card-spark { z-index:300 !important; }
+        .pepe-multiplier-flight {
+          position:absolute; left:0; top:0; z-index:1200; min-width:154px; padding:13px 19px;
+          border:1px solid rgba(139,255,180,.62); border-radius:999px;
+          color:#d7ffe4; background:linear-gradient(145deg,rgba(8,75,39,.98),rgba(3,31,19,.98));
+          box-shadow:0 0 22px rgba(57,226,119,.52),0 12px 32px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.2);
+          font:1000 clamp(25px,4.2vw,42px)/1 Inter,sans-serif; letter-spacing:-.055em;
+          text-align:center; white-space:nowrap; pointer-events:none; will-change:transform,opacity,filter;
+          text-shadow:0 3px 13px rgba(61,255,135,.38);
+        }
+        .pepe-multiplier-flight:after { content:"MULTIPLIER"; display:block; margin-top:4px; color:rgba(210,255,224,.72); font:900 7px Inter,sans-serif; letter-spacing:.22em; }
+        #pepeMultiplierValue.multiplier-win-pop { animation:pepeMultiplierTargetPop .42s cubic-bezier(.16,.9,.2,1) both; }
+        @keyframes pepeMultiplierTargetPop {
+          0% { transform:scale(1); text-shadow:0 0 0 transparent; }
+          45% { transform:scale(1.24); text-shadow:0 0 18px rgba(91,255,147,.8); }
+          72% { transform:scale(.96); }
+          100% { transform:scale(1); text-shadow:0 0 12px rgba(91,255,147,.36); }
+        }
+
+
+        /* V16: waiting silhouettes, true falling Pepe entrances, unique idle card magic,
+           accidental upright card-drop reveal, and a quick fade-to-next-table transition. */
+        .pepe-waiting-silhouettes {
+          position:absolute; inset:0; z-index:3; pointer-events:none; opacity:1; visibility:visible;
+          transition:opacity .38s ease,visibility .38s ease;
+        }
+        .pepe-room-scene.has-live-pepes .pepe-waiting-silhouettes,
+        .pepe-waiting-silhouettes.hidden-waiting { opacity:0; visibility:hidden; }
+        .pepe-waiting-figure {
+          position:absolute; display:flex; align-items:center; justify-content:center;
+          color:rgba(0,5,4,.91); opacity:.86; filter:drop-shadow(0 7px 8px rgba(0,0,0,.5));
+          transform-origin:50% 100%; animation:pepeWaitingBreath 3.3s ease-in-out infinite;
+        }
+        .pepe-waiting-figure svg { display:block; width:100%; height:100%; overflow:visible; }
+        .pepe-waiting-figure b {
+          position:absolute; left:50%; top:22%; transform:translate(-50%,-50%);
+          color:rgba(226,255,235,.84); font:900 clamp(16px,2.6vw,29px)/1 Inter,sans-serif;
+          text-shadow:0 2px 9px rgba(0,0,0,.85),0 0 12px rgba(118,255,167,.22);
+        }
+        .pepe-waiting-figure[data-wait-seat="0"] { left:7%; top:31%; width:17%; height:43%; animation-delay:-.8s; }
+        .pepe-waiting-figure[data-wait-seat="1"] { left:22%; top:24%; width:17%; height:42%; animation-delay:-1.7s; }
+        .pepe-waiting-figure[data-wait-seat="2"] { left:41.5%; top:22%; width:17%; height:42%; animation-delay:-.4s; }
+        .pepe-waiting-figure[data-wait-seat="3"] { left:61%; top:24%; width:17%; height:42%; animation-delay:-2.2s; }
+        .pepe-waiting-figure[data-wait-seat="4"] { left:76%; top:31%; width:17%; height:43%; animation-delay:-1.2s; }
+        @keyframes pepeWaitingBreath { 0%,100%{transform:translateY(0) scale(1);opacity:.78} 50%{transform:translateY(-3px) scale(1.015);opacity:.94} }
+
+        /* The five Pepes fall into their actual chair slots, compress, then rebound softly. */
+        .pepe-seat {
+          animation:pepeSeatDropIn .94s cubic-bezier(.18,.82,.22,1) both !important;
+          animation-delay:var(--seat-delay,0ms) !important;
+          outline:none !important; box-shadow:none !important;
+        }
+        @keyframes pepeSeatDropIn {
+          0% { opacity:0; transform:translate3d(0,-145%,0) rotate(-7deg) scale(.72,.78); filter:blur(3px); }
+          48% { opacity:1; transform:translate3d(0,9%,0) rotate(2.4deg) scale(1.04,.94); filter:blur(0); }
+          65% { transform:translate3d(0,-4%,0) rotate(-1.2deg) scale(.985,1.025); }
+          80% { transform:translate3d(0,2%,0) rotate(.5deg) scale(1.008,.995); }
+          100% { opacity:1; transform:translate3d(0,0,0) rotate(0) scale(1); filter:blur(0); }
+        }
+        .pepe-seat:hover:not(:disabled),.pepe-seat:focus-visible:not(:disabled) {
+          transform:scale(1.045) !important; filter:brightness(1.08) !important;
+          outline:0 !important; border-color:transparent !important; background:transparent !important; box-shadow:none !important;
+        }
+        .pepe-seat.choosing,.pepe-seat.chosen,.pepe-seat.pepe-accidental-drop {
+          outline:0 !important; border-color:transparent !important; background:transparent !important; box-shadow:none !important;
+        }
+        .pepe-seat.choosing:after,.pepe-seat.chosen:after { display:none !important; content:none !important; }
+        .pepe-seat:focus,.pepe-seat:focus-visible { outline:none !important; }
+
+        /* Idle card magic: every Pepe gets a different continuous flourish. All motion stays
+           on card backs; there is no Y-flip, so the real face can never be exposed by a trick. */
+        .pepe-seat .pepe-hidden-card { transform-style:preserve-3d; backface-visibility:visible; }
+        .pepe-seat.pepe-trick-fan .pepe-hidden-card:nth-child(1) { animation:idleFanLeft 3.7s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-fan .pepe-hidden-card:nth-child(2) { animation:idleFanCenter 3.7s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-fan .pepe-hidden-card:nth-child(3) { animation:idleFanRight 3.7s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-cut .pepe-hidden-card:nth-child(1) { animation:idleCutLeft 4.1s cubic-bezier(.2,.75,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-cut .pepe-hidden-card:nth-child(2) { animation:idleCutCenter 4.1s cubic-bezier(.2,.75,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-cut .pepe-hidden-card:nth-child(3) { animation:idleCutRight 4.1s cubic-bezier(.2,.75,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-spin .pepe-hidden-card:nth-child(2) { animation:idleSpinCard 3.45s cubic-bezier(.25,.7,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-vanish .pepe-hidden-card:nth-child(1) { animation:idleVanishCard 3.8s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-vanish .pepe-hidden-card:nth-child(2) { animation:idleVanishCover 3.8s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-shuffle .pepe-hidden-card:nth-child(1) { animation:idleShuffleLeft 3.6s cubic-bezier(.3,.75,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-shuffle .pepe-hidden-card:nth-child(2) { animation:idleShuffleMiddle 3.6s cubic-bezier(.3,.75,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-shuffle .pepe-hidden-card:nth-child(3) { animation:idleShuffleRight 3.6s cubic-bezier(.3,.75,.25,1) infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-fan .pepe-character-wrap { animation:idleBodyFan 3.7s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-cut .pepe-character-wrap { animation:idleBodyCut 4.1s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-spin .pepe-character-wrap { animation:idleBodySpin 3.45s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-vanish .pepe-character-wrap { animation:idleBodyVanish 3.8s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        .pepe-seat.pepe-trick-shuffle .pepe-character-wrap { animation:idleBodyShuffle 3.6s ease-in-out infinite; animation-delay:var(--trick-delay,0ms); }
+        @keyframes idleFanLeft { 0%,25%,100%{transform:rotate(-13deg) translateY(4px)} 43%{transform:rotate(-32deg) translate(-7px,-16px)} 61%{transform:rotate(-20deg) translate(-11px,-20px)} 79%{transform:rotate(-13deg) translateY(4px)} }
+        @keyframes idleFanCenter { 0%,25%,100%{transform:translateY(-2px)} 43%{transform:translateY(-24px) rotate(7deg)} 61%{transform:translateY(-17px) rotate(-6deg)} 79%{transform:translateY(-2px)} }
+        @keyframes idleFanRight { 0%,25%,100%{transform:rotate(13deg) translateY(4px)} 43%{transform:rotate(32deg) translate(7px,-16px)} 61%{transform:rotate(20deg) translate(11px,-20px)} 79%{transform:rotate(13deg) translateY(4px)} }
+        @keyframes idleCutLeft { 0%,35%,100%{transform:rotate(-13deg) translateY(4px)} 48%{transform:rotate(-35deg) translate(-12px,-11px)} 62%{transform:rotate(-6deg) translate(8px,-17px)} 78%{transform:rotate(-13deg) translateY(4px)} }
+        @keyframes idleCutCenter { 0%,35%,100%{transform:translateY(-2px)} 48%{transform:translate(-8px,-17px) rotate(-12deg)} 62%{transform:translate(9px,-14px) rotate(13deg)} 78%{transform:translateY(-2px)} }
+        @keyframes idleCutRight { 0%,35%,100%{transform:rotate(13deg) translateY(4px)} 48%{transform:rotate(27deg) translate(9px,-9px)} 62%{transform:rotate(9deg) translate(-8px,-12px)} 78%{transform:rotate(13deg) translateY(4px)} }
+        @keyframes idleSpinCard { 0%,28%,100%{transform:translateY(-2px) rotate(0)} 44%{transform:translateY(-23px) rotate(95deg)} 60%{transform:translateY(-20px) rotate(205deg)} 76%{transform:translateY(-2px) rotate(360deg)} }
+        @keyframes idleVanishCard { 0%,32%,100%{opacity:1;transform:rotate(-13deg) translateY(4px) scale(1)} 47%{opacity:0;transform:rotate(20deg) translate(18px,-23px) scale(.06)} 65%{opacity:0;transform:rotate(85deg) translate(-12px,-11px) scale(.06)} 79%{opacity:1;transform:rotate(-13deg) translateY(4px) scale(1)} }
+        @keyframes idleVanishCover { 0%,32%,100%{transform:translateY(-2px) rotate(0)} 49%{transform:translateY(-17px) rotate(-8deg)} 66%{transform:translate(9px,-16px) rotate(13deg)} 81%{transform:translateY(-2px) rotate(0)} }
+        @keyframes idleShuffleLeft { 0%,28%,100%{transform:rotate(-13deg) translateY(4px)} 43%{transform:translate(10px,-16px) rotate(8deg)} 58%{transform:translate(16px,-9px) rotate(16deg)} 76%{transform:rotate(-13deg) translateY(4px)} }
+        @keyframes idleShuffleMiddle { 0%,28%,100%{transform:translateY(-2px)} 43%{transform:translate(-11px,-15px) rotate(-9deg)} 58%{transform:translate(-16px,-9px) rotate(-17deg)} 76%{transform:translateY(-2px)} }
+        @keyframes idleShuffleRight { 0%,28%,100%{transform:rotate(13deg) translateY(4px)} 43%{transform:translate(-6px,-12px) rotate(-8deg)} 58%{transform:translate(-2px,-18px) rotate(-19deg)} 76%{transform:rotate(13deg) translateY(4px)} }
+        @keyframes idleBodyFan { 0%,100%{transform:rotate(0) scale(1)} 45%{transform:rotate(-2deg) scale(1.025,.985)} 68%{transform:rotate(1deg) scale(.99,1.015)} }
+        @keyframes idleBodyCut { 0%,100%{transform:rotate(0)} 46%{transform:rotate(2.7deg) translateY(-2px)} 68%{transform:rotate(-1.2deg)} }
+        @keyframes idleBodySpin { 0%,100%{transform:rotate(0) scale(1)} 48%{transform:rotate(-4deg) scale(1.035,.97)} 72%{transform:rotate(2deg)} }
+        @keyframes idleBodyVanish { 0%,100%{transform:scale(1)} 50%{transform:scale(.96,1.045) rotate(2deg)} }
+        @keyframes idleBodyShuffle { 0%,100%{transform:rotate(0)} 44%{transform:rotate(-2deg) translateY(-3px)} 64%{transform:rotate(2deg)} }
+        .pepe-seat.revealing .pepe-card-fan,
+        .pepe-seat.revealing .pepe-hidden-card,
+        .pepe-seat.revealing .pepe-character-wrap { animation-play-state:paused !important; }
+        .pepe-seat.pepe-card-showing .pepe-character-wrap { animation:pepeShowCardsReaction .72s cubic-bezier(.18,.8,.2,1) both !important; animation-play-state:running !important; }
+        .pepe-seat.pepe-card-showing .pepe-card-fan { animation:pepeCardsPresented .7s cubic-bezier(.18,.8,.2,1) both !important; animation-play-state:running !important; }
+        .pepe-seat.pepe-accidental-drop .pepe-character-wrap { animation:pepeOopsReaction .68s cubic-bezier(.2,.8,.2,1) both !important; animation-play-state:running !important; }
+        .pepe-seat.pepe-accidental-drop .pepe-card-fan { animation:pepeOopsFanSlip .6s cubic-bezier(.2,.8,.2,1) both !important; animation-play-state:running !important; }
+        .pepe-room-scene.room-arriving .pepe-seat { animation:pepeSeatDropIn .94s cubic-bezier(.18,.82,.22,1) both !important; animation-delay:var(--seat-delay,0ms) !important; }
+        @keyframes pepeShowCardsReaction { 0%{transform:rotate(0) scale(1)} 28%{transform:rotate(-3deg) scale(1.06,.94) translateY(-4px)} 54%{transform:rotate(2deg) scale(.98,1.035)} 100%{transform:rotate(0) scale(1)} }
+        @keyframes pepeCardsPresented { 0%{transform:translateX(-50%) translateY(0) rotate(0)} 35%{transform:translateX(-50%) translateY(-13px) rotate(-8deg)} 68%{transform:translateX(-50%) translateY(-7px) rotate(5deg)} 100%{transform:translateX(-50%) translateY(0) rotate(0)} }
+        @keyframes pepeOopsReaction { 0%{transform:rotate(0) scale(1)} 20%{transform:rotate(4deg) translateY(-5px) scale(.98,1.04)} 44%{transform:rotate(-5deg) translateY(4px) scale(1.035,.94)} 66%{transform:rotate(2deg) scale(.99,1.02)} 100%{transform:rotate(0) scale(1)} }
+        @keyframes pepeOopsFanSlip { 0%{transform:translateX(-50%) translateY(0) rotate(0)} 25%{transform:translateX(-50%) translateY(-7px) rotate(8deg)} 55%{transform:translateX(-50%) translateY(5px) rotate(-12deg)} 100%{transform:translateX(-50%) translateY(0) rotate(0)} }
+
+        /* Next-table changes use a simple fade; the viewpoint stays seated and fixed. */
+        #pepeFadeVeil {
+          position:fixed; inset:0; z-index:100; pointer-events:none; opacity:0; visibility:hidden;
+          background:radial-gradient(ellipse at 50% 38%,rgba(2,8,5,.78),rgba(0,0,0,.985) 74%);
+          transition:opacity .46s ease,visibility .46s ease;
+        }
+        #pepeFadeVeil.visible { opacity:1; visibility:visible; }
+        .pepe-room-scene.table-fade-out {
+          opacity:.08 !important;
+          filter:brightness(.18) blur(2px) !important;
+          transition:opacity .42s ease,filter .42s ease !important;
+          transform:none !important;
+        }
+        .pepe-room-scene.table-fade-in {
+          animation:cryptRoomFadeIn .58s cubic-bezier(.2,.75,.2,1) both !important;
+          transform:none !important;
+        }
+        .pepe-room-scene.cinematic-zoom { transition:transform .34s cubic-bezier(.18,.8,.2,1); transform:scale(1.07); }
+        .pepe-room-scene.cinematic-zoom-out { transition:transform .42s cubic-bezier(.2,.8,.2,1); transform:scale(1); }
+        .pepe-lamp-cone { top:16% !important; height:78% !important; }
+        @media(max-width:720px) {
+          .pepe-waiting-figure[data-wait-seat="0"] { left:6%; top:33%; width:18%; height:41%; }
+          .pepe-waiting-figure[data-wait-seat="1"] { left:21%; top:27%; width:18%; height:39%; }
+          .pepe-waiting-figure[data-wait-seat="2"] { left:41%; top:25%; width:18%; height:39%; }
+          .pepe-waiting-figure[data-wait-seat="3"] { left:60%; top:27%; width:18%; height:39%; }
+          .pepe-waiting-figure[data-wait-seat="4"] { left:75%; top:33%; width:18%; height:41%; }
+        }
+
+</style>
 </head>
 <body class="bg-pitch text-zinc-200 font-sans antialiased relative w-full h-full">
 
@@ -649,7 +1169,7 @@
           <button class="mode-card" type="button" data-enter-mode="pepe" aria-label="Play Find TUZ">
             <div class="mode-visual pepe-mode-visual">
               <div class="pepe-preview-table">
-                <div class="pepe-preview-character pepe-preview-one"><img src="https://i.postimg.cc/1tmsX72F/download-98-36006666666665.gif" alt="Pepe preview"><span class="pepe-preview-fallback">PEPE</span></div>
+                <div class="pepe-preview-character pepe-preview-one"><img src="https://i.postimg.cc/QtwHMX6N/ezgif-5e2bdfee40c6deec.gif" alt="Pepe preview"><span class="pepe-preview-fallback">PEPE</span></div>
                 <div class="pepe-preview-character pepe-preview-two"><img src="https://i.postimg.cc/yNBzprVw/ezgif-8181fe8c5387714c.gif" alt="Pepe preview"><span class="pepe-preview-fallback">PEPE</span></div>
                 <div class="pepe-preview-character pepe-preview-three"><img src="https://i.postimg.cc/15kSw3bf/ezgif-817d70fd08e26549.gif" alt="Pepe preview"><span class="pepe-preview-fallback">PEPE</span></div>
                 <div class="pepe-preview-playing-card">♠</div><div class="pepe-preview-playing-card card-two">♦</div>
@@ -744,15 +1264,25 @@
         </div>
 
         <div class="pepe-table-stage">
-          <div class="pepe-table-rail">
-            <div class="pepe-table-felt">
-              <div class="pepe-table-lights"></div>
-              <div class="pepe-table-meta"><span>PRIVATE TABLE</span><span id="pepeStageLabel">WAITING FOR BET</span></div>
-              <div id="pepePlayers" class="pepe-players">
-                <div class="pepe-empty-state"><div class="pepe-empty-mark">♠</div><strong>THE TABLE IS EMPTY</strong><span>Place your bet to invite the Pepes.</span></div>
+          <div class="pepe-room-scene" id="pepeRoomScene" aria-label="Illustrated Pepe card room">
+            <img class="pepe-room-art" src="https://i.postimg.cc/rFK1f3kL/remove-the-entire-poker-1-removebg-preview.png" alt="Five-chair illustrated card room" draggable="false">
+            <span id="pepeStageLabel" hidden>WAITING FOR BET</span><span id="pepeRiskLabel" hidden>HIDDEN HANDS · UNKNOWN RISK</span>
+            <div class="pepe-lamp-layout" id="pepeLampLayout" aria-hidden="true">
+              <div class="pepe-lamp-rig" id="pepeLampRig">
+                <div class="pepe-lamp-cone" id="pepeLampGlow"></div>
+                <img class="pepe-lamp-art" src="https://i.postimg.cc/Pqk1rq8P/extract-only-the-hanging-2-removebg-preview.png" alt="" draggable="false">
               </div>
-              <div class="pepe-table-footer"><span>CHOOSE THE PEPE HOLDING TUZ</span><span id="pepeRiskLabel">HIDDEN HANDS · UNKNOWN RISK</span></div>
             </div>
+            <div id="pepePlayers" class="pepe-players" aria-label="Pepe players"></div>
+            <div id="pepeWaitingSilhouettes" class="pepe-waiting-silhouettes" aria-hidden="true">
+              <div class="pepe-waiting-figure" data-wait-seat="0"><svg viewBox="0 0 100 120" aria-hidden="true"><path d="M24 34C17 12 31 3 43 17C48 23 52 23 57 17C69 3 83 12 76 34C88 42 92 55 86 69C81 81 70 86 61 88L70 119H30L39 88C21 84 10 70 14 53C16 45 19 39 24 34Z" fill="currentColor"/><path d="M29 37C31 29 41 28 46 35C51 28 65 29 69 37C67 49 58 55 49 55C39 55 31 49 29 37Z" fill="#17201b" opacity=".62"/></svg><b>?</b></div>
+              <div class="pepe-waiting-figure" data-wait-seat="1"><svg viewBox="0 0 100 120" aria-hidden="true"><path d="M24 34C17 12 31 3 43 17C48 23 52 23 57 17C69 3 83 12 76 34C88 42 92 55 86 69C81 81 70 86 61 88L70 119H30L39 88C21 84 10 70 14 53C16 45 19 39 24 34Z" fill="currentColor"/><path d="M29 37C31 29 41 28 46 35C51 28 65 29 69 37C67 49 58 55 49 55C39 55 31 49 29 37Z" fill="#17201b" opacity=".62"/></svg><b>?</b></div>
+              <div class="pepe-waiting-figure" data-wait-seat="2"><svg viewBox="0 0 100 120" aria-hidden="true"><path d="M24 34C17 12 31 3 43 17C48 23 52 23 57 17C69 3 83 12 76 34C88 42 92 55 86 69C81 81 70 86 61 88L70 119H30L39 88C21 84 10 70 14 53C16 45 19 39 24 34Z" fill="currentColor"/><path d="M29 37C31 29 41 28 46 35C51 28 65 29 69 37C67 49 58 55 49 55C39 55 31 49 29 37Z" fill="#17201b" opacity=".62"/></svg><b>?</b></div>
+              <div class="pepe-waiting-figure" data-wait-seat="3"><svg viewBox="0 0 100 120" aria-hidden="true"><path d="M24 34C17 12 31 3 43 17C48 23 52 23 57 17C69 3 83 12 76 34C88 42 92 55 86 69C81 81 70 86 61 88L70 119H30L39 88C21 84 10 70 14 53C16 45 19 39 24 34Z" fill="currentColor"/><path d="M29 37C31 29 41 28 46 35C51 28 65 29 69 37C67 49 58 55 49 55C39 55 31 49 29 37Z" fill="#17201b" opacity=".62"/></svg><b>?</b></div>
+              <div class="pepe-waiting-figure" data-wait-seat="4"><svg viewBox="0 0 100 120" aria-hidden="true"><path d="M24 34C17 12 31 3 43 17C48 23 52 23 57 17C69 3 83 12 76 34C88 42 92 55 86 69C81 81 70 86 61 88L70 119H30L39 88C21 84 10 70 14 53C16 45 19 39 24 34Z" fill="currentColor"/><path d="M29 37C31 29 41 28 46 35C51 28 65 29 69 37C67 49 58 55 49 55C39 55 31 49 29 37Z" fill="#17201b" opacity=".62"/></svg><b>?</b></div>
+            </div>
+            <img class="pepe-table-art" src="https://i.postimg.cc/C5tqyMgS/extract-only-the-round-2-removebg-preview.png" alt="Green felt playing table" draggable="false">
+            <div class="pepe-scene-vignette" aria-hidden="true"></div>
           </div>
         </div>
 
@@ -769,6 +1299,7 @@
           <div class="pepe-footnote">FIND TUZ TO ADVANCE · HIGHER STAGES BRING FEWER SAFE PICKS AND BIGGER MULTIPLIERS</div>
         </div>
       </div>
+      <div id="pepeFadeVeil" aria-hidden="true"></div>
     </section>
 
     <section id="settingsModal" aria-label="Game settings" aria-modal="true" role="dialog" class="settings-modal hidden-settings">
@@ -800,8 +1331,29 @@
           </div>
           <div id="secretPatternStatus" class="secret-status">No secret pattern armed.</div>
         </section>
+        <section class="settings-section scene-layout-settings">
+          <div><h3>Card room layout</h3><p>Fine-tune the room, table, lamp and Pepe positions. Open the editor while Find TUZ is visible.</p></div>
+          <button id="sceneLayoutEditBtn" type="button" class="scene-edit-open">EDIT ROOM LAYOUT</button>
+        </section>
       </div>
     </section>
+
+    <aside id="sceneEditorDock" class="scene-editor-dock" hidden aria-label="Card room layout editor">
+      <div class="scene-editor-head"><div><strong>ROOM LAYOUT</strong><small>Drag the room preview or use the sliders</small></div><button id="sceneEditorDone" type="button" class="scene-editor-done">DONE</button></div>
+      <label class="scene-editor-field">EDIT LAYER
+        <select id="sceneEditTarget">
+          <option value="room">Room / chairs</option>
+          <option value="table">Table</option>
+          <option value="lamp">Hanging lamp</option>
+          <option value="pepes">Pepes + cards</option>
+        </select>
+      </label>
+      <label class="scene-editor-field"><span>HORIZONTAL <output id="sceneEditXValue">0%</output></span><input id="sceneEditX" type="range" min="-30" max="30" step="0.5" value="0"></label>
+      <label class="scene-editor-field"><span>VERTICAL <output id="sceneEditYValue">0%</output></span><input id="sceneEditY" type="range" min="-30" max="30" step="0.5" value="0"></label>
+      <label class="scene-editor-field"><span>SIZE <output id="sceneEditScaleValue">100%</output></span><input id="sceneEditScale" type="range" min="50" max="150" step="1" value="100"></label>
+      <div class="scene-editor-actions"><button id="sceneEditReset" type="button">RESET</button><button id="sceneEditCopy" type="button">COPY PARAMETERS</button></div>
+      <div id="sceneEditStatus" class="scene-editor-status" aria-live="polite">Choose a layer, then drag it in the room.</div>
+    </aside>
 
     <!-- Top Floating Glassmorphic Institutional Header -->
     <header class="fixed top-4 left-4 right-4 sm:top-5 sm:left-6 sm:right-6 z-10 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
@@ -1210,15 +1762,42 @@
             const pepeStageLabel = document.getElementById('pepeStageLabel');
             const pepeRiskLabel = document.getElementById('pepeRiskLabel');
             const pepeStatus = document.getElementById('pepeStatus');
+            const pepeRoomScene = document.getElementById('pepeRoomScene');
+            const pepeWaitingSilhouettes = document.getElementById('pepeWaitingSilhouettes');
+            const pepeFadeVeil = document.getElementById('pepeFadeVeil');
+            let pepeWaitingResetTimer = null;
+            const pepeCardFXLayer = (() => {
+                let layer = document.getElementById('pepeCardFXLayer');
+                if (!layer) { layer = document.createElement('div'); layer.id = 'pepeCardFXLayer'; layer.setAttribute('aria-hidden','true'); document.body.appendChild(layer); }
+                return layer;
+            })();
+            const pepeLampRig = document.getElementById('pepeLampRig');
+            const pepeLampGlow = document.getElementById('pepeLampGlow');
+            const pepeRoomArt = pepeRoomScene.querySelector('.pepe-room-art');
+            const pepeTableArt = pepeRoomScene.querySelector('.pepe-table-art');
+            const pepeLampLayout = document.getElementById('pepeLampLayout');
+            const sceneEditorDock = document.getElementById('sceneEditorDock');
+            const sceneLayoutEditBtn = document.getElementById('sceneLayoutEditBtn');
+            const sceneEditorDone = document.getElementById('sceneEditorDone');
+            const sceneEditTarget = document.getElementById('sceneEditTarget');
+            const sceneEditX = document.getElementById('sceneEditX');
+            const sceneEditY = document.getElementById('sceneEditY');
+            const sceneEditScale = document.getElementById('sceneEditScale');
+            const sceneEditXValue = document.getElementById('sceneEditXValue');
+            const sceneEditYValue = document.getElementById('sceneEditYValue');
+            const sceneEditScaleValue = document.getElementById('sceneEditScaleValue');
+            const sceneEditReset = document.getElementById('sceneEditReset');
+            const sceneEditCopy = document.getElementById('sceneEditCopy');
+            const sceneEditStatus = document.getElementById('sceneEditStatus');
             const PEPE_GIFS = [
-                'https://i.postimg.cc/1tmsX72F/download-98-36006666666665.gif',
+                'https://i.postimg.cc/QtwHMX6N/ezgif-5e2bdfee40c6deec.gif',
                 'https://i.postimg.cc/yNBzprVw/ezgif-8181fe8c5387714c.gif',
                 'https://i.postimg.cc/15kSw3bf/ezgif-817d70fd08e26549.gif'
             ];
             document.querySelectorAll('.pepe-preview-character img').forEach((img) => {
                 img.addEventListener('error', () => { img.hidden = true; const fallback = img.parentElement.querySelector('.pepe-preview-fallback'); if (fallback) fallback.style.display = 'grid'; }, {once:true});
             });
-            const PEPE_MULTIPLIERS = [1.20,1.56,2.05,2.78,3.82,5.30,7.45,10.6,15.2,22,32,48,72,108,165,250];
+            const PEPE_MULTIPLIERS = [1.25,1.72,2.38,3.30,4.62,6.52,9.25,13.2,19,27.5,40,58,84,122,178,260,380,560,820,998];
             const pepeGame = { active:false, awaitingNext:false, resolving:false, bet:0, stage:0, multiplier:1, players:[], roundNumber:0, tableNumber:0 };
 
             function refreshAllBalances() {
@@ -1249,6 +1828,13 @@
                     state.chartFrozen = true;
                     document.body.classList.add('pepe-active');
                     pepeScreen.classList.add('active');
+                    pepeRoomScene.classList.remove('walking-away','walking-in','room-arriving','table-fade-out','table-fade-in');
+                    pepeLampRig.classList.remove('lamp-off','lamp-impact');
+                    if (!pepeGame.active && !pepeGame.awaitingNext) {
+                        pepeRoomScene.classList.remove('has-live-pepes');
+                        pepeWaitingSilhouettes.classList.remove('hidden-waiting');
+                    }
+                    pepeFadeVeil.classList.remove('visible');
                     updatePepeUI();
                     playUiSound('click');
                     return;
@@ -1458,17 +2044,25 @@
                 return r < .12 ? 2 : r < .51 ? 3 : r < .90 ? 4 : 5;
             }
             function randomPepeTuzCount(stage, count) {
+                // The opening table is deliberately generous: at least one TUZ is guaranteed,
+                // and multi-TUZ hands are common so the player can learn the table.
                 if (stage === 0) {
                     const r = Math.random();
-                    if (count === 2) return r < .16 ? 2 : 1;
-                    if (count === 3) return r < .12 ? 3 : r < .58 ? 2 : 1;
-                    if (count === 4) return r < .20 ? 3 : r < .82 ? 2 : 1;
-                    return r < .27 ? 3 : r < .86 ? 2 : 1;
+                    if (count === 2) return r < .24 ? 2 : 1;
+                    if (count === 3) return r < .16 ? 3 : r < .78 ? 2 : 1;
+                    if (count === 4) return r < .20 ? 3 : r < .84 ? 2 : 1;
+                    return r < .25 ? 3 : r < .87 ? 2 : 1;
                 }
-                const noTuzChance = Math.min(.44, .035 + (stage - 1) * .067);
+                // Every successful table makes the next deal harder: fewer TUZ hands,
+                // and progressively fewer multi-TUZ deals. The multiplier rises each stage.
+                const noTuzChance = Math.min(.78, .015 + stage * .105);
                 if (Math.random() < noTuzChance) return 0;
-                const twoTuzChance = Math.max(.025, .54 - stage * .085);
-                if (count >= 3 && Math.random() < twoTuzChance) return 2;
+                const twoTuzChance = Math.max(.015, .50 - stage * .10);
+                if (count >= 3 && Math.random() < twoTuzChance) {
+                    if (count >= 5 && stage <= 1 && Math.random() < .16) return 3;
+                    if (count >= 4 && stage === 1 && Math.random() < .12) return 3;
+                    return 2;
+                }
                 return 1;
             }
             function setPepeStatus(message, tone='normal') {
@@ -1493,10 +2087,157 @@
                 renderGame();
                 ladderBalanceValue.textContent = money(game.balance);
             }
+
+            // Room layout values are independent per visual layer and persist locally.
+            const SCENE_LAYOUT_DEFAULTS = {
+                room:  { x:-2.6278255607900767, y:0.6306868574056435, scale:1.09 },
+                table: { x:-1.383066084626356, y:8.420457904937095, scale:0.7 },
+                lamp:  { x:-0.2766132169252713, y:-18.983050290707226, scale:0.5 },
+                pepes: { x:-0.5, y:-1.2613737148112865, scale:1 }
+            };
+            const sceneLayout = (() => {
+                let saved = {};
+                try { saved = JSON.parse(localStorage.getItem('pulsePepeSceneLayoutV2') || '{}') || {}; } catch (_) {}
+                const result = {};
+                for (const key of Object.keys(SCENE_LAYOUT_DEFAULTS)) {
+                    const base = SCENE_LAYOUT_DEFAULTS[key];
+                    const item = saved[key] || {};
+                    result[key] = {
+                        x: Number.isFinite(Number(item.x)) ? Math.max(-30,Math.min(30,Number(item.x))) : base.x,
+                        y: Number.isFinite(Number(item.y)) ? Math.max(-30,Math.min(30,Number(item.y))) : base.y,
+                        scale: Number.isFinite(Number(item.scale)) ? Math.max(.5,Math.min(1.5,Number(item.scale))) : base.scale
+                    };
+                }
+                return result;
+            })();
+            let sceneEditorActive = false;
+            let sceneDragState = null;
+
+            function saveSceneLayout() {
+                try { localStorage.setItem('pulsePepeSceneLayoutV2', JSON.stringify(sceneLayout)); } catch (_) {}
+            }
+            function applySceneLayout() {
+                const room = sceneLayout.room, table = sceneLayout.table, lamp = sceneLayout.lamp, pepes = sceneLayout.pepes;
+                pepeRoomArt.style.transform = `translate(${room.x}%,${room.y}%) scale(${room.scale})`;
+                pepeTableArt.style.left = `calc(50% + ${table.x}%)`;
+                pepeTableArt.style.top = `calc(8.5% + ${table.y}%)`;
+                pepeTableArt.style.transform = `translateX(-50%) scale(${table.scale})`;
+                pepeLampLayout.style.transform = `translate(${lamp.x}%,${lamp.y}%) scale(${lamp.scale})`;
+                pepePlayers.style.transform = `translate(${pepes.x}%,${pepes.y}%) scale(${pepes.scale})`;
+                saveSceneLayout();
+            }
+            function updateSceneEditorControls() {
+                const item = sceneLayout[sceneEditTarget.value];
+                sceneEditX.value = String(item.x);
+                sceneEditY.value = String(item.y);
+                sceneEditScale.value = String(Math.round(item.scale*100));
+                sceneEditXValue.textContent = `${item.x.toFixed(1)}%`;
+                sceneEditYValue.textContent = `${item.y.toFixed(1)}%`;
+                sceneEditScaleValue.textContent = `${Math.round(item.scale*100)}%`;
+            }
+            function updateSceneEditorValue(axis, value) {
+                const item = sceneLayout[sceneEditTarget.value];
+                if (axis === 'scale') item.scale = Math.max(.5,Math.min(1.5,Number(value)/100));
+                else item[axis] = Math.max(-30,Math.min(30,Number(value)));
+                applySceneLayout();
+                updateSceneEditorControls();
+                sceneEditStatus.textContent = 'Layout adjusted. Changes are saved on this device.';
+            }
+            function openSceneLayoutEditor() {
+                if (!pepeScreen.classList.contains('active')) enterTopLevelMode('pepe');
+                document.getElementById('settingsModal').classList.add('hidden-settings');
+                sceneEditorDock.hidden = false;
+                sceneEditorActive = true;
+                pepeRoomScene.classList.add('scene-editing');
+                pepeRoomScene.dataset.editTarget = sceneEditTarget.value;
+                updateSceneEditorControls();
+                sceneEditStatus.textContent = 'Drag anywhere in the room to move the selected layer. Use SIZE to scale it.';
+            }
+            function closeSceneLayoutEditor() {
+                sceneEditorActive = false;
+                sceneDragState = null;
+                sceneEditorDock.hidden = true;
+                pepeRoomScene.classList.remove('scene-editing');
+                delete pepeRoomScene.dataset.editTarget;
+                saveSceneLayout();
+            }
+            async function copySceneLayout() {
+                const payload = {
+                    version: 'CRYPT UP room layout v1',
+                    units: 'x/y are percentages of the room canvas; scale is a multiplier',
+                    room: {...sceneLayout.room},
+                    table: {...sceneLayout.table},
+                    lamp: {...sceneLayout.lamp},
+                    pepes: {...sceneLayout.pepes}
+                };
+                const serialized = JSON.stringify(payload, null, 2);
+                let copied = false;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(serialized);
+                        copied = true;
+                    }
+                } catch (_) {}
+                if (!copied) {
+                    const field = document.createElement('textarea');
+                    field.value = serialized;
+                    field.setAttribute('readonly','');
+                    field.style.position = 'fixed'; field.style.opacity = '0'; field.style.pointerEvents = 'none';
+                    document.body.appendChild(field); field.select();
+                    try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+                    field.remove();
+                }
+                sceneEditStatus.textContent = copied ? 'Copied! Paste these exact parameters into the chat.' : 'Clipboard unavailable. The values are shown below.';
+                if (!copied) window.prompt('Copy these room layout parameters:', serialized);
+            }
+            sceneLayoutEditBtn.addEventListener('click', openSceneLayoutEditor);
+            sceneEditorDone.addEventListener('click', closeSceneLayoutEditor);
+            sceneEditTarget.addEventListener('change', () => {
+                pepeRoomScene.dataset.editTarget = sceneEditTarget.value;
+                updateSceneEditorControls();
+            });
+            sceneEditX.addEventListener('input', () => updateSceneEditorValue('x',sceneEditX.value));
+            sceneEditY.addEventListener('input', () => updateSceneEditorValue('y',sceneEditY.value));
+            sceneEditScale.addEventListener('input', () => updateSceneEditorValue('scale',sceneEditScale.value));
+            sceneEditReset.addEventListener('click', () => {
+                for (const key of Object.keys(SCENE_LAYOUT_DEFAULTS)) sceneLayout[key] = {...SCENE_LAYOUT_DEFAULTS[key]};
+                applySceneLayout(); updateSceneEditorControls();
+                sceneEditStatus.textContent = 'Default room layout restored.';
+            });
+            sceneEditCopy.addEventListener('click', copySceneLayout);
+            pepeRoomScene.addEventListener('pointerdown', (event) => {
+                if (!sceneEditorActive || event.button > 0) return;
+                const rect = pepeRoomScene.getBoundingClientRect();
+                sceneDragState = {
+                    pointerId:event.pointerId, startX:event.clientX, startY:event.clientY,
+                    rect, x:sceneLayout[sceneEditTarget.value].x, y:sceneLayout[sceneEditTarget.value].y
+                };
+                pepeRoomScene.setPointerCapture(event.pointerId);
+                event.preventDefault();
+            });
+            pepeRoomScene.addEventListener('pointermove', (event) => {
+                if (!sceneEditorActive || !sceneDragState || sceneDragState.pointerId !== event.pointerId) return;
+                const item = sceneLayout[sceneEditTarget.value];
+                item.x = Math.max(-30,Math.min(30,sceneDragState.x + (event.clientX-sceneDragState.startX)/sceneDragState.rect.width*100));
+                item.y = Math.max(-30,Math.min(30,sceneDragState.y + (event.clientY-sceneDragState.startY)/sceneDragState.rect.height*100));
+                applySceneLayout(); updateSceneEditorControls();
+            });
+            const stopSceneDrag = (event) => {
+                if (sceneDragState && sceneDragState.pointerId === event.pointerId) {
+                    sceneDragState = null; sceneEditStatus.textContent = 'Position updated and saved.';
+                }
+            };
+            pepeRoomScene.addEventListener('pointerup', stopSceneDrag);
+            pepeRoomScene.addEventListener('pointercancel', stopSceneDrag);
+            applySceneLayout();
+
             function makePepePlayers() {
                 const count = weightedPepeCount();
                 const tuzCount = randomPepeTuzCount(pepeGame.stage, count);
                 const positions = shuffledIndices(count);
+                const chairSlots = shuffledIndices(5).slice(0, count);
+                const trickPool = ['fan','cut','spin','vanish','shuffle'];
+                const trickOrder = shuffledIndices(trickPool.length).map(i => trickPool[i]);
                 const tuzPositions = new Set(positions.slice(0, Math.min(count,tuzCount)));
                 pepeGame.players = Array.from({length:count}, (_,i) => {
                     const tuz = tuzPositions.has(i);
@@ -1509,8 +2250,8 @@
                         const suit = suits[Math.floor(Math.random()*suits.length)];
                         return { value:ranks[Math.floor(Math.random()*ranks.length)], suit, isTuz:false, red:suit==='♥'||suit==='♦' };
                     });
-                    return { id:i, gif:PEPE_GIFS[Math.floor(Math.random()*PEPE_GIFS.length)], tuz,
-                        cardCount, tuzIndex, cardFaces, revealed:false };
+                    return { id:i, seatSlot:chairSlots[i], gif:PEPE_GIFS[Math.floor(Math.random()*PEPE_GIFS.length)], tuz,
+                        cardCount, tuzIndex, cardFaces, trickType:trickOrder[i], trickPhase:Math.floor(Math.random()*3600), revealed:false };
                 });
             }
             function renderPepePlayers() {
@@ -1518,9 +2259,11 @@
                 pepeGame.players.forEach((player,index) => {
                     const seat = document.createElement('button');
                     seat.type = 'button';
-                    seat.className = 'pepe-seat';
-                    seat.style.setProperty('--seat-delay', `${index*105}ms`);
+                    seat.className = `pepe-seat pepe-trick-${player.trickType}`;
+                    seat.style.setProperty('--seat-delay', `${index*92}ms`);
+                    seat.style.setProperty('--trick-delay', `${-player.trickPhase}ms`);
                     seat.dataset.pepeIndex = String(index);
+                    seat.dataset.seatSlot = String(player.seatSlot ?? index);
                     seat.setAttribute('aria-label', `Choose Pepe ${index+1}, hidden cards`);
                     const label = document.createElement('span');
                     label.className = 'pepe-seat-label';
@@ -1560,14 +2303,65 @@
                 reveal.textContent = player.tuz ? 'TUZ ✓' : 'NO TUZ ×';
                 seat.disabled = true;
             }
-            function dealPepeTable() {
+            function animatePepeLampLanding() {
+                pepeRoomScene.classList.remove('walking-away','room-arriving');
+                pepeRoomScene.classList.add('room-arriving');
+                pepeLampRig.classList.remove('lamp-off','lamp-impact');
+                // Force a fresh wobble animation on every new deal.
+                void pepeLampRig.offsetWidth;
+                pepeLampRig.classList.add('lamp-impact');
+                window.setTimeout(() => {
+                    pepeLampRig.classList.remove('lamp-impact');
+                    pepeRoomScene.classList.remove('room-arriving');
+                }, 1400);
+            }
+            function dealPepeTable({arrival=false} = {}) {
+                if (pepeWaitingResetTimer) { clearTimeout(pepeWaitingResetTimer); pepeWaitingResetTimer = null; }
+                pepeRoomScene.classList.remove('cinematic-zoom','cinematic-zoom-out','table-fade-out','table-fade-in');
+                pepeRoomScene.classList.add('has-live-pepes');
+                pepeRoomScene.querySelectorAll('.pepe-flying-card').forEach(card => card.remove());
+                // Previous reveal cards stay on the felt until the new deal begins.
+                pepeCardFXLayer.replaceChildren();
                 makePepePlayers();
                 renderPepePlayers();
+                pepeRoomScene.classList.remove('walking-away','walking-in','room-arriving');
+                void pepeRoomScene.offsetWidth;
+                if (arrival) {
+                    // New table: the black fade clears, Pepes drop into their seats,
+                    // and the lamp comes back on. No walking or camera movement.
+                    pepeRoomScene.classList.add('room-arriving','table-fade-in');
+                    pepeFadeVeil.classList.remove('visible');
+                    pepeLampRig.classList.remove('lamp-off','lamp-impact');
+                    void pepeLampRig.offsetWidth;
+                    pepeLampRig.classList.add('lamp-impact');
+                    window.setTimeout(() => {
+                        pepeLampRig.classList.remove('lamp-impact');
+                        pepeRoomScene.classList.remove('room-arriving','table-fade-in');
+                    }, 1050);
+                } else {
+                    pepeRoomScene.classList.add('walking-in');
+                    animatePepeLampLanding();
+                }
                 pepeGame.tableNumber += 1;
                 pepeGame.resolving = false;
                 pepeGame.awaitingNext = false;
                 setPepeStatus(`TABLE ${pepeGame.tableNumber} · ${pepeGame.players.length} PEPES HAVE ARRIVED. FIND TUZ.`, 'normal');
                 updatePepeUI();
+            }
+            function restorePepeWaitingScene(delay=1850) {
+                if (pepeWaitingResetTimer) clearTimeout(pepeWaitingResetTimer);
+                pepeWaitingResetTimer = window.setTimeout(() => {
+                    pepeWaitingResetTimer = null;
+                    if (pepeGame.active || pepeGame.awaitingNext || pepeGame.resolving) return;
+                    pepeRoomScene.classList.remove('has-live-pepes','walking-away','walking-in');
+                    pepeRoomScene.classList.add('waiting-room');
+                    pepePlayers.querySelectorAll('.pepe-seat').forEach(seat => seat.classList.add('departing'));
+                    window.setTimeout(() => {
+                        if (pepeGame.active) return;
+                        pepePlayers.replaceChildren();
+                        pepeCardFXLayer.replaceChildren();
+                    }, 440);
+                }, delay);
             }
             function startPepeRound() {
                 if (pepeGame.active) return;
@@ -1585,38 +2379,611 @@
                 pepeGame.stage = 0;
                 pepeGame.multiplier = 1;
                 pepeGame.tableNumber = 0;
+                pepeRoomScene.classList.remove('waiting-room');
                 dealPepeTable();
                 playUiSound('bet');
             }
-            function revealPepeTable(chosenIndex, pickedCardIndex) {
-                const revealTimers = [];
-                pepeGame.players.forEach((player,index) => {
-                    const seat = pepePlayers.querySelector(`[data-pepe-index="${index}"]`);
-                    if (!seat) return;
-                    seat.disabled = true;
-                    seat.classList.add('revealing');
-                    if (index === chosenIndex) seat.classList.add('chosen','choosing');
-                    const cards = Array.from(seat.querySelectorAll('.pepe-hidden-card'));
-                    cards.forEach((card,cardIndex) => {
-                        const isPicked = index === chosenIndex && cardIndex === pickedCardIndex;
-                        // The selected physical card flips first and lifts toward the player.
-                        const delay = isPicked ? 150 : (index === chosenIndex ? 620 + cardIndex*125 : 790 + index*95 + cardIndex*105);
-                        window.setTimeout(() => {
-                            card.classList.add('flipped');
-                            if (isPicked) card.classList.add('picked');
-                        }, delay);
-                        revealTimers.push(delay + 760);
-                    });
-                    const badgeDelay = Math.max(...cards.map((_,cardIndex) => {
-                        const isPicked = index === chosenIndex && cardIndex === pickedCardIndex;
-                        return isPicked ? 150 : (index === chosenIndex ? 620 + cardIndex*125 : 790 + index*95 + cardIndex*105);
-                    })) + 260;
-                    window.setTimeout(() => setPepeRevealed(seat,player,index===chosenIndex), badgeDelay);
-                    revealTimers.push(badgeDelay);
-                });
-                return Math.max(1500, ...revealTimers) + 100;
+            // The reveal FX are placed in a fixed viewport layer. This avoids table/seat
+            // stacking contexts clipping the card and lets every trick use real screen coordinates.
+            const cardWait = (ms) => new Promise(resolve => window.setTimeout(resolve, ms));
+            function cardRectInViewport(element) {
+                const r = element.getBoundingClientRect();
+                return { left:r.left, top:r.top, width:r.width, height:r.height, cx:r.left+r.width/2, cy:r.top+r.height/2 };
             }
-            function choosePepe(index) {
+            function makeCardFX(sourceCard, extraClass='') {
+                if (!sourceCard) return null;
+                const rect = cardRectInViewport(sourceCard);
+                const computed = getComputedStyle(sourceCard);
+                const width = Math.max(18, parseFloat(computed.width) || rect.width);
+                const height = Math.max(26, parseFloat(computed.height) || rect.height);
+                const card = sourceCard.cloneNode(true);
+                card.className = `pepe-hidden-card pepe-fx-card ${extraClass}`.trim();
+                card.removeAttribute('data-card-index');
+                card.setAttribute('aria-hidden','true');
+                card.style.position = 'absolute';
+                card.style.left = '0px';
+                card.style.top = '0px';
+                card.style.width = `${width}px`;
+                card.style.height = `${height}px`;
+                card.style.minWidth = `${width}px`;
+                card.style.minHeight = `${height}px`;
+                card.style.maxWidth = `${width}px`;
+                card.style.maxHeight = `${height}px`;
+                card.style.margin = '0';
+                card.style.padding = '0';
+                card.style.opacity = '1';
+                card.style.visibility = 'visible';
+                card.style.display = 'block';
+                card.style.transformOrigin = '50% 50%';
+                card.style.transform = `translate3d(${rect.cx-width/2}px,${rect.cy-height/2}px,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
+                card.style.zIndex = '240';
+                card.style.pointerEvents = 'none';
+                card.dataset.fxWidth = String(width);
+                card.dataset.fxHeight = String(height);
+                const inner = card.querySelector('.pepe-card-inner');
+                if (inner) inner.style.transform = 'rotateY(0deg)';
+                card.classList.remove('flipped','picked','reveal-active');
+                pepeCardFXLayer.appendChild(card);
+                return { el:card, rect, width, height };
+            }
+            async function animateCardElement(element, keyframes, options={}) {
+                if (!element || typeof element.animate !== 'function') return cardWait(options.duration || 0);
+                const animation = element.animate(keyframes, { fill:'forwards', ...options });
+                try { await animation.finished; } catch (_) {}
+                // Commit the last frame before cancelling the effect. This prevents old WAAPI
+                // effects stacking over later tricks and keeps transforms deterministic.
+                try { animation.commitStyles(); } catch (_) {}
+                try { animation.cancel(); } catch (_) {}
+            }
+            async function flipFXCard(card, duration=760, delay=0) {
+                if (!card) return;
+                if (delay) await cardWait(delay);
+                const inner = card.querySelector('.pepe-card-inner');
+                if (!inner) return;
+                card.classList.add('fx-turning');
+                await animateCardElement(inner,
+                    [{ transform:'rotateY(0deg)' }, { transform:'rotateY(180deg)' }],
+                    { duration, easing:'cubic-bezier(.42,0,.18,1)' });
+                card.classList.add('flipped');
+                card.classList.remove('fx-turning');
+            }
+            function cardSparkBurst(x, y, color='#f7d98b', amount=9) {
+                for (let i=0;i<amount;i++) {
+                    const spark = document.createElement('i');
+                    spark.className = 'pepe-card-spark';
+                    spark.style.left = `${x}px`; spark.style.top = `${y}px`;
+                    spark.style.background = color;
+                    pepeCardFXLayer.appendChild(spark);
+                    const angle = (Math.PI*2*i/amount) + (Math.random()-.5)*.32;
+                    const distance = 22 + Math.random()*42;
+                    const dx = Math.cos(angle)*distance, dy = Math.sin(angle)*distance;
+                    const size = 3 + Math.random()*3;
+                    spark.style.width = `${size}px`; spark.style.height = `${size}px`;
+                    const a = spark.animate([
+                        { transform:'translate(-50%,-50%) scale(.35)', opacity:0 },
+                        { transform:`translate(calc(-50% + ${dx*.45}px),calc(-50% + ${dy*.45}px)) scale(1)`, opacity:1, offset:.28 },
+                        { transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.12)`, opacity:0 }
+                    ], { duration:520+Math.random()*260, easing:'cubic-bezier(.16,.72,.26,1)', fill:'forwards' });
+                    a.finished.catch(()=>{}).then(()=>spark.remove());
+                }
+            }
+            function cardLandingPoint(chosenSeat, spread=0) {
+                const r = pepeRoomScene.getBoundingClientRect();
+                const seat = chosenSeat ? cardRectInViewport(chosenSeat) : null;
+                const seatRatio = seat ? (seat.cx-r.left)/Math.max(1,r.width) : .5;
+                // Map each chair to a distinct point inside the green felt ellipse.
+                const xRatio = Math.max(.285, Math.min(.715, .5 + (seatRatio-.5)*.62 + spread));
+                const yRatio = .692 + Math.abs(seatRatio-.5)*.018;
+                return { x:r.left+r.width*xRatio, y:r.top+r.height*yRatio };
+            }
+            function cardThrowAngle(from, to) {
+                // Card's top edge points along its throw vector when it settles on the felt.
+                return Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI + 90;
+            }
+            function cardSourceRotation(source) {
+                try {
+                    const value = getComputedStyle(source).transform;
+                    if (!value || value === 'none') return 0;
+                    const matrix = new DOMMatrixReadOnly(value);
+                    return Math.atan2(matrix.b,matrix.a)*180/Math.PI;
+                } catch (_) { return 0; }
+            }
+            function setFXCardPose(card, x, y, z, rx, ry, rz) {
+                const w = Number(card.dataset.fxWidth) || 38;
+                const h = Number(card.dataset.fxHeight) || 54;
+                card.style.transform = `translate3d(${x-w/2}px,${y-h/2}px,${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
+            }
+            function animateFXFlight(card, from, to, options={}) {
+                const duration = options.duration ?? 690;
+                const arc = options.arc ?? 112;
+                const sideArc = options.sideArc ?? 0;
+                const depth = options.depth ?? 30;
+                const startRotation = options.startRotation ?? 0;
+                const endRotation = options.endRotation ?? cardThrowAngle(from,to);
+                const startRx = options.startRx ?? 0;
+                const endRx = options.endRx ?? 64;
+                const spinTurns = options.spinTurns ?? .32;
+                const inner = card.querySelector('.pepe-card-inner');
+                const flip = options.flip === true;
+                const flipStart = options.flipStart ?? .2;
+                const flipEnd = options.flipEnd ?? .78;
+                const startRy = options.startRy ?? 0;
+                const started = performance.now();
+                return new Promise(resolve => {
+                    const frame = now => {
+                        const t = Math.max(0,Math.min(1,(now-started)/duration));
+                        const smooth = t*t*(3-2*t);
+                        const x = from.x + (to.x-from.x)*t + Math.sin(Math.PI*t)*sideArc;
+                        const y = from.y + (to.y-from.y)*t - Math.sin(Math.PI*t)*arc;
+                        const z = Math.sin(Math.PI*t)*depth;
+                        const rx = startRx+(endRx-startRx)*smooth + Math.sin(t*Math.PI*3)*(1-t)*4;
+                        const ry = startRy*(1-t) + Math.sin(t*Math.PI*2)*(1-t)*12;
+                        const rz = startRotation+(endRotation-startRotation)*t + spinTurns*360*t;
+                        setFXCardPose(card,x,y,z,rx,ry,rz);
+                        if (inner) {
+                            let turn = 0;
+                            if (flip) {
+                                const fp = Math.max(0,Math.min(1,(t-flipStart)/Math.max(.01,flipEnd-flipStart)));
+                                turn = 180*(fp*fp*(3-2*fp));
+                            }
+                            inner.style.transform = `rotateY(${turn}deg)`;
+                        }
+                        if (t < 1) requestAnimationFrame(frame);
+                        else {
+                            setFXCardPose(card,to.x,to.y,0,endRx,0,endRotation);
+                            if (inner && flip) { inner.style.transform='rotateY(180deg)'; card.classList.add('flipped'); }
+                            resolve();
+                        }
+                    };
+                    requestAnimationFrame(frame);
+                });
+            }
+            function animateFXBounce(card, target, angle, options={}) {
+                const duration = options.duration ?? 520;
+                const height = options.height ?? 25;
+                const bounces = options.bounces ?? 3;
+                const slide = options.slide ?? 16;
+                const startRx = options.startRx ?? 64;
+                const started = performance.now();
+                return new Promise(resolve => {
+                    const frame = now => {
+                        const t = Math.max(0,Math.min(1,(now-started)/duration));
+                        const envelope = Math.pow(1-t,1.25)*Math.exp(-1.45*t);
+                        const wave = Math.abs(Math.sin(Math.PI*bounces*t));
+                        const y = target.y - height*envelope*wave;
+                        const x = target.x + slide*(1-Math.exp(-6*t))/(1-Math.exp(-6));
+                        const rx = startRx + 7*envelope*Math.sin(Math.PI*bounces*t*1.25);
+                        const ry = 9*envelope*Math.sin(Math.PI*bounces*t*1.7);
+                        const rz = angle + options.spin*envelope*Math.sin(Math.PI*bounces*t*1.4);
+                        const z = 8*envelope*wave;
+                        setFXCardPose(card,x,y,z,rx,ry,rz);
+                        if (t < 1) requestAnimationFrame(frame);
+                        else { setFXCardPose(card,target.x+slide,target.y,0,64,0,angle); resolve(); }
+                    };
+                    requestAnimationFrame(frame);
+                });
+            }
+            function animateFXEdgeBalance(card, target, angle) {
+                const duration = 860;
+                const started = performance.now();
+                return new Promise(resolve => {
+                    const frame = now => {
+                        const t = Math.max(0,Math.min(1,(now-started)/duration));
+                        const envelope = Math.pow(1-t,1.12)*Math.exp(-1.2*t);
+                        const wave = Math.abs(Math.sin(Math.PI*4*t));
+                        const x = target.x + 9*(1-Math.exp(-5*t))/(1-Math.exp(-5));
+                        const y = target.y - 48*envelope*wave;
+                        // Starts almost vertical on its short edge, then loses energy and tips flat.
+                        const tip = t*t*(3-2*t);
+                        const rx = 88-24*tip + 9*envelope*Math.sin(Math.PI*4*t);
+                        const ry = 3*envelope*Math.sin(Math.PI*3*t);
+                        const rz = angle + 13*envelope*Math.sin(Math.PI*4*t);
+                        setFXCardPose(card,x,y,12*envelope*wave,rx,ry,rz);
+                        if (t < 1) requestAnimationFrame(frame);
+                        else { setFXCardPose(card,target.x+9,target.y,0,64,0,angle); resolve(); }
+                    };
+                    requestAnimationFrame(frame);
+                });
+            }
+            // A real upright table bounce: gravity, restitution, yaw inertia and friction
+            // are integrated every animation frame instead of teleporting between keyframes.
+            function animateFXAccidentalUprightBounce(card, target, angle) {
+                // The card stands on its short edge, slightly pitched toward the camera.
+                // Its centre is raised by half the card height so the lower edge touches felt.
+                const cardH = Number(card.dataset.fxHeight) || 54;
+                const standOffset = cardH * .38;
+                const standY = target.y - standOffset;
+                let last = performance.now();
+                let height = 0;
+                let velocityY = 470;
+                let yaw = -8;
+                let yawVelocity = 880;
+                let lean = -7;
+                let leanVelocity = 125;
+                let x = target.x - 5;
+                let slideVelocity = 42;
+                let impacts = 0;
+                let elapsed = 0;
+                const gravity = 1880;
+                const restitution = .43;
+                return new Promise(resolve => {
+                    const frame = now => {
+                        const dt = Math.min(.024, Math.max(.001, (now-last)/1000));
+                        last = now;
+                        elapsed += dt;
+
+                        // Semi-implicit integration keeps the fall continuous at variable FPS.
+                        height += velocityY * dt;
+                        velocityY -= gravity * dt;
+                        if (height <= 0) {
+                            height = 0;
+                            if (velocityY < -42 && impacts < 4) {
+                                velocityY = -velocityY * restitution;
+                                impacts += 1;
+                                // Small spin/lean impulses at each felt contact sell the physical bounce.
+                                yawVelocity += (impacts % 2 ? 105 : -82);
+                                leanVelocity += (impacts % 2 ? -48 : 38);
+                                slideVelocity *= .66;
+                                cardSparkBurst(x, target.y, '#ecd5a8', impacts === 1 ? 8 : 3);
+                            } else {
+                                velocityY = 0;
+                            }
+                        }
+
+                        x += slideVelocity * dt;
+                        slideVelocity *= Math.exp(-3.5 * dt);
+                        yaw += yawVelocity * dt;
+                        yawVelocity *= Math.exp(-2.65 * dt);
+                        const leanSpring = -lean * 34 - leanVelocity * 9.2;
+                        leanVelocity += leanSpring * dt;
+                        lean += leanVelocity * dt;
+
+                        // Keep the broad face visible: 10–16deg pitch reads as upright,
+                        // while yaw spins it in 3D instead of turning it into a thin edge.
+                        const pitchX = 12 + lean * .24;
+                        const z = 4 + height * .20;
+                        const settled = impacts >= 4 && Math.abs(velocityY) < 28 &&
+                            Math.abs(yawVelocity) < 45 && Math.abs(lean) < .5 && Math.abs(slideVelocity) < 2;
+                        setFXCardPose(card, x, standY - height, z, pitchX, yaw, angle + lean * .32);
+
+                        if (!settled && elapsed < 1.42) {
+                            requestAnimationFrame(frame);
+                        } else {
+                            setFXCardPose(card, target.x + 8, standY, 0, 12, 0, angle);
+                            resolve();
+                        }
+                    };
+                    requestAnimationFrame(frame);
+                });
+            }
+            async function animateFXUprightRevealAndLay(card,target,angle) {
+                const inner = card.querySelector('.pepe-card-inner');
+                const cardH = Number(card.dataset.fxHeight) || 54;
+                const standY = target.y - cardH * .38;
+                // Hold the card upright like a dealer presenting it: face remains readable,
+                // with a small 3D pitch and a controlled side-to-side hand-like sway.
+                setFXCardPose(card, target.x + 8, standY, 2, 12, -5, angle);
+                if (inner) {
+                    await animateCardElement(inner,[
+                        {transform:'rotateY(0deg)'},
+                        {transform:'rotateY(72deg)',offset:.42,easing:'cubic-bezier(.42,0,.2,1)'},
+                        {transform:'rotateY(180deg)'}
+                    ],{duration:560,easing:'cubic-bezier(.38,0,.18,1)'});
+                    inner.style.transform='rotateY(180deg)';
+                    card.classList.add('flipped');
+                }
+                // A short hero hold makes the face readable before it tips down.
+                await cardWait(90);
+                const started = performance.now();
+                const duration = 390;
+                return new Promise(resolve => {
+                    const frame = now => {
+                        const t = Math.max(0,Math.min(1,(now-started)/duration));
+                        const e = 1 - Math.pow(1-t,3.15);
+                        const overshoot = Math.sin(Math.PI*t) * Math.pow(1-t,1.7);
+                        const rx = 12 + 52*e + 3.2*overshoot;
+                        const y = standY + (target.y-standY)*e - 5*overshoot;
+                        const z = 3*(1-e) + 5*overshoot;
+                        const rz = angle + 2.4*overshoot;
+                        setFXCardPose(card,target.x+8*(1-e),y,z,rx,0,rz);
+                        if(t<1) requestAnimationFrame(frame);
+                        else { setFXCardPose(card,target.x+8,target.y,0,64,0,angle); resolve(); }
+                    };
+                    requestAnimationFrame(frame);
+                });
+            }
+            function findTrueTuzCard() {
+                const trueIndex = pepeGame.players.findIndex(player => player.tuz);
+                if (trueIndex < 0) return null;
+                const player = pepeGame.players[trueIndex];
+                const seat = pepePlayers.querySelector(`[data-pepe-index="${trueIndex}"]`);
+                return seat?.querySelector(`.pepe-hidden-card[data-card-index="${player.tuzIndex}"]`) || null;
+            }
+            function findFalseCard(preferredSeat, fallbackCard) {
+                const preferred = Array.from(preferredSeat?.querySelectorAll('.pepe-hidden-card') || [])
+                    .find(card => Number(card.dataset.cardIndex) !== (pepeGame.players[Number(preferredSeat.dataset.pepeIndex)]?.tuzIndex ?? -1));
+                if (preferred) return preferred;
+                for (let i=0;i<pepeGame.players.length;i++) {
+                    const player=pepeGame.players[i];
+                    const seat=pepePlayers.querySelector(`[data-pepe-index="${i}"]`);
+                    const falseCard=Array.from(seat?.querySelectorAll('.pepe-hidden-card') || [])
+                        .find(card => !(player.tuz && Number(card.dataset.cardIndex)===player.tuzIndex));
+                    if (falseCard) return falseCard;
+                }
+                return fallbackCard;
+            }
+            async function playPickedCardAnimation(sourceCard, player, pickedCardIndex, chosenSeat) {
+                const mode = 1 + Math.floor(Math.random() * 6);
+                pepeGame.lastCardAnimation = mode;
+                if (!sourceCard) return mode;
+
+                const sourceRect = cardRectInViewport(sourceCard);
+                const start = {x:sourceRect.cx,y:sourceRect.cy};
+                const hiddenSources = new Map();
+                const retainedSources = new Set();
+                const retainedCards = new Set();
+                const hideSource = (el) => {
+                    if (!el || hiddenSources.has(el)) return;
+                    hiddenSources.set(el, el.style.visibility);
+                    el.style.visibility = 'hidden';
+                };
+                const retain = (card, source) => {
+                    if (!card) return;
+                    retainedCards.add(card);
+                    card.classList.add('pepe-fx-landed');
+                    card.style.visibility='visible';
+                    card.style.zIndex='260';
+                    if (source) retainedSources.add(source);
+                };
+                const makeCard = (src, cls='') => makeCardFX(src,cls)?.el || null;
+                const getStart = src => { const r=cardRectInViewport(src); return {x:r.cx,y:r.cy}; };
+                const getRotation = src => cardSourceRotation(src);
+                const landing = cardLandingPoint(chosenSeat);
+                const throwAngle = cardThrowAngle(start,landing);
+                chosenSeat.classList.add('pepe-card-showing');
+                window.setTimeout(()=>chosenSeat.classList.remove('pepe-card-showing'),1050);
+                let mainCard = makeCard(sourceCard,`pepe-fx-mode-${mode}`);
+                let decoyCard = null;
+                let realCard = null;
+                if (!mainCard) return mode;
+                // Clone while visible. The source is hidden only after the flying copy exists.
+                hideSource(sourceCard);
+
+                const landAndKeep = async (card, target, angle, opts={}) => {
+                    cardSparkBurst(target.x,target.y,opts.color || '#e8d2a6',opts.sparks ?? 10);
+                    await animateFXBounce(card,target,angle,opts);
+                    retain(card, opts.source || sourceCard);
+                    await cardWait(70);
+                };
+
+                try {
+                    if (mode === 1) {
+                        // 1 · CLASSIC DEAL: a clean visible hand-to-felt toss, one mid-air turnover,
+                        // a gentle impact, two small table bounces and a settled face-up card.
+                        await animateFXFlight(mainCard,start,landing,{
+                            duration:670,arc:112,depth:24,sideArc:5,
+                            startRotation:getRotation(sourceCard),endRotation:throwAngle,
+                            spinTurns:.18,flip:true,flipStart:.27,flipEnd:.76,endRx:64
+                        });
+                        cardSparkBurst(landing.x,landing.y,'#f1d8a7',8);
+                        await landAndKeep(mainCard,landing,throwAngle,{duration:470,height:18,bounces:2.25,slide:4,spin:5});
+                    } else if (mode === 2) {
+                        // 2 · FELT FLICK: a low fast throw, face-down felt contact, visible friction slide,
+                        // then a deliberate flip once the card has stopped sliding.
+                        await animateFXFlight(mainCard,start,landing,{
+                            duration:610,arc:76,depth:13,sideArc:18,
+                            startRotation:getRotation(sourceCard),endRotation:throwAngle,
+                            spinTurns:.62,flip:false,endRx:64
+                        });
+                        cardSparkBurst(landing.x,landing.y,'#e6d1a8',9);
+                        await animateFXBounce(mainCard,landing,throwAngle,{duration:430,height:13,bounces:2.1,slide:31,spin:8});
+                        await flipFXCard(mainCard,470);
+                        retain(mainCard,sourceCard);
+                        await cardSparkBurst(landing.x+22,landing.y,'#f7dfb5',7);
+                    } else if (mode === 3) {
+                        // 3 · UPRIGHT SPIN: the card lands standing on its short edge,
+                        // bounces and spins at the same time, then flips and tips flat.
+                        const uprightLanding = {x:landing.x, y:landing.y-(Number(mainCard.dataset.fxHeight)||54)*.38};
+                        await animateFXFlight(mainCard,start,uprightLanding,{
+                            duration:500,arc:74,depth:28,sideArc:-7,
+                            startRotation:getRotation(sourceCard),endRotation:throwAngle,
+                            spinTurns:.54,flip:false,endRx:12
+                        });
+                        cardSparkBurst(landing.x,landing.y,'#f0d3a0',10);
+                        await animateFXAccidentalUprightBounce(mainCard,landing,throwAngle);
+                        pepeRoomScene.classList.add('cinematic-zoom');
+                        await cardWait(70);
+                        await animateFXUprightRevealAndLay(mainCard,landing,throwAngle);
+                        await animateFXBounce(mainCard,landing,throwAngle,{duration:245,height:5,bounces:1.2,slide:1,spin:0,startRx:64});
+                        pepeRoomScene.classList.remove('cinematic-zoom');
+                        pepeRoomScene.classList.add('cinematic-zoom-out');
+                        window.setTimeout(()=>pepeRoomScene.classList.remove('cinematic-zoom-out'),520);
+                        retain(mainCard,sourceCard);
+                    } else if (mode === 4) {
+                        // 4 · DOUBLE-CARD SLEIGHT: the wrong card arrives first and lies on the
+                        // felt. The real TUZ then slides out from behind it at a different angle.
+                        const falseSource = player.tuz ? (findFalseCard(chosenSeat,sourceCard) || sourceCard) : sourceCard;
+                        const trueSource = findTrueTuzCard();
+                        decoyCard = falseSource === sourceCard ? mainCard : makeCard(falseSource,'pepe-fx-decoy');
+                        realCard = trueSource === sourceCard ? mainCard : (trueSource ? makeCard(trueSource,'pepe-fx-real-tuz') : null);
+                        if (falseSource !== sourceCard) hideSource(falseSource);
+                        if (trueSource && trueSource !== sourceCard) hideSource(trueSource);
+                        const falseStart = getStart(falseSource);
+                        const falseLanding = {x:landing.x-20,y:landing.y+4};
+                        const falseAngle = cardThrowAngle(falseStart,falseLanding);
+                        await animateFXFlight(decoyCard,falseStart,falseLanding,{
+                            duration:600,arc:82,depth:16,sideArc:-5,
+                            startRotation:getRotation(falseSource),endRotation:falseAngle,
+                            spinTurns:.42,flip:true,flipStart:.34,flipEnd:.82,endRx:64
+                        });
+                        await animateFXBounce(decoyCard,falseLanding,falseAngle,{duration:370,height:11,bounces:1.8,slide:7,spin:4});
+                        retain(decoyCard,falseSource);
+                        cardSparkBurst(falseLanding.x,falseLanding.y,'#d8c59f',7);
+                        if (realCard && trueSource) {
+                            const trueStart = getStart(trueSource);
+                            const trueLanding = {x:landing.x+24,y:landing.y-8};
+                            const trueAngle = cardThrowAngle(trueStart,trueLanding)+9;
+                            realCard.style.zIndex='275';
+                            await cardWait(90);
+                            await animateFXFlight(realCard,trueStart,trueLanding,{
+                                duration:660,arc:92,depth:20,sideArc:14,
+                                startRotation:getRotation(trueSource),endRotation:trueAngle,
+                                spinTurns:.58,flip:true,flipStart:.28,flipEnd:.78,endRx:64
+                            });
+                            await animateFXBounce(realCard,trueLanding,trueAngle,{duration:390,height:12,bounces:2,slide:12,spin:5});
+                            realCard.classList.add('tuz-reveal-glow');
+                            retain(realCard,trueSource);
+                            cardSparkBurst(trueLanding.x,trueLanding.y,'#7df0a8',15);
+                        }
+                    } else if (mode === 5) {
+                        // 5 · SCREEN RICOCHET: a fast throw arcs toward the viewer, sticks to the
+                        // glass for a quick reveal, then drops back down and physically settles on felt.
+                        const screenPoint={x:window.innerWidth*.5,y:window.innerHeight*.38};
+                        await animateFXFlight(mainCard,start,screenPoint,{
+                            duration:510,arc:152,depth:105,sideArc:8,
+                            startRotation:getRotation(sourceCard),endRotation:8,
+                            spinTurns:1.05,flip:true,flipStart:.32,flipEnd:.83,endRx:0
+                        });
+                        cardSparkBurst(screenPoint.x,screenPoint.y,'#e8f5ff',15);
+                        await animateCardElement(mainCard,[
+                            {transform:mainCard.style.transform,offset:0},
+                            {transform:mainCard.style.transform,offset:.18,easing:'cubic-bezier(.16,.8,.2,1)'},
+                            {transform:mainCard.style.transform,offset:1}
+                        ],{duration:120,easing:'linear'});
+                        const screenStart={...screenPoint};
+                        await animateFXFlight(mainCard,screenStart,landing,{
+                            duration:650,arc:122,depth:38,sideArc:-10,
+                            startRotation:8,endRotation:throwAngle,
+                            spinTurns:.42,flip:false,startRx:0,endRx:64
+                        });
+                        await landAndKeep(mainCard,landing,throwAngle,{duration:470,height:20,bounces:2.4,slide:9,spin:5,color:'#e9d4aa'});
+                    } else {
+                        // 6 · ACCIDENTAL DROP: Pepe reaches to reveal the card, fumbles it,
+                        // and it falls onto its short edge. It bounces and spins upright with
+                        // diminishing physical energy, the camera pushes in, then it slowly
+                        // rotates to show its face and tips flat onto the felt.
+                        chosenSeat.classList.add('pepe-accidental-drop');
+                        await cardWait(170);
+                        const uprightLanding = {x:landing.x, y:landing.y-(Number(mainCard.dataset.fxHeight)||54)*.38};
+                        await animateFXFlight(mainCard,start,uprightLanding,{
+                            duration:430,arc:12,depth:10,sideArc:5,
+                            startRotation:getRotation(sourceCard),endRotation:throwAngle,
+                            spinTurns:.58,flip:false,startRx:4,endRx:12
+                        });
+                        cardSparkBurst(landing.x,landing.y,'#e8d4ae',7);
+                        await animateFXAccidentalUprightBounce(mainCard,landing,throwAngle);
+                        pepeRoomScene.classList.add('cinematic-zoom');
+                        await cardWait(80);
+                        await animateFXUprightRevealAndLay(mainCard,landing,throwAngle);
+                        cardSparkBurst(landing.x+18,landing.y,'#b9ffd0',player.tuz?14:7);
+                        pepeRoomScene.classList.remove('cinematic-zoom');
+                        pepeRoomScene.classList.add('cinematic-zoom-out');
+                        window.setTimeout(()=>pepeRoomScene.classList.remove('cinematic-zoom-out'),520);
+                        retain(mainCard,sourceCard);
+                        window.setTimeout(()=>chosenSeat.classList.remove('pepe-accidental-drop'),900);
+                    }
+
+                    // Cards remain on the felt at their final, source-directed rotation until the next deal.
+                    for (const card of retainedCards) {
+                        card.classList.add('pepe-fx-landed');
+                        card.style.visibility='visible';
+                        card.style.zIndex='260';
+                    }
+                    pepeGame.lastTuzFXCard = pepeCardFXLayer.querySelector('.pepe-fx-card .pepe-card-front.is-tuz')?.closest('.pepe-fx-card') || mainCard;
+                } finally {
+                    for (const [original,visibility] of hiddenSources.entries()) {
+                        if (!retainedSources.has(original)) original.style.visibility=visibility;
+                    }
+                    for (const card of Array.from(pepeCardFXLayer.querySelectorAll('.pepe-fx-card'))) {
+                        if (!retainedCards.has(card)) card.remove();
+                    }
+                }
+                return mode;
+            }
+
+            async function playPepeMultiplierWinAnimation(previousMultiplier,nextMultiplier) {
+                const target = pepeMultiplierValue.getBoundingClientRect();
+                const tuzFace = pepeCardFXLayer.querySelector('.pepe-fx-card .pepe-card-front.is-tuz');
+                const sourceCard = tuzFace?.closest('.pepe-fx-card') || pepeGame.lastTuzFXCard;
+                const sourceRect = sourceCard ? cardRectInViewport(sourceCard) : {cx:window.innerWidth*.5,cy:window.innerHeight*.65};
+                const badge = document.createElement('div');
+                badge.className='pepe-multiplier-flight';
+                badge.textContent=`${previousMultiplier.toFixed(2)}×`;
+                pepeCardFXLayer.appendChild(badge);
+                const center={x:window.innerWidth*.5,y:window.innerHeight*.46};
+                const targetPoint={x:target.left+target.width*.5,y:target.top+target.height*.5};
+                const countSegment = (from,to,begin,end,duration,scaleFrom,scaleTo) => new Promise(resolve=>{
+                    const started=performance.now();
+                    const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+                    const frame=now=>{
+                        const t=Math.max(0,Math.min(1,(now-started)/duration));
+                        const e=ease(t);
+                        const x=begin.x+(end.x-begin.x)*e;
+                        const y=begin.y+(end.y-begin.y)*e;
+                        const sc=scaleFrom+(scaleTo-scaleFrom)*e;
+                        const value=from+(to-from)*e;
+                        badge.textContent=`${value.toFixed(2)}×`;
+                        badge.style.opacity=String(Math.min(1,t*4,(1-t)*5+0.5));
+                        badge.style.transform=`translate3d(${x}px,${y}px,0) translate(-50%,-50%) scale(${sc})`;
+                        if(t<1) requestAnimationFrame(frame); else resolve();
+                    };
+                    requestAnimationFrame(frame);
+                });
+                await countSegment(previousMultiplier,nextMultiplier,{x:sourceRect.cx,y:sourceRect.cy},center,420,.22,1.23);
+                badge.classList.add('multiplier-pop');
+                badge.animate([
+                    {transform:`translate3d(${center.x}px,${center.y}px,0) translate(-50%,-50%) scale(1.23)`,filter:'brightness(1)'},
+                    {transform:`translate3d(${center.x}px,${center.y}px,0) translate(-50%,-50%) scale(1.48)`,filter:'brightness(1.42)'},
+                    {transform:`translate3d(${center.x}px,${center.y}px,0) translate(-50%,-50%) scale(1.2)`,filter:'brightness(1)'}
+                ],{duration:270,easing:'cubic-bezier(.16,.9,.2,1)'});
+                await cardWait(150);
+                // Count again while the number glides into its actual multiplier display.
+                await countSegment(previousMultiplier,nextMultiplier,center,targetPoint,430,1.2,.34);
+                badge.remove();
+                pepeMultiplierValue.classList.remove('multiplier-win-pop');
+                void pepeMultiplierValue.offsetWidth;
+                pepeMultiplierValue.classList.add('multiplier-win-pop');
+                window.setTimeout(()=>pepeMultiplierValue.classList.remove('multiplier-win-pop'),470);
+            }
+            async function revealPepeTable(chosenIndex, pickedCardIndex) {
+                const chosenSeat = pepePlayers.querySelector(`[data-pepe-index="${chosenIndex}"]`);
+                const chosenPlayer = pepeGame.players[chosenIndex];
+                const chosenCards = Array.from(chosenSeat?.querySelectorAll('.pepe-hidden-card') || []);
+                const pickedCard = chosenCards[pickedCardIndex];
+                pepeGame.players.forEach((player,index) => {
+                    const seat=pepePlayers.querySelector(`[data-pepe-index="${index}"]`);
+                    if(!seat) return;
+                    seat.disabled=true;
+                    seat.classList.add('revealing');
+                    if(index===chosenIndex) seat.classList.add('chosen','choosing');
+                });
+                await playPickedCardAnimation(pickedCard,chosenPlayer,pickedCardIndex,chosenSeat);
+                // Reveal the remaining hands with a deliberate left-to-right stagger only after
+                // the cinematic picked-card trick has completely finished.
+                const revealJobs=[];
+                pepeGame.players.forEach((player,index)=>{
+                    const seat=pepePlayers.querySelector(`[data-pepe-index="${index}"]`);
+                    if(!seat) return;
+                    const cards=Array.from(seat.querySelectorAll('.pepe-hidden-card'));
+                    cards.forEach((card,cardIndex)=>{
+                        // A picked card has been moved from the player's hand onto the felt.
+                        if (card.style.visibility === 'hidden') return;
+                        const delay=70+index*72+cardIndex*95;
+                        revealJobs.push((async()=>{
+                            await cardWait(delay);
+                            card.classList.add('flipped');
+                            await cardWait(560);
+                        })());
+                    });
+                });
+                await Promise.all(revealJobs);
+                await cardWait(160);
+                pepeGame.players.forEach((player,index)=>{
+                    const seat=pepePlayers.querySelector(`[data-pepe-index="${index}"]`);
+                    setPepeRevealed(seat,player,index===chosenIndex);
+                });
+            }
+            async function choosePepe(index) {
                 if (!pepeGame.active || pepeGame.awaitingNext || pepeGame.resolving) return;
                 const player = pepeGame.players[index];
                 const seat = pepePlayers.querySelector(`[data-pepe-index="${index}"]`);
@@ -1625,37 +2992,61 @@
                 const pickedCardIndex = player.tuz ? player.tuzIndex : Math.floor(Math.random()*player.cardCount);
                 setPepeStatus('YOUR CARD IS BEING TURNED…', 'normal');
                 playUiSound('flip');
-                const revealDuration = revealPepeTable(index,pickedCardIndex);
-                window.setTimeout(() => {
-                    if (!pepeGame.active) return;
-                    if (!player.tuz) {
-                        pepeGame.active = false;
-                        pepeGame.awaitingNext = false;
-                        pepeGame.resolving = false;
-                        setPepeStatus(`WRONG PICK · TUZ WAS AT ANOTHER SEAT. ${money(pepeGame.bet)} DIAMONDS LOST.`, 'loss');
-                        playUiSound('crash');
-                        updatePepeUI();
-                        return;
-                    }
-                    const stageIndex = Math.min(pepeGame.stage, PEPE_MULTIPLIERS.length-1);
-                    pepeGame.multiplier = PEPE_MULTIPLIERS[stageIndex];
-                    pepeGame.stage += 1;
-                    pepeGame.awaitingNext = true;
+                try {
+                    await revealPepeTable(index,pickedCardIndex);
+                } catch (error) {
+                    console.error('Card reveal animation failed:',error);
+                    pepeCardFXLayer.replaceChildren();
+                    pepePlayers.querySelectorAll('.pepe-hidden-card').forEach(card=>{card.style.visibility='';card.classList.add('flipped');});
+                    pepeGame.players.forEach((p,i)=>setPepeRevealed(pepePlayers.querySelector(`[data-pepe-index="${i}"]`),p,i===index));
+                }
+                if (!pepeGame.active) return;
+                if (!player.tuz) {
+                    pepeGame.active = false;
+                    pepeGame.awaitingNext = false;
                     pepeGame.resolving = false;
-                    const payout = pepeGame.bet * pepeGame.multiplier;
-                    setPepeStatus(`TUZ FOUND! ${pepeGame.multiplier.toFixed(2)}× · CLAIM ${money(payout)} 💎 OR RISK THE NEXT TABLE.`, 'win');
-                    playUiSound('sell');
+                    setPepeStatus(`WRONG PICK · TUZ WAS AT ANOTHER SEAT. ${money(pepeGame.bet)} DIAMONDS LOST.`, 'loss');
+                    playUiSound('crash');
                     updatePepeUI();
-                }, revealDuration);
+                    restorePepeWaitingScene(2200);
+                    return;
+                }
+                const previousMultiplier = pepeGame.multiplier;
+                const stageIndex = Math.min(pepeGame.stage, PEPE_MULTIPLIERS.length-1);
+                pepeGame.multiplier = PEPE_MULTIPLIERS[stageIndex];
+                pepeGame.stage += 1;
+                pepeGame.awaitingNext = true;
+                const payout = pepeGame.bet * pepeGame.multiplier;
+                setPepeStatus(`TUZ FOUND! ${pepeGame.multiplier.toFixed(2)}× · CLAIM ${money(payout)} 💎 OR RISK THE NEXT TABLE.`, 'win');
+                playUiSound('sell');
+                await playPepeMultiplierWinAnimation(previousMultiplier,pepeGame.multiplier);
+                pepeGame.resolving = false;
+                updatePepeUI();
             }
-            function nextPepeTable() {
-                if (!pepeGame.active || !pepeGame.awaitingNext) return;
+            async function nextPepeTable() {
+                if (!pepeGame.active || !pepeGame.awaitingNext || pepeGame.resolving) return;
                 pepeGame.resolving = true;
                 pepeGame.awaitingNext = false;
                 updatePepeUI();
-                pepePlayers.querySelectorAll('.pepe-seat').forEach(seat => seat.classList.add('departing'));
-                setPepeStatus('THE OLD TABLE IS CLEARING…', 'normal');
-                window.setTimeout(() => dealPepeTable(), 460);
+                setPepeStatus('DEALING THE NEXT TABLE…', 'normal');
+
+                // Fade the existing scene and turn the lamp off. No standing or walking camera.
+                pepeLampRig.classList.add('lamp-off');
+                pepeRoomScene.classList.add('table-fade-out');
+                pepeFadeVeil.classList.add('visible');
+                await cardWait(460);
+
+                dealPepeTable({arrival:true});
+                pepeGame.resolving = true;
+                updatePepeUI();
+                // Clear the blackout into the new table while the Pepes land in their chairs.
+                await cardWait(100);
+                pepeFadeVeil.classList.remove('visible');
+                pepeRoomScene.classList.remove('table-fade-out');
+                await cardWait(720);
+                pepeRoomScene.classList.remove('table-fade-in','room-arriving');
+                pepeGame.resolving = false;
+                updatePepeUI();
             }
             function claimPepeWin() {
                 if (!pepeGame.active || !pepeGame.awaitingNext) return;
@@ -1667,6 +3058,7 @@
                 setPepeStatus(`CASHED OUT AT ${pepeGame.multiplier.toFixed(2)}× · +${money(payout-pepeGame.bet)} DIAMONDS.`, 'win');
                 playUiSound('sell');
                 refreshAllBalances();
+                restorePepeWaitingScene(2200);
             }
             pepeBetBtn.addEventListener('click', startPepeRound);
             pepeNextBtn.addEventListener('click', nextPepeTable);
